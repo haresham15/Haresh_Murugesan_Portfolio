@@ -17,7 +17,7 @@ export default function PortfolioTimeline() {
     },
     {
       title: "TutorMatch: AI-Powered Tutoring Platform",
-      description: "A platform for logistics tracking with cloud integration.",
+      description: "A platform for connecting students and tutors to learn in real life using AI.",
       icons: ["streamlit.svg", "python.svg", "huggingface.svg" ,"jupyter.svg"],
       github: "https://github.com/haresham15/TutorMatch_WebApp",
       demo: "https://finaltutormatch.streamlit.app/"
