@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import Lottie from 'lottie-react';
+import titleAnimation from './assets/title.json'; // ✅ FIXED PATH
 import { motion } from 'framer-motion';
 import Spinner from './spinner'; // path must be correct (case-sensitive)
 import './index.css'; // Ensure this file contains your Tailwind CSS setup
@@ -59,25 +61,23 @@ export default function PortfolioTimeline() {
       </nav>
 
       {/* Add IDs to Sections for Nav Links */}
-      <motion.div id="experience" className="mt-40 text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
+      <motion.div id="experience" className="mt-10 text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
         <h1 className="text-8xl font-raleway font-bold mb-9">Haresh Murugesan.</h1>
-        <p className="text-5xl font-inter text-gray-300 mt-9">Learning, Adapting and Innovating</p>
+        <p className="text-5xl font-inter text-gray-300 mt-2">Learning, Adapting and Innovating</p>
       </motion.div>
 
-      <div className="w-full min-h-screen flex items-center justify-center my-0 py-0">
-  <iframe
-    src="https://my.spline.design/ai-T53hnTPmZryGpbA0prMOVG0j/"
-    className="w-full max-w-6xl h-[100vh] rounded-xl"
-    style={{ border: 'none' }}
-    allow="autoplay; fullscreen"
-    title="Spline 3D"
-  ></iframe>
+      <div className="w-full h-[80vh] flex items-center justify-center">
+  <Lottie
+    animationData={titleAnimation}
+    loop
+    autoplay
+    className="w-[90vw] max-w-4xl"
+  />
 </div>
-
 
       {/* Other sections with IDs: #podcast, #projects, #skills */}
 
-      <motion.div id="experience" className="mt-40 text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
+      <motion.div id="experience" className="mt-20 text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
         <h2 className="text-6xl font-bold font-raleway mb-4">About Me...</h2>
           <p className="max-w-3xl mx-auto font-raleway text-lg leading-relaxed">
             I'm a CSE student at OSU focused on AI, software, and innovation. I love learning about innovations and tech every day and hope to use my technical skills to help provide meaningful contributions to society through CS and AI. I am the CEO and Director of Finances at Philocracy, a non-profit organization that aims to help people through fashion and love. I also host the Adapt: Implementing Innovations podcast, where I interview innovators and entrepreneurs about their journeys and the innovations they are implementing to solve the world's toughest challenges. In my free time, I enjoy coding, reading, and exploring new technologies.
@@ -86,7 +86,7 @@ export default function PortfolioTimeline() {
 
       <motion.div
   id="experience"
-  className="mt-32 w-full max-w-3xl"
+  className="mt-20 w-full max-w-3xl"
   initial={{ opacity: 0, y: 50 }}
   whileInView={{ opacity: 1, y: 0 }}
   transition={{ duration: 1 }}
@@ -110,12 +110,14 @@ export default function PortfolioTimeline() {
 </motion.div>
 
       <motion.div id="podcast" className="mt-20 max-w-xl text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.4 }}>
-        <h2 className="text-5xl font-semibold mb-2">The Adapt: Implementing Innovations</h2>
-        <p className="text-gray-300 mt-2 mb-4">Exploring innovations that solve the world's toughest challenges, hosted by Haresh Murugesan. Listen on Spotify, Apple, and more.</p>
+        <h2 className="text-5xl font-bold font-raleway mb-10">The Adapt: Implementing Innovations</h2>
+        <p className="text-gray-300 font-raleway mt-2 mb-10">Exploring innovations that solve the world's toughest challenges, hosted by Haresh Murugesan. Listen on Spotify, Apple, and more.</p>
         <iframe style={{ borderRadius: '12px' }} src="https://open.spotify.com/embed/show/5LPGObcWQdkoERNzZsdL98/video?utm_source=generator&theme=0" width="624" height="351" frameBorder="0" allowFullScreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"/>
       </motion.div>
 
-      <motion.div id="projects" className="mt-24 w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 gap-6" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.6 }}>
+      <motion.div id="projects" className="mt-20 w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 gap-6" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.6 }}>
+        <h2 className="text-5xl font-raleway font-bold mb-6 col-span-full text-center">Projects</h2>
+        <p className="text-gray-300 font-raleway mt-2 mb-6 col-span-full text-center">Here are some of my recent projects that showcase my skills. My Projects range topics and skill dealing with AI, Machine Learning, Software Engineering and UI/Frontend Development. I enjoy exploring different topics in Computer Science and growing my scope to learn and grow.</p>
         {projectData.map((proj, idx) => (
           <div key={idx} onClick={() => setActiveProject(proj)} className="bg-[#112240] p-4 rounded-lg shadow-md border border-blue-400 hover:scale-105 transition-transform cursor-pointer">
             <h3 className="text-white font-semibold mb-2">{proj.title}</h3>
@@ -133,18 +135,18 @@ export default function PortfolioTimeline() {
         ))}
       </motion.div>
 
-      <motion.div id="skills" className="mt-24 w-full max-w-4xl text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.8 }}>
-        <h2 className="text-xl font-semibold mb-4">🛠️ Skills & Tools</h2>
+      <motion.div id="skills" className="mt-20 w-full max-w-4xl text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.8 }}>
+        <h2 className="text-xl font-semibold mb-10">🛠️ Skills & Tools</h2>
         <div className="flex flex-wrap justify-center gap-4">
           {["react.svg", "streamlit.svg", "java.svg", "huggingface.svg", "python.svg","matlab.svg","r.svg"].map((icon, idx) => (
-            <img key={idx} src={`/icons/${icon}`} alt={icon} className="w-8 h-8" />
+            <img key={idx} src={`/icons/${icon}`} alt={icon} className="w-12 h-12" />
           ))}
         </div>
       </motion.div>
 
       {/* Footer */}
-      <motion.div className="mt-16 text-[10px] text-gray-400" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 1, delay: 1 }}>
-        © 2020–2025 <br /> All Rights Reserved
+      <motion.div className="mt-20 text-[10px] text-gray-400" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ duration: 1, delay: 1 }}>
+        © 2020–2025 <br /> All Rights Reserved Haresh Murugesan
       </motion.div>
     </div>
   );
