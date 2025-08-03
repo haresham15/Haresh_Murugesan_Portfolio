@@ -6,6 +6,7 @@
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "framer-motion": "^10.12.16",
     "lottie-react": "^2.4.1",
+    "lucide-react": "^0.536.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
