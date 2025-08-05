@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Lottie from 'lottie-react';
-import titleAnimation from './assets/title.json'; // ✅ FIXED PATH
+import titleAnimation from './assets/title.json';
 import { motion } from 'framer-motion';
-import Spinner from './spinner'; // path must be correct (case-sensitive)
-import './index.css'; // Ensure this file contains your Tailwind CSS setup
-import { Mail, Linkedin} from "lucide-react";
-
+import Spinner from './spinner'; 
+import './index.css'; 
+import { Mail, Linkedin } from 'lucide-react';
 
 export default function PortfolioTimeline() {
   const [loading, setLoading] = useState(true);
@@ -226,19 +225,24 @@ export default function PortfolioTimeline() {
     <p className="text-3xl text-gray-400 mb-8">
       Whether you have a question, a project idea, or just want to say hi.
     </p>
-    <div className="flex justify-center gap-6 mb-10">
-      <a href="mailto:haresham2006@gmail.com" className="hover:text-teal-400 transition" aria-label="Email">
-        <Mail size={35} />
-      </a>
-      <a href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hover:text-teal-400 transition"
-        aria-label="LinkedIn"
-      >
-        <Linkedin size={35} />
-      </a>
-    </div>
+    <div className="flex gap-4">
+  <a
+    href="mailto:haresham2006@gmail.com"
+    className="hover:text-teal-400 transition"
+    aria-label="Email"
+  >
+    <Mail size={35} />
+  </a>
+  <a
+    href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="hover:text-teal-400 transition"
+    aria-label="LinkedIn"
+  >
+    <Linkedin size={35} />
+  </a>
+</div>
   </div>
 </motion.div>
 
