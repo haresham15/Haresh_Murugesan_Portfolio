@@ -225,7 +225,7 @@ export default function PortfolioTimeline() {
       Whether you have a question, a project idea, or just want to say hi.
     </p>
     <div className="flex gap-4">
- {/* Email Button */}
+    {/* Email Button */}
       <a
         href="mailto:haresham2006@gmail.com"
         target="_blank"
