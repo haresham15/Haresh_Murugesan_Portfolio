@@ -13,14 +13,14 @@ export default function PortfolioTimeline() {
 
   const certs = [
   {
-    title: "CS50 Introduction to Artificial Intelligence with Python",
-    issuer: "Harvard University",
-    date: "July 2025",
+    title:"CS50 Introduction to Artificial Intelligence with Python",
+    issuer:"Harvard University",
+    date:"July 2025",
   },
   {
-    title: "1st Place - Best Use of External Data",
-    issuer: "ASA",
-    date: "March 2025",
+    title:"1st Place - Best Use of External Data",
+    issuer:"ASA",
+    date:"March 2025",
   },
   ];
 
@@ -28,7 +28,7 @@ export default function PortfolioTimeline() {
     {
       title:"CS50 Intro to AI with Python",
       description: "Completed a series of AI-focused projects as part of Harvard’s CS50 Introduction to Artificial Intelligence with Python. These projects span search algorithms, logic puzzles, probabilistic reasoning, optimization, machine learning, neural networks, and natural language processing. Each implementation demonstrates practical understanding of AI principles and Python-based system design.",
-      icons: ["python.svg", "tensorflow.svg","python.svg"],
+      icons: ["python.svg", "tensorflow.svg", "numpy.svg"],
       github: "https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects"
     },
     {
@@ -230,8 +230,7 @@ export default function PortfolioTimeline() {
       <a href="mailto:haresham2006@gmail.com" className="hover:text-teal-400 transition" aria-label="Email">
         <Mail size={35} />
       </a>
-      <a
-        href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/"
+      <a href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/"
         target="_blank"
         rel="noopener noreferrer"
         className="hover:text-teal-400 transition"
