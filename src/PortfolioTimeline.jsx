@@ -4,7 +4,6 @@ import titleAnimation from './assets/title.json';
 import { motion } from 'framer-motion';
 import Spinner from './spinner'; 
 import './index.css'; 
-import { Mail, Linkedin } from 'lucide-react';
 
 export default function PortfolioTimeline() {
   const [loading, setLoading] = useState(true);
@@ -226,22 +225,25 @@ export default function PortfolioTimeline() {
       Whether you have a question, a project idea, or just want to say hi.
     </p>
     <div className="flex gap-4">
-  <a
-    href="mailto:haresham2006@gmail.com"
-    className="hover:text-teal-400 transition"
-    aria-label="Email"
-  >
-    <Mail size={35} />
-  </a>
-  <a
-    href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="hover:text-teal-400 transition"
-    aria-label="LinkedIn"
-  >
-    <Linkedin size={35} />
-  </a>
+ {/* Email Button */}
+      <a
+        href="mailto:haresham2006@gmail.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center"
+      >
+        Email Me
+      </a>
+
+      {/* LinkedIn Button */}
+      <a
+        href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center"
+      >
+        Connect on LinkedIn
+      </a>
 </div>
   </div>
 </motion.div>
