@@ -156,7 +156,7 @@ export default function PortfolioTimeline() {
         </p>
         <div className="flex flex-col md:flex-row gap-8 items-start">
           {/* Spotify Embed on Left */}
-          <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/show/5LPGObcWQdkoERNzZsdL98/video?utm_source=generator" width="624" height="351" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+          <iframe data-testid="embed-iframe" style={{ borderRadius: '12px' }} src="https://open.spotify.com/embed/show/5LPGObcWQdkoERNzZsdL98/video?utm_source=generator" width="624" height="351" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
           {/* Description Text on Right */}
           <p className="text-lg font-raleway leading-relaxed md:w-1/2 w-full">
       The Adapt: Implementing Innovations podcast is a platform where I interview innovators and
@@ -229,9 +229,9 @@ export default function PortfolioTimeline() {
     </p>
     <div className="flex gap-4">
     {/* Email Button */}
-      <a href="mailto:haresham2006@gmail.com" target="_blank" rel="noopener noreferrer" className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center" onClick={(e) => e.stopPropagation()} >Email Me </a>
+      <a href="mailto:haresham2006@gmail.com" target="_blank" rel="noopener noreferrer" className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center" >Email Me </a>
       {/* LinkedIn Button */}
-      <a href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/" target="_blank" rel="noopener noreferrer" className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center" onClick={(e) => e.stopPropagation()} > Connect on LinkedIn </a>
+      <a href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/" target="_blank" rel="noopener noreferrer" className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center"> Connect on LinkedIn </a>
 </div>
   </div>
 </motion.div>
