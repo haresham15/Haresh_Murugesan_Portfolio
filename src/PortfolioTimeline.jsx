@@ -139,7 +139,7 @@ export default function PortfolioTimeline() {
       { year: "Feburary 2024", role: "Math Tutor", company: "Mathnasium" },
       { year: "May 2024", role: "Research Student", company: "OSU Data and CS Lab" },
       { year: "May 2025", role: "Innovation Analyst", company: "Onramp Student Innovation Program" },
-    ].map((item, i) => (
+    ].reverse().map((item, i) => (
       <div key={i} className="mb-10">
         <div className="absolute w-3 h-3 bg-blue-500 rounded-full left-[-8px] top-[5px]"></div>
         <p className="text-sm font-raleway text-blue-400">{item.year}</p>
