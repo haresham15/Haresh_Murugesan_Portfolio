@@ -229,9 +229,9 @@ export default function PortfolioTimeline() {
     </p>
     <div className="flex gap-4">
     {/* Email Button */}
-      <a href="mailto:haresham2006@gmail.com" target="_blank" rel="noopener noreferrer" className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center" >Email Me </a>
+      <a href="mailto:haresham2006@gmail.com" target="_blank" rel="noopener noreferrer" className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center" onClick={(e) => e.stopPropagation()} >Email Me </a>
       {/* LinkedIn Button */}
-      <a href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/" target="_blank" rel="noopener noreferrer" className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center"> Connect on LinkedIn </a>
+      <a href="https://www.linkedin.com/in/haresh-murugesan-4173412a1/" target="_blank" rel="noopener noreferrer" className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-teal-500 transition text-center" onClick={(e) => e.stopPropagation()}> Connect on LinkedIn </a>
 </div>
   </div>
 </motion.div>
