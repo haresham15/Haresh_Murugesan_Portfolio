@@ -185,10 +185,10 @@ export default function PortfolioTimeline() {
             </div>
             <div className="flex gap-3 text-xs">
       {proj.github && (
-        <a href={proj.github} target="_blank" rel="noopener noreferrer" className="text-blue-400 z-10 underline"> GitHub </a>
+        <a href={proj.github} target="_blank" rel="noopener noreferrer" className="text-blue-400 z-10 underline decoration-2 underline-offset-2 hover:text-blue-300 transition-colors duration-200"> GitHub </a>
       )}
       {proj.demo && (
-        <a href={proj.demo} target="_blank" rel="noopener noreferrer" className="text-blue-400 z-10 underline"> Live Demo </a>
+        <a href={proj.demo} target="_blank" rel="noopener noreferrer" className="text-blue-400 z-10 underline decoration-2 underline-offset-2 hover:text-blue-300 transition-colors duration-200"> Live Demo </a>
       )}
     </div>
           </div>
