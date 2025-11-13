@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
+  output: 'export',
+  images: {
+    unoptimized: true,
+  },
   // Transpile @react-three packages for compatibility
   transpilePackages: ['@react-three/fiber', '@react-three/drei'],
 }
