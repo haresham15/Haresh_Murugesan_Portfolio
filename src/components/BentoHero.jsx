@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import FloatingGeometry from './FloatingGeometry';
 
 const BentoHero = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -99,6 +100,16 @@ const BentoHero = () => {
             Listen on Spotify →
           </a>
         </motion.div>
+
+      </div>
+
+      {/* Floating Geometry Animation - Between Rows */}
+      <div className="mb-4">
+        <FloatingGeometry />
+      </div>
+
+      {/* Row 2 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
         {/* Tile D - Philocracy */}
         <motion.div
