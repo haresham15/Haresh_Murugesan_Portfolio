@@ -2,14 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-container {
+  animation: marquee 20s linear infinite;
+}
+
 .bg-grain {
   background-color: rgb(142, 157, 179);
 }
 
-body { /* Assuming you meant body for font-family */
+body {
+  background-color: #050505;
+  color: #E0E0E0;
   font-family: 'Inter', sans-serif;
-  font-family: 'Raleway', sans-serif;
 }
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
   width: 100vw;
   overflow-x: hidden;
