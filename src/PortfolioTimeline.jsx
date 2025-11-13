@@ -29,6 +29,13 @@ export default function PortfolioTimeline() {
       icons: ["python.svg", "tensorflow.svg", "numpy.svg"],
       github: "https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects"
     },
+    // UPDATE THE PROJECTS Section
+    {
+      title:"CS50 Intro to AI with Python",
+      description: "Completed a series of AI-focused projects as part of Harvard’s CS50 Introduction to Artificial Intelligence with Python. These projects span search algorithms, logic puzzles, probabilistic reasoning, optimization, machine learning, neural networks, and natural language processing. Each implementation demonstrates practical understanding of AI principles and Python-based system design.",
+      icons: ["python.svg", "tensorflow.svg", "numpy.svg"],
+      github: "https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects"
+    },
     {
       title: "Software 2 Engineering Projects",
       description: "This repository contains my Software 2 Engineering Projects that I have worked on in my Software 2 class at OSU. The projects include a variety of software engineering topics such as JUnit testing, Implemnting Kernel Methods, and BL Compiling",
