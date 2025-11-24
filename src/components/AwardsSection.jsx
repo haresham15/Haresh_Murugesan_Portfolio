@@ -10,7 +10,7 @@ const AwardsSection = () => {
     },
     {
       title: '1st Place - Best Use of External Data',
-      issuer: 'ASA',
+      issuer: 'American Statistical Association',
       date: 'March 2025',
     },
   ];

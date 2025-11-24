@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import Dock from './components/Dock';
 import BentoHero from './components/BentoHero';
+import FractalGlassBackground from './components/FractalGlassBackground';
 import AboutSection from './components/AboutSection';
 import ScrollyExperience from './components/ScrollyExperience';
 import PodcastSection from './components/PodcastSection';
@@ -37,7 +38,7 @@ function App() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const handleScroll = () => {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
@@ -55,7 +56,8 @@ function App() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-charcoal text-light-gray overflow-x-hidden">
+    <div className="w-full min-h-screen text-light-gray overflow-x-hidden relative">
+      <FractalGlassBackground />
       {/* Scroll Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 z-50 bg-glass-bg">
         <motion.div

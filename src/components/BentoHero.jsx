@@ -22,17 +22,17 @@ const BentoHero = () => {
   };
 
   const guestNames = [
-    'Dr. Sarah Chen',
-    'Marcus Johnson',
-    'Dr. Emily Rodriguez',
-    'Alex Thompson',
-    'Dr. James Wilson',
-    'Lisa Park',
+    'Mr. Arjun Kaicker',
+    'Mrs. Alisha McFetridge',
+    'Mr. Marc Tuiner',
+    'Mr. Kevin Hykes',
+    'Mr. Chris Martin',
+    'Dr. Joesph Wszalek',
   ];
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 py-20">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-rows-auto lg:grid-rows-2 gap-4">
+    <section className="relative w-full max-w-7xl mx-auto px-4 py-20">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Tile A - Intro */}
         <motion.div
           className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 flex flex-col justify-center"
@@ -69,6 +69,11 @@ const BentoHero = () => {
           </p>
         </motion.div>
 
+        {/* Floating Geometry Animation - Neural Network (Row 2, Full Width) */}
+        <div className="col-span-1 md:col-span-2 lg:col-span-4 row-span-1">
+          <FloatingGeometry />
+        </div>
+
         {/* Tile C - Podcast */}
         <motion.div
           className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 overflow-hidden relative"
@@ -100,16 +105,6 @@ const BentoHero = () => {
             Listen on Spotify →
           </a>
         </motion.div>
-
-      </div>
-
-      {/* Floating Geometry Animation - Between Rows */}
-      <div className="mb-4">
-        <FloatingGeometry />
-      </div>
-
-      {/* Row 2 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
         {/* Tile D - Philocracy */}
         <motion.div

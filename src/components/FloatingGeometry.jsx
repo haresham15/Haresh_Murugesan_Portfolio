@@ -21,7 +21,7 @@ const FloatingGeometry = () => {
     window.addEventListener('resize', resizeCanvas);
 
     const particles = [];
-    const particleCount = 50;
+    const particleCount = 35;
 
     // Initialize particles
     for (let i = 0; i < particleCount; i++) {
@@ -58,7 +58,7 @@ const FloatingGeometry = () => {
     const drawConnections = () => {
       ctx.globalAlpha = 0.1;
       ctx.strokeStyle = '#00D9FF';
-      ctx.lineWidth = 0.5;
+      ctx.lineWidth = 0.3;
 
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -81,7 +81,7 @@ const FloatingGeometry = () => {
       ctx.fillStyle = 'rgba(15, 23, 42, 0.1)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      time += 0.01;
+      time += 0.02;
 
       // Update and draw particles
       particles.forEach((particle, idx) => {
@@ -128,18 +128,25 @@ const FloatingGeometry = () => {
 
   return (
     <motion.div
-      className="col-span-1 md:col-span-2 lg:col-span-4 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 relative overflow-hidden h-80"
+      className="col-span-1 md:col-span-2 lg:col-span-4 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 relative overflow-hidden h-[600px]"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.25 }}
     >
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
         <h2 className="text-3xl font-mono font-bold text-light-gray mb-2 z-10">
-          Neural Network
+          "in·no·va·tion"
         </h2>
         <p className="text-sm text-light-gray/60 font-sans z-10">
-          Exploring possibilities through AI and innovation
+          the action or process of innovating.
+          <br />
+          "innovation is crucial to the continuing success of any organization"
+          <br />
+          A new method, idea or product that is different from the existing ones.
         </p>
+        <h3 className="text-xl font-mono font-bold text-light-gray mb-2 z-10">
+          Definitions from Oxford Dictionary
+        </h3>
       </div>
       <canvas
         ref={canvasRef}
