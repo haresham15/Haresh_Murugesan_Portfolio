@@ -11,7 +11,7 @@ const ProjectLab = () => {
         'Completed a series of AI-focused projects spanning search algorithms, logic puzzles, probabilistic reasoning, optimization, machine learning, neural networks, and natural language processing.',
       icons: ['python.svg', 'tensorflow.svg', 'numpy.svg'],
       github: 'https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects',
-      video: null, // Placeholder for video demo
+      image: 'cs50ai.png',
     },
     {
       title: 'TutorMatch: AI-Powered Tutoring Platform',
@@ -20,7 +20,7 @@ const ProjectLab = () => {
       icons: ['streamlit.svg', 'python.svg', 'huggingface.svg', 'jupyter.svg'],
       github: 'https://github.com/haresham15/TutorMatch_WebApp',
       demo: 'https://finaltutormatch.streamlit.app/',
-      video: null, // Placeholder for video demo
+      image: 'tutormatch.png',
     },
     {
       title: 'CarStomer: Car Value Analysis and Classification',
@@ -29,7 +29,7 @@ const ProjectLab = () => {
       icons: ['streamlit.svg', 'jupyter.svg', 'python.svg'],
       github: 'https://github.com/haresham15/CarStomerCarAnalysis',
       demo: 'https://carstomeranalysisharesh.streamlit.app/',
-      video: null, // Placeholder for video demo
+      image: 'carstomer.png',
     },
   ];
 
@@ -100,17 +100,15 @@ const ProjectLab = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              {hoveredProject === index && project.video ? (
-                <video
-                  src={project.video}
-                  autoPlay
-                  loop
-                  muted
+              {hoveredProject === index && project.image ? (
+                <img
+                  src={project.image}
+                  alt={project.title}
                   className="w-full h-48 object-cover rounded-lg mb-4"
                 />
               ) : (
                 <div className="w-full h-48 bg-neon-purple/10 rounded-lg mb-4 flex items-center justify-center">
-                  <p className="text-light-gray/40 font-sans">Demo Video</p>
+                  <p className="text-light-gray/40 font-sans">Demo Image</p>
                 </div>
               )}
               <h4 className="text-xl font-mono font-bold text-light-gray mb-2">

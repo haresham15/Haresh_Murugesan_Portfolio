@@ -56,17 +56,19 @@ const BentoHero = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <p className="text-sm text-light-gray/60 mb-2 font-sans">LIVE STATUS</p>
-          <p className="text-4xl font-mono text-neon-cyan font-bold">
+          <h1 className='text-4xl font-mono text-neon-purple font-bold'>
             {formatTime(currentTime)}
-          </p>
-          <p className="text-xs text-light-gray/40 mt-2 font-sans">
+          </h1>
+          <h3 className="text-2xl text-neon-cyan/60 mb-2 font-sans text-center font-bold">Current Projects</h3>
+          <p className="text-xl text-light-gray/60 mb-2 font-sans">Motorsports AI Management System and Web Application</p>
+          <h2 className="text-xs text-light-gray/40 mt-2 font-sans">
             {currentTime.toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',
               month: 'long',
               day: 'numeric',
             })}
-          </p>
+          </h2>
         </motion.div>
 
         {/* Floating Geometry Animation - Neural Network (Row 2, Full Width) */}
