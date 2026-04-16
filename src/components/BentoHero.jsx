@@ -84,7 +84,7 @@ const BentoHero = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <h2 className="text-2xl font-mono font-bold text-light-gray mb-4">
-            Adapt: Implementing Innovations
+            Syntinuum: Endless Evolutions Podcast
           </h2>
           <p className="text-sm text-light-gray/70 mb-4 font-sans">
             Exploring innovations that solve the world's toughest challenges
@@ -98,14 +98,24 @@ const BentoHero = () => {
               ))}
             </div>
           </div>
-          <a
-            href="https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-block text-neon-purple hover:text-neon-cyan transition-colors font-sans"
-          >
-            Listen on Spotify →
-          </a>
+          <div className="mt-4 flex gap-4">
+            <a
+              href="https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-neon-purple hover:text-neon-cyan transition-colors font-sans"
+            >
+              Listen on Spotify →
+            </a>
+            <a
+              href="https://www.syntinuumpodcast.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-neon-purple hover:text-neon-cyan transition-colors font-sans"
+            >
+              Visit Website →
+            </a>
+          </div>
         </motion.div>
 
         {/* Tile D - Philocracy */}

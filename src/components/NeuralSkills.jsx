@@ -129,6 +129,8 @@ const NeuralSkills = () => {
     'pandas.svg',
     'sql.svg',
     'tailwind.svg',
+    'scitkitlearn.svg',
+    'matplotlib.svg',
   ];
 
   return (
@@ -138,7 +140,7 @@ const NeuralSkills = () => {
       </h2>
 
       {/* 3D Neural Net Background */}
-      <div className="h-[600px] w-full mb-12 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl overflow-hidden">
+      <div className="h-[400px] w-full mb-12 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl overflow-hidden">
         <Canvas camera={{ position: [0, 0, 3], fov: 75 }}>
           <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} />

@@ -10,7 +10,7 @@ const PodcastSection = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        The Adapt: Implementing Innovations
+        Syntinuum: Endless Evolutions Podcast
       </motion.h2>
       <motion.p
         className="text-xl font-sans text-center mb-16 text-light-gray/70"
@@ -38,6 +38,16 @@ const PodcastSection = () => {
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
             loading="lazy"
           ></iframe>
+          <div className="mt-6 flex justify-center w-full">
+            <a
+              href="https://www.syntinuumpodcast.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-8 py-3 bg-neon-purple text-white font-mono font-bold rounded-lg hover:bg-neon-cyan transition-colors"
+            >
+              Visit Website
+            </a>
+          </div>
         </motion.div>
         <motion.p
           className="text-lg font-sans leading-relaxed md:w-1/2 w-full text-light-gray/80"
@@ -45,14 +55,7 @@ const PodcastSection = () => {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          The Adapt: Implementing Innovations podcast is a platform where I interview innovators and
-          entrepreneurs about their journeys and the innovations they are implementing to solve the
-          world's toughest challenges. Each episode dives deep into the stories behind the innovations,
-          the challenges faced, and the impact they aim to create. I was inspired to start this podcast
-          during the Covid Era when I realized the amount of important innovations that were keeping
-          humanity safe. Fusing my passion for learning and inventing, I reached out to leaders in their
-          respective fields to discuss and educate the general population on the work that was helping
-          the world towards a better future.
+          Syntinuum is my podcast and creative space where I can expand on innovation. I wanted to analyze the different innovations and inventions that are in the birth form. These creations are begging to be puth through countless unit tests. Creators continously checking to see how their creation will change the world and help it adapt to the growing challenges and systemic errors. Seeing how implementing the newest innovations can spark change. Our goal here at Syntinuum is to document the progress of these creations and motivate the next generation to continue the creative and breakthrough process for meaningfull change.
         </motion.p>
       </div>
     </section>

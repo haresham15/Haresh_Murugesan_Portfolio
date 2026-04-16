@@ -26,7 +26,7 @@ const ScrollyExperience = () => {
     {
       year: 'August 2023',
       role: 'Founder and Host',
-      company: 'Adapt: Implementing Innovations Podcast',
+      company: 'Syntinuum: Endless Evolutions Podcast',
       description: 'Founded and produced a tech podcast featuring CEOs and tech pioneers, growing the audience to over 8K YouTube views, 75 watch hours, and 50K Instagram views. 1000+ Likes and 50k+ Views on Tiktok. Interviewing innovators and entrepreneurs about their journeys and innovations solving world challenges.',
     },
     {

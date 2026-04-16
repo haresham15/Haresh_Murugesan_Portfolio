@@ -24,35 +24,73 @@ export default function PortfolioTimeline() {
 
   const projectData = [
     {
-      title:"CS50 Intro to AI with Python",
-      description: "Completed a series of AI-focused projects as part of Harvard’s CS50 Introduction to Artificial Intelligence with Python. These projects span search algorithms, logic puzzles, probabilistic reasoning, optimization, machine learning, neural networks, and natural language processing. Each implementation demonstrates practical understanding of AI principles and Python-based system design.",
+      title: "Healios - AI Post-Surgical Recovery Assistant",
+      description: "A full-stack application leveraging a fine-tuned TensorFlow model to assist patients in monitoring their post-surgical wound recovery. The AI-driven analysis accurately categorizes wound conditions across 10 risk classes to recommend immediate care.",
+      icons: ["react.svg", "python.svg", "tensorflow.svg", "tailwind.svg"],
+      github: "https://github.com/haresham15/healios",
+    },
+    {
+      title: "Philocracy Platform",
+      description: "The core e-commerce and operational web platform built to run Philocracy, a 501(c)(3) nonprofit apparel company. It serves as our operational hub to scale our mission, manage teams, and promote fashion driven by a charitable purpose.",
+      icons: ["react.svg", "javascript.svg", "tailwind.svg"],
+      github: "https://github.com/haresham15/Philocracy",
+      demo: "https://philocracy.vercel.app"
+    },
+    {
+      title: "Syntinuum Podcast Website",
+      description: "The dedicated web platform for the Syntinuum: Endless Evolutions podcast. Features episode listings, embedded players, and a modern design to showcase conversations with innovators and entrepreneurs.",
+      icons: ["javascript.svg", "react.svg", "tailwind.svg"],
+      github: "https://github.com/haresham15/Syntinuum_podcast_website",
+      demo: "https://syntinuum-podcast-website.vercel.app"
+    },
+    {
+      title: "DataIO - Hack To The Future",
+      description: "Developed during the Hack To The Future hackathon, DataIO is an accessible front-end tool designed to streamline data interpretation and translate large-scale information points into intuitive and user-friendly visualizations.",
+      icons: ["javascript.svg", "css.svg", "react.svg"],
+      github: "https://github.com/haresham15/DataIO",
+    },
+    {
+      title: "IBMHack Innovation",
+      description: "A dedicated JavaScript web project crafted during the IBM Hackathon, aiming to demonstrate efficient use of scalable data infrastructure and application programming interfaces for solving specific operational challenges.",
+      icons: ["javascript.svg", "css.svg", "github.svg"],
+      github: "https://github.com/haresham15/IBMHack",
+    },
+    {
+      title: "CS50 Intro to AI with Python",
+      description: "Completed a series of AI-focused projects as part of Harvard's CS50 Introduction to Artificial Intelligence with Python. These projects span search algorithms, logic puzzles, probabilistic reasoning, optimization, machine learning, neural networks, and natural language processing.",
       icons: ["python.svg", "tensorflow.svg", "numpy.svg"],
       github: "https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects"
     },
-    // UPDATE THE PROJECTS Section
     {
-      title:"CS50 Intro to AI with Python",
-      description: "Completed a series of AI-focused projects as part of Harvard’s CS50 Introduction to Artificial Intelligence with Python. These projects span search algorithms, logic puzzles, probabilistic reasoning, optimization, machine learning, neural networks, and natural language processing. Each implementation demonstrates practical understanding of AI principles and Python-based system design.",
-      icons: ["python.svg", "tensorflow.svg", "numpy.svg"],
-      github: "https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects"
+      title: "Murugesan Rajaram Lab Website",
+      description: "A professional lab website portal built for the Murugesan Rajaram research lab, providing information about ongoing research, publications, and team members.",
+      icons: ["react.svg", "javascript.svg", "css.svg"],
+      github: "https://github.com/haresham15/murugesan_rajaram_lab_website",
+    },
+    {
+      title: "MomWebsite",
+      description: "A heartfelt personal website built as a gift, featuring a modern design with smooth animations and responsive layout. Deployed live on Vercel.",
+      icons: ["react.svg", "javascript.svg", "tailwind.svg"],
+      github: "https://github.com/haresham15/MomWebsite",
+      demo: "https://mom-website-swart.vercel.app"
     },
     {
       title: "Software 2 Engineering Projects",
-      description: "This repository contains my Software 2 Engineering Projects that I have worked on in my Software 2 class at OSU. The projects include a variety of software engineering topics such as JUnit testing, Implemnting Kernel Methods, and BL Compiling",
+      description: "This repository contains my Software 2 Engineering Projects that I have worked on in my Software 2 class at OSU. The projects include a variety of software engineering topics such as JUnit testing, Implementing Kernel Methods, and BL Compiling.",
       icons: ["java.svg"],
       github: "https://github.com/haresham15/Haresh-s-Software-2-Projects",
     },
     {
       title: "CarStomer: Car Value Analysis and Classification",
-      description: "Developed a data-driven machine learning model to analyze customer demographics and vehicle preferences using Python and scikit-learn. Explored correlations between age groups and car selections to generate actionable business insights for automotive sales strategy. The project includes exploratory data analysis, feature engineering, and model evaluation to support decision-making.",
-      icons: ["streamlit.svg", "jupyter.svg", "python.svg"],
+      description: "Developed a data-driven machine learning model to analyze customer demographics and vehicle preferences using Python and scikit-learn. The project includes exploratory data analysis, feature engineering, and model evaluation to support decision-making.",
+      icons: ["Streamlit.svg", "jupyter.svg", "python.svg"],
       github: "https://github.com/haresham15/CarStomerCarAnalysis",
       demo: "https://carstomeranalysisharesh.streamlit.app/"
     },
     {
       title: "TutorMatch: AI-Powered Tutoring Platform",
-      description: "Developed a full-stack web application that facilitates tutor-student matching based on subject expertise, availability, and preferences. The platform allows users to register, browse profiles, and initiate tutoring sessions through an intuitive interface.",
-      icons: ["streamlit.svg", "python.svg", "huggingface.svg" ,"jupyter.svg"],
+      description: "Developed a full-stack web application that facilitates tutor-student matching based on subject expertise, availability, and preferences. The platform allows users to register, browse profiles, and initiate tutoring sessions.",
+      icons: ["Streamlit.svg", "python.svg", "huggingface.svg", "jupyter.svg"],
       github: "https://github.com/haresham15/TutorMatch_WebApp",
       demo: "https://finaltutormatch.streamlit.app/"
     },
@@ -65,16 +103,16 @@ export default function PortfolioTimeline() {
     {
       title: "Portfolio Website",
       description: "This is my personal portfolio website built with React and Tailwind CSS. This project helped me learn and develop my skills in Frontend Development and UI/UX Design.",
-      icons: ["javascript.svg", "react.svg", "tailwind.svg", "github.svg","css.svg"],
+      icons: ["javascript.svg", "react.svg", "tailwind.svg", "github.svg", "css.svg"],
       github: "https://github.com/haresham15/Haresh_Murugesan_Portfolio",
       demo: "https://haresh-murugesan-portfolio.onrender.com/"
     },
     {
       title: "A Birthday Website for my Brother!",
-      description: "This is a birthday website I made for my brother's birthday. This project helped me dip my toes in CSS and JavaScript while still making a meaningfull project to celebrate my Brother's birthday. I was able to learn a lot about 3d-Objects, animations and scrolls.",
+      description: "This is a birthday website I made for my brother's birthday. This project helped me dip my toes in CSS and JavaScript while still making a meaningful project to celebrate my Brother's birthday.",
       icons: ["javascript.svg", "react.svg", "tailwind.svg", "github.svg", "css.svg"],
       github: "https://github.com/haresham15/AnnaBirthdayWebsite",
-      demo: "https://annabirthday-blacktheme-fixed.onrender.com/"
+      demo: "https://annasbirthday.vercel.app"
     },
   ];
 
@@ -127,7 +165,7 @@ export default function PortfolioTimeline() {
       <motion.div id="experience" className="mt-20 text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
         <h2 className="text-8xl font-bold font-raleway mb-10">About Me...</h2>
           <p className="max-w-6xl mx-auto font-raleway text-lg leading-relaxed">
-            I'm a CSE student at OSU focused on AI, software, and innovation. I love learning about innovations and tech every day and hope to use my technical skills to help provide meaningful contributions to society through CS and AI. I am the CEO and Director of Finances at Philocracy, a non-profit organization that aims to help people through fashion and love. I also host the Adapt: Implementing Innovations podcast, where I interview innovators and entrepreneurs about their journeys and the innovations they are implementing to solve the world's toughest challenges. In my free time, I enjoy coding, reading, and exploring new technologies.
+            I'm a CSE student at OSU focused on AI, software, and innovation. I love learning about innovations and tech every day and hope to use my technical skills to help provide meaningful contributions to society through CS and AI. I am the CEO and Director of Finances at Philocracy, a non-profit organization that aims to help people through fashion and love. I also host the Syntinuum: Endless Evolutions podcast, where I interview innovators and entrepreneurs about their journeys and the innovations they are implementing to solve the world's toughest challenges. In my free time, I enjoy coding, reading, and exploring new technologies.
           </p>
       </motion.div>
 
@@ -142,7 +180,7 @@ export default function PortfolioTimeline() {
   <div className="relative border-l-2 border-blue-400 pl-6">
     {[
       { year: "April 2023", role: "CEO and Director of Finances", company: "Philocracy" },
-      { year: "August 2023", role: "Founder and Host", company: "Adapt: Implementing Innovations Podcast" },
+      { year: "August 2023", role: "Founder and Host", company: "Syntinuum: Endless Evolutions Podcast" },
       { year: "Feburary 2024", role: "Math Tutor", company: "Mathnasium" },
       { year: "May 2024", role: "Research Student", company: "OSU Data and CS Lab" },
       { year: "May 2025", role: "Innovation Analyst", company: "Onramp Student Innovation Program" },
@@ -157,7 +195,7 @@ export default function PortfolioTimeline() {
 </motion.div>
 
       <motion.div id="podcast" className="mt-20 max-w-6xl text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.4 }}>
-        <h2 className="text-6xl font-raleway font-bold mb-8 col-span-full text-center">The Adapt: Implementing Innovations</h2>
+        <h2 className="text-6xl font-raleway font-bold mb-8 col-span-full text-center">Syntinuum: Endless Evolutions</h2>
         <p className="text-xl font-raleway text-center mb-16">
           Exploring innovations that solve the world's toughest challenges, Listen on Spotify, Apple, and more.
         </p>
@@ -166,7 +204,7 @@ export default function PortfolioTimeline() {
           <iframe data-testid="embed-iframe" style={{ borderRadius: '12px', zIndex: 10, position: 'relative' }} src="https://open.spotify.com/embed/show/5LPGObcWQdkoERNzZsdL98/video?utm_source=generator" width="624" height="351" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
           {/* Description Text on Right */}
           <p className="text-lg font-raleway leading-relaxed md:w-1/2 w-full">
-      The Adapt: Implementing Innovations podcast is a platform where I interview innovators and
+      The Syntinuum: Endless Evolutions podcast is a platform where I interview innovators and
       entrepreneurs about their journeys and the innovations they are implementing to solve the
       world's toughest challenges. Each episode dives deep into the stories behind the innovations,
       the challenges faced, and the impact they aim to create. I was inspired to start this podcast
@@ -222,7 +260,7 @@ export default function PortfolioTimeline() {
       <motion.div id="skills" className="mt-20 w-full max-w-4xl text-center" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.8 }}>
         <h2 className="text-6xl font-semibold mb-10">Skills & Tools</h2>
         <div className="flex flex-wrap justify-center gap-4">
-          {["react.svg", "streamlit.svg", "java.svg", "huggingface.svg", "python.svg","matlab.svg","r.svg","jupyter.svg","github.svg", "numpy.svg", "tensorflow.svg", "css.svg", "javascript.svg" , "pandas.svg", "sql.svg", "tailwind.svg"].map((icon, idx) => (
+          {["react.svg", "Streamlit.svg", "java.svg", "huggingface.svg", "python.svg","matlab.svg","r.svg","jupyter.svg","github.svg", "numpy.svg", "tensorflow.svg", "css.svg", "javascript.svg" , "pandas.svg", "sql.svg", "tailwind.svg"].map((icon, idx) => (
             <img key={idx} src={`/icons/${icon}`} alt={icon} className="w-12 h-12" />
           ))}
         </div>
