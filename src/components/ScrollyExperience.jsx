@@ -8,8 +8,8 @@ const ScrollyExperience = () => {
     {
       year: 'May 2026',
       role: 'Incoming Technology Internship',
-      company: 'CAS (Chemical American Society)',
-      description: 'Incoming Technology Internship at CAS (Chemical American Society). Will be working on different machine learning and AI based scientific applications. working with one of the largest centers of data and scientific research in the United States.',
+      company: 'CAS (Chemical Abstract Services)',
+      description: 'Incoming Technology Internship at CAS (Chemical Abstract Services). Will be working on different machine learning and AI based scientific applications. working with one of the largest centers of data and scientific research in the United States.',
     },
     {
       year: 'May 2025',
