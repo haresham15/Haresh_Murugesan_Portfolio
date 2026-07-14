@@ -9,6 +9,7 @@ import ScrollyExperience from './components/ScrollyExperience';
 import PodcastSection from './components/PodcastSection';
 import ProjectLab from './components/ProjectLab';
 import AwardsSection from './components/AwardsSection';
+import CertificationsSection from './components/CertificationsSection';
 import ContactFooter from './components/ContactFooter';
 import Spinner from './spinner';
 
@@ -78,6 +79,7 @@ function App() {
         <ScrollyExperience />
         <PodcastSection />
         <ProjectLab />
+        <CertificationsSection />
         <AwardsSection />
         <NeuralSkills />
         <ContactFooter />

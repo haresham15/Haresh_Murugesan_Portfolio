@@ -5,7 +5,7 @@ const PodcastSection = () => {
   return (
     <section id="podcast" className="w-full max-w-7xl mx-auto px-4 py-20">
       <motion.h2
-        className="text-6xl font-mono font-bold text-light-gray mb-8 text-center"
+        className="text-6xl font-mono font-bold tracking-tight text-light-gray mb-8 text-center"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -13,7 +13,7 @@ const PodcastSection = () => {
         Syntinuum: Endless Evolutions Podcast
       </motion.h2>
       <motion.p
-        className="text-xl font-sans text-center mb-16 text-light-gray/70"
+        className="text-xl font-sans text-center mb-16 text-light-gray/70 max-w-4xl mx-auto"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
@@ -43,7 +43,7 @@ const PodcastSection = () => {
               href="https://www.syntinuumpodcast.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-8 py-3 bg-neon-purple text-white font-mono font-bold rounded-lg hover:bg-neon-cyan transition-colors"
+              className="inline-block px-8 py-3 bg-transparent border border-neon-purple text-neon-purple hover:text-white hover:bg-neon-purple/20 hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] font-mono font-bold rounded-lg transition-all"
             >
               Visit Website
             </a>

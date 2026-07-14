@@ -2,12 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const AwardsSection = () => {
-  const certs = [
-    {
-      title: 'CS50 Introduction to Artificial Intelligence with Python',
-      issuer: 'Harvard University',
-      date: 'July 2025',
-    },
+  const awards = [
     {
       title: '1st Place - Best Use of External Data',
       issuer: 'American Statistical Association',
@@ -17,14 +12,14 @@ const AwardsSection = () => {
 
   return (
     <section id="awards" className="w-full max-w-7xl mx-auto px-4 py-20">
-      <h2 className="text-6xl font-mono font-bold text-light-gray mb-16 text-center">
-        Awards and Certifications
+      <h2 className="text-6xl font-mono font-bold tracking-tight text-light-gray mb-16 text-center">
+        Awards
       </h2>
       <div className="space-y-6">
-        {certs.map((cert, index) => (
+        {awards.map((cert, index) => (
           <motion.div
             key={index}
-            className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 flex items-start gap-4"
+            className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-lg shadow-black/50 flex items-start gap-4"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: index * 0.1 }}

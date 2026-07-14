@@ -1,123 +1,27 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { spotlightProjects, archiveProjects } from '../data/projects';
 
 const ProjectLab = () => {
   const [hoveredProject, setHoveredProject] = useState(null);
 
-  const spotlightProjects = [
-    {
-      title: 'Healios - AI Post-Surgical Recovery Assistant',
-      description: 'A full-stack application leveraging a fine-tuned TensorFlow model to assist patients in monitoring their post-surgical wound recovery. The AI-driven analysis accurately categorizes wound conditions across 10 risk classes to recommend immediate care.',
-      icons: ['react.svg', 'python.svg', 'tensorflow.svg', 'tailwind.svg'],
-      github: 'https://github.com/haresham15/healios',
-      demo: '',
-      image: '',
-    },
-    {
-      title: 'DataIO - Hack To The Future',
-      description: 'Developed during the Hack To The Future hackathon, DataIO is an accessible front-end tool designed to streamline data interpretation and translate large-scale information points into intuitive and user-friendly visualizations.',
-      icons: ['javascript.svg', 'css.svg', 'react.svg'],
-      github: 'https://github.com/haresham15/DataIO',
-      demo: '',
-      image: '',
-    },
-    {
-      title: 'IBMHack Innovation',
-      description: 'A dedicated JavaScript web project crafted during the IBM Hackathon, aiming to demonstrate efficient use of scalable data infrastructure and application programming interfaces for solving specific operational challenges.',
-      icons: ['javascript.svg', 'css.svg', 'github.svg'],
-      github: 'https://github.com/haresham15/IBMHack',
-      demo: '',
-      image: '',
-    },
-    {
-      title: 'Philocracy Platform',
-      description: 'The core e-commerce and operational web platform built to run Philocracy, a 501(c)(3) nonprofit apparel company. It serves as our operational hub to scale our mission, manage teams, and promote fashion driven by a charitable purpose.',
-      icons: ['react.svg', 'javascript.svg', 'tailwind.svg'],
-      github: 'https://github.com/haresham15/Philocracy',
-      demo: 'https://philocracy.vercel.app',
-      image: '',
-    },
-  ];
-
-  const archiveProjects = [
-    {
-      year: '2026',
-      title: 'Syntinuum Podcast Website',
-      stack: 'JavaScript, React, Tailwind CSS',
-      link: 'https://github.com/haresham15/Syntinuum_podcast_website',
-    },
-    {
-      year: '2025',
-      title: 'MomWebsite',
-      stack: 'TypeScript, React, Vercel',
-      link: 'https://github.com/haresham15/MomWebsite',
-    },
-    {
-      year: '2025',
-      title: 'Murugesan Rajaram Lab Website',
-      stack: 'TypeScript, React',
-      link: 'https://github.com/haresham15/murugesan_rajaram_lab_website',
-    },
-    {
-      year: '2025',
-      title: 'CS50 Intro to AI with Python',
-      stack: 'Python, TensorFlow, NumPy',
-      link: 'https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects',
-    },
-    {
-      year: '2024',
-      title: 'Software 2 Engineering Projects',
-      stack: 'Java',
-      link: 'https://github.com/haresham15/Haresh-s-Software-2-Projects',
-    },
-    {
-      year: '2024',
-      title: 'CarStomer: Car Value Analysis',
-      stack: 'Python, Streamlit, Jupyter',
-      link: 'https://github.com/haresham15/CarStomerCarAnalysis',
-    },
-    {
-      year: '2024',
-      title: 'TutorMatch: AI-Powered Tutoring Platform',
-      stack: 'Python, Streamlit, HuggingFace',
-      link: 'https://github.com/haresham15/TutorMatch_WebApp',
-    },
-    {
-      year: '2024',
-      title: 'Software 1 Engineering Projects',
-      stack: 'Java',
-      link: 'https://github.com/haresham15/Software-Project-Java-Collection-',
-    },
-    {
-      year: '2024',
-      title: 'Portfolio Website',
-      stack: 'React, Tailwind CSS, JavaScript',
-      link: 'https://github.com/haresham15/Haresh_Murugesan_Portfolio',
-    },
-    {
-      year: '2024',
-      title: 'A Birthday Website for my Brother!',
-      stack: 'React, Tailwind CSS, JavaScript',
-      link: 'https://github.com/haresham15/AnnaBirthdayWebsite',
-    },
-  ];
-
   return (
     <section id="projects" className="w-full max-w-7xl mx-auto px-4 py-20">
-      <h2 className="text-6xl font-mono font-bold text-light-gray mb-16 text-center">
+      <h2 className="text-6xl font-mono font-bold tracking-tight text-light-gray mb-16 text-center">
         Projects
       </h2>
 
       {/* Spotlight Section */}
       <div className="mb-20">
-        <h3 className="text-3xl font-mono font-bold text-light-gray mb-8">
+        <h3 className="text-3xl font-mono font-bold tracking-tight text-light-gray mb-8">
           Spotlight
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {spotlightProjects.map((project, index) => (
             <motion.div
               key={index}
-              className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 overflow-hidden relative"
+              className="bg-black/40 backdrop-blur-md border border-white/10 hover:border-neon-cyan/50 rounded-2xl p-6 overflow-hidden relative shadow-lg shadow-black/50 transition-all duration-300"
               onMouseEnter={() => setHoveredProject(index)}
               onMouseLeave={() => setHoveredProject(null)}
               initial={{ opacity: 0, y: 20 }}
@@ -180,10 +84,10 @@ const ProjectLab = () => {
 
       {/* Archive Section */}
       <div>
-        <h3 className="text-3xl font-mono font-bold text-light-gray mb-8">
+        <h3 className="text-3xl font-mono font-bold tracking-tight text-light-gray mb-8">
           Archive
         </h3>
-        <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl overflow-hidden">
+        <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-lg shadow-black/50">
           <table className="w-full">
             <thead>
               <tr className="border-b border-glass-border">
@@ -194,7 +98,7 @@ const ProjectLab = () => {
               </tr>
             </thead>
             <tbody>
-              {archiveProjects.map((project, index) => (
+              {archiveProjects.slice(0, 4).map((project, index) => (
                 <motion.tr
                   key={index}
                   className="border-b border-glass-border hover:bg-glass-bg/50 transition-colors"
@@ -219,6 +123,16 @@ const ProjectLab = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-8 flex justify-center">
+          <Link href="/projects" className="group flex items-center gap-2 px-8 py-3 bg-black/40 backdrop-blur-md border border-white/10 hover:border-neon-cyan/50 text-light-gray font-mono rounded-lg transition-all hover:scale-105 active:scale-95 shadow-lg shadow-black/50">
+            See All Archive
+            <motion.span
+              className="text-neon-cyan group-hover:translate-x-1 transition-transform"
+            >
+              →
+            </motion.span>
+          </Link>
         </div>
       </div>
     </section>

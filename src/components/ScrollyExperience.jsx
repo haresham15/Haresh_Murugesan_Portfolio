@@ -39,7 +39,7 @@ const ScrollyExperience = () => {
 
   return (
     <section id="experience" className="w-full max-w-7xl mx-auto px-4 py-20 min-h-screen">
-      <h2 className="text-6xl font-mono font-bold text-light-gray mb-16 text-center">
+      <h2 className="text-6xl font-mono font-bold tracking-tight text-light-gray mb-16 text-center">
         Experience
       </h2>
       <div className="flex flex-col md:flex-row gap-8">
@@ -52,16 +52,16 @@ const ScrollyExperience = () => {
                 onClick={() => setActiveIndex(index)}
                 className={`w-full text-left p-4 rounded-lg border transition-all ${activeIndex === index
                   ? 'border-neon-purple bg-neon-purple/10'
-                  : 'border-glass-border bg-glass-bg/50'
+                  : 'border-white/5 bg-black/40'
                   }`}
                 whileHover={{ scale: 1.02, x: 5 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <p className="text-sm text-neon-cyan font-mono mb-1">{exp.year}</p>
-                <p className={`text-lg font-sans font-semibold transition-colors ${activeIndex === index ? 'text-white' : 'text-black'}`}>
+                <p className={`text-lg font-sans font-semibold transition-colors ${activeIndex === index ? 'text-white' : 'text-light-gray/60'}`}>
                   {exp.role}
                 </p>
-                <p className={`text-sm font-sans transition-colors ${activeIndex === index ? 'text-white/80' : 'text-black/60'}`}>{exp.company}</p>
+                <p className={`text-sm font-sans transition-colors ${activeIndex === index ? 'text-white/80' : 'text-light-gray/40'}`}>{exp.company}</p>
               </motion.button>
             ))}
           </div>
@@ -76,7 +76,7 @@ const ScrollyExperience = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
-              className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8"
+              className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl shadow-black/50"
             >
               <p className="text-neon-cyan font-mono mb-2">
                 {experiences[activeIndex].year}

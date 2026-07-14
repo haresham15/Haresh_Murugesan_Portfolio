@@ -35,12 +35,12 @@ const BentoHero = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Tile A - Intro */}
         <motion.div
-          className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 flex flex-col justify-center"
+          className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 flex flex-col justify-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-6xl font-mono font-bold text-light-gray mb-4">
+          <h1 className="text-6xl font-mono font-bold tracking-tight text-light-gray mb-4">
             Haresh Murugesan.
           </h1>
           <p className="text-2xl text-light-gray/80 font-sans">
@@ -50,7 +50,7 @@ const BentoHero = () => {
 
         {/* Tile B - Live Status */}
         <motion.div
-          className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 flex flex-col justify-center items-center"
+          className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 flex flex-col justify-center items-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
@@ -78,7 +78,7 @@ const BentoHero = () => {
 
         {/* Tile C - Podcast */}
         <motion.div
-          className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 overflow-hidden relative"
+          className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 overflow-hidden relative"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -120,7 +120,7 @@ const BentoHero = () => {
 
         {/* Tile D - Philocracy */}
         <motion.div
-          className="col-span-1 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 flex flex-col justify-center"
+          className="col-span-1 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col justify-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
@@ -138,7 +138,7 @@ const BentoHero = () => {
 
         {/* Tile E - Stack */}
         <motion.div
-          className="col-span-1 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 flex flex-col justify-center"
+          className="col-span-1 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col justify-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
