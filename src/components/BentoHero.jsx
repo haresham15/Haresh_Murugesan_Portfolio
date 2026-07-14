@@ -41,7 +41,7 @@ const BentoHero = () => {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-6xl font-mono font-bold tracking-tight text-light-gray mb-4">
-            Haresh Murugesan.
+            Hi, I'm Haresh Murugesan.
           </h1>
           <p className="text-2xl text-light-gray/80 font-sans">
             Learning, Adapting and Innovating
@@ -60,7 +60,9 @@ const BentoHero = () => {
             {formatTime(currentTime)}
           </h1>
           <h3 className="text-2xl text-neon-cyan/60 mb-2 font-sans text-center font-bold">Current Projects</h3>
-          <p className="text-xl text-light-gray/60 mb-2 font-sans">Motorsports AI Management System and Web Application</p>
+          <a href="/prd/motorsports" target="_blank" rel="noopener noreferrer" className="text-xl text-light-gray/60 hover:text-neon-cyan mb-2 font-sans transition-colors underline decoration-neon-cyan/30 underline-offset-4 cursor-pointer text-center">
+            Motorsports AI Management System and Web Application (PRD)
+          </a>
           <h2 className="text-xs text-light-gray/40 mt-2 font-sans">
             {currentTime.toLocaleDateString('en-US', {
               weekday: 'long',

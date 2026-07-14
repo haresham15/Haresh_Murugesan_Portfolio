@@ -15,7 +15,7 @@ const ScrollyExperience = () => {
       year: 'May 2025',
       role: 'Innovation Analyst',
       company: 'Onramp Student Innovation Program',
-      description: 'Analyzing innovative solutions and supporting student innovation initiatives. Collaborated with 99P Labs in a data accelerator to identify unmet customer needs by applying lean startup and market research methodologies while working with leadership on 1000+ sample data models and visualizations.',
+      description: 'Collaborated with 99P Labs in a data accelerator to identify unmet customer needs by applying lean startup methodologies. Led [X] pitch presentations to executives, analyzing over [Y,000]+ sample data models and visualizations to deliver [Z]% faster insight generation.',
     },
     {
       year: 'May 2024',
@@ -33,7 +33,7 @@ const ScrollyExperience = () => {
       year: 'April 2023',
       role: 'CEO and Director of Finances',
       company: 'Philocracy',
-      description: 'Leading a non-profit organization that helps people through fashion and love. A 501(c)(3) nonprofit apparel company, managing a team of four and overseeing all operations and data',
+      description: 'Lead a 501(c)(3) nonprofit apparel company scaling charitable impact through e-commerce. Managed a $Z operating budget, grew online revenue by [X]%, and oversaw a cross-functional team of [Y] to optimize supply chain and logistics data.',
     },
   ];
 

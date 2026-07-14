@@ -39,22 +39,38 @@ const ProjectLab = () => {
                   <p className="text-light-gray/40 font-sans">Demo Image</p>
                 </div>
               )}
-              <h4 className="text-xl font-mono font-bold text-light-gray mb-2">
-                {project.title}
-              </h4>
+              
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-2xl font-mono font-bold text-light-gray flex-1 tracking-tight">
+                  {project.title}
+                </h3>
+                <div className="flex gap-2 ml-4">
+                  {project.icons.map((icon, i) => (
+                    <img key={i} src={`/icons/${icon}`} alt="tech-icon" className="w-6 h-6 opacity-70" />
+                  ))}
+                </div>
+              </div>
+              
+              {project.trailer && (
+                <div className="w-full h-48 mb-4 rounded-lg overflow-hidden border border-white/10 relative bg-black">
+                  <div className="absolute inset-0 flex items-center justify-center text-neon-cyan/50 font-mono text-sm">
+                    [Video Trailer Loading...]
+                  </div>
+                  <video 
+                    src={project.trailer} 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline 
+                    className="w-full h-full object-cover relative z-10 opacity-80 hover:opacity-100 transition-opacity"
+                  />
+                </div>
+              )}
+
               <p className="text-light-gray/70 font-sans mb-4 text-sm">
                 {project.description}
               </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {project.icons.map((icon, i) => (
-                  <img
-                    key={i}
-                    src={`/icons/${icon}`}
-                    alt={icon}
-                    className="w-6 h-6"
-                  />
-                ))}
-              </div>
+              
               <div className="flex gap-3">
                 {project.github && (
                   <a
@@ -75,6 +91,15 @@ const ProjectLab = () => {
                   >
                     Live Demo →
                   </a>
+                )}
+                {project.slug && (
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    className="text-neon-purple hover:text-neon-cyan transition-colors text-sm font-mono flex items-center gap-2 border border-neon-purple/50 px-3 py-1 rounded-full bg-neon-purple/5 hover:bg-neon-cyan/10"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Read Case Study
+                  </Link>
                 )}
               </div>
             </motion.div>

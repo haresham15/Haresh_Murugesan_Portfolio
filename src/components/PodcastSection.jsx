@@ -49,14 +49,19 @@ const PodcastSection = () => {
             </a>
           </div>
         </motion.div>
-        <motion.p
-          className="text-lg font-sans leading-relaxed md:w-1/2 w-full text-light-gray/80"
+        <motion.div
+          className="text-lg font-sans leading-relaxed md:w-1/2 w-full text-light-gray/80 space-y-4"
           initial={{ opacity: 0, x: 20 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          Syntinuum is my podcast and creative space where I can expand on innovation. I wanted to analyze the different innovations and inventions that are in the birth form. These creations are begging to be puth through countless unit tests. Creators continously checking to see how their creation will change the world and help it adapt to the growing challenges and systemic errors. Seeing how implementing the newest innovations can spark change. Our goal here at Syntinuum is to document the progress of these creations and motivate the next generation to continue the creative and breakthrough process for meaningfull change.
-        </motion.p>
+          <p>
+            Syntinuum is where I reverse-engineer the journeys of technical founders, CEOs, and innovators. Rather than just discussing high-level vision, we dive deep into the messy realities of building scalable systems and finding product-market fit.
+          </p>
+          <p>
+            Interviewing these pioneers gives me a front-row seat to system-design decisions and engineering trade-offs that don't make it into textbooks. From parsing through their early architectural pivots to understanding how they manage technical debt while scaling, Syntinuum is an active extension of my engineering education.
+          </p>
+        </motion.div>
       </div>
     </section>
   );

@@ -5,7 +5,12 @@ const AwardsSection = () => {
   const awards = [
     {
       title: '1st Place - Best Use of External Data',
-      issuer: 'American Statistical Association',
+      issuer: 'DataFest / American Statistical Association',
+      date: 'March 2026',
+    },
+    {
+      title: '1st Place - Best Use of External Data',
+      issuer: 'DataFest / American Statistical Association',
       date: 'March 2025',
     },
   ];

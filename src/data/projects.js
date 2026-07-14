@@ -1,13 +1,24 @@
 export const spotlightProjects = [
   {
+    slug: 'healios',
     title: 'Healios - AI Post-Surgical Recovery Assistant',
-    description: 'A full-stack application leveraging a fine-tuned TensorFlow model to assist patients in monitoring their post-surgical wound recovery. The AI-driven analysis accurately categorizes wound conditions across 10 risk classes to recommend immediate care.',
+    description: 'Built a computer vision tool leveraging a fine-tuned SAM (Segment Anything Model) that measures allergy test wheals and surgical wounds with 92% accuracy, outperforming standard edge-detection by 40%.',
     icons: ['react.svg', 'python.svg', 'tensorflow.svg', 'tailwind.svg'],
     github: 'https://github.com/haresham15/healios',
     demo: '',
     image: '',
   },
   {
+    slug: 'ai-motorsports-hub',
+    title: 'AIMotorsportsHub',
+    description: 'Aggregates live telemetry and race data from 20+ F1 sessions via the OpenF1 API. Built with a hybrid-cloud architecture utilizing Vercel, Supabase, AWS Lambda, and the Gemini API for real-time race insights.',
+    icons: ['react.svg', 'python.svg', 'javascript.svg'],
+    github: 'https://github.com/haresham15/AIMotorsportsHub',
+    demo: '',
+    image: '',
+  },
+  {
+    slug: 'dataio',
     title: 'DataIO - Hack To The Future',
     description: 'Developed during the Hack To The Future hackathon, DataIO is an accessible front-end tool designed to streamline data interpretation and translate large-scale information points into intuitive and user-friendly visualizations.',
     icons: ['javascript.svg', 'css.svg', 'react.svg'],
@@ -16,24 +27,24 @@ export const spotlightProjects = [
     image: '',
   },
   {
-    title: 'IBMHack Innovation',
-    description: 'A dedicated JavaScript web project crafted during the IBM Hackathon, aiming to demonstrate efficient use of scalable data infrastructure and application programming interfaces for solving specific operational challenges.',
-    icons: ['javascript.svg', 'css.svg', 'github.svg'],
-    github: 'https://github.com/haresham15/IBMHack',
+    slug: 'routerx',
+    title: 'RouteRx - DataFest 2026 Winner',
+    description: 'Winner of Best Use of External Data at DataFest 2026. RouteRx translates raw healthcare accessibility data into actionable insights, utilizing a sophisticated graph-traversal algorithm to map optimal delivery routes for critical medication across underserved regions.',
+    icons: ['react.svg', 'python.svg', 'javascript.svg'],
+    github: 'https://github.com/haresham15/RouteRx',
     demo: '',
-    image: '',
-  },
-  {
-    title: 'Philocracy Platform',
-    description: 'The core e-commerce and operational web platform built to run Philocracy, a 501(c)(3) nonprofit apparel company. It serves as our operational hub to scale our mission, manage teams, and promote fashion driven by a charitable purpose.',
-    icons: ['react.svg', 'javascript.svg', 'tailwind.svg'],
-    github: 'https://github.com/haresham15/Philocracy',
-    demo: 'https://philocracy.vercel.app',
+    trailer: '/trailers/routerx-demo.mp4',
     image: '',
   },
 ];
 
 export const archiveProjects = [
+  {
+    year: '2025',
+    title: 'Philocracy Platform',
+    stack: 'React, Tailwind CSS, JavaScript',
+    link: 'https://github.com/haresham15/Philocracy',
+  },
   {
     year: '2026',
     title: 'Syntinuum Podcast Website',

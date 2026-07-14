@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import Dock from './components/Dock';
+import Header from './components/Header';
 import BentoHero from './components/BentoHero';
 import FractalGlassBackground from './components/FractalGlassBackground';
 import AboutSection from './components/AboutSection';
 import ScrollyExperience from './components/ScrollyExperience';
 import PodcastSection from './components/PodcastSection';
 import ProjectLab from './components/ProjectLab';
+import NowSection from './components/NowSection';
 import AwardsSection from './components/AwardsSection';
 import CertificationsSection from './components/CertificationsSection';
 import ContactFooter from './components/ContactFooter';
 import Spinner from './spinner';
+import TerminalLoader from './components/TerminalLoader';
 
 // Dynamically import NeuralSkills with no SSR to avoid React 19 compatibility issues
 const NeuralSkills = dynamic(() => import('./components/NeuralSkills'), {
@@ -21,8 +24,8 @@ const NeuralSkills = dynamic(() => import('./components/NeuralSkills'), {
       <h2 className="text-6xl font-mono font-bold text-light-gray mb-16 text-center">
         Skills & Tools
       </h2>
-      <div className="h-[600px] w-full mb-12 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl flex items-center justify-center">
-        <p className="text-light-gray/60 font-sans">Loading 3D visualization...</p>
+      <div className="h-[600px] w-full mb-12 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl flex items-center justify-center p-8">
+        <TerminalLoader />
       </div>
     </section>
   ),
@@ -69,6 +72,9 @@ function App() {
         />
       </div>
 
+      {/* Frictionless Header */}
+      <Header />
+
       {/* Dock Navigation */}
       <Dock />
 
@@ -79,6 +85,7 @@ function App() {
         <ScrollyExperience />
         <PodcastSection />
         <ProjectLab />
+        <NowSection />
         <CertificationsSection />
         <AwardsSection />
         <NeuralSkills />

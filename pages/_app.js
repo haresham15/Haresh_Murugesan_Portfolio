@@ -8,7 +8,7 @@ export default function App({ Component, pageProps }) {
         <title>Haresh Murugesan | Portfolio</title>
         <meta
           name="description"
-          content="Portfolio of Haresh Murugesan — Full Stack Developer, AI Enthusiast, and more. See projects, experience, and contact."
+          content="Portfolio of Haresh Murugesan — Building computer vision and cloud-native tools."
         />
         <meta
           name="keywords"
@@ -23,8 +23,8 @@ export default function App({ Component, pageProps }) {
           property="og:description"
           content="Explore Haresh's creative and technical projects, podcasts, and tech insights."
         />
-        <meta property="og:image" content="https://yourdomain.com/preview-image.png" />
-        <meta property="og:url" content="https://yourdomain.com" />
+        <meta property="og:image" content="https://hareshmurugesan.com/preview-image.png" />
+        <meta property="og:url" content="https://hareshmurugesan.com" />
         <meta property="og:type" content="website" />
 
         {/* Twitter Card */}
@@ -34,7 +34,7 @@ export default function App({ Component, pageProps }) {
           name="twitter:description"
           content="Explore Haresh's creative and technical projects, podcasts, and tech insights."
         />
-        <meta name="twitter:image" content="https://yourdomain.com/preview-image.png" />
+        <meta name="twitter:image" content="https://hareshmurugesan.com/preview-image.png" />
       </Head>
       <Component {...pageProps} />
     </>
