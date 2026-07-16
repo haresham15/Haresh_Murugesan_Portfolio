@@ -8,8 +8,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        mono: ['Space Grotesk', 'monospace'],
+        sans: ['Montserrat', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
         raleway: ['Raleway', 'sans-serif'],
       },
@@ -18,8 +18,8 @@ module.exports = {
         'light-gray': '#E0E0E0',
         'glass-border': 'rgba(255, 255, 255, 0.1)',
         'glass-bg': 'rgba(255, 255, 255, 0.05)',
-        'neon-purple': '#9333ea',
-        'neon-cyan': '#22d3ee',
+        'cine-lavender': '#d8b4fe',
+        'cine-teal': '#7dd3fc',
       },
       backdropBlur: {
         xs: '2px',
