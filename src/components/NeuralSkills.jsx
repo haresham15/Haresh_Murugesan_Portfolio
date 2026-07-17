@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { motion } from 'framer-motion';
 import * as THREE from 'three';
+import Image from 'next/image';
 
 function NeuralNetwork({ count = 60 }) {
  const nodesRef = useRef();
@@ -188,7 +189,7 @@ const SkillCard = ({ skill, idx }) => {
    whileHover={{ scale: 1.1, y: -5 }}
    whileTap={{ scale: 0.95 }}
   >
-   <img src={`/icons/${skill.icon}`} alt={skill.title} className="w-12 h-12 relative z-10" />
+   <Image src={`/icons/${skill.icon}`} alt={skill.title} width={48} height={48} className="w-12 h-12 relative z-10" />
 
    {/* Detail Modal with Dynamic CSS Positioning */}
    <div 

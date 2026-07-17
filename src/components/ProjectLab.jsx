@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { spotlightProjects, archiveProjects } from '../data/projects';
 
 const ProjectLab = () => {
@@ -29,9 +30,11 @@ const ProjectLab = () => {
        transition={{ duration: 0.8, delay: index * 0.1 , ease: [0.22, 1, 0.36, 1]}}
       >
        {hoveredProject === index && project.image ? (
-        <img
+        <Image
          src={project.image}
          alt={project.title}
+         width={600}
+         height={400}
          className="w-full h-48 object-cover rounded-lg mb-4"
         />
        ) : (
@@ -46,7 +49,7 @@ const ProjectLab = () => {
         </h3>
         <div className="flex gap-2 ml-4">
          {project.icons.map((icon, i) => (
-          <img key={i} src={`/icons/${icon}`} alt="tech-icon" className="w-6 h-6 opacity-70" />
+          <Image key={i} src={`/icons/${icon}`} alt="tech-icon" width={24} height={24} className="w-6 h-6 opacity-70" />
          ))}
         </div>
        </div>

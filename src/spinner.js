@@ -18,7 +18,7 @@ const Wrapper = styled.div`
  justify-content: center;
  align-items: center;
  height: 100vh;
- background-color: #0d1b2a;
+ background-color: #050505;
 
  .spinner {
   position: relative;

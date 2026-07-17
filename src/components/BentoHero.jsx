@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import FloatingGeometry from './FloatingGeometry';
 
 const BentoHero = () => {
@@ -60,9 +61,9 @@ const BentoHero = () => {
       {formatTime(currentTime)}
      </h1>
      <h3 className="text-2xl text-cine-teal/60 mb-2 font-sans text-center font-bold">Current Projects</h3>
-     <a href="/prd/motorsports" target="_blank" rel="noopener noreferrer" className="text-xl text-light-gray/60 hover:text-cine-teal mb-2 font-sans transition-colors underline decoration-cine-teal/30 underline-offset-4 cursor-pointer text-center">
+     <Link href="/prd/motorsports" target="_blank" rel="noopener noreferrer" className="text-xl text-light-gray/60 hover:text-cine-teal mb-2 font-sans transition-colors underline decoration-cine-teal/30 underline-offset-4 cursor-pointer text-center">
       Motorsports AI Management System and Web Application (PRD)
-     </a>
+     </Link>
      <h2 className="text-xs text-light-gray/40 mt-2 font-sans">
       {currentTime.toLocaleDateString('en-US', {
        weekday: 'long',
