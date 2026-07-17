@@ -8,7 +8,7 @@ const PodcastSection = () => {
     className="text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-8 text-center"
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1.2 }}
+    transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
    >
     Syntinuum: Endless Evolutions Podcast
    </motion.h2>
@@ -16,7 +16,7 @@ const PodcastSection = () => {
     className="text-xl font-sans text-center mb-16 text-light-gray/70 max-w-4xl mx-auto"
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1.2, delay: 0.1 }}
+    transition={{ duration: 0.8, delay: 0.05 , ease: [0.22, 1, 0.36, 1]}}
    >
     Exploring innovations that solve the world's toughest challenges. Listen on Spotify, Apple, and more.
    </motion.p>
@@ -25,7 +25,7 @@ const PodcastSection = () => {
      className="w-full md:w-1/2"
      initial={{ opacity: 0, x: -20 }}
      whileInView={{ opacity: 1, x: 0 }}
-     transition={{ duration: 1.2, delay: 0.2 }}
+     transition={{ duration: 0.8, delay: 0.1 , ease: [0.22, 1, 0.36, 1]}}
     >
      <iframe
       data-testid="embed-iframe"
@@ -53,7 +53,7 @@ const PodcastSection = () => {
      className="text-lg font-sans leading-relaxed md:w-1/2 w-full text-light-gray/80 space-y-4"
      initial={{ opacity: 0, x: 20 }}
      whileInView={{ opacity: 1, x: 0 }}
-     transition={{ duration: 1.2, delay: 0.3 }}
+     transition={{ duration: 0.8, delay: 0.15 , ease: [0.22, 1, 0.36, 1]}}
     >
      <p>
       Syntinuum is where I reverse-engineer the journeys of technical founders, CEOs, and innovators. Rather than just discussing high-level vision, we dive deep into the messy realities of building scalable systems and finding product-market fit.

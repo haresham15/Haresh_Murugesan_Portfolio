@@ -8,7 +8,7 @@ const ContactFooter = () => {
     className="text-8xl md:text-9xl font-sans tracking-widest uppercase font-bold text-light-gray mb-16 text-center"
     initial={{ opacity: 0, y: 50 }}
     whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1.2 }}
+    transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
    >
     LET'S BUILD.
    </motion.h2>
@@ -17,7 +17,7 @@ const ContactFooter = () => {
     className="text-2xl text-light-gray/70 mb-12 text-center font-sans max-w-2xl"
     initial={{ opacity: 0 }}
     whileInView={{ opacity: 1 }}
-    transition={{ duration: 1.2, delay: 0.2 }}
+    transition={{ duration: 0.8, delay: 0.1 , ease: [0.22, 1, 0.36, 1]}}
    >
     Whether you have a question, a project idea, or just want to say hi.
    </motion.p>
@@ -30,7 +30,7 @@ const ContactFooter = () => {
      whileTap={{ scale: 0.95 }}
      initial={{ opacity: 0, y: 20 }}
      whileInView={{ opacity: 1, y: 0 }}
-     transition={{ duration: 1.2, delay: 0.4 }}
+     transition={{ duration: 0.8, delay: 0.2 , ease: [0.22, 1, 0.36, 1]}}
     >
      Email Me
     </motion.a>
@@ -44,7 +44,7 @@ const ContactFooter = () => {
      whileTap={{ scale: 0.95 }}
      initial={{ opacity: 0, y: 20 }}
      whileInView={{ opacity: 1, y: 0 }}
-     transition={{ duration: 1.2, delay: 0.5 }}
+     transition={{ duration: 0.8, delay: 0.25 , ease: [0.22, 1, 0.36, 1]}}
     >
      Connect on LinkedIn
     </motion.a>
@@ -54,7 +54,7 @@ const ContactFooter = () => {
     className="mt-20 text-sm text-light-gray/40 font-sans"
     initial={{ opacity: 0 }}
     whileInView={{ opacity: 1 }}
-    transition={{ duration: 1.2, delay: 0.6 }}
+    transition={{ duration: 0.8, delay: 0.3 , ease: [0.22, 1, 0.36, 1]}}
    >
     © 2025 All Rights Reserved Haresh Murugesan
    </motion.div>

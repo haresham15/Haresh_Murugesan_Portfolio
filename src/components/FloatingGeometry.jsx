@@ -131,7 +131,7 @@ const FloatingGeometry = () => {
    className="col-span-1 md:col-span-2 lg:col-span-4 row-span-1 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 relative overflow-hidden h-[300px]"
    initial={{ opacity: 0, y: 20 }}
    animate={{ opacity: 1, y: 0 }}
-   transition={{ duration: 1.2, delay: 0.25 }}
+   transition={{ duration: 0.8, delay: 0.125 , ease: [0.22, 1, 0.36, 1]}}
   >
    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
     <h2 className="text-3xl font-sans tracking-widest uppercase font-bold text-light-gray mb-2 z-10">

@@ -44,7 +44,7 @@ export default function Projects() {
         className={`group relative bg-black/40 backdrop-blur-md border border-white/5 hover:border-cine-teal/50 rounded-2xl p-6 transition-all duration-300 shadow-lg shadow-black/50 overflow-hidden flex flex-col justify-between ${colSpanClass} hover:-translate-y-1`}
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1.2, delay: index * 0.03 }}
+        transition={{ duration: 0.8, delay: index * 0.03 , ease: [0.22, 1, 0.36, 1]}}
        >
         {/* Neon Hover Sweep Effect */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-cine-teal/5 to-transparent -translate-x-full translate-y-full group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-700 ease-out"></div>

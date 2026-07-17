@@ -8,9 +8,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Montserrat', 'sans-serif'],
-        inter: ['Inter', 'sans-serif'],
-        inter: ['Inter', 'sans-serif'],
+        sans: ['Oswald', 'sans-serif'],
+        inter: ['Manrope', 'sans-serif'],
+        outfit: ['Outfit', 'sans-serif'],
         raleway: ['Raleway', 'sans-serif'],
       },
       colors: {

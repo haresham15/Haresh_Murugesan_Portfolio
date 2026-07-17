@@ -107,7 +107,7 @@ const AchievementsGallery = () => {
        initial={{ opacity: 0, scale: 0.9 }}
        animate={{ opacity: 1, scale: 1 }}
        exit={{ opacity: 0, scale: 0.9 }}
-       transition={{ duration: 1.2, delay: index * 0.05 }}
+       transition={{ duration: 0.8, delay: index * 0.05 , ease: [0.22, 1, 0.36, 1]}}
        key={item.id}
        className={`bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-cine-lavender/50 transition-colors shadow-lg shadow-black/50 group flex flex-col justify-between cursor-pointer ${item.colSpan}`}
        onClick={() => setSelectedItem(item)}

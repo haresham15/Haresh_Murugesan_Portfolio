@@ -38,7 +38,7 @@ const BentoHero = () => {
      className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 flex flex-col justify-center"
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
-     transition={{ duration: 1.2 }}
+     transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
     >
      <h1 className="text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-4">
       Hi, I'm Haresh Murugesan.
@@ -53,7 +53,7 @@ const BentoHero = () => {
      className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 flex flex-col justify-center items-center"
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
-     transition={{ duration: 1.2, delay: 0.1 }}
+     transition={{ duration: 0.8, delay: 0.05 , ease: [0.22, 1, 0.36, 1]}}
     >
      <p className="text-sm text-light-gray/60 mb-2 font-sans">LIVE STATUS</p>
      <h1 className='text-4xl font-sans tracking-widest uppercase text-cine-lavender font-bold'>
@@ -83,7 +83,7 @@ const BentoHero = () => {
      className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 overflow-hidden relative"
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
-     transition={{ duration: 1.2, delay: 0.2 }}
+     transition={{ duration: 0.8, delay: 0.1 , ease: [0.22, 1, 0.36, 1]}}
     >
      <h2 className="text-2xl font-sans tracking-widest uppercase font-bold text-light-gray mb-4">
       Syntinuum: Endless Evolutions Podcast
@@ -125,7 +125,7 @@ const BentoHero = () => {
      className="col-span-1 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col justify-center"
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
-     transition={{ duration: 1.2, delay: 0.3 }}
+     transition={{ duration: 0.8, delay: 0.15 , ease: [0.22, 1, 0.36, 1]}}
     >
      <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-light-gray mb-2">
       Philocracy
@@ -143,7 +143,7 @@ const BentoHero = () => {
      className="col-span-1 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col justify-center"
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
-     transition={{ duration: 1.2, delay: 0.4 }}
+     transition={{ duration: 0.8, delay: 0.2 , ease: [0.22, 1, 0.36, 1]}}
     >
      <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-light-gray mb-4">
       Stack

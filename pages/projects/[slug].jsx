@@ -34,7 +34,7 @@ export default function ProjectCaseStudy({ project }) {
     <motion.div
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
-     transition={{ duration: 1.2 }}
+     transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
     >
      <h1 className="text-4xl md:text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-white mb-6">
       {project.title}

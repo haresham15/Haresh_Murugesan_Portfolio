@@ -15,9 +15,7 @@ const FractalGlassBackground = () => {
           }}
           transition={{
             duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+            repeat: Infinity, ease: [0.22, 1, 0.36, 1]}}
         />
         {/* Magenta Streak */}
         <motion.div
@@ -29,9 +27,7 @@ const FractalGlassBackground = () => {
           transition={{
             duration: 10,
             repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
+            delay: 1, ease: [0.22, 1, 0.36, 1]}}
         />
         {/*Blue Streak */}
         <motion.div
@@ -43,9 +39,7 @@ const FractalGlassBackground = () => {
           transition={{
             duration: 12,
             repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2,
-          }}
+            delay: 2, ease: [0.22, 1, 0.36, 1]}}
         />
         {/* Deep Blue Base */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/10 to-transparent" />

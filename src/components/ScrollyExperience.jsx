@@ -69,7 +69,7 @@ const ScrollyExperience = () => {
        initial={{ opacity: 0, x: 20 }}
        animate={{ opacity: 1, x: 0 }}
        exit={{ opacity: 0, x: -20 }}
-       transition={{ duration: 1.2 }}
+       transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
        className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl shadow-black/50"
       >
        <p className="text-cine-teal font-sans tracking-widest uppercase mb-2">

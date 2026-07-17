@@ -26,7 +26,7 @@ export default function MotorsportsPRD() {
     <motion.div
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
-     transition={{ duration: 1.2 }}
+     transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
     >
      <div className="mb-4 text-cine-teal font-sans tracking-widest uppercase text-sm uppercase tracking-widest">
       Product Requirements Document

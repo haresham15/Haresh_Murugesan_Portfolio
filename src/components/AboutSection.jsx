@@ -8,7 +8,7 @@ const AboutSection = () => {
     className="text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-10 text-center"
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1.2 }}
+    transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
    >
     About Me...
    </motion.h2>
@@ -16,7 +16,7 @@ const AboutSection = () => {
     className="max-w-4xl mx-auto font-sans text-lg leading-loose text-light-gray/80 text-center"
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1.2, delay: 0.1 }}
+    transition={{ duration: 0.8, delay: 0.05 , ease: [0.22, 1, 0.36, 1]}}
    >
     I'm a CSE student at OSU focused on AI, software, and innovation. I love learning about innovations and tech every day and hope to use my technical skills to help provide meaningful contributions to society through CS and AI. I am the CEO and Director of Finances at Philocracy, a non-profit organization that aims to help people through fashion and love. I also host the Syntinuum: Endless Evolutions podcast, where I interview innovators and entrepreneurs about their journeys and the innovations they are implementing to solve the world's toughest challenges. In my free time, I enjoy coding, reading, and exploring new technologies.
    </motion.p>
