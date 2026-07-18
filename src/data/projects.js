@@ -2,7 +2,7 @@ export const spotlightProjects = [
  {
   slug: 'healios',
   title: 'Healios - AI Post-Surgical Recovery Assistant',
-  description: 'Built a computer vision tool leveraging a fine-tuned SAM (Segment Anything Model) that measures allergy test wheals and surgical wounds with 92% accuracy, outperforming standard edge-detection by 40%.',
+  description: 'Engineered a computer vision application utilizing a fine-tuned SAM (Segment Anything Model) to measure surgical wounds and allergy test wheals. Achieved 92% measurement accuracy, outperforming standard edge-detection algorithms by 40%.',
   icons: ['react.svg', 'python.svg', 'tensorflow.svg', 'tailwind.svg'],
   github: 'https://github.com/haresham15/healios',
   demo: '',
@@ -18,7 +18,7 @@ export const spotlightProjects = [
  {
   slug: 'ai-motorsports-hub',
   title: 'AIMotorsportsHub',
-  description: 'Aggregates live telemetry and race data from 20+ F1 sessions via the OpenF1 API. Built with a hybrid-cloud architecture utilizing Vercel, Supabase, AWS Lambda, and the Gemini API for real-time race insights.',
+  description: 'Developed a real-time telemetry aggregation platform processing live race data from 20+ F1 sessions via the OpenF1 API. Architected a scalable hybrid-cloud solution utilizing AWS Lambda, Supabase, and Vercel, integrating the Gemini API for real-time predictive insights.',
   icons: ['react.svg', 'python.svg', 'javascript.svg'],
   github: 'https://github.com/haresham15/AIMotorsportsHub',
   demo: '',
@@ -34,7 +34,7 @@ export const spotlightProjects = [
  {
   slug: 'dataio',
   title: 'DataIO - Hack To The Future',
-  description: 'Developed during the Hack To The Future hackathon, DataIO is an accessible front-end tool designed to streamline data interpretation and translate large-scale information points into intuitive and user-friendly visualizations.',
+  description: 'Award-winning project from the Hack To The Future hackathon. DataIO is a high-performance frontend data visualization tool engineered to seamlessly translate large-scale datasets into intuitive, interactive, and accessible UI components.',
   icons: ['javascript.svg', 'css.svg', 'react.svg'],
   github: 'https://github.com/haresham15/DataIO',
   demo: '',
@@ -50,7 +50,7 @@ export const spotlightProjects = [
  {
   slug: 'routerx',
   title: 'RouteRx - DataFest 2026 Winner',
-  description: 'Winner of Best Use of External Data at DataFest 2026. RouteRx translates raw healthcare accessibility data into actionable insights, utilizing a sophisticated graph-traversal algorithm to map optimal delivery routes for critical medication across underserved regions.',
+  description: 'Awarded "Best Use of External Data" at DataFest 2026. RouteRx is a spatial data analytics platform that leverages advanced graph-traversal algorithms to process raw healthcare data, dynamically mapping optimal medication delivery routes for underserved regions.',
   icons: ['react.svg', 'python.svg', 'javascript.svg'],
   github: 'https://github.com/haresham15/RouteRx',
   demo: '',

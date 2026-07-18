@@ -18,7 +18,7 @@ const AboutSection = () => {
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.8, delay: 0.05 , ease: [0.22, 1, 0.36, 1]}}
    >
-    I'm a CSE student at OSU focused on AI, software, and innovation. I love learning about innovations and tech every day and hope to use my technical skills to help provide meaningful contributions to society through CS and AI. I am the CEO and Director of Finances at Philocracy, a non-profit organization that aims to help people through fashion and love. I also host the Syntinuum: Endless Evolutions podcast, where I interview innovators and entrepreneurs about their journeys and the innovations they are implementing to solve the world's toughest challenges. In my free time, I enjoy coding, reading, and exploring new technologies.
+    I am a Computer Science Engineering student at The Ohio State University, specializing in Artificial Intelligence, full-stack software development, and innovative system design. Driven by a passion for creating impactful technology, I leverage my technical expertise in AI and modern frameworks to engineer scalable solutions. As the CEO and Director of Finances at Philocracy—a non-profit organization—I lead cross-functional initiatives merging fashion and community support. Additionally, I host the Syntinuum: Endless Evolutions podcast, where I engage with industry leaders and entrepreneurs to explore cutting-edge innovations tackling global challenges. Always eager to embrace new technologies, I am actively seeking opportunities to drive growth and engineering excellence in a forward-thinking organization.
    </motion.p>
   </section>
  );

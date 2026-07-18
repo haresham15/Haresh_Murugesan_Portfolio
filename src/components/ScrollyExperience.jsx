@@ -9,25 +9,25 @@ const ScrollyExperience = () => {
    year: 'May 2026 - Aug 2026',
    role: 'Technology Internship',
    company: 'CAS',
-   description: 'Worked as an SW and AI Developer on Business and Agent-Based Applications for Product Stakeholders. Utilized AWS services like S3 and DynamoDB to deploy applications, train AI Models, and process business data. Practiced Agentic and Trunk-Based Development practices while also assisting on C2 and C4 Architecture Designs.',
+   description: 'Engineered robust software and AI solutions for business and agent-based applications. Leveraged AWS infrastructure (S3, DynamoDB) to deploy scalable applications, train machine learning models, and process high-volume business data. Championed trunk-based and agentic development methodologies, while contributing significantly to complex C2 and C4 system architecture designs.',
   },
   {
    year: 'June 2026 - Present',
    role: 'Undergraduate AI/ML Researcher',
    company: 'Ohio State University',
-   description: 'Working on technical tasks in Digital Pathology using AI/ML methodologies.',
+   description: 'Spearheading advanced research in Digital Pathology by implementing cutting-edge AI and Machine Learning methodologies to solve complex, data-driven diagnostic challenges.',
   },
   {
    year: 'May 2025 - Present',
    role: 'Innovation Analyst Internship',
    company: 'Honda Research Institute Onramp Program',
-   description: 'Collaborated with 99P Labs in a data accelerator to identify unmet customer needs by applying lean startup and market research methodologies while working with leadership on 1000+ sample data models and visualizations.',
+   description: 'Partnered with 99P Labs in a data accelerator initiative, applying lean startup methodologies to uncover unmet market needs. Developed and analyzed 1,000+ data models and visualizations, presenting actionable strategic insights directly to senior leadership.',
   },
   {
    year: 'August 2023 - Present',
    role: 'Founder and Interviewer',
    company: 'Syntinuum: Endless Evolutions Podcast',
-   description: 'Founded and produced a tech podcast featuring CEOs and tech pioneers, growing the audience to over 8K YouTube views, 75 watch hours, and 50K Instagram views. 1000+ Likes and 50k+ Views on TikTok. Built a custom website using NextJS and unique animations, found on SyntinuumPodcast.com.',
+   description: 'Founded and grew a technology podcast interviewing industry-leading CEOs and pioneers, achieving over 100K+ combined cross-platform impressions. Architected and deployed a highly interactive, custom front-end platform using Next.js and complex animations to host content and drive engagement.',
   },
  ];
 
