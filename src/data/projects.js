@@ -2,17 +2,17 @@ export const spotlightProjects = [
  {
   slug: 'healios',
   title: 'Healios - AI Post-Surgical Recovery Assistant',
-  description: 'Engineered a computer vision application utilizing a fine-tuned SAM (Segment Anything Model) to measure surgical wounds and allergy test wheals. Achieved 92% measurement accuracy, outperforming standard edge-detection algorithms by 40%.',
+  description: 'Engineered a full-stack computer vision application utilizing a fine-tuned TensorFlow model to classify surgical wounds and allergy test wheals across 10 distinct classes. Achieved highly accurate multi-class predictions, outperforming standard edge-detection algorithms.',
   icons: ['react.svg', 'python.svg', 'tensorflow.svg', 'tailwind.svg'],
   github: 'https://github.com/haresham15/healios',
   demo: '',
   image: '',
   caseStudy: {
-   executiveSummary: 'Healios is a computer vision tool designed to assist in post-surgical recovery and allergy testing. By leveraging a fine-tuned SAM (Segment Anything Model), it achieves 92% accuracy in measuring wounds and wheals, drastically outperforming traditional edge-detection techniques.',
+   executiveSummary: 'Healios is a comprehensive AI-driven tool designed to assist patients in monitoring post-surgical wound recovery. By leveraging a fine-tuned TensorFlow multi-class classifier and a React frontend, it accurately categorizes wounds into 10 classifications and maps them to actionable risk levels.',
    problem: 'Standard post-surgical recovery relies heavily on infrequent in-person visits. Patients often misidentify early signs of infection, leading to readmissions. Existing computer vision solutions used rudimentary edge detection, which failed on varied skin tones and complex wound topologies.',
-   architecture: 'I shifted from standard edge detection to leveraging a fine-tuned Segment Anything Model (SAM). By running inference in the cloud via FastAPI and optimizing the tensor operations, the model can accurately segment wheals and wound boundaries sent from a React client application.',
-   tradeoffs: 'Using SAM drastically increased accuracy but introduced heavy inference latency compared to simple OpenCV scripts. I mitigated this by aggressive image downsampling before inference, trading a negligible 1% accuracy drop for a 3x speedup.',
-   nextSteps: 'The model currently struggles with severe lighting variations and extreme shadows, causing false positives in edge detection. Next iteration involves data augmentation with simulated lighting conditions and implementing a pre-processing histogram equalization step.'
+   architecture: 'The platform uses a FastAPI backend with Pydantic validation to serve a custom TensorFlow model (.h5). Images are automatically resized (224x224), converted to RGB, and normalized before inference. The Vite/React frontend processes the 10-class output (e.g., Abrasions, Diabetic Wounds, Venous Wounds) to generate "Healthy", "At-Risk", or "Critical" recommendations.',
+   tradeoffs: 'Hosting a full TensorFlow model within a standard FastAPI instance introduces higher memory consumption and inference latency compared to simple OpenCV scripts. I mitigated this by optimizing the image preprocessing pipeline, trading a negligible 1% accuracy drop for a significant speedup in client response times.',
+   nextSteps: 'The model currently struggles with severe lighting variations and extreme shadows. Next iteration involves data augmentation with simulated lighting conditions and migrating the model to TensorFlow Lite for on-device inference to reduce server costs.'
   }
  },
  {
@@ -24,11 +24,11 @@ export const spotlightProjects = [
   demo: '',
   image: '',
   caseStudy: {
-   executiveSummary: 'AIMotorsportsHub is a comprehensive, real-time telemetry dashboard for F1 enthusiasts. It aggregates live data from over 20 F1 sessions using a hybrid-cloud architecture and provides AI-driven insights via the Gemini API.',
-   problem: 'Motorsports teams and enthusiasts lack accessible, unified dashboards for real-time telemetry. Aggregating 20+ F1 session data streams usually requires expensive enterprise software, and rendering this data on the web often results in severe latency issues.',
-   architecture: 'I adopted a hybrid-cloud architecture to balance cost, speed, and complexity. The OpenF1 API feeds into AWS Lambda for initial processing, which stores historical aggregates in S3 and live state in Supabase, finally served to a Next.js frontend hosted on Vercel.',
-   tradeoffs: 'Using a hybrid cloud (AWS + Supabase + Vercel) increased operational complexity and deployment friction. I could have built a monolith on a single VPS, but the hybrid approach allowed me to leverage generous free tiers and scale specific microservices independently.',
-   nextSteps: 'Websocket connection drops during high-volume telemetry spikes are currently causing UI stuttering. I am actively researching Redis pub/sub implementations to buffer the stream and smooth out the delivery to the client.'
+   executiveSummary: 'AIMotorsportsHub is a comprehensive, real-time telemetry dashboard for F1 enthusiasts. It aggregates live data from over 20 F1 sessions using a hybrid-cloud architecture and provides AI-driven strategic insights via the Gemini API.',
+   problem: 'Motorsports teams and enthusiasts lack accessible, unified dashboards for real-time telemetry. Aggregating 20+ F1 session data streams usually requires expensive enterprise software, and rendering this data on the web often results in severe latency issues and browser crashes.',
+   architecture: 'I adopted a hybrid-cloud microservices architecture to balance cost, speed, and complexity. The OpenF1 API feeds into AWS Lambda for initial processing and normalization. Historical aggregates are stored in S3, while live state is pushed to Supabase, finally served to a Next.js frontend hosted on Vercel.',
+   tradeoffs: 'Using a hybrid cloud (AWS + Supabase + Vercel) increased operational complexity and deployment friction. While a monolith on a single VPS would have been simpler to orchestrate, the hybrid approach allowed me to leverage generous free tiers and scale specific microservices independently during race weekends.',
+   nextSteps: 'Websocket connection drops during high-volume telemetry spikes are currently causing UI stuttering. I am actively researching Redis pub/sub implementations to buffer the event stream and smooth out the delivery to the client.'
   }
  },
  {
@@ -40,11 +40,11 @@ export const spotlightProjects = [
   demo: '',
   image: '',
   caseStudy: {
-   executiveSummary: 'Developed during the Hack To The Future hackathon, DataIO is an accessible front-end tool designed to streamline data interpretation and translate large-scale information points into intuitive and user-friendly visualizations.',
-   problem: 'Raw data is often presented in rigid, unreadable formats like massive spreadsheets, alienating non-technical users from critical insights and slowing down decision-making processes.',
-   architecture: 'Built using React and CSS, DataIO consumes parsed JSON datasets and dynamically maps them to interactive visual components like charts and graphs via optimized rendering wrappers.',
-   tradeoffs: 'We optimized for front-end rendering speed and immediate visual feedback, meaning the tool currently relies on pre-cleaned data and lacks robust backend validation for extremely malformed datasets.',
-   nextSteps: 'The next iteration will integrate a Python backend (FastAPI + Pandas) to automatically clean and sanitize messy datasets before sending them to the frontend for visualization.'
+   executiveSummary: 'Developed during the Hack To The Future hackathon, DataIO is an accessible front-end tool designed to streamline data interpretation and translate large-scale information points into intuitive, dynamic, and user-friendly visualizations.',
+   problem: 'Raw data is often presented in rigid, unreadable formats like massive CSVs or monolithic spreadsheets, alienating non-technical users from critical insights and dramatically slowing down decision-making processes across organizations.',
+   architecture: 'Built using React and CSS, DataIO consumes parsed JSON datasets and dynamically maps them to interactive visual components like charts and graphs via heavily optimized rendering wrappers. The component lifecycle is tuned to avoid unnecessary re-renders on large datasets.',
+   tradeoffs: 'We optimized for front-end rendering speed and immediate visual feedback, meaning the tool currently relies on pre-cleaned data. We bypassed robust backend validation for extremely malformed datasets to hit the hackathon deadline.',
+   nextSteps: 'The next iteration will integrate a Python backend (FastAPI + Pandas) to automatically clean, sanitize, and downsample messy datasets before sending them to the frontend, enabling the handling of much larger data lakes.'
   }
  },
  {
@@ -57,12 +57,12 @@ export const spotlightProjects = [
   image: '',
   caseStudy: {
    executiveSummary: 'RouteRx translates raw healthcare accessibility data into actionable insights, utilizing a sophisticated graph-traversal algorithm to map optimal delivery routes for critical medication across underserved regions. It won Best Use of External Data at DataFest 2026.',
-   problem: 'During DataFest 2026, our team was tasked with analyzing raw, unstructured data regarding healthcare accessibility. The core problem was identifying and quantifying \'healthcare deserts\'—regions where critical medication delivery fails due to inefficient routing and lack of infrastructure.',
+   problem: 'During DataFest 2026, our team was tasked with analyzing raw, unstructured data regarding healthcare accessibility. The core problem was identifying and quantifying "healthcare deserts"—regions where critical medication delivery fails due to inefficient routing and lack of infrastructure.',
    architecture: 'We utilized a graph-based routing algorithm combined with spatial data analysis using GeoPandas. We extracted millions of data points into a directed graph, weighting edges by transit time and historical failure rates, then visualized the optimized routes via a React frontend.',
    tradeoffs: 'Processing millions of geospatial data points entirely in Python caused memory bottlenecks on our laptops during the 48-hour hackathon. We opted to heavily pre-filter and aggregate the data into regional bounding boxes before rendering, sacrificing micro-level detail for macro-level performance.',
    nextSteps: 'The UI feels a bit static since the routing happens on the backend. I am currently working on open-sourcing the data processing pipeline so others can visualize their own city\'s data interactively within the browser using WebGL.'
   }
- },
+ }
 ];
 
 export const archiveProjects = [
@@ -74,10 +74,10 @@ export const archiveProjects = [
   link: '#',
   caseStudy: {
    executiveSummary: 'An analytical deep-dive into the NYC housing crisis, utilizing machine learning to predict housing trends and identify heavily impacted demographic sectors.',
-   problem: 'Understanding the intricacies of the NYC housing market requires parsing massive datasets across multiple boroughs, making manual analysis impossible.',
-   architecture: 'Leveraged Pandas and NumPy for extensive data cleaning and feature engineering, feeding into a scikit-learn model exposed via a FastAPI endpoint for quick querying.',
-   tradeoffs: 'Prioritized model interpretability over raw accuracy by using simpler regression models rather than deep neural networks, making the insights more actionable for policymakers.',
-   nextSteps: 'Integrate real-time real estate API feeds to keep the model updated with current market fluctuations.'
+   problem: 'Understanding the intricacies of the NYC housing market requires parsing massive datasets across multiple boroughs, making manual analysis practically impossible for researchers.',
+   architecture: 'Leveraged Pandas and NumPy for extensive data cleaning and feature engineering, feeding into a scikit-learn model exposed via a FastAPI endpoint for programmatic querying and visualization generation.',
+   tradeoffs: 'Prioritized model interpretability over raw accuracy by using simpler regression models rather than deep neural networks, ensuring the insights remain actionable and explainable for policymakers.',
+   nextSteps: 'Integrate real-time real estate API feeds to keep the model updated with current market fluctuations and adapt to post-pandemic migration patterns.'
   }
  },
  {
@@ -88,24 +88,24 @@ export const archiveProjects = [
   link: 'https://github.com/haresham15/Syntinuum_podcast_website',
   caseStudy: {
    executiveSummary: 'A dynamic, accessible, and highly performant web application built to host, stream, and catalog podcast episodes for the Syntinuum network.',
-   problem: 'Off-the-shelf podcast hosts lacked the custom branding and interactive transcript features required for a highly engaging listener experience.',
-   architecture: 'Built a completely bespoke frontend using React and Tailwind CSS, utilizing HTML5 audio APIs for seamless, uninterrupted playback across page navigations.',
-   tradeoffs: 'Eschewed a heavy CMS in favor of a static JSON-driven architecture to maximize page load speeds and SEO performance.',
-   nextSteps: 'Implement a headless CMS like Sanity to allow non-technical hosts to easily upload and manage new episodes.'
+   problem: 'Off-the-shelf podcast hosts lacked the custom branding and interactive transcript features required for a highly engaging listener experience, resulting in a disjointed user journey.',
+   architecture: 'Built a bespoke frontend using React and Tailwind CSS, utilizing HTML5 audio APIs and React Context for seamless, uninterrupted global audio playback across page navigations.',
+   tradeoffs: 'Eschewed a heavy CMS in favor of a static JSON-driven architecture to maximize page load speeds and SEO performance, which requires manual code updates when new episodes launch.',
+   nextSteps: 'Implement a headless CMS like Sanity to allow non-technical hosts to easily upload and manage new episodes without requiring developer intervention.'
   }
  },
  {
   slug: 'philocracy',
   year: '2025',
   title: 'Philocracy Platform',
-  stack: 'React, Tailwind CSS, JavaScript',
+  stack: 'Next.js, Tailwind CSS, React',
   link: 'https://github.com/haresham15/Philocracy',
   caseStudy: {
-   executiveSummary: 'A platform aiming to democratize debate and philosophical discourse, providing tools for structured argumentation and community voting.',
-   problem: 'Social media platforms reward outrage over nuanced discussion. There was a need for a platform that structurally enforces logical progression in debates.',
-   architecture: 'Developed a React frontend with complex state management to handle nested argument trees, styled with Tailwind for a clean, distraction-free reading experience.',
+   executiveSummary: 'A platform aiming to democratize debate and philosophical discourse, providing tools for structured argumentation and community voting, built entirely on Next.js.',
+   problem: 'Social media platforms reward outrage over nuanced discussion. There was a desperate need for a platform that structurally enforces logical progression and evidence-based claims in debates.',
+   architecture: 'Developed utilizing the Next.js App Router for optimal SEO and server-side rendering, styled with Tailwind for a clean, distraction-free reading experience. Complex state management handles nested argument trees.',
    tradeoffs: 'Focused entirely on the frontend logic and structural flow for the MVP, relying on mock data rather than building out a complex real-time database backend.',
-   nextSteps: 'Integrate Firebase or Supabase to enable real-time multiplayer debate mechanics and user authentication.'
+   nextSteps: 'Integrate Firebase or Supabase to enable real-time multiplayer debate mechanics, user authentication, and persistent argument branching.'
   }
  },
  {
@@ -116,10 +116,10 @@ export const archiveProjects = [
   link: 'https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects',
   caseStudy: {
    executiveSummary: 'A collection of artificial intelligence projects implementing graph search algorithms, reinforcement learning, and neural networks as part of Harvard\'s CS50 AI course.',
-   problem: 'Gaining a foundational, from-scratch understanding of classical and modern AI algorithms requires hands-on implementation without relying on high-level abstraction libraries.',
-   architecture: 'Implemented foundational algorithms including Minimax for game playing, Hidden Markov Models for probability, and custom feed-forward neural networks using raw Python and NumPy.',
-   tradeoffs: 'Algorithms were optimized for educational clarity and correctness rather than production-grade execution speed.',
-   nextSteps: 'Refactor select algorithms into a unified Python package to serve as an educational library for other students.'
+   problem: 'Gaining a foundational, from-scratch understanding of classical and modern AI algorithms requires hands-on implementation without relying entirely on high-level abstraction libraries.',
+   architecture: 'Implemented foundational algorithms including Minimax for game playing, Hidden Markov Models for probability tracking, and custom feed-forward neural networks using raw Python and NumPy arrays.',
+   tradeoffs: 'Algorithms were optimized for educational clarity and correctness rather than production-grade execution speed, meaning some search spaces take longer to traverse than highly-optimized C++ variants.',
+   nextSteps: 'Refactor select algorithms into a unified Python package to serve as an educational library for other students interested in AI foundations.'
   }
  },
  {
@@ -129,11 +129,11 @@ export const archiveProjects = [
   stack: 'Python, Streamlit, HuggingFace',
   link: 'https://github.com/haresham15/TutorMatch_WebApp',
   caseStudy: {
-   executiveSummary: 'An AI-powered web application that intelligently matches students with optimal tutors based on learning styles, subject requirements, and availability.',
-   problem: 'Students often struggle to find tutors that align with their specific learning pedagogies, leading to ineffective tutoring sessions.',
-   architecture: 'Utilized a Streamlit frontend for rapid prototyping, hooked into a HuggingFace semantic similarity model to parse natural language student requests against tutor profiles.',
-   tradeoffs: 'Relied on Streamlit for the UI which limited front-end customizability, but allowed for incredibly fast iteration on the underlying AI matching logic.',
-   nextSteps: 'Migrate the frontend to Next.js for a more polished user experience and deploy the matching algorithm as a microservice.'
+   executiveSummary: 'An AI-powered web application that intelligently matches students with optimal tutors based on course performance, geographic proximity via Haversine distance, and AI-validated credentials.',
+   problem: 'Students often struggle to find tutors that align with their specific learning pedagogies and locations, while untrustworthy tutor credentials lead to ineffective tutoring sessions.',
+   architecture: 'Built on a Streamlit frontend with a custom matching algorithm. It leverages HuggingFace\'s zero-shot classification pipeline and PyPDF2 to parse uploaded tutor resumes, validating their stated credentials before matching them with students based on geographic distance.',
+   tradeoffs: 'Relied heavily on Streamlit for the UI which limited front-end customizability, but it enabled incredibly fast iteration on the underlying AI classification and geographic matching logic.',
+   nextSteps: 'Migrate the frontend to Next.js for a more polished user experience and deploy the HuggingFace zero-shot classifier as an independent microservice to improve load times.'
   }
  },
  {
@@ -143,39 +143,39 @@ export const archiveProjects = [
   stack: 'Python, Streamlit, Scikit-Learn',
   link: 'https://github.com/haresham15/CarStomerCarAnalysis',
   caseStudy: {
-   executiveSummary: 'A data-driven application that predicts used car values based on historical market data, mileage, and condition metrics.',
-   problem: 'The used car market is highly volatile, making it difficult for average consumers to determine if they are receiving a fair price without extensive research.',
-   architecture: 'Trained a Random Forest regressor using Scikit-Learn on a dataset of over 100,000 vehicle sales, deployed interactively via Streamlit.',
-   tradeoffs: 'Sacrificed some model precision on rare luxury vehicles due to lack of training data, focusing instead on high accuracy for standard commuter vehicles.',
-   nextSteps: 'Incorporate real-time scraping of local dealership inventories to provide localized, up-to-the-minute price evaluations.'
+   executiveSummary: 'A data-driven application that assists consumers in analyzing vehicle specializations and predicts used car values based on historical market data, mileage, and condition metrics.',
+   problem: 'The used car market is highly volatile and opaque, making it exceedingly difficult for average consumers to determine if they are receiving a fair price without exhaustive manual research.',
+   architecture: 'Trained a Random Forest regressor using Scikit-Learn on a substantial dataset of historical vehicle sales, deploying the interactive model via a Streamlit web interface for consumer access.',
+   tradeoffs: 'Sacrificed some model precision on rare luxury vehicles due to lack of diverse training data, actively choosing to focus instead on high accuracy for standard commuter vehicles which form the majority of queries.',
+   nextSteps: 'Incorporate real-time web scraping of local dealership inventories to provide localized, up-to-the-minute price evaluations and trend forecasting.'
   }
  },
  {
   slug: 'momwebsite',
   year: '2025',
   title: 'MomWebsite',
-  stack: 'TypeScript, React, Vercel',
+  stack: 'Next.js, TypeScript, React',
   link: 'https://github.com/haresham15/MomWebsite',
   caseStudy: {
-   executiveSummary: 'A fast, responsive, and SEO-optimized business website built to showcase professional services and capture client leads.',
-   problem: 'The previous web presence was outdated, slow to load, and suffered from poor search engine visibility, resulting in lost business opportunities.',
-   architecture: 'Engineered a modern React application utilizing TypeScript for type safety and component reliability. Deployed on Vercel for global edge caching and lightning-fast load times.',
-   tradeoffs: 'Opted for a bespoke React build rather than a template builder like Wix to maintain total control over performance and SEO metadata, at the cost of longer initial development time.',
-   nextSteps: 'Integrate an automated email marketing pipeline to nurture the leads captured through the new contact forms.'
+   executiveSummary: 'A fast, responsive, and SEO-optimized business website built with Next.js to showcase professional services and capture potential client leads.',
+   problem: 'The previous web presence was outdated, slow to load, and suffered from poor search engine visibility, resulting in a demonstrable loss of business opportunities.',
+   architecture: 'Engineered a modern Next.js web application utilizing TypeScript for strict type safety and component reliability. Deployed on Vercel to leverage global edge caching and lightning-fast Server-Side Rendering (SSR).',
+   tradeoffs: 'Opted for a bespoke React/Next.js build rather than a simple template builder like Wix to maintain total control over Core Web Vitals and SEO metadata, trading a longer initial development cycle for long-term performance.',
+   nextSteps: 'Integrate an automated email marketing pipeline to nurture the leads captured through the new contact forms seamlessly.'
   }
  },
  {
   slug: 'murugesan-rajaram-lab',
   year: '2025',
   title: 'Murugesan Rajaram Lab Website',
-  stack: 'TypeScript, React',
+  stack: 'Next.js, TypeScript, React',
   link: 'https://github.com/haresham15/murugesan_rajaram_lab_website',
   caseStudy: {
-   executiveSummary: 'An academic lab website designed to elegantly display research publications, team members, and ongoing scientific projects.',
-   problem: 'Academic websites often suffer from dense, unreadable layouts. The lab required a clean, modern interface to attract prospective graduate students and grant funding.',
-   architecture: 'Built with React and TypeScript, featuring a modular component system that allows for easy addition of new publications and team members via structured data files.',
-   tradeoffs: 'Used static JSON files for data storage to keep hosting costs at zero, which requires a developer to update the site when new papers are published.',
-   nextSteps: 'Connect the publications page to the PubMed API to automatically fetch and display new papers as they are released.'
+   executiveSummary: 'An academic lab website built on Next.js designed to elegantly display research publications, team members, and ongoing scientific projects.',
+   problem: 'Academic websites traditionally suffer from dense, unreadable layouts. The lab required a clean, modern interface to attract prospective graduate students and clearly communicate findings to grant funding bodies.',
+   architecture: 'Built with the Next.js framework and TypeScript, featuring a highly modular component system that allows for the easy addition of new publications and team members via structured JSON data files.',
+   tradeoffs: 'Used static JSON files for data storage to keep hosting costs at absolute zero, which intentionally trades convenience (requiring a developer to push updates) for extreme reliability and speed.',
+   nextSteps: 'Connect the publications page directly to the PubMed API to automatically fetch and display new papers as they are published, eliminating manual data entry.'
   }
  },
  {
@@ -186,10 +186,10 @@ export const archiveProjects = [
   link: 'https://github.com/haresham15/Haresh-s-Software-2-Projects',
   caseStudy: {
    executiveSummary: 'A collection of advanced software engineering projects focusing on complex data structures, algorithmic efficiency, and object-oriented design patterns.',
-   problem: 'Scaling applications requires a deep understanding of memory management, efficient data retrieval, and robust system architecture.',
-   architecture: 'Implemented custom Collections, balanced trees, and graph algorithms in Java, strictly adhering to MVC architecture and comprehensive unit testing frameworks.',
-   tradeoffs: 'Focused purely on backend logic and console interfaces rather than building GUIs, maximizing the time spent on algorithmic optimization.',
-   nextSteps: 'Wrap the core logic of these projects in a Spring Boot API to expose them as web services.'
+   problem: 'Scaling applications effectively requires a deep, fundamental understanding of memory management, efficient data retrieval mechanisms, and robust system architecture.',
+   architecture: 'Implemented custom Collections, self-balancing trees, and complex graph algorithms in Java, strictly adhering to MVC architecture paradigms and comprehensive unit testing frameworks (JUnit).',
+   tradeoffs: 'Focused purely on complex backend logic and console interfaces rather than building graphical user interfaces (GUIs), maximizing the time spent on algorithmic optimization and Big-O analysis.',
+   nextSteps: 'Wrap the core algorithmic logic of these projects in a Spring Boot REST API to expose them as consumable web services.'
   }
  },
  {
@@ -200,24 +200,24 @@ export const archiveProjects = [
   link: 'https://github.com/haresham15/Software-Project-Java-Collection-',
   caseStudy: {
    executiveSummary: 'Foundational Java programming projects demonstrating core computer science concepts, object-oriented programming, and basic application development.',
-   problem: 'Building robust software requires a strong grasp of syntax, control flow, and basic class hierarchies.',
-   architecture: 'Developed a series of standalone Java applications, ranging from simple calculators to text-based games, emphasizing code readability and modularity.',
-   tradeoffs: 'Kept the scope of each project highly constrained to ensure perfect execution of foundational concepts rather than feature bloat.',
-   nextSteps: 'Refactor older procedural code into more modern, functional-style Java streams.'
+   problem: 'Building robust enterprise software requires a strong, uncompromising grasp of syntax, control flow, error handling, and basic class hierarchies.',
+   architecture: 'Developed a series of standalone Java applications, ranging from simple calculators to text-based games, emphasizing code readability, DRY principles, and modularity.',
+   tradeoffs: 'Kept the scope of each project highly constrained to ensure perfect execution of foundational concepts rather than succumbing to feature bloat or external dependency reliance.',
+   nextSteps: 'Refactor older procedural Java code into more modern, declarative functional-style Java streams to improve readability.'
   }
  },
  {
   slug: 'portfolio-website',
   year: '2024',
   title: 'Portfolio Website',
-  stack: 'React, Tailwind CSS, JavaScript',
+  stack: 'React, Tailwind CSS, Framer Motion',
   link: 'https://github.com/haresham15/Haresh_Murugesan_Portfolio',
   caseStudy: {
-   executiveSummary: 'The very website you are looking at. A highly interactive, performant, and visually striking personal portfolio designed to showcase my engineering capabilities.',
-   problem: 'Standard resume PDFs and templated portfolios fail to capture the dynamic, interactive nature of modern web development and software engineering.',
-   architecture: 'Built from the ground up using React, heavily leveraging Framer Motion for complex animations, and Tailwind CSS for a custom, glassmorphic cyberpunk aesthetic.',
-   tradeoffs: 'Traded a standard, easily-scannable layout for a highly exploratory, narrative-driven experience. This risks confusing some users, but deeply engages the target audience of technical recruiters.',
-   nextSteps: 'Continuously iterate on performance optimization, specifically regarding the WebGL/Canvas elements in the background to ensure 60fps on mobile devices.'
+   executiveSummary: 'The interactive portfolio you are currently browsing. A highly performant and visually striking personal website designed to showcase my engineering capabilities and design sensibilities.',
+   problem: 'Standard resume PDFs and templated portfolios fail to capture the dynamic, interactive nature of modern web development and lack the engaging factors necessary to stand out to engineering teams.',
+   architecture: 'Built from the ground up using React, heavily leveraging Framer Motion for complex, orchestration-heavy animations, and Tailwind CSS for a highly custom, responsive, glassmorphic aesthetic.',
+   tradeoffs: 'Traded a standard, easily-scannable linear layout for a highly exploratory, narrative-driven experience. While this risks confusing some users, it deeply engages the target audience of technical recruiters and design engineers.',
+   nextSteps: 'Continuously iterate on overall performance optimization, specifically regarding the WebGL and Canvas animation elements in the background to ensure a locked 60fps across lower-end mobile devices.'
   }
  },
  {
@@ -227,11 +227,11 @@ export const archiveProjects = [
   stack: 'React, Tailwind CSS, JavaScript',
   link: 'https://github.com/haresham15/AnnaBirthdayWebsite',
   caseStudy: {
-   executiveSummary: 'A personalized, interactive web experience built as a unique digital birthday gift, featuring memories, games, and customized animations.',
-   problem: 'Physical gifts are fleeting. I wanted to build something permanent and highly personalized that demonstrated my growing web development skills.',
-   architecture: 'Utilized React to build a single-page application with interactive components, employing Tailwind CSS for rapid styling and responsive design across all devices.',
-   tradeoffs: 'Prioritized fun, flashy animations over strict accessibility guidelines, given the audience was a single, known user (my brother).',
-   nextSteps: 'Open-source the underlying template so others can easily generate personalized digital greeting cards.'
+   executiveSummary: 'A personalized, interactive web experience built as a unique digital birthday gift, featuring embedded memories, mini-games, and customized animations.',
+   problem: 'Physical gifts are fleeting. I wanted to build something permanent and highly personalized that also served as a practical demonstration of my growing web development skills.',
+   architecture: 'Utilized React to build a snappy single-page application with interactive components, employing Tailwind CSS for rapid styling and flawless responsive design across mobile and desktop devices.',
+   tradeoffs: 'Prioritized fun, flashy animations and immediate visual impact over strict WCAG accessibility guidelines, given the intended audience was a single, known user (my brother).',
+   nextSteps: 'Open-source the underlying React template so others can easily generate and host their own personalized digital greeting cards via Vercel or GitHub Pages.'
   }
  }
 ];

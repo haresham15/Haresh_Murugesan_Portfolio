@@ -155,7 +155,7 @@ const AchievementsGallery = () => {
        initial={{ scale: 0.9, y: 20 }}
        animate={{ scale: 1, y: 0 }}
        exit={{ scale: 0.9, y: 20 }}
-       className="bg-glass-bg border border-glass-border rounded-2xl w-full max-w-6xl h-[90vh] sm:h-[80vh] flex flex-col md:flex-row overflow-hidden relative shadow-2xl shadow-cine-lavender/20"
+       className="bg-glass-bg border border-glass-border rounded-2xl w-full max-w-6xl h-auto max-h-[90vh] flex flex-col md:flex-row overflow-hidden relative shadow-2xl shadow-cine-lavender/20"
        onClick={(e) => e.stopPropagation()} // Prevent clicks inside modal from closing it
       >
        {/* Close Button */}
@@ -168,7 +168,7 @@ const AchievementsGallery = () => {
        </button>
 
        {/* Left Side: PDF Viewer */}
-       <div className={`w-full ${selectedItem.description ? 'md:w-2/3 h-[50vh] md:h-full border-b md:border-b-0 md:border-r' : 'h-[90vh] sm:h-[80vh]'} bg-black/40 border-glass-border`}>
+       <div className={`w-full ${selectedItem.description ? 'md:w-2/3 border-b md:border-b-0 md:border-r' : ''} aspect-[1.414] border-glass-border`}>
         {selectedItem.pdfUrl ? (
          <iframe
           src={`${selectedItem.pdfUrl}#toolbar=0&view=FitH`}
@@ -177,7 +177,7 @@ const AchievementsGallery = () => {
           style={{ border: 'none' }}
          />
         ) : (
-         <div className="w-full h-full flex items-center justify-center text-light-gray/50 font-sans tracking-widest uppercase">
+         <div className="w-full h-full flex items-center justify-center text-light-gray/50 font-sans tracking-widest uppercase bg-black/40">
           PDF not available yet.
          </div>
         )}
