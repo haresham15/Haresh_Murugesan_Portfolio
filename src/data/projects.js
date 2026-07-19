@@ -48,19 +48,19 @@ export const spotlightProjects = [
   }
  },
  {
-  slug: 'routerx',
-  title: 'RouteRx - DataFest 2026 Winner',
-  description: 'Awarded "Best Use of External Data" at DataFest 2026. RouteRx is a spatial data analytics platform that leverages advanced graph-traversal algorithms to process raw healthcare data, dynamically mapping optimal medication delivery routes for underserved regions.',
+  slug: 'careline',
+  title: 'Bi-Directional Transit Hub (Careline)',
+  description: 'Predictive logistics engine solving healthcare transit barriers through bi-directional shuttle optimization for Stormont Vail Health. Built for DataFest 2026.',
   icons: ['react.svg', 'python.svg', 'javascript.svg'],
-  github: 'https://github.com/haresham15/RouteRx',
-  demo: '',
-  image: '',
+  github: 'https://github.com/haresham15/Careline',
+  demo: 'https://data-fest2026.vercel.app/',
+  image: '/careline.png',
   caseStudy: {
-   executiveSummary: 'RouteRx translates raw healthcare accessibility data into actionable insights, utilizing a sophisticated graph-traversal algorithm to map optimal delivery routes for critical medication across underserved regions. It won Best Use of External Data at DataFest 2026.',
-   problem: 'During DataFest 2026, our team was tasked with analyzing raw, unstructured data regarding healthcare accessibility. The core problem was identifying and quantifying "healthcare deserts"—regions where critical medication delivery fails due to inefficient routing and lack of infrastructure.',
-   architecture: 'We utilized a graph-based routing algorithm combined with spatial data analysis using GeoPandas. We extracted millions of data points into a directed graph, weighting edges by transit time and historical failure rates, then visualized the optimized routes via a React frontend.',
-   tradeoffs: 'Processing millions of geospatial data points entirely in Python caused memory bottlenecks on our laptops during the 48-hour hackathon. We opted to heavily pre-filter and aggregate the data into regional bounding boxes before rendering, sacrificing micro-level detail for macro-level performance.',
-   nextSteps: 'The UI feels a bit static since the routing happens on the backend. I am currently working on open-sourcing the data processing pipeline so others can visualize their own city\'s data interactively within the browser using WebGL.'
+   executiveSummary: 'Patients from transit-poor neighborhoods miss preventative care and escalate to the ER. Discharged patients are trapped in beds because public transit can\'t get them home. One bi-directional shuttle fleet solves both problems on a single budget.',
+   problem: 'Stormont Vail Health faced a crisis: patients from transit-vulnerable areas escalated to the ER, while medically cleared patients were stuck in beds due to lack of transit. 43 of 141 Census Blocks had zero bus stops within 800m.',
+   architecture: 'Engineered a spatial data analytics platform combining a Transit Vulnerability Index and DBSCAN clustering to group high-vulnerability blocks into shuttle zones. Utilized Open Source Routing Machine (OSRM) for turn-by-turn routing and an interactive dashboard for discharge manifests.',
+   tradeoffs: 'Processed millions of geospatial data points but faced performance bottlenecks during DataFest 2026. We mitigated this by aggregating data into regional bounding boxes and shuttle zone clusters, sacrificing micro-level detail for macro-level routing efficiency.',
+   nextSteps: 'Further optimize the shuttle routing by integrating real-time traffic data and expanding the Transit Vulnerability Map to cover additional regional healthcare facilities.'
   }
  }
 ];
