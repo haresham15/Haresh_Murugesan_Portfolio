@@ -21,8 +21,8 @@ const AchievementsGallery = dynamic(() => import('./components/AchievementsGalle
 const NeuralSkills = dynamic(() => import('./components/NeuralSkills'), {
  ssr: false,
  loading: () => (
-  <section id="skills" className="w-full max-w-7xl mx-auto px-4 py-20 relative">
-   <h2 className="text-6xl font-sans tracking-widest uppercase font-bold text-light-gray mb-16 text-center">
+  <section id="skills" className="w-full max-w-7xl mx-auto px-4 py-24 relative">
+   <h2 className="text-6xl font-heading tracking-widest uppercase font-bold text-light-gray mb-16 text-center">
     Skills & Tools
    </h2>
    <div className="h-[600px] w-full mb-12 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl flex items-center justify-center p-8">

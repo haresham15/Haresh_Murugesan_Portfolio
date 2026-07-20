@@ -15,16 +15,16 @@ export default function Projects() {
    
    <FractalGlassBackground />
    
-   <main className="w-full max-w-7xl mx-auto px-4 py-20 relative z-10">
+   <main className="w-full max-w-7xl mx-auto px-4 py-24 relative z-10">
     <Link 
      href="/" 
-     className="inline-flex items-center gap-2 mb-12 text-cine-teal hover:text-cine-lavender transition-colors font-sans tracking-widest uppercase group"
+     className="inline-flex items-center gap-2 mb-12 text-cine-teal hover:text-cine-lavender transition-colors font-heading tracking-widest uppercase group"
     >
      <span className="group-hover:-translate-x-1 transition-transform">←</span>
      Back to Portfolio
     </Link>
     
-    <h1 className="text-6xl font-sans tracking-widest uppercase font-bold text-light-gray mb-16 text-center tracking-tight">
+    <h1 className="text-6xl font-heading tracking-widest uppercase font-bold text-light-gray mb-16 text-center tracking-tight">
      Project Archive
     </h1>
 
@@ -52,7 +52,7 @@ export default function Projects() {
 
         <div className="relative z-10">
          <div className="flex justify-between items-start mb-6">
-          <span className="px-3 py-1 bg-cine-teal/10 text-cine-teal text-xs font-sans tracking-widest uppercase rounded-full border border-cine-teal/20 group-hover:border-cine-teal/50 transition-colors">
+          <span className="px-3 py-1 bg-cine-teal/10 text-cine-teal text-xs font-heading tracking-widest uppercase rounded-full border border-cine-teal/20 group-hover:border-cine-teal/50 transition-colors">
            {project.year}
           </span>
           <div className="text-light-gray/40 group-hover:text-cine-teal transition-colors">
@@ -66,7 +66,7 @@ export default function Projects() {
         </div>
 
         <div className="relative z-10 mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
-         <p className="text-light-gray/50 font-sans tracking-widest uppercase text-xs uppercase tracking-wider leading-relaxed truncate pr-4">
+         <p className="text-light-gray/50 font-heading tracking-widest uppercase text-xs uppercase tracking-wider leading-relaxed truncate pr-4">
           {project.stack}
          </p>
          <div className="flex gap-1.5 shrink-0">

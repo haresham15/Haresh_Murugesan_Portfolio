@@ -32,8 +32,8 @@ const ScrollyExperience = () => {
  ];
 
  return (
-  <section id="experience" className="w-full max-w-7xl mx-auto px-4 py-20 min-h-screen">
-   <h2 className="text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-16 text-center">
+  <section id="experience" className="w-full max-w-7xl mx-auto px-4 py-24">
+   <h2 className="text-6xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray mb-16 text-center">
     Experience
    </h2>
    <div className="flex flex-col md:flex-row gap-8">
@@ -51,7 +51,7 @@ const ScrollyExperience = () => {
         whileHover={{ scale: 1.02, x: 5 }}
         whileTap={{ scale: 0.98 }}
        >
-        <p className="text-sm text-cine-teal font-sans tracking-widest uppercase mb-1">{exp.year}</p>
+        <p className="text-sm text-cine-teal font-heading tracking-widest uppercase mb-1">{exp.year}</p>
         <p className={`text-lg font-sans font-semibold transition-colors ${activeIndex === index ? 'text-white' : 'text-light-gray/60'}`}>
          {exp.role}
         </p>
@@ -72,10 +72,10 @@ const ScrollyExperience = () => {
        transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
        className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-cine-glow-lavender animate-pulse-glow"
       >
-       <p className="text-cine-teal font-sans tracking-widest uppercase mb-2">
+       <p className="text-cine-teal font-heading tracking-widest uppercase mb-2">
         {experiences[activeIndex].year}
        </p>
-       <h3 className="text-3xl font-sans tracking-widest uppercase font-bold text-light-gray mb-2">
+       <h3 className="text-3xl font-heading tracking-widest uppercase font-bold text-light-gray mb-2">
         {experiences[activeIndex].role}
        </h3>
        <p className="text-xl text-light-gray/80 font-sans mb-6">

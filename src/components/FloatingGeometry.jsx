@@ -134,7 +134,7 @@ const FloatingGeometry = () => {
    transition={{ duration: 0.8, delay: 0.125 , ease: [0.22, 1, 0.36, 1]}}
   >
    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-    <h2 className="text-3xl font-sans tracking-widest uppercase font-bold text-light-gray mb-2 z-10">
+    <h2 className="text-3xl font-heading tracking-widest uppercase font-bold text-light-gray mb-2 z-10">
      "in·no·va·tion"
     </h2>
     <p className="text-sm text-light-gray/60 font-sans z-10">
@@ -144,7 +144,7 @@ const FloatingGeometry = () => {
      <br />
      A new method, idea or product that is different from the existing ones.
     </p>
-    <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-light-gray mb-2 z-10">
+    <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-light-gray mb-2 z-10">
      Definitions from Oxford Dictionary
     </h3>
    </div>

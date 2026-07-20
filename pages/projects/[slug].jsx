@@ -9,14 +9,14 @@ import Header from '../../src/components/Header';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
+  whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: "-50px" },
   viewport: { once: true },
   transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
 };
 
 export default function ProjectCaseStudy({ project }) {
   if (!project) {
-    return <div className="text-white p-20 flex items-center justify-center min-h-screen font-sans text-2xl tracking-widest uppercase">Project not found</div>;
+    return <div className="text-white p-20 flex items-center justify-center min-h-screen font-heading text-2xl tracking-widest uppercase">Project not found</div>;
   }
 
   const caseStudy = project.caseStudy || {};
@@ -52,14 +52,14 @@ export default function ProjectCaseStudy({ project }) {
           <div className="relative z-10 w-full max-w-6xl mx-auto px-4 pb-12">
             <Link 
               href="/projects"
-              className="text-light-gray/60 hover:text-cine-teal font-sans tracking-widest uppercase text-sm mb-6 inline-flex items-center gap-2 transition-colors"
+              className="text-light-gray/60 hover:text-cine-teal font-heading tracking-widest uppercase text-sm mb-6 inline-flex items-center gap-2 transition-colors"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
               Back to Archive
             </Link>
             
             <motion.h1 
-              className="text-5xl md:text-7xl font-sans tracking-widest uppercase font-bold tracking-tight text-white mb-6"
+              className="text-5xl md:text-7xl font-heading tracking-widest uppercase font-bold tracking-tight text-white mb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -74,22 +74,22 @@ export default function ProjectCaseStudy({ project }) {
               transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             >
               {project.stack && (
-                <span className="text-cine-lavender font-sans tracking-widest uppercase px-4 py-2 text-sm border border-cine-lavender/30 bg-cine-lavender/5 rounded-full">
+                <span className="text-cine-lavender font-heading tracking-widest uppercase px-4 py-2 text-sm border border-cine-lavender/30 bg-cine-lavender/5 rounded-full">
                   {project.stack}
                 </span>
               )}
               {project.github && (
-                <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-cine-teal hover:text-white font-sans tracking-widest uppercase text-sm border border-cine-teal/30 bg-cine-teal/10 px-6 py-2 rounded-full transition-all hover:bg-cine-teal/20">
+                <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-cine-teal hover:text-white font-heading tracking-widest uppercase text-sm border border-cine-teal/30 bg-cine-teal/10 px-6 py-2 rounded-full transition-all hover:bg-cine-teal/20">
                   GitHub
                 </a>
               )}
               {project.demo && (
-                <a href={project.demo} target="_blank" rel="noopener noreferrer" className="text-white hover:text-charcoal font-sans tracking-widest uppercase text-sm border border-white bg-white/10 hover:bg-white px-6 py-2 rounded-full transition-all">
+                <a href={project.demo} target="_blank" rel="noopener noreferrer" className="text-white hover:text-charcoal font-heading tracking-widest uppercase text-sm border border-white bg-white/10 hover:bg-white px-6 py-2 rounded-full transition-all">
                   Live Demo
                 </a>
               )}
               {project.link && project.link !== '#' && !project.github && !project.demo && (
-                <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-cine-teal hover:text-white font-sans tracking-widest uppercase text-sm border border-cine-teal/30 bg-cine-teal/10 px-6 py-2 rounded-full transition-all hover:bg-cine-teal/20">
+                <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-cine-teal hover:text-white font-heading tracking-widest uppercase text-sm border border-cine-teal/30 bg-cine-teal/10 px-6 py-2 rounded-full transition-all hover:bg-cine-teal/20">
                   {project.link.includes('github.com') ? 'GitHub' : 'View Project'}
                 </a>
               )}
@@ -109,7 +109,7 @@ export default function ProjectCaseStudy({ project }) {
                 {...fadeIn}
               >
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cine-teal to-cine-lavender opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                <h2 className="text-2xl font-sans tracking-widest uppercase font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-light-gray/60 mb-6">
+                <h2 className="text-2xl font-heading tracking-widest uppercase font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-light-gray/60 mb-6">
                   Executive Summary
                 </h2>
                 <p className="text-light-gray/90 font-inter leading-relaxed text-lg">
@@ -123,7 +123,7 @@ export default function ProjectCaseStudy({ project }) {
                 className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-8 hover:border-cine-teal/30 transition-colors"
                 {...fadeIn}
               >
-                <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-cine-teal mb-4 flex items-center gap-3">
+                <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-cine-teal mb-4 flex items-center gap-3">
                   <span className="text-3xl font-light text-cine-teal/50">01</span> The Problem
                 </h3>
                 <p className="text-light-gray/80 font-inter leading-relaxed text-lg">
@@ -137,7 +137,7 @@ export default function ProjectCaseStudy({ project }) {
                 className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-8 hover:border-cine-lavender/30 transition-colors"
                 {...fadeIn}
               >
-                <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-cine-lavender mb-4 flex items-center gap-3">
+                <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-cine-lavender mb-4 flex items-center gap-3">
                   <span className="text-3xl font-light text-cine-lavender/50">02</span> Approach & Architecture
                 </h3>
                 <p className="text-light-gray/80 font-inter leading-relaxed text-lg">
@@ -152,7 +152,7 @@ export default function ProjectCaseStudy({ project }) {
                   className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-8 hover:border-white/20 transition-colors"
                   {...fadeIn}
                 >
-                  <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-white mb-4 flex items-center gap-3">
+                  <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-white mb-4 flex items-center gap-3">
                     <span className="text-3xl font-light text-white/30">03</span> Tradeoffs
                   </h3>
                   <p className="text-light-gray/80 font-inter leading-relaxed">
@@ -166,7 +166,7 @@ export default function ProjectCaseStudy({ project }) {
                   className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-8 hover:border-cine-teal/30 transition-colors"
                   {...fadeIn}
                 >
-                  <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-cine-teal mb-4 flex items-center gap-3">
+                  <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-cine-teal mb-4 flex items-center gap-3">
                     <span className="text-3xl font-light text-cine-teal/30">04</span> Next Steps
                   </h3>
                   <p className="text-light-gray/80 font-inter leading-relaxed">
@@ -184,11 +184,11 @@ export default function ProjectCaseStudy({ project }) {
               className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-3xl p-8 sticky top-32"
               {...fadeIn}
             >
-              <h3 className="text-sm font-sans tracking-widest uppercase font-bold text-light-gray/50 mb-6">Project Metadata</h3>
+              <h3 className="text-sm font-heading tracking-widest uppercase font-bold text-light-gray/50 mb-6">Project Metadata</h3>
               
               {project.icons && project.icons.length > 0 && (
                 <div className="mb-8">
-                  <p className="text-xs font-sans tracking-widest uppercase text-light-gray/40 mb-3">Technologies</p>
+                  <p className="text-xs font-heading tracking-widest uppercase text-light-gray/40 mb-3">Technologies</p>
                   <div className="flex flex-wrap gap-3">
                     {project.icons.map((icon, i) => (
                       <div key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center p-2">
@@ -201,7 +201,7 @@ export default function ProjectCaseStudy({ project }) {
 
               {project.description && (
                 <div>
-                  <p className="text-xs font-sans tracking-widest uppercase text-light-gray/40 mb-3">TL;DR</p>
+                  <p className="text-xs font-heading tracking-widest uppercase text-light-gray/40 mb-3">TL;DR</p>
                   <p className="text-light-gray/70 font-inter text-sm leading-relaxed">
                     {project.description}
                   </p>

@@ -3,11 +3,11 @@ import { motion } from 'framer-motion';
 
 const PodcastSection = () => {
  return (
-  <section id="podcast" className="w-full max-w-7xl mx-auto px-4 py-20">
+  <section id="podcast" className="w-full max-w-7xl mx-auto px-4 py-24">
    <motion.h2
-    className="text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-8 text-center"
+    className="text-6xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray mb-8 text-center"
     initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
+    whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }}
     transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
    >
     Syntinuum: Endless Evolutions Podcast
@@ -15,7 +15,7 @@ const PodcastSection = () => {
    <motion.p
     className="text-xl font-sans text-center mb-16 text-light-gray/70 max-w-4xl mx-auto"
     initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
+    whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }}
     transition={{ duration: 0.8, delay: 0.05 , ease: [0.22, 1, 0.36, 1]}}
    >
     Exploring innovations that solve the world's toughest challenges. Listen on Spotify, Apple, and more.
@@ -24,7 +24,7 @@ const PodcastSection = () => {
     <motion.div
      className="w-full md:w-1/2"
      initial={{ opacity: 0, x: -20 }}
-     whileInView={{ opacity: 1, x: 0 }}
+     whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }}
      transition={{ duration: 0.8, delay: 0.1 , ease: [0.22, 1, 0.36, 1]}}
     >
      <iframe
@@ -43,7 +43,7 @@ const PodcastSection = () => {
        href="https://www.syntinuumpodcast.com/"
        target="_blank" rel="noopener noreferrer"
        
-       className="inline-block px-8 py-3 bg-transparent border border-cine-lavender text-cine-lavender hover:text-white hover:bg-cine-lavender/20 hover:shadow-2xl font-sans tracking-widest uppercase font-bold rounded-lg transition-all"
+       className="inline-block px-8 py-3 bg-transparent border border-cine-lavender text-cine-lavender hover:text-white hover:bg-cine-lavender/20 hover:shadow-2xl font-heading tracking-widest uppercase font-bold rounded-lg transition-all"
       >
        Visit Website
       </a>
@@ -52,7 +52,7 @@ const PodcastSection = () => {
     <motion.div
      className="text-lg font-sans leading-relaxed md:w-1/2 w-full text-light-gray/80 space-y-4"
      initial={{ opacity: 0, x: 20 }}
-     whileInView={{ opacity: 1, x: 0 }}
+     whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-50px" }}
      transition={{ duration: 0.8, delay: 0.15 , ease: [0.22, 1, 0.36, 1]}}
     >
      <p>

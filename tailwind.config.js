@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
+        heading: ['"Space Grotesk"', 'sans-serif'],
         inter: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
         outfit: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
         raleway: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],

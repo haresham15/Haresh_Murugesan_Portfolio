@@ -73,8 +73,8 @@ const AchievementsGallery = () => {
  );
 
  return (
-  <section id="achievements" className="w-full max-w-7xl mx-auto px-4 py-20 relative z-10">
-   <h2 className="text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-8 text-center">
+  <section id="achievements" className="w-full max-w-7xl mx-auto px-4 py-24 relative z-10">
+   <h2 className="text-6xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray mb-8 text-center">
     Achievements
    </h2>
    
@@ -119,9 +119,9 @@ const AchievementsGallery = () => {
          }`}>
           {item.type === 'award' ? 'Award' : 'Certification'}
          </span>
-         <span className="text-light-gray/40 font-sans tracking-widest uppercase text-sm">{item.date}</span>
+         <span className="text-light-gray/40 font-heading tracking-widest uppercase text-sm">{item.date}</span>
         </div>
-        <h3 className="text-2xl font-sans font-bold text-light-gray mb-2 group-hover:text-white transition-colors">
+        <h3 className="text-2xl font-heading font-bold text-light-gray mb-2 group-hover:text-white transition-colors">
          {item.title}
         </h3>
         <p className="text-light-gray/70 font-sans mb-4">{item.issuer}</p>
@@ -132,7 +132,7 @@ const AchievementsGallery = () => {
         )}
        </div>
        
-       <div className="mt-6 flex items-center gap-2 text-cine-teal group-hover:text-cine-lavender transition-colors font-sans tracking-widest uppercase text-sm uppercase tracking-wider">
+       <div className="mt-6 flex items-center gap-2 text-cine-teal group-hover:text-cine-lavender transition-colors font-heading tracking-widest uppercase text-sm uppercase tracking-wider">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         View Document <span className="text-lg leading-none transform group-hover:translate-x-1 transition-transform">→</span>
        </div>
@@ -177,7 +177,7 @@ const AchievementsGallery = () => {
           style={{ border: 'none' }}
          />
         ) : (
-         <div className="w-full h-full flex items-center justify-center text-light-gray/50 font-sans tracking-widest uppercase bg-black/40">
+         <div className="w-full h-full flex items-center justify-center text-light-gray/50 font-heading tracking-widest uppercase bg-black/40">
           PDF not available yet.
          </div>
         )}
@@ -192,15 +192,15 @@ const AchievementsGallery = () => {
           {selectedItem.type === 'award' ? 'Award' : 'Certification'}
          </span>
          
-         <span className="text-light-gray/40 font-sans tracking-widest uppercase mb-2 block">{selectedItem.date}</span>
-         <h3 className="text-3xl font-bold font-sans text-light-gray mb-2">
+         <span className="text-light-gray/40 font-heading tracking-widest uppercase mb-2 block">{selectedItem.date}</span>
+         <h3 className="text-3xl font-bold font-heading text-light-gray mb-2">
           {selectedItem.title}
          </h3>
          <p className="text-xl text-cine-lavender/80 font-sans mb-8 border-b border-glass-border pb-4">
           {selectedItem.issuer}
          </p>
          <div className="prose prose-invert">
-          <h4 className="text-light-gray font-sans tracking-widest uppercase text-lg mb-2">About this achievement</h4>
+          <h4 className="text-light-gray font-heading tracking-widest uppercase text-lg mb-2">About this achievement</h4>
           <p className="text-light-gray/70 leading-relaxed font-sans">
            {selectedItem.description}
           </p>

@@ -8,7 +8,7 @@ const CinematicLoader = () => {
     initial={{ opacity: 0, letterSpacing: '0px' }}
     animate={{ opacity: [0, 1, 0.5, 1], letterSpacing: '10px' }}
     transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' , ease: [0.22, 1, 0.36, 1]}}
-    className="font-sans font-bold text-cine-teal uppercase text-sm mb-4"
+    className="font-heading font-bold text-cine-teal uppercase text-sm mb-4"
    >
     Loading
    </motion.div>

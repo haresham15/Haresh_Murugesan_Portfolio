@@ -8,14 +8,14 @@ const ProjectLab = () => {
 
 
  return (
-  <section id="projects" className="w-full max-w-7xl mx-auto px-4 py-20">
-   <h2 className="text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-16 text-center">
+  <section id="projects" className="w-full max-w-7xl mx-auto px-4 py-24">
+   <h2 className="text-6xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray mb-16 text-center">
     Projects
    </h2>
 
    {/* Spotlight Section */}
    <div className="mb-20">
-    <h3 className="text-3xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-8">
+    <h3 className="text-3xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray mb-8">
      Spotlight
     </h3>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -24,7 +24,7 @@ const ProjectLab = () => {
        key={index}
        className="bg-black/40 backdrop-blur-md border border-white/10 hover:border-cine-teal/50 rounded-2xl p-6 overflow-hidden relative shadow-lg shadow-black/50 hover:shadow-cine-glow-teal transition-all duration-300"
        initial={{ opacity: 0, y: 20 }}
-       whileInView={{ opacity: 1, y: 0 }}
+       whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }}
        transition={{ duration: 0.8, delay: index * 0.1 , ease: [0.22, 1, 0.36, 1]}}
       >
        {project.image ? (
@@ -42,7 +42,7 @@ const ProjectLab = () => {
        )}
        
        <div className="flex justify-between items-start mb-4">
-        <h3 className="text-2xl font-sans tracking-widest uppercase font-bold text-light-gray flex-1 tracking-tight">
+        <h3 className="text-2xl font-heading tracking-widest uppercase font-bold text-light-gray flex-1 tracking-tight">
          {project.title}
         </h3>
         <div className="flex gap-2 ml-4">
@@ -84,7 +84,7 @@ const ProjectLab = () => {
         {project.slug && (
          <Link
           href={`/projects/${project.slug}`}
-          className="text-cine-lavender hover:text-cine-teal transition-colors text-sm font-sans tracking-widest uppercase flex items-center gap-2 border border-cine-lavender/50 px-3 py-1 rounded-full bg-cine-lavender/5 hover:bg-cine-teal/10"
+          className="text-cine-lavender hover:text-cine-teal transition-colors text-sm font-heading tracking-widest uppercase flex items-center gap-2 border border-cine-lavender/50 px-3 py-1 rounded-full bg-cine-lavender/5 hover:bg-cine-teal/10"
          >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
           Read Case Study
@@ -98,7 +98,7 @@ const ProjectLab = () => {
 
    {/* Full Archive Link */}
    <div className="mt-12 flex justify-center">
-    <Link href="/projects" className="group relative px-10 py-4 bg-black/40 backdrop-blur-md border border-white/10 hover:border-cine-teal/50 text-light-gray font-sans tracking-widest uppercase rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-black/50 hover:shadow-cine-glow-teal overflow-hidden">
+    <Link href="/projects" className="group relative px-10 py-4 bg-black/40 backdrop-blur-md border border-white/10 hover:border-cine-teal/50 text-light-gray font-heading tracking-widest uppercase rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-black/50 hover:shadow-cine-glow-teal overflow-hidden">
      {/* Hover sweep effect */}
      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cine-teal/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
      

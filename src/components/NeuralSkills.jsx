@@ -202,7 +202,7 @@ const SkillCard = ({ skill, idx }) => {
      className={`absolute ${classes.linePosition} w-6 h-[1px] bg-cine-teal/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100`}
     ></div>
     
-    <h4 className="text-cine-teal font-sans tracking-widest uppercase font-bold text-sm border-b border-white/10 pb-1 mb-1">
+    <h4 className="text-cine-teal font-heading tracking-widest uppercase font-bold text-sm border-b border-white/10 pb-1 mb-1">
      {skill.title}
     </h4>
     <p className="text-light-gray/90 text-xs font-sans leading-relaxed">
@@ -240,8 +240,8 @@ const NeuralSkills = () => {
  ];
 
  return (
-  <section id="skills" className="w-full max-w-7xl mx-auto px-4 py-20 relative">
-   <h2 className="text-6xl font-sans tracking-widest uppercase font-bold text-light-gray mb-16 text-center">
+  <section id="skills" className="w-full max-w-7xl mx-auto px-4 py-24 relative">
+   <h2 className="text-6xl font-heading tracking-widest uppercase font-bold text-light-gray mb-16 text-center">
     Skills & Tools
    </h2>
 

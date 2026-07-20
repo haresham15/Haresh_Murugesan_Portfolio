@@ -32,7 +32,7 @@ const BentoHero = () => {
  ];
 
  return (
-  <section className="relative w-full max-w-7xl mx-auto px-4 py-20">
+  <section className="relative w-full max-w-7xl mx-auto px-4 py-24">
    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     {/* Tile A - Intro */}
     <motion.div
@@ -41,10 +41,10 @@ const BentoHero = () => {
      animate={{ opacity: 1, y: 0 }}
      transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
     >
-     <h1 className="text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-4">
+     <h1 className="text-6xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray mb-4">
       Hi, I'm Haresh Murugesan.
      </h1>
-     <p className="text-2xl text-light-gray/80 font-sans">
+     <p className="text-2xl text-light-gray/80 font-heading">
       Learning, Adapting and Innovating
      </p>
     </motion.div>
@@ -57,14 +57,14 @@ const BentoHero = () => {
      transition={{ duration: 0.8, delay: 0.05 , ease: [0.22, 1, 0.36, 1]}}
     >
      <p className="text-sm text-light-gray/60 mb-2 font-sans">LIVE STATUS</p>
-     <h1 className='text-4xl font-sans tracking-widest uppercase text-cine-lavender font-bold'>
+     <h1 className='text-4xl font-heading tracking-widest uppercase text-cine-lavender font-bold'>
       {formatTime(currentTime)}
      </h1>
-     <h3 className="text-2xl text-cine-teal/60 mb-2 font-sans text-center font-bold">Current Projects</h3>
+     <h3 className="text-2xl text-cine-teal/60 mb-2 font-heading text-center font-bold">Current Projects</h3>
      <Link href="/prd/motorsports" target="_blank" rel="noopener noreferrer" className="text-xl text-light-gray/60 hover:text-cine-teal mb-2 font-sans transition-colors underline decoration-cine-teal/30 underline-offset-4 cursor-pointer text-center">
       Motorsports AI Management System and Web Application (PRD)
      </Link>
-     <h2 className="text-xs text-light-gray/40 mt-2 font-sans">
+     <h2 className="text-xs text-light-gray/40 mt-2 font-heading">
       {currentTime.toLocaleDateString('en-US', {
        weekday: 'long',
        year: 'numeric',
@@ -86,7 +86,7 @@ const BentoHero = () => {
      animate={{ opacity: 1, y: 0 }}
      transition={{ duration: 0.8, delay: 0.1 , ease: [0.22, 1, 0.36, 1]}}
     >
-     <h2 className="text-2xl font-sans tracking-widest uppercase font-bold text-light-gray mb-4">
+     <h2 className="text-2xl font-heading tracking-widest uppercase font-bold text-light-gray mb-4">
       Syntinuum: Endless Evolutions Podcast
      </h2>
      <p className="text-sm text-light-gray/70 mb-4 font-sans">
@@ -128,7 +128,7 @@ const BentoHero = () => {
      animate={{ opacity: 1, y: 0 }}
      transition={{ duration: 0.8, delay: 0.15 , ease: [0.22, 1, 0.36, 1]}}
     >
-     <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-light-gray mb-2">
+     <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-light-gray mb-2">
       Philocracy
      </h3>
      <p className="text-sm text-light-gray/70 font-sans">
@@ -146,7 +146,7 @@ const BentoHero = () => {
      animate={{ opacity: 1, y: 0 }}
      transition={{ duration: 0.8, delay: 0.2 , ease: [0.22, 1, 0.36, 1]}}
     >
-     <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-light-gray mb-4">
+     <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-light-gray mb-4">
       Stack
      </h3>
      <div className="flex flex-wrap gap-2">

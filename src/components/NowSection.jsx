@@ -16,8 +16,8 @@ const NowSection = () => {
  ];
 
  return (
-  <section id="now" className="w-full max-w-4xl mx-auto px-4 py-20">
-   <h2 className="text-4xl md:text-6xl font-sans tracking-widest uppercase font-bold tracking-tight text-light-gray mb-12 flex items-center gap-4">
+  <section id="now" className="w-full max-w-4xl mx-auto px-4 py-24">
+   <h2 className="text-4xl md:text-6xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray mb-12 flex items-center gap-4">
     What I'm Building Now
     <span className="relative flex h-4 w-4">
      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cine-teal opacity-75"></span>
@@ -31,15 +31,15 @@ const NowSection = () => {
       key={index}
       className="relative"
       initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
+      whileInView={{ opacity: 1, x: 0 }} 
+      viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.8, delay: index * 0.1 , ease: [0.22, 1, 0.36, 1]}}
-      viewport={{ once: true }}
      >
       {/* Timeline dot */}
       <div className="absolute -left-[21px] md:-left-[37px] top-2 h-3 w-3 rounded-full bg-cine-teal/50 border border-cine-teal"></div>
       
-      <span className="text-cine-teal font-sans tracking-widest uppercase text-sm block mb-2">{post.date}</span>
-      <h3 className="text-xl font-sans tracking-widest uppercase font-bold text-white mb-2">{post.title}</h3>
+      <span className="text-cine-teal font-heading tracking-widest uppercase text-sm block mb-2">{post.date}</span>
+      <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-white mb-2">{post.title}</h3>
       <p className="text-light-gray/80 font-sans leading-relaxed">
        {post.content}
       </p>
