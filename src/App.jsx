@@ -7,13 +7,15 @@ import BentoHero from './components/BentoHero';
 import FractalGlassBackground from './components/FractalGlassBackground';
 import AboutSection from './components/AboutSection';
 import ScrollyExperience from './components/ScrollyExperience';
-import PodcastSection from './components/PodcastSection';
-import ProjectLab from './components/ProjectLab';
-import NowSection from './components/NowSection';
-import AchievementsGallery from './components/AchievementsGallery';
 import ContactFooter from './components/ContactFooter';
 import Spinner from './spinner';
 import TerminalLoader from './components/TerminalLoader';
+
+// Dynamically import below-the-fold components to improve initial load performance
+const PodcastSection = dynamic(() => import('./components/PodcastSection'), { ssr: true });
+const ProjectLab = dynamic(() => import('./components/ProjectLab'), { ssr: true });
+const NowSection = dynamic(() => import('./components/NowSection'), { ssr: true });
+const AchievementsGallery = dynamic(() => import('./components/AchievementsGallery'), { ssr: true });
 
 // Dynamically import NeuralSkills with no SSR to avoid React 19 compatibility issues
 const NeuralSkills = dynamic(() => import('./components/NeuralSkills'), {

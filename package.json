@@ -21,7 +21,6 @@
     "three": "^0.160.1"
   },
   "devDependencies": {
-    "baseline-browser-mapping": "^2.9.19",
     "sitemap-generator": "^7.5.2"
   },
   "scripts": {

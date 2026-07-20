@@ -2,15 +2,15 @@ export const spotlightProjects = [
  {
   slug: 'healios',
   title: 'Healios - AI Post-Surgical Recovery Assistant',
-  description: 'Engineered a full-stack computer vision application utilizing a fine-tuned TensorFlow model to classify surgical wounds and allergy test wheals across 10 distinct classes. Achieved highly accurate multi-class predictions, outperforming standard edge-detection algorithms.',
+  description: 'Engineered a full-stack computer vision application utilizing a fine-tuned TensorFlow model to classify surgical wounds and allergy test wheals across 10 distinct classes. Achieved highly accurate multi-class predictions, outperforming standard edge-detection algorithms. The application is now fully deployed and accessible to patients.',
   icons: ['react.svg', 'python.svg', 'tensorflow.svg', 'tailwind.svg'],
   github: 'https://github.com/haresham15/healios',
-  demo: '',
-  image: '',
+  demo: 'https://healiosaisurgeryassistant.vercel.app/patient/dashboard',
+  image: '/healios.png',
   caseStudy: {
    executiveSummary: 'Healios is a comprehensive AI-driven tool designed to assist patients in monitoring post-surgical wound recovery. By leveraging a fine-tuned TensorFlow multi-class classifier and a React frontend, it accurately categorizes wounds into 10 classifications and maps them to actionable risk levels.',
    problem: 'Standard post-surgical recovery relies heavily on infrequent in-person visits. Patients often misidentify early signs of infection, leading to readmissions. Existing computer vision solutions used rudimentary edge detection, which failed on varied skin tones and complex wound topologies.',
-   architecture: 'The platform uses a FastAPI backend with Pydantic validation to serve a custom TensorFlow model (.h5). Images are automatically resized (224x224), converted to RGB, and normalized before inference. The Vite/React frontend processes the 10-class output (e.g., Abrasions, Diabetic Wounds, Venous Wounds) to generate "Healthy", "At-Risk", or "Critical" recommendations.',
+   architecture: 'The platform uses a FastAPI backend with Pydantic validation to serve a custom TensorFlow model (.h5). Images are automatically resized (224x224), converted to RGB, and normalized before inference. The Vite/React frontend processes the 10-class output (e.g., Abrasions, Diabetic Wounds, Venous Wounds) to generate "Healthy", "At-Risk", or "Critical" recommendations. The frontend is seamlessly deployed and hosted on Vercel.',
    tradeoffs: 'Hosting a full TensorFlow model within a standard FastAPI instance introduces higher memory consumption and inference latency compared to simple OpenCV scripts. I mitigated this by optimizing the image preprocessing pipeline, trading a negligible 1% accuracy drop for a significant speedup in client response times.',
    nextSteps: 'The model currently struggles with severe lighting variations and extreme shadows. Next iteration involves data augmentation with simulated lighting conditions and migrating the model to TensorFlow Lite for on-device inference to reduce server costs.'
   }

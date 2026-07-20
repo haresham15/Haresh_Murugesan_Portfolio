@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { spotlightProjects, archiveProjects } from '../data/projects';
 
 const ProjectLab = () => {
- const [hoveredProject, setHoveredProject] = useState(null);
+
 
  return (
   <section id="projects" className="w-full max-w-7xl mx-auto px-4 py-20">
@@ -23,13 +23,11 @@ const ProjectLab = () => {
       <motion.div
        key={index}
        className="bg-black/40 backdrop-blur-md border border-white/10 hover:border-cine-teal/50 rounded-2xl p-6 overflow-hidden relative shadow-lg shadow-black/50 transition-all duration-300"
-       onMouseEnter={() => setHoveredProject(index)}
-       onMouseLeave={() => setHoveredProject(null)}
        initial={{ opacity: 0, y: 20 }}
        whileInView={{ opacity: 1, y: 0 }}
        transition={{ duration: 0.8, delay: index * 0.1 , ease: [0.22, 1, 0.36, 1]}}
       >
-       {hoveredProject === index && project.image ? (
+       {project.image ? (
         <Image
          src={project.image}
          alt={project.title}
