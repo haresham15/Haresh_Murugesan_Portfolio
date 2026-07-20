@@ -183,9 +183,10 @@ const SkillCard = ({ skill, idx }) => {
 
  return (
   <motion.div
+   id={`skill-${skill.icon.split('.')[0]}`}
    ref={cardRef}
    onMouseEnter={handleMouseEnter}
-   className="relative group bg-glass-bg backdrop-blur-md border border-glass-border rounded-xl p-4 hover:border-cine-teal transition-colors cursor-pointer z-10 hover:z-50"
+   className="relative scroll-mt-32 group bg-glass-bg backdrop-blur-md border border-glass-border rounded-xl p-4 hover:border-cine-teal transition-all duration-300 cursor-pointer z-10 hover:z-50 hover:shadow-cine-glow-teal"
    whileHover={{ scale: 1.1, y: -5 }}
    whileTap={{ scale: 0.95 }}
   >
@@ -193,7 +194,7 @@ const SkillCard = ({ skill, idx }) => {
 
    {/* Detail Modal with Dynamic CSS Positioning */}
    <div 
-    className={`absolute ${classes.modalPosition} w-48 md:w-56 p-4 bg-[#050505]/95 backdrop-blur-xl border border-white/10 group-hover:border-cine-teal/50 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible scale-75 group-hover:scale-100 transition-all duration-300 pointer-events-none shadow-2xl shadow-black/80 flex flex-col gap-1.5 z-50`}
+    className={`absolute ${classes.modalPosition} w-48 md:w-56 p-4 bg-[#050505]/95 backdrop-blur-xl border border-white/10 group-hover:border-cine-teal/50 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible scale-75 group-hover:scale-100 transition-all duration-300 pointer-events-none shadow-cine-glow-teal flex flex-col gap-1.5 z-50 animate-pulse-glow`}
     style={{ marginTop, marginLeft }}
    >
     {/* Angled Connecting Thin Line */}
@@ -228,9 +229,13 @@ const NeuralSkills = () => {
   { icon: 'css.svg', title: 'CSS', description: 'Styling, animations, and responsive web design.' },
   { icon: 'javascript.svg', title: 'JavaScript', description: 'Dynamic scripting for interactive web features.' },
   { icon: 'pandas.svg', title: 'Pandas', description: 'Powerful data manipulation and analysis library.' },
-  { icon: 'sql.svg', title: 'SQL', description: 'Relational database management and data querying.' },
+  { icon: 'nextjs.svg', title: 'Next.js', description: 'Building scalable, fast, and SEO-optimized React applications.' },
+  { icon: 'typescript.svg', title: 'TypeScript', description: 'Strict syntactical superset of JavaScript for robust codebases.' },
   { icon: 'tailwind.svg', title: 'Tailwind CSS', description: 'Utility-first CSS framework for rapid UI development.' },
-  { icon: 'scitkitlearn.svg', title: 'scikit-learn', description: 'Machine learning library for predictive data analysis.' },
+  { icon: 'fastapi.svg', title: 'FastAPI', description: 'High-performance web framework for building APIs with Python.' },
+  { icon: 'aws.svg', title: 'AWS', description: 'Cloud infrastructure, serverless computing, and microservices.' },
+  { icon: 'sql.svg', title: 'SQL', description: 'Relational database management and data manipulation.' },
+  { icon: 'scitkitlearn.svg', title: 'Scikit-Learn', description: 'Machine learning library for classification, regression, and clustering.' },
   { icon: 'matplotlib.svg', title: 'Matplotlib', description: 'Comprehensive library for creating static and interactive visualizations.' },
  ];
 

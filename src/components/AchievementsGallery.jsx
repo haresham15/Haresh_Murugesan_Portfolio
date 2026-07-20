@@ -109,7 +109,7 @@ const AchievementsGallery = () => {
        exit={{ opacity: 0, scale: 0.9 }}
        transition={{ duration: 0.8, delay: index * 0.05 , ease: [0.22, 1, 0.36, 1]}}
        key={item.id}
-       className={`bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-cine-lavender/50 transition-colors shadow-lg shadow-black/50 group flex flex-col justify-between cursor-pointer ${item.colSpan}`}
+       className={`bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-cine-lavender/50 transition-all duration-300 shadow-lg shadow-black/50 hover:shadow-cine-glow-lavender group flex flex-col justify-between cursor-pointer ${item.colSpan}`}
        onClick={() => setSelectedItem(item)}
       >
        <div>
@@ -155,7 +155,7 @@ const AchievementsGallery = () => {
        initial={{ scale: 0.9, y: 20 }}
        animate={{ scale: 1, y: 0 }}
        exit={{ scale: 0.9, y: 20 }}
-       className="bg-glass-bg border border-glass-border rounded-2xl w-full max-w-6xl h-auto max-h-[90vh] flex flex-col md:flex-row overflow-hidden relative shadow-2xl shadow-cine-lavender/20"
+       className="bg-glass-bg border border-glass-border rounded-2xl w-full max-w-6xl h-auto max-h-[90vh] flex flex-col md:flex-row overflow-hidden relative shadow-cine-glow-lavender animate-pulse-glow"
        onClick={(e) => e.stopPropagation()} // Prevent clicks inside modal from closing it
       >
        {/* Close Button */}

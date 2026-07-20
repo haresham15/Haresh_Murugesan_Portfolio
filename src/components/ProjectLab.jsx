@@ -22,7 +22,7 @@ const ProjectLab = () => {
      {spotlightProjects.map((project, index) => (
       <motion.div
        key={index}
-       className="bg-black/40 backdrop-blur-md border border-white/10 hover:border-cine-teal/50 rounded-2xl p-6 overflow-hidden relative shadow-lg shadow-black/50 transition-all duration-300"
+       className="bg-black/40 backdrop-blur-md border border-white/10 hover:border-cine-teal/50 rounded-2xl p-6 overflow-hidden relative shadow-lg shadow-black/50 hover:shadow-cine-glow-teal transition-all duration-300"
        initial={{ opacity: 0, y: 20 }}
        whileInView={{ opacity: 1, y: 0 }}
        transition={{ duration: 0.8, delay: index * 0.1 , ease: [0.22, 1, 0.36, 1]}}
@@ -47,7 +47,9 @@ const ProjectLab = () => {
         </h3>
         <div className="flex gap-2 ml-4">
          {project.icons.map((icon, i) => (
-          <Image key={i} src={`/icons/${icon}`} alt="tech-icon" width={24} height={24} className="w-6 h-6 opacity-70" />
+          <a key={i} href={`#skill-${icon.split('.')[0]}`} className="hover:scale-110 transition-transform">
+           <Image src={`/icons/${icon}`} alt="tech-icon" width={24} height={24} className="w-6 h-6 opacity-70 hover:opacity-100" />
+          </a>
          ))}
         </div>
        </div>
@@ -96,7 +98,7 @@ const ProjectLab = () => {
 
    {/* Full Archive Link */}
    <div className="mt-12 flex justify-center">
-    <Link href="/projects" className="group relative px-10 py-4 bg-black/40 backdrop-blur-md border border-white/10 hover:border-cine-teal/50 text-light-gray font-sans tracking-widest uppercase rounded-xl transition-all hover:scale-105 shadow-lg shadow-black/50 overflow-hidden">
+    <Link href="/projects" className="group relative px-10 py-4 bg-black/40 backdrop-blur-md border border-white/10 hover:border-cine-teal/50 text-light-gray font-sans tracking-widest uppercase rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-black/50 hover:shadow-cine-glow-teal overflow-hidden">
      {/* Hover sweep effect */}
      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cine-teal/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
      

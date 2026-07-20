@@ -3,7 +3,7 @@ export const spotlightProjects = [
   slug: 'healios',
   title: 'Healios - AI Post-Surgical Recovery Assistant',
   description: 'Engineered a full-stack computer vision application utilizing a fine-tuned TensorFlow model to classify surgical wounds and allergy test wheals across 10 distinct classes. Achieved highly accurate multi-class predictions, outperforming standard edge-detection algorithms. The application is now fully deployed and accessible to patients.',
-  icons: ['react.svg', 'python.svg', 'tensorflow.svg', 'tailwind.svg'],
+  icons: ['react.svg', 'python.svg', 'tensorflow.svg', 'tailwind.svg', 'fastapi.svg'],
   github: 'https://github.com/haresham15/healios',
   demo: 'https://healiosaisurgeryassistant.vercel.app/patient/dashboard',
   image: '/healios.png',
@@ -19,7 +19,7 @@ export const spotlightProjects = [
   slug: 'ai-motorsports-hub',
   title: 'AIMotorsportsHub',
   description: 'Developed a real-time telemetry aggregation platform processing live race data from 20+ F1 sessions via the OpenF1 API. Architected a scalable hybrid-cloud solution utilizing AWS Lambda, Supabase, and Vercel, integrating the Gemini API for real-time predictive insights.',
-  icons: ['react.svg', 'python.svg', 'javascript.svg'],
+  icons: ['react.svg', 'python.svg', 'javascript.svg', 'nextjs.svg', 'aws.svg'],
   github: 'https://github.com/haresham15/AIMotorsportsHub',
   demo: '',
   image: '',
@@ -32,26 +32,26 @@ export const spotlightProjects = [
   }
  },
  {
-  slug: 'dataio',
-  title: 'DataIO - Hack To The Future',
-  description: 'Award-winning project from the Hack To The Future hackathon. DataIO is a high-performance frontend data visualization tool engineered to seamlessly translate large-scale datasets into intuitive, interactive, and accessible UI components.',
-  icons: ['javascript.svg', 'css.svg', 'react.svg'],
+  slug: 'nyc-housing-market-ai',
+  title: 'NYC Housing Market AI/ML Analysis',
+  description: 'Award-winning project from the Hack To The Future hackathon. Engineered a cyberpunk-themed, interactive visualization engine that leverages machine learning and spatial data analytics to analyze housing value concentration, wealth gravity, and gentrification vectors across New York City.',
+  icons: ['javascript.svg', 'css.svg', 'react.svg', 'python.svg', 'scitkitlearn.svg'],
   github: 'https://github.com/haresham15/DataIO',
-  demo: '',
-  image: '',
+  demo: 'https://data-io-gamma.vercel.app/',
+  image: '/nyc-map-magnet.png',
   caseStudy: {
-   executiveSummary: 'Developed during the Hack To The Future hackathon, DataIO is an accessible front-end tool designed to streamline data interpretation and translate large-scale information points into intuitive, dynamic, and user-friendly visualizations.',
-   problem: 'Raw data is often presented in rigid, unreadable formats like massive CSVs or monolithic spreadsheets, alienating non-technical users from critical insights and dramatically slowing down decision-making processes across organizations.',
-   architecture: 'Built using React and CSS, DataIO consumes parsed JSON datasets and dynamically maps them to interactive visual components like charts and graphs via heavily optimized rendering wrappers. The component lifecycle is tuned to avoid unnecessary re-renders on large datasets.',
-   tradeoffs: 'We optimized for front-end rendering speed and immediate visual feedback, meaning the tool currently relies on pre-cleaned data. We bypassed robust backend validation for extremely malformed datasets to hit the hackathon deadline.',
-   nextSteps: 'The next iteration will integrate a Python backend (FastAPI + Pandas) to automatically clean, sanitize, and downsample messy datasets before sending them to the frontend, enabling the handling of much larger data lakes.'
+   executiveSummary: 'Developed during the Hack To The Future hackathon, this project is a dynamic market physics engine designed to visualize the NYC housing crisis. By treating the real estate market as a physical system, it uses AI/ML to map wealth gravity wells and economic zones.',
+   problem: 'Traditional real estate models view housing prices as a static map of costs. There was a need to dynamically visualize how high-density wealth zones pull market value inward and accelerate gentrification across the five boroughs.',
+   architecture: 'Built a high-performance React frontend that consumes parsed NYC spatial datasets. It features dynamic rendering wrappers and utilizes K-Means Clustering to detect hidden similarities between properties based on age, location, and price.',
+   tradeoffs: 'Optimized for front-end rendering speed and immersive 3D/cyberpunk aesthetics for the hackathon, meaning the tool currently relies on pre-processed machine learning outputs rather than real-time model inference.',
+   nextSteps: 'Integrate real-time real estate API feeds to keep the AI model updated with current market fluctuations and adapt to ongoing migration patterns.'
   }
  },
  {
   slug: 'careline',
   title: 'Bi-Directional Transit Hub (Careline)',
   description: 'Predictive logistics engine solving healthcare transit barriers through bi-directional shuttle optimization for Stormont Vail Health. Built for DataFest 2026.',
-  icons: ['react.svg', 'python.svg', 'javascript.svg'],
+  icons: ['react.svg', 'python.svg', 'javascript.svg', 'pandas.svg'],
   github: 'https://github.com/haresham15/Careline',
   demo: 'https://data-fest2026.vercel.app/',
   image: '/careline.png',
@@ -66,25 +66,13 @@ export const spotlightProjects = [
 ];
 
 export const archiveProjects = [
- {
-  slug: 'nyc-housing-crisis-analysis',
-  year: '2026',
-  title: 'NYC Housing Crisis AI/ML Analysis',
-  stack: 'FastAPI, Pandas, NumPy',
-  link: '#',
-  caseStudy: {
-   executiveSummary: 'An analytical deep-dive into the NYC housing crisis, utilizing machine learning to predict housing trends and identify heavily impacted demographic sectors.',
-   problem: 'Understanding the intricacies of the NYC housing market requires parsing massive datasets across multiple boroughs, making manual analysis practically impossible for researchers.',
-   architecture: 'Leveraged Pandas and NumPy for extensive data cleaning and feature engineering, feeding into a scikit-learn model exposed via a FastAPI endpoint for programmatic querying and visualization generation.',
-   tradeoffs: 'Prioritized model interpretability over raw accuracy by using simpler regression models rather than deep neural networks, ensuring the insights remain actionable and explainable for policymakers.',
-   nextSteps: 'Integrate real-time real estate API feeds to keep the model updated with current market fluctuations and adapt to post-pandemic migration patterns.'
-  }
- },
+
  {
   slug: 'syntinuum-podcast-website',
   year: '2026',
   title: 'Syntinuum Podcast Website',
   stack: 'JavaScript, React, Tailwind CSS',
+  icons: ['javascript.svg', 'react.svg', 'tailwind.svg'],
   link: 'https://github.com/haresham15/Syntinuum_podcast_website',
   caseStudy: {
    executiveSummary: 'A dynamic, accessible, and highly performant web application built to host, stream, and catalog podcast episodes for the Syntinuum network.',
@@ -99,6 +87,7 @@ export const archiveProjects = [
   year: '2025',
   title: 'Philocracy Platform',
   stack: 'Next.js, Tailwind CSS, React',
+  icons: ['nextjs.svg', 'tailwind.svg', 'react.svg'],
   link: 'https://github.com/haresham15/Philocracy',
   caseStudy: {
    executiveSummary: 'A platform aiming to democratize debate and philosophical discourse, providing tools for structured argumentation and community voting, built entirely on Next.js.',
@@ -113,6 +102,7 @@ export const archiveProjects = [
   year: '2025',
   title: 'CS50 Intro to AI with Python',
   stack: 'Python, TensorFlow, NumPy',
+  icons: ['python.svg', 'tensorflow.svg', 'numpy.svg'],
   link: 'https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects',
   caseStudy: {
    executiveSummary: 'A collection of artificial intelligence projects implementing graph search algorithms, reinforcement learning, and neural networks as part of Harvard\'s CS50 AI course.',
@@ -127,6 +117,7 @@ export const archiveProjects = [
   year: '2025',
   title: 'TutorMatch: AI-Powered Tutoring Platform',
   stack: 'Python, Streamlit, HuggingFace',
+  icons: ['python.svg', 'streamlit.svg', 'huggingface.svg'],
   link: 'https://github.com/haresham15/TutorMatch_WebApp',
   caseStudy: {
    executiveSummary: 'An AI-powered web application that intelligently matches students with optimal tutors based on course performance, geographic proximity via Haversine distance, and AI-validated credentials.',
@@ -141,6 +132,7 @@ export const archiveProjects = [
   year: '2025',
   title: 'CarStomer: Car Value Analysis',
   stack: 'Python, Streamlit, Scikit-Learn',
+  icons: ['python.svg', 'streamlit.svg', 'scitkitlearn.svg'],
   link: 'https://github.com/haresham15/CarStomerCarAnalysis',
   caseStudy: {
    executiveSummary: 'A data-driven application that assists consumers in analyzing vehicle specializations and predicts used car values based on historical market data, mileage, and condition metrics.',
@@ -155,6 +147,7 @@ export const archiveProjects = [
   year: '2025',
   title: 'MomWebsite',
   stack: 'Next.js, TypeScript, React',
+  icons: ['nextjs.svg', 'typescript.svg', 'react.svg'],
   link: 'https://github.com/haresham15/MomWebsite',
   caseStudy: {
    executiveSummary: 'A fast, responsive, and SEO-optimized business website built with Next.js to showcase professional services and capture potential client leads.',
@@ -169,6 +162,7 @@ export const archiveProjects = [
   year: '2025',
   title: 'Murugesan Rajaram Lab Website',
   stack: 'Next.js, TypeScript, React',
+  icons: ['nextjs.svg', 'typescript.svg', 'react.svg'],
   link: 'https://github.com/haresham15/murugesan_rajaram_lab_website',
   caseStudy: {
    executiveSummary: 'An academic lab website built on Next.js designed to elegantly display research publications, team members, and ongoing scientific projects.',
@@ -182,7 +176,8 @@ export const archiveProjects = [
   slug: 'software-2-projects',
   year: '2024',
   title: 'Software 2 Engineering Projects',
-  stack: 'Java',
+  stack: 'Java, JUnit',
+  icons: ['java.svg'],
   link: 'https://github.com/haresham15/Haresh-s-Software-2-Projects',
   caseStudy: {
    executiveSummary: 'A collection of advanced software engineering projects focusing on complex data structures, algorithmic efficiency, and object-oriented design patterns.',
@@ -197,6 +192,7 @@ export const archiveProjects = [
   year: '2024',
   title: 'Software 1 Engineering Projects',
   stack: 'Java',
+  icons: ['java.svg'],
   link: 'https://github.com/haresham15/Software-Project-Java-Collection-',
   caseStudy: {
    executiveSummary: 'Foundational Java programming projects demonstrating core computer science concepts, object-oriented programming, and basic application development.',
@@ -211,6 +207,7 @@ export const archiveProjects = [
   year: '2024',
   title: 'Portfolio Website',
   stack: 'React, Tailwind CSS, Framer Motion',
+  icons: ['react.svg', 'tailwind.svg'],
   link: 'https://github.com/haresham15/Haresh_Murugesan_Portfolio',
   caseStudy: {
    executiveSummary: 'The interactive portfolio you are currently browsing. A highly performant and visually striking personal website designed to showcase my engineering capabilities and design sensibilities.',
@@ -225,6 +222,7 @@ export const archiveProjects = [
   year: '2024',
   title: 'A Birthday Website for my Brother!',
   stack: 'React, Tailwind CSS, JavaScript',
+  icons: ['react.svg', 'tailwind.svg', 'javascript.svg'],
   link: 'https://github.com/haresham15/AnnaBirthdayWebsite',
   caseStudy: {
    executiveSummary: 'A personalized, interactive web experience built as a unique digital birthday gift, featuring embedded memories, mini-games, and customized animations.',

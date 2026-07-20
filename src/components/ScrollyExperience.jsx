@@ -44,9 +44,9 @@ const ScrollyExperience = () => {
        <motion.button
         key={index}
         onClick={() => setActiveIndex(index)}
-        className={`w-full text-left p-4 rounded-lg border transition-all ${activeIndex === index
-         ? 'border-cine-lavender bg-cine-lavender/10'
-         : 'border-white/5 bg-black/40'
+        className={`w-full text-left p-4 rounded-lg border transition-all duration-300 ${activeIndex === index
+         ? 'border-cine-lavender bg-cine-lavender/10 shadow-cine-glow-lavender'
+         : 'border-white/5 bg-black/40 hover:shadow-cine-glow-lavender hover:border-cine-lavender/50'
          }`}
         whileHover={{ scale: 1.02, x: 5 }}
         whileTap={{ scale: 0.98 }}
@@ -70,7 +70,7 @@ const ScrollyExperience = () => {
        animate={{ opacity: 1, x: 0 }}
        exit={{ opacity: 0, x: -20 }}
        transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
-       className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl shadow-black/50"
+       className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-cine-glow-lavender animate-pulse-glow"
       >
        <p className="text-cine-teal font-sans tracking-widest uppercase mb-2">
         {experiences[activeIndex].year}

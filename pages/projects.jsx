@@ -1,6 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import FractalGlassBackground from '../src/components/FractalGlassBackground';
 import { archiveProjects } from '../src/data/projects';
@@ -64,10 +65,21 @@ export default function Projects() {
          </h3>
         </div>
 
-        <div className="relative z-10 mt-6 pt-4 border-t border-white/5">
-         <p className="text-light-gray/50 font-sans tracking-widest uppercase text-xs uppercase tracking-wider leading-relaxed">
+        <div className="relative z-10 mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+         <p className="text-light-gray/50 font-sans tracking-widest uppercase text-xs uppercase tracking-wider leading-relaxed truncate pr-4">
           {project.stack}
          </p>
+         <div className="flex gap-1.5 shrink-0">
+          {project.icons?.map((icon, i) => (
+           <button 
+            key={i} 
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.href = `/#skill-${icon.split('.')[0]}`; }} 
+            className="hover:scale-125 transition-transform cursor-pointer"
+           >
+            <Image src={`/icons/${icon}`} alt="tech-icon" width={20} height={20} className="w-5 h-5 opacity-70 hover:opacity-100" />
+           </button>
+          ))}
+         </div>
         </div>
        </MotionLink>
       );

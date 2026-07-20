@@ -8,10 +8,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Oswald', 'sans-serif'],
-        inter: ['Manrope', 'sans-serif'],
-        outfit: ['Outfit', 'sans-serif'],
-        raleway: ['Raleway', 'sans-serif'],
+        sans: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
+        inter: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
+        outfit: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
+        raleway: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
       },
       colors: {
         'charcoal': '#050505',
@@ -23,6 +23,19 @@ module.exports = {
       },
       backdropBlur: {
         xs: '2px',
+      },
+      boxShadow: {
+        'cine-glow-lavender': '0 0 30px -5px rgba(216, 180, 254, 0.4), 0 0 15px -5px rgba(216, 180, 254, 0.3)',
+        'cine-glow-teal': '0 0 30px -5px rgba(125, 211, 252, 0.4), 0 0 15px -5px rgba(125, 211, 252, 0.3)',
+      },
+      keyframes: {
+        'pulse-glow': {
+          '0%, 100%': { opacity: '0.8', filter: 'brightness(1)' },
+          '50%': { opacity: '1', filter: 'brightness(1.2)' },
+        },
+      },
+      animation: {
+        'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
       },
     },
   },
