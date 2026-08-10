@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import { motion } from 'framer-motion';
 import * as THREE from 'three';
 import Image from 'next/image';
+import Link from 'next/link';
 
 function NeuralNetwork({ count = 60 }) {
  const nodesRef = useRef();
@@ -181,36 +182,65 @@ const SkillCard = ({ skill, idx }) => {
  const marginTop = isTopPos ? `${classes.randomOffset.y}px` : `-${classes.randomOffset.y}px`;
  const marginLeft = isLeftPos ? `${classes.randomOffset.x}px` : `-${classes.randomOffset.x}px`;
 
- return (
-  <motion.div
-   id={`skill-${skill.icon.split('.')[0]}`}
-   ref={cardRef}
-   onMouseEnter={handleMouseEnter}
-   className="relative scroll-mt-32 group bg-glass-bg backdrop-blur-md border border-glass-border rounded-xl p-4 hover:border-cine-teal transition-all duration-300 cursor-pointer z-10 hover:z-50 hover:shadow-cine-glow-teal"
-   whileHover={{ scale: 1.1, y: -5 }}
-   whileTap={{ scale: 0.95 }}
-  >
-   <Image src={`/icons/${skill.icon}`} alt={skill.title} width={48} height={48} className="w-12 h-12 relative z-10" />
+  const isAWS = skill.title === 'AWS';
 
-   {/* Detail Modal with Dynamic CSS Positioning */}
-   <div 
-    className={`absolute ${classes.modalPosition} w-48 md:w-56 p-4 bg-[#050505]/95 backdrop-blur-xl border border-white/10 group-hover:border-cine-teal/50 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible scale-75 group-hover:scale-100 transition-all duration-300 pointer-events-none shadow-cine-glow-teal flex flex-col gap-1.5 z-50 animate-pulse-glow`}
-    style={{ marginTop, marginLeft }}
+  const cardContent = (
+   <motion.div
+    id={`skill-${skill.icon.split('.')[0]}`}
+    ref={cardRef}
+    onMouseEnter={handleMouseEnter}
+    className={`relative scroll-mt-32 group bg-glass-bg backdrop-blur-md border border-glass-border p-4 transition-all duration-300 cursor-pointer z-10 hover:z-50 hover:shadow-cine-glow-teal ${
+     isAWS 
+      ? 'rounded-2xl border-cine-teal/70 shadow-[0_0_15px_rgba(5,213,186,0.3)] bg-cine-teal/10 hover:bg-cine-teal/20 mx-2' 
+      : 'rounded-xl hover:border-cine-teal'
+    }`}
+    whileHover={{ scale: isAWS ? 1.2 : 1.1, y: -5 }}
+    whileTap={{ scale: 0.95 }}
    >
-    {/* Angled Connecting Thin Line */}
+    <div className="relative flex flex-col items-center justify-center">
+     <Image 
+      src={`/icons/${skill.icon}`} 
+      alt={skill.title} 
+      width={isAWS ? 64 : 48} 
+      height={isAWS ? 64 : 48} 
+      className={`${isAWS ? 'w-16 h-16' : 'w-12 h-12'} relative z-10`} 
+     />
+     {isAWS && (
+      <span className="absolute -bottom-4 bg-cine-teal text-black text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap opacity-80 group-hover:opacity-100 transition-opacity">
+       Explore Ecosystem
+      </span>
+     )}
+    </div>
+
+    {/* Detail Modal with Dynamic CSS Positioning */}
     <div 
-     className={`absolute ${classes.linePosition} w-6 h-[1px] bg-cine-teal/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100`}
-    ></div>
-    
-    <h4 className="text-cine-teal font-heading tracking-widest uppercase font-bold text-sm border-b border-white/10 pb-1 mb-1">
-     {skill.title}
-    </h4>
-    <p className="text-light-gray/90 text-xs font-sans leading-relaxed">
-     {skill.description}
-    </p>
-   </div>
-  </motion.div>
- );
+     className={`absolute ${classes.modalPosition} w-48 md:w-56 p-4 bg-[#050505]/95 backdrop-blur-xl border border-white/10 group-hover:border-cine-teal/50 rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible scale-75 group-hover:scale-100 transition-all duration-300 pointer-events-none shadow-cine-glow-teal flex flex-col gap-1.5 z-50 animate-pulse-glow`}
+     style={{ marginTop, marginLeft }}
+    >
+     {/* Angled Connecting Thin Line */}
+     <div 
+      className={`absolute ${classes.linePosition} w-6 h-[1px] bg-cine-teal/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100`}
+     ></div>
+     
+     <h4 className="text-cine-teal font-heading tracking-widest uppercase font-bold text-sm border-b border-white/10 pb-1 mb-1">
+      {skill.title}
+     </h4>
+     <p className="text-light-gray/90 text-xs font-sans leading-relaxed">
+      {isAWS ? 'Click to explore the AWS ecosystem and tools I use.' : skill.description}
+     </p>
+    </div>
+   </motion.div>
+  );
+
+  if (isAWS) {
+   return (
+    <Link href="/skills/aws" className="z-10 hover:z-50">
+     {cardContent}
+    </Link>
+   );
+  }
+
+  return cardContent;
 };
 
 const NeuralSkills = () => {
