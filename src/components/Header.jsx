@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 const Header = () => {
  return (
   <header className="fixed top-0 left-0 w-full z-40 bg-black/40 backdrop-blur-md border-b border-white/10 py-3 px-6 flex justify-between items-center">
-   <div className="font-heading tracking-widest uppercase font-bold text-light-gray text-xl tracking-tight">
+   <div className="font-heading tracking-widest uppercase font-bold text-light-gray text-xl tracking-tight flex items-center gap-3">
+    <img src="/profile.jpeg" alt="Haresh Murugesan" className="w-8 h-8 rounded-full object-cover border border-white/20" />
     HM.
    </div>
    <nav className="flex gap-4 md:gap-6 items-center">

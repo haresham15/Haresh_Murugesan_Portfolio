@@ -41,10 +41,13 @@ const BentoHero = () => {
      animate={{ opacity: 1, y: 0 }}
      transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
     >
-     <h1 className="text-6xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray mb-4">
-      Hi, I'm Haresh Murugesan.
-     </h1>
-     <p className="text-2xl text-light-gray/80 font-heading">
+     <div className="flex flex-col md:flex-row md:items-center gap-6 mb-4">
+      <img src="/profile.jpeg" alt="Haresh Murugesan" className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border border-white/10 shadow-lg shrink-0" />
+      <h1 className="text-4xl md:text-6xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray">
+       Hi, I'm Haresh Murugesan.
+      </h1>
+     </div>
+     <p className="text-xl md:text-2xl text-light-gray/80 font-heading">
       Learning, Adapting and Innovating
      </p>
     </motion.div>

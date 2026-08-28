@@ -25,21 +25,17 @@ export default function App({ Component, pageProps }) {
      property="og:description"
      content="Explore Haresh's creative and technical projects, podcasts, and tech insights."
     />
-    <meta property="og:image" content="https://hareshmurugesan.com/preview-image.png" />
+    <meta property="og:image" content="https://hareshmurugesan.com/preview-image.jpeg" />
     <meta property="og:url" content="https://hareshmurugesan.com" />
     <meta property="og:type" content="website" />
 
-    {/* Twitter Card */}
+    {/* Twitter */}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Haresh Murugesan | Developer Portfolio" />
-    <meta
-     name="twitter:description"
-     content="Explore Haresh's creative and technical projects, podcasts, and tech insights."
-    />
-    <meta name="twitter:image" content="https://hareshmurugesan.com/preview-image.png" />
+    <meta name="twitter:title" content="Haresh Murugesan | Software Engineer" />
+    <meta name="twitter:description" content="Portfolio of Haresh Murugesan, specializing in AI, Full-Stack Development, and Innovative System Design." />
+    <meta name="twitter:image" content="https://hareshmurugesan.com/preview-image.jpeg" />
    </Head>
    <Component {...pageProps} />
   </>
  )
 }
-
