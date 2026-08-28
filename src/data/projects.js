@@ -16,19 +16,19 @@ export const spotlightProjects = [
   }
  },
  {
-  slug: 'ai-motorsports-hub',
-  title: 'AIMotorsportsHub',
-  description: 'Developed a real-time telemetry aggregation platform processing live race data from 20+ F1 sessions via the OpenF1 API. Architected a scalable hybrid-cloud solution utilizing AWS Lambda, Supabase, and Vercel, integrating the Gemini API for real-time predictive insights.',
-  icons: ['react.svg', 'python.svg', 'javascript.svg', 'nextjs.svg', 'aws.svg'],
+  slug: 'apexis',
+  title: 'Apexis (AIMotorsportsHub)',
+  description: 'A centralized, personalized web platform for motorsport fans. Features real-time 2D race map visualization (via Web Workers), TensorFlow.js tire degradation predictions, in-browser OCR broadcast scanning, and a Gemini-powered Race Engineer chatbot.',
+  icons: ['nextjs.svg', 'react.svg', 'typescript.svg', 'tensorflow.svg', 'tailwind.svg'],
   github: 'https://github.com/haresham15/AIMotorsportsHub',
-  demo: '',
-  image: '',
+  demo: 'https://ai-motorsports-hub.vercel.app/',
+  image: '/apexis.png',
   caseStudy: {
-   executiveSummary: 'AIMotorsportsHub is a comprehensive, real-time telemetry dashboard for F1 enthusiasts. It aggregates live data from over 20 F1 sessions using a hybrid-cloud architecture and provides AI-driven strategic insights via the Gemini API.',
-   problem: 'Motorsports teams and enthusiasts lack accessible, unified dashboards for real-time telemetry. Aggregating 20+ F1 session data streams usually requires expensive enterprise software, and rendering this data on the web often results in severe latency issues and browser crashes.',
-   architecture: 'I adopted a hybrid-cloud microservices architecture to balance cost, speed, and complexity. The OpenF1 API feeds into AWS Lambda for initial processing and normalization. Historical aggregates are stored in S3, while live state is pushed to Supabase, finally served to a Next.js frontend hosted on Vercel.',
-   tradeoffs: 'Using a hybrid cloud (AWS + Supabase + Vercel) increased operational complexity and deployment friction. While a monolith on a single VPS would have been simpler to orchestrate, the hybrid approach allowed me to leverage generous free tiers and scale specific microservices independently during race weekends.',
-   nextSteps: 'Websocket connection drops during high-volume telemetry spikes are currently causing UI stuttering. I am actively researching Redis pub/sub implementations to buffer the event stream and smooth out the delivery to the client.'
+   executiveSummary: 'Apexis is a unified hub for motorsport enthusiasts, aggregating real-time tracking across F1, NASCAR, Formula E, and more. It seamlessly integrates a custom multi-threaded 2D live race simulation with generative AI to offer deep, personalized race insights.',
+   problem: 'Fans following multiple racing series juggle numerous disjointed apps for timings, schedules, and news. There lacked a singular, intelligent dashboard combining live telemetry visualization with contextual AI to explain complex race strategies dynamically.',
+   architecture: 'Built on Next.js 14 and React 19 using TypeScript and Tailwind CSS. It leverages a custom Web Worker pipeline to offload heavy 2D map rendering and race simulation. Live standings are extracted completely client-side using Tesseract.js OCR, while TensorFlow.js handles predictive modeling.',
+   tradeoffs: 'Shifted heavy processing like Computer Vision OCR and race simulation entirely to the client-side via Web Workers. While this drastically reduces backend server costs and API latency, it requires modern client hardware to maintain 60fps during 24-hour endurance events.',
+   nextSteps: 'V2.0 focuses on push notifications for red flags, deep historical driver statistics, a unified global motorsport calendar, and live community chat rooms during active sessions.'
   }
  },
  {

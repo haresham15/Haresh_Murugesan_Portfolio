@@ -21,10 +21,24 @@ export default function ProjectCaseStudy({ project }) {
 
   const caseStudy = project.caseStudy || {};
 
+  const isArchive = archiveProjects.some(p => p.slug === project.slug);
+  const backHref = isArchive ? "/projects" : "/";
+  const backText = isArchive ? "Back to Archive" : "Back to Home";
+
   return (
     <div className="w-full min-h-screen text-light-gray overflow-x-hidden relative bg-[#050505]">
       <Head>
         <title>{project.title} | Case Study</title>
+        {project.description && <meta name="description" content={project.description} />}
+        <meta property="og:title" content={`${project.title} | Case Study`} />
+        {project.description && <meta property="og:description" content={project.description} />}
+        <meta property="og:image" content={project.image ? `https://hareshmurugesan.com${project.image}` : "https://hareshmurugesan.com/preview-image.jpeg"} />
+        <meta property="og:url" content={`https://hareshmurugesan.com/projects/${project.slug}`} />
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${project.title} | Case Study`} />
+        {project.description && <meta name="twitter:description" content={project.description} />}
+        <meta name="twitter:image" content={project.image ? `https://hareshmurugesan.com${project.image}` : "https://hareshmurugesan.com/preview-image.jpeg"} />
       </Head>
       
       <FractalGlassBackground />
@@ -51,11 +65,11 @@ export default function ProjectCaseStudy({ project }) {
           
           <div className="relative z-10 w-full max-w-6xl mx-auto px-4 pb-12">
             <Link 
-              href="/projects"
+              href={backHref}
               className="text-light-gray/60 hover:text-cine-teal font-heading tracking-widest uppercase text-sm mb-6 inline-flex items-center gap-2 transition-colors"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-              Back to Archive
+              {backText}
             </Link>
             
             <motion.h1 

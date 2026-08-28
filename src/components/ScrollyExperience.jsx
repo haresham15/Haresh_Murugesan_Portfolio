@@ -70,7 +70,7 @@ const ScrollyExperience = () => {
        animate={{ opacity: 1, x: 0 }}
        exit={{ opacity: 0, x: -20 }}
        transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
-       className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-cine-glow-lavender animate-pulse-glow"
+       className="pl-8 border-l-2 border-cine-teal/30"
       >
        <p className="text-cine-teal font-heading tracking-widest uppercase mb-2">
         {experiences[activeIndex].year}

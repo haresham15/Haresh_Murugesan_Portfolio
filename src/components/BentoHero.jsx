@@ -5,8 +5,10 @@ import FloatingGeometry from './FloatingGeometry';
 
 const BentoHero = () => {
  const [currentTime, setCurrentTime] = useState(new Date());
+ const [mounted, setMounted] = useState(false);
 
  useEffect(() => {
+  setMounted(true);
   const timer = setInterval(() => {
    setCurrentTime(new Date());
   }, 1000);
@@ -32,135 +34,94 @@ const BentoHero = () => {
  ];
 
  return (
-  <section className="relative w-full max-w-7xl mx-auto px-4 py-24">
-   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    {/* Tile A - Intro */}
+  <section className="relative w-full max-w-7xl mx-auto px-4 py-32 flex flex-col gap-16">
+   {/* Top Section: Intro & Status */}
+   <div className="flex flex-col lg:flex-row gap-12 items-end justify-between">
     <motion.div
-     className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 flex flex-col justify-center"
+     className="flex-1 max-w-3xl"
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
      transition={{ duration: 0.8 , ease: [0.22, 1, 0.36, 1]}}
     >
-     <div className="flex flex-col md:flex-row md:items-center gap-6 mb-4">
-      <img src="/profile.jpeg" alt="Haresh Murugesan" className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border border-white/10 shadow-lg shrink-0" />
-      <h1 className="text-4xl md:text-6xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray">
-       Hi, I'm Haresh Murugesan.
+     <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
+      <img src="/profile.jpeg" alt="Haresh Murugesan" className="w-24 h-24 rounded-full object-cover shadow-lg shrink-0" />
+      <h1 className="text-5xl md:text-7xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray leading-tight">
+       Haresh<br/>Murugesan
       </h1>
      </div>
-     <p className="text-xl md:text-2xl text-light-gray/80 font-heading">
-      Learning, Adapting and Innovating
+     <p className="text-2xl md:text-3xl text-cine-teal font-heading tracking-widest uppercase">
+      Learning, Adapting, Innovating.
      </p>
     </motion.div>
 
-    {/* Tile B - Live Status */}
     <motion.div
-     className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 flex flex-col justify-center items-center"
+     className="lg:w-1/3 flex flex-col items-start lg:items-end text-left lg:text-right"
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
      transition={{ duration: 0.8, delay: 0.05 , ease: [0.22, 1, 0.36, 1]}}
     >
-     <p className="text-sm text-light-gray/60 mb-2 font-sans">LIVE STATUS</p>
-     <h1 className='text-4xl font-heading tracking-widest uppercase text-cine-lavender font-bold'>
-      {formatTime(currentTime)}
-     </h1>
-     <h3 className="text-2xl text-cine-teal/60 mb-2 font-heading text-center font-bold">Current Projects</h3>
-     <Link href="/prd/motorsports" target="_blank" rel="noopener noreferrer" className="text-xl text-light-gray/60 hover:text-cine-teal mb-2 font-sans transition-colors underline decoration-cine-teal/30 underline-offset-4 cursor-pointer text-center">
-      Motorsports AI Management System and Web Application (PRD)
-     </Link>
-     <h2 className="text-xs text-light-gray/40 mt-2 font-heading">
-      {currentTime.toLocaleDateString('en-US', {
-       weekday: 'long',
-       year: 'numeric',
-       month: 'long',
-       day: 'numeric',
-      })}
+     <p className="text-sm text-light-gray/60 mb-2 font-sans tracking-widest uppercase">Local Time</p>
+     <h2 className='text-3xl md:text-4xl font-heading tracking-widest uppercase text-cine-lavender font-bold mb-6 min-h-[40px]'>
+      {mounted ? formatTime(currentTime) : ''}
      </h2>
+     <p className="text-sm text-light-gray/60 mb-2 font-sans tracking-widest uppercase">Currently Building</p>
+     <Link href="/prd/motorsports" target="_blank" rel="noopener noreferrer" className="text-lg text-white hover:text-cine-teal font-sans transition-colors underline decoration-cine-teal/30 underline-offset-4">
+      Motorsports AI Management System
+     </Link>
     </motion.div>
+   </div>
 
-    {/* Floating Geometry Animation - Neural Network (Row 2, Full Width) */}
-    <div className="col-span-1 md:col-span-2 lg:col-span-4 row-span-1">
-     <FloatingGeometry />
-    </div>
+   {/* Floating Geometry full width divider */}
+   <div className="w-full h-[200px] relative">
+    <FloatingGeometry />
+   </div>
 
-    {/* Tile C - Podcast */}
+   {/* Bottom Section: Podcast, Philocracy, Stack */}
+   <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-8">
+    {/* Podcast Marquee */}
     <motion.div
-     className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 overflow-hidden relative"
+     className="md:col-span-2 border-t border-white/10 pt-6"
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
      transition={{ duration: 0.8, delay: 0.1 , ease: [0.22, 1, 0.36, 1]}}
     >
-     <h2 className="text-2xl font-heading tracking-widest uppercase font-bold text-light-gray mb-4">
-      Syntinuum: Endless Evolutions Podcast
+     <h2 className="text-xl font-heading tracking-widest uppercase font-bold text-light-gray mb-2">
+      Syntinuum Podcast
      </h2>
-     <p className="text-sm text-light-gray/70 mb-4 font-sans">
-      Exploring innovations that solve the world's toughest challenges
-     </p>
-     <div className="relative overflow-hidden h-8">
-      <div className="marquee-container absolute whitespace-nowrap">
+     <div className="relative overflow-hidden h-8 mb-4">
+      <div className="marquee-container absolute whitespace-nowrap flex items-center">
        {[...guestNames, ...guestNames].map((name, idx) => (
-        <span key={idx} className="inline-block mr-8 text-light-gray/60 font-sans">
+        <span key={idx} className="inline-block mr-8 text-light-gray/50 font-sans text-sm">
          {name} •
         </span>
        ))}
       </div>
      </div>
-     <div className="mt-4 flex gap-4">
-      <a
-       href="https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98"
-       target="_blank" rel="noopener noreferrer"
-       
-       className="inline-block text-cine-lavender hover:text-cine-teal transition-colors font-sans"
-      >
-       Listen on Spotify →
-      </a>
-      <a
-       href="https://www.syntinuumpodcast.com/"
-       target="_blank" rel="noopener noreferrer"
-       
-       className="inline-block text-cine-lavender hover:text-cine-teal transition-colors font-sans"
-      >
-       Visit Website →
-      </a>
-     </div>
+     <a href="https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98" target="_blank" rel="noopener noreferrer" className="text-cine-lavender hover:text-white transition-colors text-sm font-sans tracking-widest uppercase">
+      Listen on Spotify →
+     </a>
     </motion.div>
 
-    {/* Tile D - Philocracy */}
+    {/* Stack & Philocracy */}
     <motion.div
-     className="col-span-1 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col justify-center"
+     className="md:col-span-1 border-t border-white/10 pt-6 flex flex-col justify-between"
      initial={{ opacity: 0, y: 20 }}
      animate={{ opacity: 1, y: 0 }}
      transition={{ duration: 0.8, delay: 0.15 , ease: [0.22, 1, 0.36, 1]}}
     >
-     <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-light-gray mb-2">
-      Philocracy
-     </h3>
-     <p className="text-sm text-light-gray/70 font-sans">
-      CEO & Director of Finances
-     </p>
-     <p className="text-xs text-light-gray/50 mt-2 font-sans">
-      Non-profit organization helping people through fashion and love
-     </p>
-    </motion.div>
-
-    {/* Tile E - Stack */}
-    <motion.div
-     className="col-span-1 row-span-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col justify-center"
-     initial={{ opacity: 0, y: 20 }}
-     animate={{ opacity: 1, y: 0 }}
-     transition={{ duration: 0.8, delay: 0.2 , ease: [0.22, 1, 0.36, 1]}}
-    >
-     <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-light-gray mb-4">
-      Stack
-     </h3>
-     <div className="flex flex-wrap gap-2">
-      {['React', 'Python', 'AI/ML', 'Java'].map((tech, idx) => (
-       <span
-        key={idx}
-        className="text-xs px-2 py-1 bg-cine-lavender/20 text-cine-lavender rounded-full font-sans"
-       >
-        {tech}
-       </span>
-      ))}
+     <div className="mb-6">
+      <h3 className="text-sm font-sans tracking-widest uppercase text-light-gray/60 mb-3">Core Stack</h3>
+      <div className="flex flex-wrap gap-2">
+       {['React', 'Python', 'AI/ML', 'Java'].map((tech, idx) => (
+        <span key={idx} className="text-xs px-2 py-1 border border-cine-teal/30 text-cine-teal rounded-full font-sans">
+         {tech}
+        </span>
+       ))}
+      </div>
+     </div>
+     <div>
+      <h3 className="text-sm font-sans tracking-widest uppercase text-light-gray/60 mb-1">Philocracy</h3>
+      <p className="text-white text-sm font-sans">CEO & Director of Finances</p>
      </div>
     </motion.div>
    </div>
@@ -169,4 +130,3 @@ const BentoHero = () => {
 };
 
 export default BentoHero;
-

@@ -18,11 +18,11 @@ const ProjectLab = () => {
     <h3 className="text-3xl font-heading tracking-widest uppercase font-bold tracking-tight text-light-gray mb-8">
      Spotlight
     </h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-     {spotlightProjects.map((project, index) => (
-      <motion.div
-       key={index}
-       className="bg-black/40 backdrop-blur-md border border-white/10 hover:border-cine-teal/50 rounded-2xl p-6 overflow-hidden relative shadow-lg shadow-black/50 hover:shadow-cine-glow-teal transition-all duration-300"
+     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+      {spotlightProjects.map((project, index) => (
+       <motion.div
+        key={index}
+        className="bg-white/[0.02] border border-white/5 hover:border-cine-teal/30 hover:bg-white/[0.04] rounded-2xl p-6 overflow-hidden relative transition-all duration-300 flex flex-col"
        initial={{ opacity: 0, y: 20 }}
        whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }}
        transition={{ duration: 0.8, delay: index * 0.1 , ease: [0.22, 1, 0.36, 1]}}

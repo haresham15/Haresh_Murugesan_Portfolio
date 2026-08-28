@@ -48,6 +48,18 @@ const ContactFooter = () => {
     >
      Connect on LinkedIn
     </motion.a>
+    <motion.a
+     href="/resume.pdf"
+     target="_blank" rel="noopener noreferrer"
+     className="bg-cine-teal/10 backdrop-blur-md border border-cine-teal/30 rounded-full px-8 py-4 text-cine-teal font-heading tracking-widest uppercase text-lg hover:bg-cine-teal hover:text-black transition-all"
+     whileHover={{ scale: 1.05, y: -2 }}
+     whileTap={{ scale: 0.95 }}
+     initial={{ opacity: 0, y: 20 }}
+     whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }}
+     transition={{ duration: 0.8, delay: 0.3 , ease: [0.22, 1, 0.36, 1]}}
+    >
+     Download Resume
+    </motion.a>
    </div>
 
    <motion.div
@@ -56,11 +68,13 @@ const ContactFooter = () => {
     whileInView={{ opacity: 1 }} viewport={{ once: true, margin: "-50px" }}
     transition={{ duration: 0.8, delay: 0.3 , ease: [0.22, 1, 0.36, 1]}}
    >
-    © 2025 All Rights Reserved Haresh Murugesan
+    <p className="text-light-gray/50 text-sm font-sans">
+       © 2026 All Rights Reserved<br/>
+       Haresh Murugesan
+      </p>
    </motion.div>
   </section>
  );
 };
 
 export default ContactFooter;
-

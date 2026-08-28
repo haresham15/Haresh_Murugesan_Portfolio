@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: hhttps://www.hareshmurugesan.com/sitemap.xml
+Sitemap: https://www.hareshmurugesan.com/sitemap.xml

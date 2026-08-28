@@ -90,7 +90,7 @@ const AchievementsGallery = () => {
         : 'bg-black/40 border-white/10 text-light-gray/60 hover:text-light-gray hover:border-white/30'
       }`}
      >
-      {tab.charAt(0).toUpperCase() + tab.slice(1)}s
+      {tab === 'all' ? 'All' : tab.charAt(0).toUpperCase() + tab.slice(1) + 's'}
      </button>
     ))}
    </div>
@@ -109,7 +109,7 @@ const AchievementsGallery = () => {
        exit={{ opacity: 0, scale: 0.9 }}
        transition={{ duration: 0.8, delay: index * 0.05 , ease: [0.22, 1, 0.36, 1]}}
        key={item.id}
-       className={`bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-cine-lavender/50 transition-all duration-300 shadow-lg shadow-black/50 hover:shadow-cine-glow-lavender group flex flex-col justify-between cursor-pointer ${item.colSpan}`}
+       className={`bg-cine-lavender/5 border border-cine-lavender/20 rounded-xl p-6 hover:bg-cine-lavender/10 transition-all duration-300 shadow-none group flex flex-col justify-between cursor-pointer ${item.colSpan}`}
        onClick={() => setSelectedItem(item)}
       >
        <div>
