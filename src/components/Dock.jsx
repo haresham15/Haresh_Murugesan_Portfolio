@@ -7,10 +7,10 @@ const Dock = () => {
   { label: 'Experience', href: '#experience' },
   { label: 'Podcast', href: '#podcast' },
   { label: 'Projects', href: '#projects' },
-  { label: 'Now', href: '#now' },
-  { label: 'Achievements', href: '#achievements' },
   { label: 'Skills', href: '#skills' },
+  { label: 'Achievements', href: '#achievements' },
   { label: 'History', href: '#history' },
+  { label: 'Now', href: '#now' },
   { label: 'Contact', href: '#contact' },
  ];
 

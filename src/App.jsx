@@ -76,10 +76,10 @@ function App() {
     <ScrollyExperience />
     <PodcastSection />
     <ProjectLab />
-    <NowSection />
-    <AchievementsGallery />
     <NeuralSkills />
+    <AchievementsGallery />
     <HistorySection />
+    <NowSection />
     <ContactFooter />
    </main>
   </div>
@@ -87,4 +87,3 @@ function App() {
 }
 
 export default App;
-
