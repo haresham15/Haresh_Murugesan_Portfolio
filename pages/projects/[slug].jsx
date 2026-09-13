@@ -9,8 +9,8 @@ import Header from '../../src/components/Header';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: "-50px" },
-  viewport: { once: true },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-50px" },
   transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
 };
 
@@ -25,10 +25,12 @@ export default function ProjectCaseStudy({ project }) {
   const backHref = isArchive ? "/projects" : "/";
   const backText = isArchive ? "Back to Archive" : "Back to Home";
 
+  const hasDistinctDemo = project.demo && project.demo !== project.github;
+
   return (
     <div className="w-full min-h-screen text-light-gray overflow-x-hidden relative bg-[#050505]">
       <Head>
-        <title>{project.title} | Case Study</title>
+        <title>{`${project.title} | Case Study`}</title>
         {project.description && <meta name="description" content={project.description} />}
         <meta property="og:title" content={`${project.title} | Case Study`} />
         {project.description && <meta property="og:description" content={project.description} />}
@@ -44,36 +46,34 @@ export default function ProjectCaseStudy({ project }) {
       <FractalGlassBackground />
       <Header />
 
-      <main className="w-full pb-32 relative z-10">
+      <main className="w-full pt-24 sm:pt-28 pb-32 relative z-10">
         
         {/* HERO SECTION */}
-        <div className="relative w-full h-[60vh] min-h-[400px] flex items-end justify-center mb-16 overflow-hidden">
+        <div className="relative w-full border-b border-white/10 mb-12 sm:mb-16">
           {project.image && (
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 overflow-hidden opacity-15 filter blur-xl pointer-events-none">
               <Image 
                 src={project.image} 
-                alt={project.title} 
-                layout="fill" 
-                objectFit="cover" 
-                className="opacity-40 object-top"
+                alt={project.title}
+                width={1200}
+                height={600}
                 priority
+                className="w-full h-full object-cover" 
               />
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent"></div>
             </div>
           )}
           
           <div className="relative z-10 w-full max-w-6xl mx-auto px-4 pb-12">
             <Link 
               href={backHref}
-              className="text-light-gray/60 hover:text-cine-teal font-heading tracking-widest uppercase text-sm mb-6 inline-flex items-center gap-2 transition-colors"
+              className="text-light-gray/60 hover:text-cine-teal font-sans text-xs sm:text-sm font-medium mb-6 inline-flex items-center gap-2 transition-colors"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
               {backText}
             </Link>
             
             <motion.h1 
-              className="text-5xl md:text-7xl font-heading tracking-widest uppercase font-bold tracking-tight text-white mb-6"
+              className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold tracking-tight text-white mb-4 sm:mb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -82,29 +82,29 @@ export default function ProjectCaseStudy({ project }) {
             </motion.h1>
 
             <motion.div 
-              className="flex flex-wrap items-center gap-4"
+              className="flex flex-wrap items-center gap-2.5 sm:gap-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             >
               {project.stack && (
-                <span className="text-cine-lavender font-heading tracking-widest uppercase px-4 py-2 text-sm border border-cine-lavender/30 bg-cine-lavender/5 rounded-full">
+                <span className="text-cine-lavender font-mono text-xs sm:text-sm px-3.5 py-1.5 border border-cine-lavender/30 bg-cine-lavender/5 rounded-full font-medium">
                   {project.stack}
                 </span>
               )}
               {project.github && (
-                <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-cine-teal hover:text-white font-heading tracking-widest uppercase text-sm border border-cine-teal/30 bg-cine-teal/10 px-6 py-2 rounded-full transition-all hover:bg-cine-teal/20">
-                  GitHub
+                <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-cine-teal hover:text-white font-sans text-xs sm:text-sm font-medium border border-cine-teal/30 bg-cine-teal/10 px-4 py-1.5 sm:px-6 sm:py-2 rounded-full transition-all hover:bg-cine-teal/20">
+                  GitHub ↗
                 </a>
               )}
-              {project.demo && (
-                <a href={project.demo} target="_blank" rel="noopener noreferrer" className="text-white hover:text-charcoal font-heading tracking-widest uppercase text-sm border border-white bg-white/10 hover:bg-white px-6 py-2 rounded-full transition-all">
-                  Live Demo
+              {hasDistinctDemo && (
+                <a href={project.demo} target="_blank" rel="noopener noreferrer" className="text-white hover:text-charcoal font-sans text-xs sm:text-sm font-medium border border-white bg-white/10 hover:bg-white hover:text-black px-4 py-1.5 sm:px-6 sm:py-2 rounded-full transition-all">
+                  Live Demo ↗
                 </a>
               )}
-              {project.link && project.link !== '#' && !project.github && !project.demo && (
-                <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-cine-teal hover:text-white font-heading tracking-widest uppercase text-sm border border-cine-teal/30 bg-cine-teal/10 px-6 py-2 rounded-full transition-all hover:bg-cine-teal/20">
-                  {project.link.includes('github.com') ? 'GitHub' : 'View Project'}
+              {project.link && project.link !== '#' && !project.github && !hasDistinctDemo && (
+                <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-cine-teal hover:text-white font-sans text-xs sm:text-sm font-medium border border-cine-teal/30 bg-cine-teal/10 px-4 py-1.5 sm:px-6 sm:py-2 rounded-full transition-all hover:bg-cine-teal/20">
+                  {project.link.includes('github.com') ? 'GitHub ↗' : 'View Project ↗'}
                 </a>
               )}
             </motion.div>
@@ -117,30 +117,76 @@ export default function ProjectCaseStudy({ project }) {
           {/* Main Body */}
           <div className="lg:col-span-8 space-y-8">
             
+            {/* High-Resolution System Interface Preview */}
+            {project.image && (
+              <motion.div 
+                className="w-full rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-black/50 group relative hover:border-cine-teal/40 transition-colors"
+                {...fadeIn}
+              >
+                <div className="relative aspect-video w-full overflow-hidden">
+                  <Image
+                    src={project.image}
+                    alt={`${project.title} System Interface`}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 760px"
+                    className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
+                </div>
+              </motion.div>
+            )}
+
             {caseStudy.executiveSummary && (
               <motion.section 
-                className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-3xl p-8 shadow-2xl relative overflow-hidden group"
+                className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-3xl p-5 sm:p-8 shadow-2xl relative overflow-hidden group"
                 {...fadeIn}
               >
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cine-teal to-cine-lavender opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                <h2 className="text-2xl font-heading tracking-widest uppercase font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-light-gray/60 mb-6">
+                <h2 className="text-xl sm:text-2xl font-heading font-bold text-white mb-4 sm:mb-6 tracking-tight">
                   Executive Summary
                 </h2>
-                <p className="text-light-gray/90 font-inter leading-relaxed text-lg">
+                <p className="text-light-gray/90 font-inter leading-relaxed text-sm sm:text-base md:text-lg">
                   {caseStudy.executiveSummary}
                 </p>
               </motion.section>
             )}
 
-            {caseStudy.problem && (
+            {/* Quantified Benchmarks & Metrics */}
+            {caseStudy.metrics && caseStudy.metrics.length > 0 && (
               <motion.section 
-                className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-8 hover:border-cine-teal/30 transition-colors"
+                className="bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-5 sm:p-8 hover:border-cine-teal/30 transition-colors relative overflow-hidden"
                 {...fadeIn}
               >
-                <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-cine-teal mb-4 flex items-center gap-3">
-                  <span className="text-3xl font-light text-cine-teal/50">01</span> The Problem
+                <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
+                  <h3 className="text-lg sm:text-xl font-heading font-semibold text-cine-teal flex items-center gap-2 sm:gap-3 tracking-tight">
+                    <span className="text-xl sm:text-2xl text-cine-teal">⚡</span> Quantified Benchmarks & Metrics
+                  </h3>
+                  <span className="text-xs font-mono font-medium text-cine-teal px-2.5 py-1 bg-cine-teal/10 border border-cine-teal/30 rounded-full shrink-0">
+                    Grounded Metrics
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                  {caseStudy.metrics.map((metric, i) => (
+                    <div key={i} className="p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-cine-teal/40 transition-all flex flex-col justify-between">
+                      <span className="text-xs font-mono text-light-gray/50 mb-1">{metric.label}</span>
+                      <span className="text-xl sm:text-2xl font-bold font-heading text-white tracking-tight my-1">{metric.value}</span>
+                      <span className="text-xs text-light-gray/60 font-sans leading-relaxed">{metric.detail}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.section>
+            )}
+
+            {caseStudy.problem && (
+              <motion.section 
+                className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-5 sm:p-8 hover:border-cine-teal/30 transition-colors"
+                {...fadeIn}
+              >
+                <h3 className="text-lg sm:text-xl font-heading font-semibold text-cine-teal mb-3 sm:mb-4 flex items-center gap-3 tracking-tight">
+                  <span className="text-2xl sm:text-3xl font-mono text-cine-teal/50">01</span> The Problem
                 </h3>
-                <p className="text-light-gray/80 font-inter leading-relaxed text-lg">
+                <p className="text-light-gray/80 font-inter leading-relaxed text-sm sm:text-base md:text-lg">
                   {caseStudy.problem}
                 </p>
               </motion.section>
@@ -148,28 +194,28 @@ export default function ProjectCaseStudy({ project }) {
 
             {caseStudy.architecture && (
               <motion.section 
-                className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-8 hover:border-cine-lavender/30 transition-colors"
+                className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-5 sm:p-8 hover:border-cine-lavender/30 transition-colors"
                 {...fadeIn}
               >
-                <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-cine-lavender mb-4 flex items-center gap-3">
-                  <span className="text-3xl font-light text-cine-lavender/50">02</span> Approach & Architecture
+                <h3 className="text-lg sm:text-xl font-heading font-semibold text-cine-lavender mb-3 sm:mb-4 flex items-center gap-3 tracking-tight">
+                  <span className="text-2xl sm:text-3xl font-mono text-cine-lavender/50">02</span> Approach & Architecture
                 </h3>
-                <p className="text-light-gray/80 font-inter leading-relaxed text-lg">
+                <p className="text-light-gray/80 font-inter leading-relaxed text-sm sm:text-base md:text-lg">
                   {caseStudy.architecture}
                 </p>
               </motion.section>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
               {caseStudy.tradeoffs && (
                 <motion.section 
-                  className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-8 hover:border-white/20 transition-colors"
+                  className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-5 sm:p-8 hover:border-white/20 transition-colors"
                   {...fadeIn}
                 >
-                  <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-white mb-4 flex items-center gap-3">
-                    <span className="text-3xl font-light text-white/30">03</span> Tradeoffs
+                  <h3 className="text-lg sm:text-xl font-heading font-semibold text-white mb-3 sm:mb-4 flex items-center gap-3 tracking-tight">
+                    <span className="text-2xl sm:text-3xl font-mono text-white/30">03</span> Tradeoffs
                   </h3>
-                  <p className="text-light-gray/80 font-inter leading-relaxed">
+                  <p className="text-light-gray/80 font-inter leading-relaxed text-xs sm:text-sm">
                     {caseStudy.tradeoffs}
                   </p>
                 </motion.section>
@@ -177,13 +223,13 @@ export default function ProjectCaseStudy({ project }) {
 
               {caseStudy.nextSteps && (
                 <motion.section 
-                  className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-8 hover:border-cine-teal/30 transition-colors"
+                  className="bg-black/40 backdrop-blur-md border border-white/5 rounded-3xl p-5 sm:p-8 hover:border-cine-teal/30 transition-colors"
                   {...fadeIn}
                 >
-                  <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-cine-teal mb-4 flex items-center gap-3">
-                    <span className="text-3xl font-light text-cine-teal/30">04</span> Next Steps
+                  <h3 className="text-lg sm:text-xl font-heading font-semibold text-cine-teal mb-3 sm:mb-4 flex items-center gap-3 tracking-tight">
+                    <span className="text-2xl sm:text-3xl font-mono text-cine-teal/30">04</span> Next Steps
                   </h3>
-                  <p className="text-light-gray/80 font-inter leading-relaxed">
+                  <p className="text-light-gray/80 font-inter leading-relaxed text-xs sm:text-sm">
                     {caseStudy.nextSteps}
                   </p>
                 </motion.section>
@@ -195,14 +241,14 @@ export default function ProjectCaseStudy({ project }) {
           {/* Sidebar */}
           <div className="lg:col-span-4 space-y-6">
             <motion.div 
-              className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-3xl p-8 sticky top-32"
+              className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-3xl p-5 sm:p-8 lg:sticky lg:top-32"
               {...fadeIn}
             >
-              <h3 className="text-sm font-heading tracking-widest uppercase font-bold text-light-gray/50 mb-6">Project Metadata</h3>
+              <h3 className="text-xs font-mono text-light-gray/50 mb-6 font-medium">Project Metadata</h3>
               
               {project.icons && project.icons.length > 0 && (
                 <div className="mb-8">
-                  <p className="text-xs font-heading tracking-widest uppercase text-light-gray/40 mb-3">Technologies</p>
+                  <p className="text-xs font-mono text-light-gray/40 mb-3">Technologies</p>
                   <div className="flex flex-wrap gap-3">
                     {project.icons.map((icon, i) => (
                       <div key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center p-2">
@@ -215,7 +261,7 @@ export default function ProjectCaseStudy({ project }) {
 
               {project.description && (
                 <div>
-                  <p className="text-xs font-heading tracking-widest uppercase text-light-gray/40 mb-3">TL;DR</p>
+                  <p className="text-xs font-mono text-light-gray/40 mb-3">Summary</p>
                   <p className="text-light-gray/70 font-inter text-sm leading-relaxed">
                     {project.description}
                   </p>

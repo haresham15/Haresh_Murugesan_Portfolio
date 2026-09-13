@@ -1,235 +1,364 @@
 export const spotlightProjects = [
- {
-  slug: 'healios',
-  title: 'Healios - AI Post-Surgical Recovery Assistant',
-  description: 'Engineered a full-stack computer vision application utilizing a fine-tuned TensorFlow model to classify surgical wounds and allergy test wheals across 10 distinct classes. Achieved highly accurate multi-class predictions, outperforming standard edge-detection algorithms. The application is now fully deployed and accessible to patients.',
-  icons: ['react.svg', 'python.svg', 'tensorflow.svg', 'tailwind.svg', 'fastapi.svg'],
-  github: 'https://github.com/haresham15/healios',
-  demo: 'https://healiosaisurgeryassistant.vercel.app/patient/dashboard',
-  image: '/healios.png',
-  caseStudy: {
-   executiveSummary: 'Healios is a comprehensive AI-driven tool designed to assist patients in monitoring post-surgical wound recovery. By leveraging a fine-tuned TensorFlow multi-class classifier and a React frontend, it accurately categorizes wounds into 10 classifications and maps them to actionable risk levels.',
-   problem: 'Standard post-surgical recovery relies heavily on infrequent in-person visits. Patients often misidentify early signs of infection, leading to readmissions. Existing computer vision solutions used rudimentary edge detection, which failed on varied skin tones and complex wound topologies.',
-   architecture: 'The platform uses a FastAPI backend with Pydantic validation to serve a custom TensorFlow model (.h5). Images are automatically resized (224x224), converted to RGB, and normalized before inference. The Vite/React frontend processes the 10-class output (e.g., Abrasions, Diabetic Wounds, Venous Wounds) to generate "Healthy", "At-Risk", or "Critical" recommendations. The frontend is seamlessly deployed and hosted on Vercel.',
-   tradeoffs: 'Hosting a full TensorFlow model within a standard FastAPI instance introduces higher memory consumption and inference latency compared to simple OpenCV scripts. I mitigated this by optimizing the image preprocessing pipeline, trading a negligible 1% accuracy drop for a significant speedup in client response times.',
-   nextSteps: 'The model currently struggles with severe lighting variations and extreme shadows. Next iteration involves data augmentation with simulated lighting conditions and migrating the model to TensorFlow Lite for on-device inference to reduce server costs.'
+  {
+    slug: 'healios',
+    year: '2026',
+    title: 'Healios V2 — Multimodal Post-Op Recovery Platform',
+    category: 'AI & Vision',
+    highlight: '8.09ms Grad-CAM XAI',
+    stack: 'Next.js, TypeScript, Python, FastAPI, TensorFlow',
+    description: 'Enterprise-grade clinical recovery monitoring ecosystem integrating Explainable AI (Grad-CAM in 8.09ms), tissue morphology HSV segmentation (2.00ms), edge HTML5 Canvas Laplacian blur gatekeeping (<35ms), and an EHR-integrated clinical recovery agent grounded in ERAS protocols.',
+    icons: ['nextjs.svg', 'python.svg', 'fastapi.svg', 'tensorflow.svg', 'typescript.svg'],
+    github: 'https://github.com/haresham15/HealiosPostSurgery',
+    demo: 'https://healiosaisurgeryassistant.vercel.app/patient/dashboard',
+    image: '/healios.png',
+    caseStudy: {
+      executiveSummary: 'Healios V2 is a full-stack post-surgical recovery intelligence platform combining deep learning, explainable AI, client-side edge computing, and multi-turn clinical decision support. It bridges the trust deficit in healthcare AI by pairing wound risk classifications with real-time gradient saliency maps and color-space tissue morphology analysis.',
+      problem: 'Postoperative surgical site infections (SSIs) account for up to 20% of unplanned 30-day hospital readmissions in general and abdominal surgery. Remote monitoring workflows frequently fail because black-box deep learning scores are distrusted by surgeons, blurred patient photographs degrade diagnostic reliability while wasting cloud bandwidth, and generic LLMs hallucinate non-standard advice rather than adhering to validated surgical guidelines (ERAS, CDC SSI surveillance).',
+      architecture: 'Engineered as a Next.js 14 and TypeScript frontend coupled with a high-performance Python FastAPI backend and SQLModel EHR persistence layer. Features an Explainable AI (XAI) Grad-CAM engine using a vectorized NumPy piecewise linear Jet colormap (sub-10ms generation without heavy matplotlib dependencies); an HSV color-space tissue segmentation analyzer measuring granulation (proliferative red/pink), slough (fibrinous yellow/tan), and necrosis (avascular eschar); an edge HTML5 Canvas Laplacian blur and luminance quality gatekeeper running in-browser (<35ms) before upload; and a multi-turn clinical recovery agent executing real-time EHR diagnostic tools (tool_get_vitals, tool_get_medications, tool_get_latest_assessment, hybrid_vector_rag_query) with automated surgical escalation triage.',
+      tradeoffs: 'Evaluating image focus and exposure on the browser Canvas before transmission eliminated wasted cloud compute on unreadable captures and delivered instant feedback (<35ms) to patients without server round-trips. We also replaced server-side matplotlib rendering with pure NumPy piecewise linear interpolation, cutting memory consumption by 120MB+ and avoiding server GUI thread-locks. For clinical guidance, an embedded in-memory hybrid RAG (BM25 + TF-IDF) achieved 0.14ms lookup speeds with zero cloud database latency.',
+      metrics: [
+        { label: 'Grad-CAM Saliency', value: '8.09 ms', detail: 'End-to-end generation latency (224x224 input)' },
+        { label: 'Tissue Morphology', value: '2.00 ms', detail: 'Vectorized HSV bed segmentation (128x128)' },
+        { label: 'Hybrid Protocol RAG', value: '0.14 ms', detail: 'BM25 + TF-IDF query latency' },
+        { label: 'Edge Pre-Flight Gate', value: '< 35 ms', detail: 'In-browser Canvas Laplacian blur check' },
+        { label: 'Clinical Agent Exec', value: '5.43 ms', detail: 'EHR diagnostic tool execution + ERAS synthesis' },
+        { label: 'Test Suite Coverage', value: '100% PASS', detail: '5/5 unit & integration suites, 0 TS errors' }
+      ],
+      nextSteps: 'Expanding clinical trial validation across diverse postoperative incisions and Fitzpatrick skin phototypes, followed by WebRTC integration for direct clinician-patient video consultations.'
+    }
+  },
+  {
+    slug: 'apexis',
+    year: '2026',
+    title: 'Apexis — Centralized Motorsports Intelligence Platform',
+    category: 'Full-Stack Systems',
+    highlight: '60fps Race Sim & OCR',
+    stack: 'Next.js, React, TypeScript, TensorFlow.js, Tesseract.js',
+    description: 'Unified telemetry and predictive strategy platform for motorsport fans (F1, F2, F3, FE, NASCAR, GTWC). Features a multi-threaded 2D live race simulation Web Worker, client-side Tesseract.js OCR broadcast scanning, a TensorFlow.js tire degradation predictor, and a Gemini-powered Race Engineer.',
+    icons: ['nextjs.svg', 'react.svg', 'typescript.svg', 'tensorflow.svg', 'tailwind.svg'],
+    github: 'https://github.com/haresham15/AIMotorsportsHub',
+    demo: 'https://ai-motorsports-hub.vercel.app/',
+    image: '/apexis.png',
+    caseStudy: {
+      executiveSummary: 'Apexis aggregates multi-series motorsport telemetry into a singular, interactive intelligence hub. By running 2D race simulations and computer vision standings extraction off-main-thread via Web Workers and deploying TensorFlow.js in the browser, it delivers real-time predictive strategy modeling with zero server compute overhead.',
+      problem: 'Motorsport enthusiasts following multiple racing series are forced to toggle between fragmented live-timing websites, static PDF classification sheets, and ungrounded social media commentary. There lacked a centralized dashboard combining live spatial telemetry with contextual AI to explain tire cliff points, pit delta windows, and race strategies dynamically.',
+      architecture: 'Built on Next.js 14 (App Router), React, TypeScript, and Tailwind CSS with serverless Next.js API routes. Offloads compute-heavy tasks to dedicated browser Web Workers: a custom 2D simulation engine (simulator.worker.ts) renders real-time driver positions using OpenF1 track geometries, while Tesseract.js OCR extracts standings from external TV feeds directly in-browser. An embedded TensorFlow.js neural network projects tire degradation penalties, and an indexed local SQLite database (better-sqlite3) powers sub-15ms historical head-to-head comparisons dating back to 1950.',
+      tradeoffs: 'Migrating the physics simulation engine and broadcast OCR entirely to client-side Web Workers eliminated expensive cloud GPU/server infrastructure and network streaming latency. The tradeoff is requiring modern client hardware capable of sustaining 60fps rendering during multi-car endurance sessions.',
+      metrics: [
+        { label: 'Simulation Frame Rate', value: '60 fps', detail: 'Off-main-thread Web Worker physics pipeline' },
+        { label: 'Broadcast OCR Engine', value: '100% Client-Side', detail: 'Tesseract.js worker running zero-cost in browser' },
+        { label: 'Historical Query Time', value: '< 12 ms', detail: 'Indexed local SQLite lookups across 1950–present' },
+        { label: 'Telemetry API Latency', value: '< 150 ms', detail: 'Serverless OpenF1 telemetry ingestion' }
+      ],
+      nextSteps: 'Implementing live team-radio audio transcription and predictive machine learning models for safety-car deployment likelihood during incident sectors.'
+    }
+  },
+  {
+    slug: 'tempo',
+    year: '2026',
+    title: 'Tempo — RSD Communication Buffer & Regulation Suite',
+    category: 'AI & Vision',
+    highlight: '100% Crisis Recall',
+    stack: 'Next.js 15, React 19, TypeScript, PostgreSQL (pgvector)',
+    description: 'Tactical emotional buffer and executive regulation suite designed for Rejection Sensitive Dysphoria (RSD) and ADHD task freeze. Features PostgreSQL pgvector IVFFlat Cosine RAG, 100% crisis recall deterministic safety, dual-provider failover (DeepSeek V3 / Gemini), and Spatial Task Chunker CV.',
+    icons: ['nextjs.svg', 'react.svg', 'typescript.svg', 'sql.svg', 'tailwind.svg'],
+    github: 'https://github.com/haresham15/TempoADHDAssist',
+    demo: 'https://github.com/haresham15/TempoADHDAssist',
+    image: '/tempo.png',
+    caseStudy: {
+      executiveSummary: 'Tempo serves as a cognitive circuit breaker for neurodivergent individuals facing rejection sensitivity and task paralysis. It pairs an ephemeral, zero-destination communication buffer with PostgreSQL pgvector semantic emotional memory, deterministic crisis interception, and spatial vision task chunking.',
+      problem: 'For individuals with ADHD and RSD, ambiguous messages (a brief email from a manager or flat text from a friend) trigger an immediate, autonomic fight-or-flight alarm. In acute distress, prefrontal executive function shuts down, precipitating impulsive defensive replies, task freeze, and shame spirals. Existing productivity software exacerbates working memory overload.',
+      architecture: 'Built on Next.js 15, React 19, TypeScript, and accessible WCAG AAA CSS Modules with Supabase PostgreSQL and Row Level Security. Leverages PostgreSQL pgvector IVFFlat Cosine Similarity (768-dim embeddings) to retrieve historically resolved spirals matching the current trigger. Implements an active-passive LLM failover state machine (DeepSeek V3 primary structured JSON → Google Gemini 3.5 Flash Lite fallback) with 1-turn Zod schema self-correction. Employs Gemini Multimodal Vision for a Spatial Task Chunker that spotlights one item from messy room photos, alongside a Web Audio engine generating Brownian noise, a 65 BPM vagal grounding pulse, and a 432Hz harmonic drone.',
+      tradeoffs: 'Omitted all outgoing third-party integrations (Slack, email, SMS) by design. While this requires manual copy-pasting, it creates an absolute zero-destination barrier that guarantees an emotionally volatile draft cannot be accidentally sent. Furthermore, a deterministic regex safety filter intercepts crisis language in 0.2ms before model dispatch, eliminating hallucination risks on life-safety triggers.',
+      metrics: [
+        { label: 'Crisis Detection Recall', value: '100.0%', detail: '5/5 caught, 0 false negatives on 30-case benchmark' },
+        { label: 'Colloquial False-Alarm', value: '0.0%', detail: '0/5 false positives on colloquial distress idioms' },
+        { label: 'Zod Schema Parse Rate', value: '100.0%', detail: '0 syntax crashes via 1-turn prompt self-correction' },
+        { label: 'Primary LLM Latency', value: 'p50: 644 ms', detail: 'DeepSeek V3 structured JSON response time' },
+        { label: 'Fallback LLM Latency', value: 'p50: 828 ms', detail: 'Gemini 3.5 Flash Lite failover response time' },
+        { label: 'Semantic RAG Accuracy', value: '100.0%', detail: 'pgvector Cosine Sim 0.824 surfacing past spirals' },
+        { label: 'Inference Cost / Turn', value: '$0.00007', detail: 'Low-cost token reasoning optimization' }
+      ],
+      nextSteps: 'Developing an on-device quantized small language model (Gemma 2 2B via WebGPU / ONNX) to enable 100% offline, air-gapped emotional reframing on mobile browsers.'
+    }
+  },
+  {
+    slug: 'careline',
+    year: '2026',
+    title: 'Careline — Bi-Directional Transit Hub',
+    category: 'Research & Data',
+    highlight: '1st Place DataFest 2026',
+    stack: 'React, Python, OSRM, DBSCAN, Pandas',
+    description: 'Predictive logistics engine solving healthcare transit barriers through bi-directional shuttle optimization for Stormont Vail Health. 1st Place Winner at DataFest 2026 (Best Use of External Data).',
+    icons: ['react.svg', 'python.svg', 'javascript.svg', 'pandas.svg'],
+    github: 'https://github.com/haresham15/Careline',
+    demo: 'https://data-fest2026.vercel.app/',
+    image: '/careline.png',
+    caseStudy: {
+      executiveSummary: 'Patients from transit-poor neighborhoods miss preventative care and escalate to the ER. Discharged patients are trapped in beds because public transit cannot get them home. One bi-directional shuttle fleet solves both problems on a single unified budget.',
+      problem: 'Stormont Vail Health faced a regional healthcare crisis: patients from transit-vulnerable areas escalated to emergency rooms for preventable conditions, while medically cleared patients occupied acute-care hospital beds due to lack of transit. 43 of 141 Census Blocks had zero bus stops within 800m.',
+      architecture: 'Engineered a spatial data analytics platform combining a custom Transit Vulnerability Index and DBSCAN clustering to group high-vulnerability blocks into shuttle zones. Utilized Open Source Routing Machine (OSRM) for turn-by-turn routing and an interactive React dashboard for discharge manifests.',
+      tradeoffs: 'Processed millions of geospatial data points but faced performance bottlenecks during DataFest 2026. We mitigated this by aggregating data into regional bounding boxes and shuttle zone clusters, sacrificing micro-level coordinate detail for macro-level routing efficiency.',
+      metrics: [
+        { label: 'Award', value: '1st Place', detail: 'Best Use of External Data (American Statistical Association)' },
+        { label: 'Transit Gap Identified', value: '43 Blocks', detail: 'Found 43 of 141 census blocks with zero 800m bus access' },
+        { label: 'Routing Engine', value: 'OSRM Turn-by-Turn', detail: 'Bi-directional patient pickup & discharge routing' }
+      ],
+      nextSteps: 'Further optimize the shuttle routing by integrating real-time traffic data and expanding the Transit Vulnerability Map to cover additional regional healthcare facilities.'
+    }
   }
- },
- {
-  slug: 'apexis',
-  title: 'Apexis (AIMotorsportsHub)',
-  description: 'A centralized, personalized web platform for motorsport fans. Features real-time 2D race map visualization (via Web Workers), TensorFlow.js tire degradation predictions, in-browser OCR broadcast scanning, and a Gemini-powered Race Engineer chatbot.',
-  icons: ['nextjs.svg', 'react.svg', 'typescript.svg', 'tensorflow.svg', 'tailwind.svg'],
-  github: 'https://github.com/haresham15/AIMotorsportsHub',
-  demo: 'https://ai-motorsports-hub.vercel.app/',
-  image: '/apexis.png',
-  caseStudy: {
-   executiveSummary: 'Apexis is a unified hub for motorsport enthusiasts, aggregating real-time tracking across F1, NASCAR, Formula E, and more. It seamlessly integrates a custom multi-threaded 2D live race simulation with generative AI to offer deep, personalized race insights.',
-   problem: 'Fans following multiple racing series juggle numerous disjointed apps for timings, schedules, and news. There lacked a singular, intelligent dashboard combining live telemetry visualization with contextual AI to explain complex race strategies dynamically.',
-   architecture: 'Built on Next.js 14 and React 19 using TypeScript and Tailwind CSS. It leverages a custom Web Worker pipeline to offload heavy 2D map rendering and race simulation. Live standings are extracted completely client-side using Tesseract.js OCR, while TensorFlow.js handles predictive modeling.',
-   tradeoffs: 'Shifted heavy processing like Computer Vision OCR and race simulation entirely to the client-side via Web Workers. While this drastically reduces backend server costs and API latency, it requires modern client hardware to maintain 60fps during 24-hour endurance events.',
-   nextSteps: 'V2.0 focuses on push notifications for red flags, deep historical driver statistics, a unified global motorsport calendar, and live community chat rooms during active sessions.'
-  }
- },
- {
-  slug: 'nyc-housing-market-ai',
-  title: 'NYC Housing Market AI/ML Analysis',
-  description: 'Award-winning project from the Hack To The Future hackathon. Engineered a cyberpunk-themed, interactive visualization engine that leverages machine learning and spatial data analytics to analyze housing value concentration, wealth gravity, and gentrification vectors across New York City.',
-  icons: ['javascript.svg', 'css.svg', 'react.svg', 'python.svg', 'scitkitlearn.svg'],
-  github: 'https://github.com/haresham15/DataIO',
-  demo: 'https://data-io-gamma.vercel.app/',
-  image: '/nyc-map-magnet.png',
-  caseStudy: {
-   executiveSummary: 'Developed during the Hack To The Future hackathon, this project is a dynamic market physics engine designed to visualize the NYC housing crisis. By treating the real estate market as a physical system, it uses AI/ML to map wealth gravity wells and economic zones.',
-   problem: 'Traditional real estate models view housing prices as a static map of costs. There was a need to dynamically visualize how high-density wealth zones pull market value inward and accelerate gentrification across the five boroughs.',
-   architecture: 'Built a high-performance React frontend that consumes parsed NYC spatial datasets. It features dynamic rendering wrappers and utilizes K-Means Clustering to detect hidden similarities between properties based on age, location, and price.',
-   tradeoffs: 'Optimized for front-end rendering speed and immersive 3D/cyberpunk aesthetics for the hackathon, meaning the tool currently relies on pre-processed machine learning outputs rather than real-time model inference.',
-   nextSteps: 'Integrate real-time real estate API feeds to keep the AI model updated with current market fluctuations and adapt to ongoing migration patterns.'
-  }
- },
- {
-  slug: 'careline',
-  title: 'Bi-Directional Transit Hub (Careline)',
-  description: 'Predictive logistics engine solving healthcare transit barriers through bi-directional shuttle optimization for Stormont Vail Health. Built for DataFest 2026.',
-  icons: ['react.svg', 'python.svg', 'javascript.svg', 'pandas.svg'],
-  github: 'https://github.com/haresham15/Careline',
-  demo: 'https://data-fest2026.vercel.app/',
-  image: '/careline.png',
-  caseStudy: {
-   executiveSummary: 'Patients from transit-poor neighborhoods miss preventative care and escalate to the ER. Discharged patients are trapped in beds because public transit can\'t get them home. One bi-directional shuttle fleet solves both problems on a single budget.',
-   problem: 'Stormont Vail Health faced a crisis: patients from transit-vulnerable areas escalated to the ER, while medically cleared patients were stuck in beds due to lack of transit. 43 of 141 Census Blocks had zero bus stops within 800m.',
-   architecture: 'Engineered a spatial data analytics platform combining a Transit Vulnerability Index and DBSCAN clustering to group high-vulnerability blocks into shuttle zones. Utilized Open Source Routing Machine (OSRM) for turn-by-turn routing and an interactive dashboard for discharge manifests.',
-   tradeoffs: 'Processed millions of geospatial data points but faced performance bottlenecks during DataFest 2026. We mitigated this by aggregating data into regional bounding boxes and shuttle zone clusters, sacrificing micro-level detail for macro-level routing efficiency.',
-   nextSteps: 'Further optimize the shuttle routing by integrating real-time traffic data and expanding the Transit Vulnerability Map to cover additional regional healthcare facilities.'
-  }
- }
 ];
 
 export const archiveProjects = [
-
- {
-  slug: 'syntinuum-podcast-website',
-  year: '2026',
-  title: 'Syntinuum Podcast Website',
-  stack: 'JavaScript, React, Tailwind CSS',
-  icons: ['javascript.svg', 'react.svg', 'tailwind.svg'],
-  link: 'https://github.com/haresham15/Syntinuum_podcast_website',
-  caseStudy: {
-   executiveSummary: 'A dynamic, accessible, and highly performant web application built to host, stream, and catalog podcast episodes for the Syntinuum network.',
-   problem: 'Off-the-shelf podcast hosts lacked the custom branding and interactive transcript features required for a highly engaging listener experience, resulting in a disjointed user journey.',
-   architecture: 'Built a bespoke frontend using React and Tailwind CSS, utilizing HTML5 audio APIs and React Context for seamless, uninterrupted global audio playback across page navigations.',
-   tradeoffs: 'Eschewed a heavy CMS in favor of a static JSON-driven architecture to maximize page load speeds and SEO performance, which requires manual code updates when new episodes launch.',
-   nextSteps: 'Implement a headless CMS like Sanity to allow non-technical hosts to easily upload and manage new episodes without requiring developer intervention.'
+  {
+    slug: 'nyc-housing-market-ai',
+    year: '2026',
+    title: 'NYC Housing Market AI/ML Analysis',
+    category: 'Research & Data',
+    highlight: 'Hackathon Award Winner',
+    stack: 'React, Python, Scikit-Learn, K-Means',
+    description: 'Interactive spatial physics and ML visualization engine analyzing housing value concentration, wealth gravity, and gentrification vectors across NYC. Awarded at Hack To The Future.',
+    icons: ['react.svg', 'python.svg', 'scitkitlearn.svg', 'javascript.svg'],
+    github: 'https://github.com/haresham15/DataIO',
+    link: 'https://github.com/haresham15/DataIO',
+    image: '/nyc-map-magnet.png',
+    caseStudy: {
+      executiveSummary: 'Award-winning project from the Hack To The Future hackathon. An interactive spatial data visualization engine that leverages machine learning and spatial physics to analyze housing value concentration, wealth gravity, and gentrification vectors across NYC.',
+      problem: 'Traditional real estate models view housing prices as a static map of costs. There was a need to dynamically visualize how high-density wealth zones pull market value inward and accelerate gentrification across the five boroughs.',
+      architecture: 'Built a high-performance React frontend that consumes parsed NYC spatial datasets. Utilizes K-Means Clustering to detect hidden similarities between properties based on age, location, and price.',
+      tradeoffs: 'Optimized for front-end rendering speed and immersive 3D aesthetics for the hackathon, meaning the tool currently relies on pre-processed machine learning outputs rather than real-time model inference.',
+      nextSteps: 'Integrate real-time real estate API feeds to keep the AI model updated with current market fluctuations and adapt to ongoing migration patterns.'
+    }
+  },
+  {
+    slug: 'cv-allergy-wheal',
+    year: '2026',
+    title: 'Digital Pathology & Allergy Wheal CV Research',
+    category: 'AI & Vision',
+    highlight: 'Ohio State Research',
+    stack: 'Python, OpenCV, TensorFlow, Scikit-Image',
+    description: 'Automated computer vision image-processing pipeline quantifying allergy skin prick test (SPT) wheal and flare areas, replacing subjective millimeter calipers with standardized clinical metrics.',
+    icons: ['python.svg', 'tensorflow.svg', 'scitkitlearn.svg'],
+    github: 'https://github.com/haresham15/cv_allergy_wheal',
+    link: 'https://github.com/haresham15/cv_allergy_wheal',
+    image: '/cv-allergy-wheal.png',
+    caseStudy: {
+      executiveSummary: 'Computer vision research developed at The Ohio State University to automate allergy skin prick test (SPT) wheal and flare quantification, replacing subjective millimeter calipers with standardized clinical imaging metrics.',
+      problem: 'Manual millimeter ruler measurements of skin prick test wheals suffer from high inter-observer variability and measurement error in allergy clinics, leading to inconsistent diagnostic grading for environmental and food allergens.',
+      architecture: 'Engineered an image processing pipeline combining spatial color thresholding, convex hull edge contouring, and elliptical fitting to calculate major/minor axis lengths and total wheal surface area in square millimeters against calibration markers.',
+      tradeoffs: 'Prioritized deterministic geometric contouring over deep convolutional segmentation networks to ensure transparent, reproducible measurements that clinical researchers could audit directly without black-box opacity.',
+      nextSteps: 'Validate the automated contouring algorithm across a multi-center dataset of varying patient skin tones and erythema intensities.'
+    }
+  },
+  {
+    slug: 'syntinuum-podcast-website',
+    year: '2026',
+    title: 'Syntinuum Podcast Website',
+    category: 'Full-Stack Systems',
+    highlight: '100K+ Impressions',
+    stack: 'JavaScript, React, Tailwind CSS',
+    description: 'Global audio streaming web application for the Syntinuum podcast, delivering persistent audio playback, episode catalogs, and responsive listening interfaces across devices.',
+    icons: ['javascript.svg', 'react.svg', 'tailwind.svg'],
+    github: 'https://github.com/haresham15/Syntinuum_podcast_website',
+    demo: 'https://www.syntinuumpodcast.com/',
+    link: 'https://github.com/haresham15/Syntinuum_podcast_website',
+    caseStudy: {
+      executiveSummary: 'A fast, accessible web application built to host, stream, and catalog podcast episodes for the Syntinuum network (100K+ combined cross-platform impressions).',
+      problem: 'Off-the-shelf podcast landing pages lacked the custom aesthetic and audio control required for an engaging listener experience.',
+      architecture: 'Built a bespoke frontend using React and Tailwind CSS, utilizing HTML5 audio APIs and React Context for persistent, uninterrupted global audio playback across page navigations.',
+      tradeoffs: 'Eschewed a heavy CMS in favor of a static JSON-driven architecture to maximize page load speeds and SEO performance.',
+      nextSteps: 'Implement a lightweight headless CMS to allow guest information and transcripts to be updated dynamically.'
+    }
+  },
+  {
+    slug: 'philocracy',
+    year: '2025',
+    title: 'Philocracy Platform',
+    category: 'Full-Stack Systems',
+    highlight: 'Structured Debate Trees',
+    stack: 'Next.js, Tailwind CSS, React',
+    description: 'Structured philosophical debate platform enforcing logical argumentation schemas, claim citations, and nested premise trees to combat online discourse polarization.',
+    icons: ['nextjs.svg', 'tailwind.svg', 'react.svg'],
+    github: 'https://github.com/haresham15/Philocracy',
+    link: 'https://github.com/haresham15/Philocracy',
+    caseStudy: {
+      executiveSummary: 'A platform aiming to structure debate and philosophical discourse, providing tools for structured argumentation and claims validation.',
+      problem: 'Online discussion forums reward outrage over nuanced discussion. Philocracy was designed to structurally enforce logical progression and evidence-based claims in debates.',
+      architecture: 'Developed utilizing the Next.js App Router for server-side rendering, styled with Tailwind for a clean, distraction-free reading experience with nested argument tree state management.',
+      tradeoffs: 'Focused on argument hierarchy modeling and clean typography for the MVP, using structured JSON schemas before connecting a live relational database backend.',
+      nextSteps: 'Integrate Supabase to enable multi-user argument branching, claim citation verification, and real-time voting.'
+    }
+  },
+  {
+    slug: 'cs50-ai-projects',
+    year: '2025',
+    title: 'CS50 Intro to AI with Python',
+    category: 'AI & Vision',
+    highlight: 'Harvard CS50 AI',
+    stack: 'Python, TensorFlow, NumPy',
+    description: 'Hands-on implementations of classical AI and probabilistic reasoning algorithms: Minimax with Alpha-Beta pruning, HMMs, k-NN, and feed-forward neural networks from mathematical first principles.',
+    icons: ['python.svg', 'tensorflow.svg', 'numpy.svg'],
+    github: 'https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects',
+    link: 'https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects',
+    caseStudy: {
+      executiveSummary: 'A collection of artificial intelligence implementations covering classical search algorithms, probabilistic inference, and neural networks completed for Harvard’s CS50 AI course.',
+      problem: 'Mastering foundational AI algorithms requires hands-on implementation from mathematical first principles rather than relying solely on high-level wrappers.',
+      architecture: 'Implemented core algorithms including Minimax with Alpha-Beta Pruning, Hidden Markov Models, k-Nearest Neighbors, and feed-forward neural networks using Python and NumPy.',
+      tradeoffs: 'Prioritized mathematical clarity and algorithmic correctness over low-level C++ speed optimizations.',
+      nextSteps: 'Package reusable components into an educational CLI suite for students exploring search algorithms.'
+    }
+  },
+  {
+    slug: 'tutormatch',
+    year: '2025',
+    title: 'TutorMatch: AI-Powered Tutoring Platform',
+    category: 'AI & Vision',
+    highlight: 'Zero-Shot NLP Matching',
+    stack: 'Python, Streamlit, Hugging Face',
+    description: 'Algorithmic matching portal pairing students with verified tutors based on course requirements, Haversine geospatial proximity, and Hugging Face zero-shot resume validation.',
+    icons: ['python.svg', 'streamlit.svg', 'huggingface.svg'],
+    github: 'https://github.com/haresham15/TutorMatch_WebApp',
+    link: 'https://github.com/haresham15/TutorMatch_WebApp',
+    caseStudy: {
+      executiveSummary: 'A web application that matches students with optimal tutors based on course requirements, geographic proximity via Haversine distance, and NLP-validated resume credentials.',
+      problem: 'Students struggle to find tutors with verified subject-matter expertise within their local geographic area, while manual resume vetting is slow and inconsistent.',
+      architecture: 'Built on a Streamlit frontend with a custom matching algorithm. Leveraged Hugging Face zero-shot classification pipelines and PyPDF2 to parse uploaded tutor resumes, validating stated credentials before calculating proximity matches.',
+      tradeoffs: 'Used Streamlit for rapid prototyping of the AI classification pipeline, prioritizing algorithm iteration speed over custom component styling.',
+      nextSteps: 'Migrate the interface to Next.js and deploy the classification model as a dedicated microservice.'
+    }
+  },
+  {
+    slug: 'carstomer',
+    year: '2025',
+    title: 'CarStomer: Car Value Analysis',
+    category: 'Research & Data',
+    highlight: 'Random Forest Valuation',
+    stack: 'Python, Streamlit, Scikit-Learn',
+    description: 'Predictive automotive valuation engine using Random Forest regression over historical sales data to forecast used car fair-market value based on mileage, trim, and market trends.',
+    icons: ['python.svg', 'streamlit.svg', 'scitkitlearn.svg'],
+    github: 'https://github.com/haresham15/CarStomerCarAnalysis',
+    link: 'https://github.com/haresham15/CarStomerCarAnalysis',
+    caseStudy: {
+      executiveSummary: 'A data-driven application predicting used vehicle valuations based on historical market trends, mileage degradation, and trim features.',
+      problem: 'Used car pricing can be opaque, making it difficult for buyers to determine fair market value without manual research across disparate listings.',
+      architecture: 'Trained a Random Forest regressor on historical automotive sales data, exposing an interactive parameter tuning dashboard via Streamlit.',
+      tradeoffs: 'Constrained feature space to high-volume commuter models to ensure robust model confidence intervals rather than over-fitting to rare luxury trims.',
+      nextSteps: 'Incorporate real-time localized dealership price scraping to track regional supply and demand shifts.'
+    }
+  },
+  {
+    slug: 'momwebsite',
+    year: '2025',
+    title: 'Professional Services Client Portal',
+    category: 'Full-Stack Systems',
+    highlight: 'TypeScript & SEO Portal',
+    stack: 'Next.js, TypeScript, React',
+    description: 'High-conversion business portal and booking interface built with strict TypeScript types, server-side rendering, and responsive mobile architecture deployed on Vercel.',
+    icons: ['nextjs.svg', 'typescript.svg', 'react.svg'],
+    github: 'https://github.com/haresham15/MomWebsite',
+    link: 'https://github.com/haresham15/MomWebsite',
+    caseStudy: {
+      executiveSummary: 'A fast, responsive business website and client portal built with Next.js and TypeScript, optimized for high Core Web Vitals and search visibility.',
+      problem: 'The previous web presence was unoptimized and lacked mobile responsiveness, hindering organic client inquiry conversion.',
+      architecture: 'Engineered a modern Next.js application with strict TypeScript types, server-side rendering, and automated contact validation deployed on Vercel.',
+      tradeoffs: 'Built a custom React codebase instead of a no-code website builder to maintain complete control over DOM tree size, asset loading, and Lighthouse performance.',
+      nextSteps: 'Integrate automated appointment scheduling with calendar synchronization.'
+    }
+  },
+  {
+    slug: 'murugesan-rajaram-lab',
+    year: '2025',
+    title: 'Murugesan Rajaram Lab Website',
+    category: 'Full-Stack Systems',
+    highlight: 'Academic Research Portal',
+    stack: 'Next.js, TypeScript, React',
+    description: 'Academic research lab portal cataloging peer-reviewed biomedical publications, grant awards, and researcher profiles, engineered with schema-driven React components.',
+    icons: ['nextjs.svg', 'typescript.svg', 'react.svg'],
+    github: 'https://github.com/haresham15/murugesan_rajaram_lab_website',
+    link: 'https://github.com/haresham15/murugesan_rajaram_lab_website',
+    caseStudy: {
+      executiveSummary: 'An academic research lab portal built on Next.js to catalog peer-reviewed publications, grant milestones, and research team profiles.',
+      problem: 'Academic websites often suffer from unmaintained layouts that fail to clearly communicate research outputs to funding bodies and prospective graduate researchers.',
+      architecture: 'Structured modular React components driven by validated JSON schemas, allowing frictionless publication and personnel updates with static site generation.',
+      tradeoffs: 'Selected static JSON schemas to ensure zero maintenance and zero hosting overhead while keeping page transitions instantaneous.',
+      nextSteps: 'Connect directly to the PubMed API to automatically pull and index new lab publications upon acceptance.'
+    }
+  },
+  {
+    slug: 'software-2-projects',
+    year: '2024',
+    title: 'Software 2 Engineering Projects',
+    category: 'Systems & Core',
+    highlight: 'Data Structures & Invariants',
+    stack: 'Java, JUnit',
+    description: 'Advanced software engineering implementations covering fundamental data structures, memory management, pointer manipulation, and recursive tree invariants in Java with JUnit.',
+    icons: ['java.svg'],
+    github: 'https://github.com/haresham15/Haresh-s-Software-2-Projects',
+    link: 'https://github.com/haresham15/Haresh-s-Software-2-Projects',
+    caseStudy: {
+      executiveSummary: 'A collection of advanced software engineering implementations focusing on fundamental data structures, memory management, and algorithmic complexity in Java.',
+      problem: 'Writing production-grade systems requires an uncompromising foundation in pointer manipulation, recursion, trees, and Big-O efficiency.',
+      architecture: 'Implemented custom collections, binary search trees, sorting routines, and graph traversal algorithms adhering strictly to unit-tested invariants (JUnit).',
+      tradeoffs: 'Focused on algorithmic correctness, strict unit testing, and Big-O performance rather than UI layers.',
+      nextSteps: 'Expose core data structures via REST microservices to benchmark concurrency under high thread contention.'
+    }
+  },
+  {
+    slug: 'software-1-projects',
+    year: '2024',
+    title: 'Software 1 Engineering Projects',
+    category: 'Systems & Core',
+    highlight: 'Java OOP & Contracts',
+    stack: 'Java',
+    description: 'Foundational object-oriented design implementations emphasizing encapsulation, clean class contracts, defensive programming, and modular design patterns in Java.',
+    icons: ['java.svg'],
+    github: 'https://github.com/haresham15/Software-Project-Java-Collection-',
+    link: 'https://github.com/haresham15/Software-Project-Java-Collection-',
+    caseStudy: {
+      executiveSummary: 'Foundational Java software projects covering object-oriented design patterns, encapsulation, and unit testing.',
+      problem: 'Mastering software engineering requires hands-on mastery of language typing, control flow, and modular class decomposition.',
+      architecture: 'Constructed standalone modular Java applications emphasizing DRY principles, defensive programming, and readable documentation.',
+      tradeoffs: 'Maintained strict single-responsibility scope across all modules to emphasize clean class contracts.',
+      nextSteps: 'Refactor older imperative loops into functional Java Stream pipelines.'
+    }
+  },
+  {
+    slug: 'portfolio-website',
+    year: '2024',
+    title: 'Personal Portfolio & Design System',
+    category: 'Full-Stack Systems',
+    highlight: 'Three.js & Particle Engine',
+    stack: 'React, Next.js, Tailwind CSS, Three.js',
+    description: 'Interactive personal portfolio and cinematic design system featuring 3D Three.js neural networks, Google Antigravity-inspired interactive particles, and SSG static export.',
+    icons: ['nextjs.svg', 'react.svg', 'tailwind.svg'],
+    github: 'https://github.com/haresham15/Haresh_Murugesan_Portfolio',
+    demo: 'https://hareshmurugesan.com',
+    link: 'https://github.com/haresham15/Haresh_Murugesan_Portfolio',
+    caseStudy: {
+      executiveSummary: 'The interactive personal portfolio and design system you are currently viewing, featuring 3D Three.js neural visualizations, dynamic Framer Motion animations, and SSG static export.',
+      problem: 'Standard static resumes and generic templates fail to communicate an engineer’s full-stack craftsmanship, design intuition, and technical storytelling.',
+      architecture: 'Crafted with Next.js, Tailwind CSS, Framer Motion, and React Three Fiber. Configured for static export with optimized asset bundling and responsive glassmorphism.',
+      tradeoffs: 'Balanced rich 3D Canvas visual effects with performance by dynamically loading heavy components and running WebGL background renders without CPU bottlenecks.',
+      nextSteps: 'Add interactive terminal playground allowing recruiters to test API endpoints directly in-browser.'
+    }
+  },
+  {
+    slug: 'anna-birthday',
+    year: '2024',
+    title: 'A Birthday Website for my Brother!',
+    category: 'Full-Stack Systems',
+    highlight: 'Interactive Timeline',
+    stack: 'React, Tailwind CSS, JavaScript',
+    description: 'Personalized single-page web experience showcasing custom CSS keyframe animations, interactive memory timeline states, and responsive component design.',
+    icons: ['react.svg', 'tailwind.svg', 'javascript.svg'],
+    github: 'https://github.com/haresham15/AnnaBirthdayWebsite',
+    link: 'https://github.com/haresham15/AnnaBirthdayWebsite',
+    caseStudy: {
+      executiveSummary: 'A personalized interactive single-page web experience built as a digital gift, showcasing custom CSS animations and responsive component design.',
+      problem: 'Creating a memorable digital experience requires thoughtful interaction design and polished responsive styling.',
+      architecture: 'Constructed with React and Tailwind CSS, featuring custom timeline animation states and micro-interactions.',
+      tradeoffs: 'Optimized purely for emotional delight and visual impact for a single user rather than generalized configurability.',
+      nextSteps: 'Extract interactive memory timeline into an open-source template component.'
+    }
   }
- },
- {
-  slug: 'philocracy',
-  year: '2025',
-  title: 'Philocracy Platform',
-  stack: 'Next.js, Tailwind CSS, React',
-  icons: ['nextjs.svg', 'tailwind.svg', 'react.svg'],
-  link: 'https://github.com/haresham15/Philocracy',
-  caseStudy: {
-   executiveSummary: 'A platform aiming to democratize debate and philosophical discourse, providing tools for structured argumentation and community voting, built entirely on Next.js.',
-   problem: 'Social media platforms reward outrage over nuanced discussion. There was a desperate need for a platform that structurally enforces logical progression and evidence-based claims in debates.',
-   architecture: 'Developed utilizing the Next.js App Router for optimal SEO and server-side rendering, styled with Tailwind for a clean, distraction-free reading experience. Complex state management handles nested argument trees.',
-   tradeoffs: 'Focused entirely on the frontend logic and structural flow for the MVP, relying on mock data rather than building out a complex real-time database backend.',
-   nextSteps: 'Integrate Firebase or Supabase to enable real-time multiplayer debate mechanics, user authentication, and persistent argument branching.'
-  }
- },
- {
-  slug: 'cs50-ai-projects',
-  year: '2025',
-  title: 'CS50 Intro to AI with Python',
-  stack: 'Python, TensorFlow, NumPy',
-  icons: ['python.svg', 'tensorflow.svg', 'numpy.svg'],
-  link: 'https://github.com/haresham15/Haresh-s-CS50-Intro-to-AI-with-Python-Projects',
-  caseStudy: {
-   executiveSummary: 'A collection of artificial intelligence projects implementing graph search algorithms, reinforcement learning, and neural networks as part of Harvard\'s CS50 AI course.',
-   problem: 'Gaining a foundational, from-scratch understanding of classical and modern AI algorithms requires hands-on implementation without relying entirely on high-level abstraction libraries.',
-   architecture: 'Implemented foundational algorithms including Minimax for game playing, Hidden Markov Models for probability tracking, and custom feed-forward neural networks using raw Python and NumPy arrays.',
-   tradeoffs: 'Algorithms were optimized for educational clarity and correctness rather than production-grade execution speed, meaning some search spaces take longer to traverse than highly-optimized C++ variants.',
-   nextSteps: 'Refactor select algorithms into a unified Python package to serve as an educational library for other students interested in AI foundations.'
-  }
- },
- {
-  slug: 'tutormatch',
-  year: '2025',
-  title: 'TutorMatch: AI-Powered Tutoring Platform',
-  stack: 'Python, Streamlit, HuggingFace',
-  icons: ['python.svg', 'streamlit.svg', 'huggingface.svg'],
-  link: 'https://github.com/haresham15/TutorMatch_WebApp',
-  caseStudy: {
-   executiveSummary: 'An AI-powered web application that intelligently matches students with optimal tutors based on course performance, geographic proximity via Haversine distance, and AI-validated credentials.',
-   problem: 'Students often struggle to find tutors that align with their specific learning pedagogies and locations, while untrustworthy tutor credentials lead to ineffective tutoring sessions.',
-   architecture: 'Built on a Streamlit frontend with a custom matching algorithm. It leverages HuggingFace\'s zero-shot classification pipeline and PyPDF2 to parse uploaded tutor resumes, validating their stated credentials before matching them with students based on geographic distance.',
-   tradeoffs: 'Relied heavily on Streamlit for the UI which limited front-end customizability, but it enabled incredibly fast iteration on the underlying AI classification and geographic matching logic.',
-   nextSteps: 'Migrate the frontend to Next.js for a more polished user experience and deploy the HuggingFace zero-shot classifier as an independent microservice to improve load times.'
-  }
- },
- {
-  slug: 'carstomer',
-  year: '2025',
-  title: 'CarStomer: Car Value Analysis',
-  stack: 'Python, Streamlit, Scikit-Learn',
-  icons: ['python.svg', 'streamlit.svg', 'scitkitlearn.svg'],
-  link: 'https://github.com/haresham15/CarStomerCarAnalysis',
-  caseStudy: {
-   executiveSummary: 'A data-driven application that assists consumers in analyzing vehicle specializations and predicts used car values based on historical market data, mileage, and condition metrics.',
-   problem: 'The used car market is highly volatile and opaque, making it exceedingly difficult for average consumers to determine if they are receiving a fair price without exhaustive manual research.',
-   architecture: 'Trained a Random Forest regressor using Scikit-Learn on a substantial dataset of historical vehicle sales, deploying the interactive model via a Streamlit web interface for consumer access.',
-   tradeoffs: 'Sacrificed some model precision on rare luxury vehicles due to lack of diverse training data, actively choosing to focus instead on high accuracy for standard commuter vehicles which form the majority of queries.',
-   nextSteps: 'Incorporate real-time web scraping of local dealership inventories to provide localized, up-to-the-minute price evaluations and trend forecasting.'
-  }
- },
- {
-  slug: 'momwebsite',
-  year: '2025',
-  title: 'MomWebsite',
-  stack: 'Next.js, TypeScript, React',
-  icons: ['nextjs.svg', 'typescript.svg', 'react.svg'],
-  link: 'https://github.com/haresham15/MomWebsite',
-  caseStudy: {
-   executiveSummary: 'A fast, responsive, and SEO-optimized business website built with Next.js to showcase professional services and capture potential client leads.',
-   problem: 'The previous web presence was outdated, slow to load, and suffered from poor search engine visibility, resulting in a demonstrable loss of business opportunities.',
-   architecture: 'Engineered a modern Next.js web application utilizing TypeScript for strict type safety and component reliability. Deployed on Vercel to leverage global edge caching and lightning-fast Server-Side Rendering (SSR).',
-   tradeoffs: 'Opted for a bespoke React/Next.js build rather than a simple template builder like Wix to maintain total control over Core Web Vitals and SEO metadata, trading a longer initial development cycle for long-term performance.',
-   nextSteps: 'Integrate an automated email marketing pipeline to nurture the leads captured through the new contact forms seamlessly.'
-  }
- },
- {
-  slug: 'murugesan-rajaram-lab',
-  year: '2025',
-  title: 'Murugesan Rajaram Lab Website',
-  stack: 'Next.js, TypeScript, React',
-  icons: ['nextjs.svg', 'typescript.svg', 'react.svg'],
-  link: 'https://github.com/haresham15/murugesan_rajaram_lab_website',
-  caseStudy: {
-   executiveSummary: 'An academic lab website built on Next.js designed to elegantly display research publications, team members, and ongoing scientific projects.',
-   problem: 'Academic websites traditionally suffer from dense, unreadable layouts. The lab required a clean, modern interface to attract prospective graduate students and clearly communicate findings to grant funding bodies.',
-   architecture: 'Built with the Next.js framework and TypeScript, featuring a highly modular component system that allows for the easy addition of new publications and team members via structured JSON data files.',
-   tradeoffs: 'Used static JSON files for data storage to keep hosting costs at absolute zero, which intentionally trades convenience (requiring a developer to push updates) for extreme reliability and speed.',
-   nextSteps: 'Connect the publications page directly to the PubMed API to automatically fetch and display new papers as they are published, eliminating manual data entry.'
-  }
- },
- {
-  slug: 'software-2-projects',
-  year: '2024',
-  title: 'Software 2 Engineering Projects',
-  stack: 'Java, JUnit',
-  icons: ['java.svg'],
-  link: 'https://github.com/haresham15/Haresh-s-Software-2-Projects',
-  caseStudy: {
-   executiveSummary: 'A collection of advanced software engineering projects focusing on complex data structures, algorithmic efficiency, and object-oriented design patterns.',
-   problem: 'Scaling applications effectively requires a deep, fundamental understanding of memory management, efficient data retrieval mechanisms, and robust system architecture.',
-   architecture: 'Implemented custom Collections, self-balancing trees, and complex graph algorithms in Java, strictly adhering to MVC architecture paradigms and comprehensive unit testing frameworks (JUnit).',
-   tradeoffs: 'Focused purely on complex backend logic and console interfaces rather than building graphical user interfaces (GUIs), maximizing the time spent on algorithmic optimization and Big-O analysis.',
-   nextSteps: 'Wrap the core algorithmic logic of these projects in a Spring Boot REST API to expose them as consumable web services.'
-  }
- },
- {
-  slug: 'software-1-projects',
-  year: '2024',
-  title: 'Software 1 Engineering Projects',
-  stack: 'Java',
-  icons: ['java.svg'],
-  link: 'https://github.com/haresham15/Software-Project-Java-Collection-',
-  caseStudy: {
-   executiveSummary: 'Foundational Java programming projects demonstrating core computer science concepts, object-oriented programming, and basic application development.',
-   problem: 'Building robust enterprise software requires a strong, uncompromising grasp of syntax, control flow, error handling, and basic class hierarchies.',
-   architecture: 'Developed a series of standalone Java applications, ranging from simple calculators to text-based games, emphasizing code readability, DRY principles, and modularity.',
-   tradeoffs: 'Kept the scope of each project highly constrained to ensure perfect execution of foundational concepts rather than succumbing to feature bloat or external dependency reliance.',
-   nextSteps: 'Refactor older procedural Java code into more modern, declarative functional-style Java streams to improve readability.'
-  }
- },
- {
-  slug: 'portfolio-website',
-  year: '2024',
-  title: 'Portfolio Website',
-  stack: 'React, Tailwind CSS, Framer Motion',
-  icons: ['react.svg', 'tailwind.svg'],
-  link: 'https://github.com/haresham15/Haresh_Murugesan_Portfolio',
-  caseStudy: {
-   executiveSummary: 'The interactive portfolio you are currently browsing. A highly performant and visually striking personal website designed to showcase my engineering capabilities and design sensibilities.',
-   problem: 'Standard resume PDFs and templated portfolios fail to capture the dynamic, interactive nature of modern web development and lack the engaging factors necessary to stand out to engineering teams.',
-   architecture: 'Built from the ground up using React, heavily leveraging Framer Motion for complex, orchestration-heavy animations, and Tailwind CSS for a highly custom, responsive, glassmorphic aesthetic.',
-   tradeoffs: 'Traded a standard, easily-scannable linear layout for a highly exploratory, narrative-driven experience. While this risks confusing some users, it deeply engages the target audience of technical recruiters and design engineers.',
-   nextSteps: 'Continuously iterate on overall performance optimization, specifically regarding the WebGL and Canvas animation elements in the background to ensure a locked 60fps across lower-end mobile devices.'
-  }
- },
- {
-  slug: 'anna-birthday',
-  year: '2024',
-  title: 'A Birthday Website for my Brother!',
-  stack: 'React, Tailwind CSS, JavaScript',
-  icons: ['react.svg', 'tailwind.svg', 'javascript.svg'],
-  link: 'https://github.com/haresham15/AnnaBirthdayWebsite',
-  caseStudy: {
-   executiveSummary: 'A personalized, interactive web experience built as a unique digital birthday gift, featuring embedded memories, mini-games, and customized animations.',
-   problem: 'Physical gifts are fleeting. I wanted to build something permanent and highly personalized that also served as a practical demonstration of my growing web development skills.',
-   architecture: 'Utilized React to build a snappy single-page application with interactive components, employing Tailwind CSS for rapid styling and flawless responsive design across mobile and desktop devices.',
-   tradeoffs: 'Prioritized fun, flashy animations and immediate visual impact over strict WCAG accessibility guidelines, given the intended audience was a single, known user (my brother).',
-   nextSteps: 'Open-source the underlying React template so others can easily generate and host their own personalized digital greeting cards via Vercel or GitHub Pages.'
-  }
- }
 ];

@@ -8,11 +8,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
-        heading: ['"Space Grotesk"', 'sans-serif'],
-        inter: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
-        outfit: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
-        raleway: ['"HomepageBaukasten"', '"Homepage Baukasten"', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        heading: ['"Space Grotesk"', 'Inter', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       colors: {
         'charcoal': '#050505',

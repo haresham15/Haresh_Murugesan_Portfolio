@@ -133,19 +133,17 @@ const FloatingGeometry = () => {
    animate={{ opacity: 1, y: 0 }}
    transition={{ duration: 0.8, delay: 0.125 , ease: [0.22, 1, 0.36, 1]}}
   >
-   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-    <h2 className="text-3xl font-heading tracking-widest uppercase font-bold text-light-gray mb-2 z-10">
+   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-4 text-center">
+    <h2 className="text-2xl sm:text-3xl font-heading font-semibold text-white tracking-tight mb-1.5 sm:mb-2 z-10">
      "in·no·va·tion"
     </h2>
-    <p className="text-sm text-light-gray/60 font-sans z-10">
+    <p className="text-xs sm:text-sm text-light-gray/60 font-sans z-10 max-w-md leading-relaxed">
      the action or process of innovating.
-     <br />
-     "innovation is crucial to the continuing success of any organization"
-     <br />
-     A new method, idea or product that is different from the existing ones.
+     <br className="hidden sm:inline" />
+     {" "}A new method, idea or product that is different from existing ones.
     </p>
-    <h3 className="text-xl font-heading tracking-widest uppercase font-bold text-light-gray mb-2 z-10">
-     Definitions from Oxford Dictionary
+    <h3 className="text-[11px] sm:text-xs font-sans text-light-gray/40 mt-1.5 sm:mt-2 z-10">
+     Oxford Dictionary
     </h3>
    </div>
    <canvas

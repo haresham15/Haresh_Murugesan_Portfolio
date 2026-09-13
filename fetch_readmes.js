@@ -2,11 +2,11 @@ const fs = require('fs');
 const https = require('https');
 
 const repos = [
-  'healios', 'AIMotorsportsHub', 'DataIO', 'Careline',
-  'Syntinuum_podcast_website', 'Philocracy', 'Haresh-s-CS50-Intro-to-AI-with-Python-Projects',
-  'TutorMatch_WebApp', 'CarStomerCarAnalysis', 'MomWebsite', 'murugesan_rajaram_lab_website',
-  'Haresh-s-Software-2-Projects', 'Software-Project-Java-Collection-', 'Haresh_Murugesan_Portfolio',
-  'AnnaBirthdayWebsite'
+  'HealiosPostSurgery', 'healios', 'AIMotorsportsHub', 'TempoADHDAssist', 'Careline', 'DataIO',
+  'cv_allergy_wheal', 'Syntinuum_podcast_website', 'Philocracy',
+  'Haresh-s-CS50-Intro-to-AI-with-Python-Projects', 'TutorMatch_WebApp', 'CarStomerCarAnalysis',
+  'MomWebsite', 'murugesan_rajaram_lab_website', 'Haresh-s-Software-2-Projects',
+  'Software-Project-Java-Collection-', 'Haresh_Murugesan_Portfolio', 'AnnaBirthdayWebsite'
 ];
 
 async function fetchReadme(repo) {

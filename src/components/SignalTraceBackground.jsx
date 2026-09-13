@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import AntigravityParticles from './AntigravityParticles';
 
 const SignalTraceBackground = () => {
  const [traces, setTraces] = useState([]);
@@ -46,8 +47,11 @@ const SignalTraceBackground = () => {
    <div className="absolute top-0 bottom-0 left-[20%] w-[1px] bg-gradient-to-b from-transparent via-cine-lavender/10 to-transparent" />
    <div className="absolute top-0 bottom-0 right-[25%] w-[1px] bg-gradient-to-b from-transparent via-cine-teal/10 to-transparent" />
 
+   {/* Google Antigravity Interactive Particle Field */}
+   <AntigravityParticles />
+
    {/* Vignette */}
-   <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-[#050505] opacity-90 pointer-events-none" />
+   <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-[#050505] opacity-75 pointer-events-none" />
 
    <style jsx>{`
     @keyframes traceSweep {

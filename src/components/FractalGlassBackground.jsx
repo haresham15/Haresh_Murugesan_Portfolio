@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import AntigravityParticles from './AntigravityParticles';
 
 const FractalGlassBackground = () => {
   return (
@@ -67,8 +68,11 @@ const FractalGlassBackground = () => {
         }}
       />
 
+      {/* Google Antigravity Interactive Particle Field */}
+      <AntigravityParticles />
+
       {/* Vignette */}
-      <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-[#050505] opacity-80 pointer-events-none" />
+      <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-[#050505] opacity-75 pointer-events-none" />
     </div>
   );
 };

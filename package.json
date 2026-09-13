@@ -27,7 +27,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "npx serve@latest out",
-    "lint": "next lint"
+    "lint": "next build"
   },
   "browserslist": {
     "production": [
