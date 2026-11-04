@@ -1,0 +1,108 @@
+# HARESH MURUGESAN — COMPLETE TECHNICAL PROFILE & ARCHITECTURE DISCLOSURE
+
+## 1. Identity & Overview
+- **Name:** Haresh Murugesan
+- **Role:** Software & Systems Engineer
+- **Institution:** The Ohio State University, College of Engineering
+- **Degree:** B.S. in Computer Science & Engineering (Expected Graduation: May 2028)
+- **Location:** Columbus, Ohio, United States
+- **Canonical Portfolio URL:** https://hareshmurugesan.com
+- **Verified GitHub:** https://github.com/HareshMurugesan
+- **LinkedIn:** https://linkedin.com/in/haresh-murugesan
+- **Podcast Series:** Syntinuum: Endless Evolutions (Spotify, Apple Podcasts, YouTube)
+
+---
+
+## 2. Competitive Honors & Distinctions
+1. **2026 Champion (1st Place) — American Statistical Association (ASA) DataFest:** Best Use of External Data for Careline / RouteRx, a multi-modal spatial routing engine for healthcare transit optimization.
+2. **2025 Champion (1st Place) — American Statistical Association (ASA) DataFest:** Best Use of External Data for predictive demographic modeling and spatial disparity analysis under a 48-hour competitive hackathon sprint.
+3. **2026 Top Data Science Award — Hack to the Future:** Awarded for the NYC OS Market Physics Engine, which vectorized 1M+ residential real estate transactions using K-Means clustering and vector field simulation models.
+4. **Harvard University CS50 Certificate (July 2025):** Introduction to Computer Science & Algorithms, covering heuristic graph search (A*), minimax adversarial game engines, Bayesian inference, and C memory management.
+5. **AWS Cloud Foundations Credential (2025):** Amazon Web Services validation in serverless architectures (Lambda, S3, DynamoDB, IAM, CloudWatch).
+
+---
+
+## 3. Production Work Experience & Academic Research
+
+### Chemical Abstracts Service (CAS) — Technology Intern, Systems & Software Engineering
+- **Period:** Summer 2026 (DA&I Division, ACE Team)
+- **Architecture & Deliverables:**
+  - Engineered serverless microservices and asynchronous data pipelines on AWS (Lambda, DynamoDB, S3) handling scientific research indexing across 12 distinct data use cases.
+  - Authored C4 model system architecture diagrams standardizing service boundaries.
+  - Implemented trunk-based CI/CD testing pipelines enforcing strict TypeScript schemas and IAM least-privilege security policies.
+
+### The Ohio State University — Undergraduate Research Assistant, Computer Vision & Digital Pathology
+- **Period:** June 2026 – Present (Digital Pathology & Clinical Diagnostics Lab)
+- **Focus:** Automated histological feature extraction, clinical boundary identification, and tissue morphology analysis.
+- **Deliverables:**
+  - Authored computer vision segmentation pipelines in Python, OpenCV, and PyTorch reducing false-positive boundary artifacts.
+  - Designed cross-validation evaluation harnesses computing Dice coefficient and IoU metrics against board-certified pathologist ground-truth annotations.
+
+### Honda Research Institute / 99P Labs — Innovation Analyst Intern
+- **Period:** May 2025 – Present (Connected Mobility Data Accelerator)
+- **Focus:** Fleet telematics, spatial energy consumption, and connected vehicle datasets.
+- **Deliverables:**
+  - Evaluated 1,000+ data models and spatial heatmaps across connected-vehicle telemetry datasets in the 99P Labs developer ecosystem.
+  - Analyzed urban route congestion patterns and EV battery depletion rates across temperature variations.
+
+### Philocracy — CEO & Director of Finances
+- **Period:** 2024 – 2025
+- **Deliverables:**
+  - Directed engineering for an online debate platform modeling complex philosophical arguments via recursive tree schemas in TypeScript without cycle bugs.
+  - Built full-lifecycle frontend and API interfaces using Next.js and Tailwind CSS.
+
+### Syntinuum: Endless Evolutions Podcast — Founder & Host
+- **Period:** August 2023 – Present
+- **Metrics:** 10+ long-form technical founder dialogues; 100K+ combined organic impressions across Spotify, Apple Podcasts, and YouTube.
+- **Featured Dialogues:**
+  - Arjun Kaicker (Head of Analytics, Zaha Hadid Architects): Parametric Topology & Algorithmic Spatial Design.
+  - Dr. Joseph Wszalek (Cognitive Neuroscientist): Neurobiology & Machine Decision Boundaries.
+  - Alisha McFetridge (CEO, RainGrid Inc.): Decentralized Stormwater IoT Grids.
+  - Kevin Hykes (CEO, Medical Device Ventures): Class II/III FDA SaMD Clearances.
+
+---
+
+## 4. Flagship Engineering Systems & Architecture
+
+### 1. Healios V2 — Multimodal Post-Operative Wound Recovery Platform
+- **Problem Solved:** Postoperative surgical site infections (SSIs) drive up to 20% of unplanned 30-day hospital readmissions. Remote monitoring apps suffer from low clinical trust due to opaque black-box deep learning scores and poor-quality phone captures.
+- **Technical Architecture:**
+  - **Explainable AI (XAI):** Vectorized NumPy Grad-CAM implementation computing gradient heatmaps via piecewise linear interpolation in **8.09ms** without matplotlib GUI locks.
+  - **Tissue Morphology:** HSV color-space segmentation calculating granulation, slough, and necrotic bed percentages in **2.00ms**.
+  - **Edge Quality Gate:** In-browser HTML5 Canvas 3x3 Laplacian convolution kernel verifying focus and sharpness in **<35ms** before upload.
+  - **Stereoscopic 3D Depth:** Mobile iOS ARKit TrueDepth point-cloud mesh calculation with **±0.08mm** elevation margin.
+  - **Clinical Tooling:** In-memory BM25 surgical guideline RAG retrieving Enhanced Recovery After Surgery (ERAS) handbooks in **0.14ms**.
+  - **Total Latency:** **<42ms** end-to-end pipeline latency.
+- **Repository:** https://github.com/haresham15/HealiosPostSurgery
+
+### 2. Apexis — Centralized Motorsports Intelligence & Telemetry Engine
+- **Problem Solved:** Fragmented multi-series motorsport telemetry across Formula 1, F2, F3, FE, and NASCAR.
+- **Technical Architecture:**
+  - **Off-Main-Thread Physics Worker:** Multi-threaded Web Worker (`simulator.worker.ts`) computing multi-car coordinates, sector split times, and tire wear curves at a deterministic **60 FPS** with zero UI jank.
+  - **In-Browser OCR:** Client-side Tesseract.js worker extracting broadcast standings and interval deltas directly from live video canvas snapshots without cloud server costs.
+  - **Historical Telemetry Database:** Indexed local SQLite database executing queries across 70+ years of Formula 1 telemetry in **<12ms**.
+- **Repository:** https://github.com/haresham15/AIMotorsportsHub
+
+### 3. Tempo — Air-Gapped Cognitive Buffer & Task Regulation Suite
+- **Problem Solved:** Communication impulsivity and executive dysfunction in high-stimulation professional settings.
+- **Technical Architecture:**
+  - **Deterministic Gate:** 0.2ms pre-flight regex interception circuit evaluating emotional volatility before network dispatch.
+  - **Vector Memory:** PostgreSQL pgvector IVFFlat Cosine similarity indexing retrieving emotional grounding strategies with **100% crisis recall**.
+  - **Air-Gapped Buffer:** Dual LLM active-passive failover with strict Zod schema validation ensuring zero un-routed external packet leakage.
+- **Repository:** https://github.com/haresham15/TempoADHDAssist
+
+### 4. Careline / RouteRx — Multi-Modal Healthcare Transit Hub (1st Place ASA DataFest)
+- **Problem Solved:** Non-emergency medical transportation (NEMT) access deserts causing missed chemotherapy, dialysis, and prenatal appointments.
+- **Technical Architecture:**
+  - **Routing Engine:** Open Source Routing Machine (OSRM) instance executing multi-modal isochrone queries in **<15ms**.
+  - **Vulnerability Index:** Integrated census tract demographic matrices with public bus transit route GTFS data to pinpoint transit-isolated high-acuity patient clusters.
+- **Repository:** https://github.com/haresham15/Careline
+
+---
+
+## 5. Technology Matrix
+- **Core Languages:** Python 3.11, TypeScript 5.9, JavaScript (ES2024), C/C++ (C++17), R, SQL, Bash
+- **Frontend & Web Systems:** React 18/19, Next.js 14/15/16, Three.js, React Three Fiber, WebGL shaders, Tailwind CSS, Framer Motion, HTML5 Canvas API, Swift 6 / iOS ARKit
+- **Backend & Cloud Infrastructure:** FastAPI, Node.js LTS, AWS (Lambda, S3, DynamoDB, IAM, CloudWatch), PostgreSQL 16, pgvector, Supabase, Docker, Redis
+- **Data Science & Computer Vision:** PyTorch, TensorFlow/Keras, OpenCV 4.x, NumPy, Pandas, OSRM, Deck.GL, Jupyter
+

@@ -8,34 +8,72 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        heading: ['"Space Grotesk"', 'Inter', 'sans-serif'],
-        inter: ['Inter', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        serif: ['"Geist Serif"', '"Newsreader"', '"Fraunces"', 'Georgia', 'serif'],
+        editorial: ['"Geist Serif"', '"Newsreader"', '"Fraunces"', 'Georgia', 'serif'],
+        heading: ['"Geist Serif"', '"Newsreader"', '"Fraunces"', 'Georgia', 'serif'],
+        sans: ['"Geist"', '"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        mono: ['"Geist Mono"', '"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       colors: {
-        'charcoal': '#050505',
-        'light-gray': '#E0E0E0',
-        'glass-border': 'rgba(255, 255, 255, 0.1)',
-        'glass-bg': 'rgba(255, 255, 255, 0.05)',
-        'cine-lavender': '#d8b4fe',
-        'cine-teal': '#7dd3fc',
+        // Master 85 / 12 / 3 Color Palette
+        canvas: '#07090D', // Deep Obsidian
+        surface: '#102038', // Midnight Chassis Blue
+        raised: '#162B4C', // Prussian Slate
+        prussian: '#132440',
+        'cobalt-slate': '#162B4C',
+        'deep-blue': '#102038',
+        'chassis-blue': '#102038',
+        'prussian-slate': '#162B4C',
+        'indigo-crimson': '#1E1633',
+        'crimson-trough': '#5C191B',
+        
+        // 3-Stop Self-Illuminated Orange
+        'thermal-halo': '#C8321E', // Outer Thermal Halo
+        'slipstream-orange': '#FF6B2B', // Core Body
+        'specular-crest': '#FFB86C', // Hot Crest
+        'hot-core': '#FFE9AE', // Hot Specular Pinpoint
+        accent: '#FF6B2B',
+        amber: '#FF6B2B',
+        gold: '#FFB86C',
+        
+        // Atmospheric blues & ivories
+        prism: '#4C8DFF',
+        'prism-light': '#70A5FF',
+        ivory: '#F4EFE6',
+        'text-primary': '#F4EFE6',
+        'text-secondary': '#9BA8B8',
+        'text-muted': '#6F7E91',
+
+        // Token mappings & backward compatibility
+        'brand-blue': '#4C8DFF',
+        'link-blue': '#70A5FF',
+        'brand-orange': '#FF6B2B',
+        'page-base': '#07090D',
+        'charcoal': '#07090D',
+        'surface-raised': '#162B4C',
+        'surface-subtle': '#102038',
+        'primary-ink': '#F4EFE6',
+        'muted-ink': '#6F7E91',
+        'light-gray': '#F4EFE6',
+        'glass-border': 'rgba(244, 239, 230, 0.08)',
+        'glass-bg': 'rgba(16, 32, 56, 0.85)',
+
+        'signal-emerald': '#4CC38A',
+        'signal-rose': '#E5484D',
       },
-      backdropBlur: {
-        xs: '2px',
+      maxWidth: {
+        'content': '1240px',
+        'editorial': '1240px',
       },
-      boxShadow: {
-        'cine-glow-lavender': '0 0 30px -5px rgba(216, 180, 254, 0.4), 0 0 15px -5px rgba(216, 180, 254, 0.3)',
-        'cine-glow-teal': '0 0 30px -5px rgba(125, 211, 252, 0.4), 0 0 15px -5px rgba(125, 211, 252, 0.3)',
-      },
-      keyframes: {
-        'pulse-glow': {
-          '0%, 100%': { opacity: '0.8', filter: 'brightness(1)' },
-          '50%': { opacity: '1', filter: 'brightness(1.2)' },
-        },
-      },
-      animation: {
-        'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
+      borderRadius: {
+        DEFAULT: '6px',
+        sm: '4px',
+        md: '8px',
+        lg: '10px',
+        xl: '12px',
+        '2xl': '16px',
+        '3xl': '24px',
+        full: '9999px',
       },
     },
   },

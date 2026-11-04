@@ -1,0 +1,38 @@
+# Haresh Murugesan — Software & Systems Architecture
+
+> Portfolio, verified engineering benchmarks, clinical computer vision research, and real-time simulation systems.
+
+## Summary
+- **Name:** Haresh Murugesan
+- **Role:** Software & Systems Engineer
+- **Education:** B.S. Computer Science & Engineering, The Ohio State University (Expected May 2028)
+- **Primary Disciplines:** High-Performance Client Web, Computer Vision, Distributed Systems, Real-Time Simulation, Spatial Telemetry
+- **Canonical Website:** https://hareshmurugesan.com
+- **GitHub:** https://github.com/HareshMurugesan
+- **LinkedIn:** https://linkedin.com/in/haresh-murugesan
+- **Spotify Podcast:** https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98
+
+## Key Distinctions
+- **2× 1st Place Champion — American Statistical Association DataFest (2025, 2026):** Best Use of External Data for spatial healthcare routing (Careline / RouteRx) and demographic optimization.
+- **Top Data Science Award — Hack to the Future (2026):** Spatial physics & housing market valuation engine parsing 1M+ records.
+- **Technology Intern — Chemical Abstracts Service (CAS, Summer 2026):** Delivered 12 serverless microservices with C4 architectural models and sub-second scientific data indexing.
+- **Undergraduate Research Assistant — The Ohio State University (2026–Present):** Digital Pathology & Clinical Diagnostics Lab building automated histological segmentation pipelines.
+- **Innovation Analyst — Honda Research Institute / 99P Labs (2025–Present):** Evaluated 1,000+ connected-vehicle telemetry and spatial energy models.
+- **Founder & Host — Syntinuum: Endless Evolutions Podcast (2023–Present):** 10+ technical founder dialogues; 100K+ combined impressions.
+
+## Flagship Systems & Case Studies
+- [Healios V2](https://hareshmurugesan.com/projects/healios): Clinical post-op recovery monitoring pipeline. 8.09ms vectorized NumPy Grad-CAM XAI, 3D LiDAR wound bed elevation topography (0.1mm margin), in-browser HTML5 Canvas Laplacian blur gate (<35ms), and in-memory BM25 ERAS guideline RAG (0.14ms).
+- [Apexis](https://hareshmurugesan.com/projects/apexis): Deterministic 60fps motorsport race simulation engine offloaded to dedicated Web Workers, client-side broadcast OCR via Tesseract.js, and sub-12ms SQLite lookups across 70+ years of F1 telemetry.
+- [Tempo](https://hareshmurugesan.com/projects/tempo): Air-gapped cognitive buffer and task regulation platform with PostgreSQL pgvector IVFFlat Cosine memory, 100% crisis recall, and dual-provider active-passive failover.
+- [Careline / RouteRx](https://hareshmurugesan.com/projects/routerx-careline-hub): Healthcare transit platform pairing Open Source Routing Machine (OSRM) sub-15ms isochrone queries with census demographic matrices to identify transit deserts.
+- [TamilTrove](https://hareshmurugesan.com/projects/tamiltrove): Morphological text segmentation, corpus search, and linguistic analytics for classical Tamil script.
+- [NYC OS Market Physics](https://hareshmurugesan.com/projects/nyc-housing-market-ai): Real estate transaction vector field physics engine parsing 1M+ property records with Deck.GL.
+
+## Core Technical Competencies
+- **Languages:** Python, TypeScript, JavaScript, C/C++, R, SQL, Bash
+- **Frontend & 3D:** React, Next.js, Three.js, React Three Fiber, WebGL, Tailwind CSS, Framer Motion, HTML5 Canvas API, Swift/ARKit
+- **Backend & Cloud:** FastAPI, Node.js, AWS (Lambda, S3, DynamoDB, CloudWatch), PostgreSQL, Supabase, pgvector, Docker, Redis
+- **Data & CV:** PyTorch, TensorFlow, OpenCV, NumPy, Pandas, OSRM, Deck.GL
+
+Full technical documentation: https://hareshmurugesan.com/llms-full.txt
+

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import FractalGlassBackground from '../../src/components/FractalGlassBackground';
 import Header from '../../src/components/Header';
+import ContactFooter from '../../src/components/ContactFooter';
 
 export default function MotorsportsPRD() {
  return (
@@ -130,6 +131,7 @@ export default function MotorsportsPRD() {
      </div>
     </motion.div>
    </main>
+   <ContactFooter />
   </div>
  );
 }

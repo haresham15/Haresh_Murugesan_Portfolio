@@ -1,26 +1,47 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.hareshmurugesan.com/</loc>
+    <loc>https://hareshmurugesan.com/</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.hareshmurugesan.com/projects</loc>
+    <loc>https://hareshmurugesan.com/projects</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.9</priority>
   </url>
-  <url><loc>https://www.hareshmurugesan.com/projects/healios</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/apexis</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/tempo</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/careline</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/nyc-housing-market-ai</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/cv-allergy-wheal</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/syntinuum-podcast-website</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/philocracy</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/cs50-ai-projects</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/tutormatch</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/carstomer</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/momwebsite</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/murugesan-rajaram-lab</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/software-2-projects</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/software-1-projects</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/portfolio-website</loc></url>
-  <url><loc>https://www.hareshmurugesan.com/projects/anna-birthday</loc></url>
+  <url>
+    <loc>https://hareshmurugesan.com/about</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hareshmurugesan.com/resume</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://hareshmurugesan.com/system</loc>
+    <lastmod>2026-10-29</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url><loc>https://hareshmurugesan.com/projects/apexis</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/healios</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/tempo</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/routerx-careline</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/careline</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/tamiltrove</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/nyc-housing-market-ai</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/cv-allergy-wheal</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/syntinuum-podcast-website</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/philocracy</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/cs50-ai-projects</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/tutormatch</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/carstomer</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/momwebsite</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/murugesan-rajaram-lab</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/software-2-projects</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/software-1-projects</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/portfolio-website</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://hareshmurugesan.com/projects/anna-birthday</loc><lastmod>2026-10-29</lastmod></url>
 </urlset>
