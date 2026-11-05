@@ -1,8 +1,0 @@
-services:
-  - type: static
-    name: haresh-portfolio
-    buildCommand: npm run build
-    staticPublishPath: out
-    envVars:
-      - key: NODE_ENV
-        value: production

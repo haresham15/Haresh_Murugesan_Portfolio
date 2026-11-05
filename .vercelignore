@@ -1,0 +1,10 @@
+# Legacy build artifacts
+build/
+dist/
+.build_backup/
+
+# Development / Tooling caches
+.codegraph/
+.agents/
+screenshots/
+render.yaml
