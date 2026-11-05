@@ -24,18 +24,18 @@ export const C4DiagramViewer: React.FC<C4DiagramViewerProps> = ({ diagram }) => 
   };
 
   return (
-    <div className="w-full rounded-2xl bg-[#0D1118] border border-white/10 p-5 sm:p-7 shadow-token-card">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-white/10 gap-2">
+    <div className="w-full rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/[0.1] p-5 sm:p-7 shadow-[0_4px_24px_rgba(7,11,18,0.7)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#F3EFE7]/[0.08] gap-2">
         <div>
-          <h4 className="text-base sm:text-lg font-heading font-bold text-white tracking-tight">
+          <h4 className="text-base sm:text-lg font-raleway font-bold text-[#F3EFE7] tracking-tight">
             {diagram.title}
           </h4>
-          <p className="text-xs font-sans text-[#A6ADB8] mt-0.5">
+          <p className="text-xs font-sans text-[#A7B2C3] mt-0.5">
             {diagram.description}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-[10px] font-mono text-[#A6ADB8]">
-          <span className="w-2 h-2 rounded-full bg-[#7DD3FC]" />
+        <div className="flex items-center gap-2 text-[10px] font-mono text-[#A7B2C3]">
+          <span className="w-2 h-2 rounded-full bg-[#82B7FF]" />
           <span>C4 Level 2/3 Component Model</span>
         </div>
       </div>
@@ -47,19 +47,19 @@ export const C4DiagramViewer: React.FC<C4DiagramViewerProps> = ({ diagram }) => 
           return (
             <div
               key={node.id}
-              className={`p-4 rounded-xl border ${colors.bg} ${colors.border} flex flex-col justify-between`}
+              className={`p-4 rounded-[2px] border ${colors.bg} ${colors.border} flex flex-col justify-between`}
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-full ${colors.badge}`}>
+                  <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded-[2px] ${colors.badge}`}>
                     {node.type}
                   </span>
-                  <span className="text-[10px] font-mono text-[#A6ADB8]">{node.sublabel}</span>
+                  <span className="text-[10px] font-mono text-[#A7B2C3]">{node.sublabel}</span>
                 </div>
-                <p className={`text-sm font-heading font-bold ${colors.text} mb-1`}>
+                <p className={`text-sm font-raleway font-bold ${colors.text} mb-1`}>
                   {node.label}
                 </p>
-                <p className="text-xs font-sans text-[#A6ADB8] leading-relaxed">
+                <p className="text-xs font-sans text-[#A7B2C3] leading-relaxed">
                   {node.description}
                 </p>
               </div>
@@ -70,24 +70,24 @@ export const C4DiagramViewer: React.FC<C4DiagramViewerProps> = ({ diagram }) => 
 
       {/* Edges / Dataflow Ledger */}
       {diagram.edges && diagram.edges.length > 0 && (
-        <div className="pt-4 border-t border-white/5">
-          <p className="text-[11px] font-mono uppercase tracking-widest text-[#A6ADB8]/70 mb-3">
+        <div className="pt-4 border-t border-[#F3EFE7]/[0.06]">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-[#A7B2C3]/70 mb-3">
             Inter-Component Protocol Boundaries
           </p>
           <div className="space-y-2">
             {diagram.edges.map((edge, idx) => (
               <div
                 key={idx}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-lg bg-white/[0.02] border border-white/5 text-xs font-mono gap-2"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded-[2px] bg-[#101B30]/40 border border-[#F3EFE7]/[0.06] text-xs font-mono gap-2"
               >
-                <div className="flex items-center gap-2 text-[#E0E0E0]">
-                  <span className="text-[#7DD3FC] font-semibold">{edge.from}</span>
-                  <span className="text-[#A6ADB8]">→</span>
-                  <span className="text-[#34D399] font-semibold">{edge.to}</span>
-                  <span className="text-[#A6ADB8]/70 font-sans hidden md:inline">: {edge.label}</span>
+                <div className="flex items-center gap-2 text-[#F3EFE7]">
+                  <span className="text-[#82B7FF] font-semibold">{edge.from}</span>
+                  <span className="text-[#A7B2C3]">→</span>
+                  <span className="text-[#4CC38A] font-semibold">{edge.to}</span>
+                  <span className="text-[#A7B2C3]/70 font-sans hidden md:inline">: {edge.label}</span>
                 </div>
                 {edge.protocol && (
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-[#A6ADB8] border border-white/10 self-start sm:self-auto">
+                  <span className="text-[10px] px-2 py-0.5 rounded-[2px] bg-[#101B30] text-[#A7B2C3] border border-[#F3EFE7]/10 self-start sm:self-auto">
                     {edge.protocol}
                   </span>
                 )}

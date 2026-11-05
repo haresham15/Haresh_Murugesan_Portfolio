@@ -17,22 +17,22 @@ export const CinematicHero: React.FC = () => {
           
           {/* Availability & Mode Shortcut Pill */}
           <div className="flex flex-wrap items-center gap-2 mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 w-fit">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-[#F3EFE7]/10 w-fit">
               <span className="w-2 h-2 rounded-full bg-[#34D399] animate-pulse" />
               <span className="text-xs font-mono text-[#E0E0E0] tracking-wide">
                 {profile.availability.status} · {profile.availability.targetSeason}
               </span>
             </div>
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.02] border border-white/5 text-[11px] font-mono text-[#A6ADB8]">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.02] border border-[#F3EFE7]/[0.08] text-[11px] font-mono text-[#A6ADB8]">
               <span>Key:</span>
-              <kbd className="px-1 py-0.5 rounded bg-white/10 text-white font-semibold">[R]</kbd>
+              <kbd className="px-1 py-0.5 rounded bg-white/10 text-[#F3EFE7] font-semibold">[R]</kbd>
               <span>Recruiter Scan</span>
             </span>
           </div>
 
           {/* Profile Name & Picture Header */}
           <div className="flex items-center gap-4 sm:gap-5 mb-5">
-            <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden border border-white/15 shadow-lg shrink-0">
+            <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-[2px] overflow-hidden border border-[#F3EFE7]/15 shadow-lg shrink-0">
               <Image
                 src="/profile.jpeg"
                 alt="Haresh Murugesan"
@@ -43,7 +43,7 @@ export const CinematicHero: React.FC = () => {
               />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold text-white tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold text-[#F3EFE7] tracking-tight leading-tight">
                 {profile.name}
               </h1>
               <p className="text-xs font-mono text-[#7DD3FC] tracking-wider uppercase mt-0.5">
@@ -69,10 +69,10 @@ export const CinematicHero: React.FC = () => {
               <Link
                 key={chip.id}
                 href={chip.href}
-                className="group flex items-center justify-between p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/10 hover:border-[#7DD3FC]/40 transition-all text-left"
+                className="group flex items-center justify-between p-3 rounded-[2px] bg-white/[0.02] hover:bg-white/[0.06] border border-[#F3EFE7]/10 hover:border-[#7DD3FC]/40 transition-all text-left"
               >
                 <div>
-                  <p className="text-xs sm:text-sm font-sans font-semibold text-white group-hover:text-[#7DD3FC] transition-colors">
+                  <p className="text-xs sm:text-sm font-sans font-semibold text-[#F3EFE7] group-hover:text-[#7DD3FC] transition-colors">
                     {chip.label}
                   </p>
                   <p className="text-[11px] font-mono text-[#A6ADB8]">
@@ -91,7 +91,7 @@ export const CinematicHero: React.FC = () => {
             <a
               href="#projects"
               data-magnetic
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-sans font-semibold text-[#050505] bg-[#7DD3FC] hover:bg-white transition-all shadow-[0_2px_12px_rgba(125,211,252,0.3)]"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-[2px] text-sm font-sans font-semibold text-[#050505] bg-[#7DD3FC] hover:bg-white transition-all shadow-[0_2px_12px_rgba(125,211,252,0.3)]"
             >
               <span>Explore my work</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
@@ -103,7 +103,7 @@ export const CinematicHero: React.FC = () => {
             <Link
               href="/resume"
               data-magnetic
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-sans font-medium text-[#E0E0E0] bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-[2px] text-sm font-sans font-medium text-[#E0E0E0] bg-white/5 hover:bg-white/10 border border-[#F3EFE7]/10 hover:border-white/20 transition-all"
             >
               <span>View résumé</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-[#A6ADB8]">

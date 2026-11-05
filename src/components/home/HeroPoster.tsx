@@ -67,7 +67,7 @@ export const HeroPoster: React.FC = () => {
   const isResActive = activeHeroLayer === 'all' || activeHeroLayer === 'research';
 
   return (
-    <div className="w-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#0D1118]/80 border border-white/10 rounded-3xl shadow-token-card relative overflow-hidden">
+    <div className="w-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#070B12]/80 border border-[#F3EFE7]/10 rounded-[2px]  relative overflow-hidden">
       
       {/* Background Radial Glow */}
       <div
@@ -78,7 +78,7 @@ export const HeroPoster: React.FC = () => {
       />
 
       {/* Header telemetry badge */}
-      <div className="w-full flex items-center justify-between mb-4 pb-3 border-b border-white/5 text-[11px] font-mono text-[#A6ADB8] relative z-10">
+      <div className="w-full flex items-center justify-between mb-4 pb-3 border-b border-[#F3EFE7]/[0.08] text-[11px] font-mono text-[#A6ADB8] relative z-10">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#7DD3FC] animate-ping" />
           <span className="uppercase tracking-widest text-[#E0E0E0]">Signal-to-System Architecture</span>
@@ -254,8 +254,8 @@ export const HeroPoster: React.FC = () => {
               onClick={() => setActiveHeroLayer(layer.id)}
               className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all border ${
                 isSelected
-                  ? 'bg-white/10 text-white border-[#7DD3FC] shadow-[0_0_12px_rgba(125,211,252,0.25)]'
-                  : 'bg-white/[0.02] text-[#A6ADB8] border-white/5 hover:border-white/15 hover:text-white'
+                  ? 'bg-white/10 text-[#F3EFE7] border-[#7DD3FC] shadow-[0_0_12px_rgba(125,211,252,0.25)]'
+                  : 'bg-white/[0.02] text-[#A6ADB8] border-[#F3EFE7]/[0.08] hover:border-[#F3EFE7]/15 hover:text-[#F3EFE7]'
               }`}
             >
               {layer.label}
@@ -265,13 +265,13 @@ export const HeroPoster: React.FC = () => {
       </div>
 
       {/* Dynamic Semantic Technical Proof readout */}
-      <div className="w-full mt-2 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
+      <div className="w-full mt-2 pt-4 border-t border-[#F3EFE7]/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 relative z-10">
         <p className="text-xs sm:text-sm font-sans text-[#E0E0E0] leading-relaxed max-w-lg">
           {currentLayer.proof}
         </p>
         <Link
           href={currentLayer.href}
-          className="text-xs font-mono text-[#7DD3FC] hover:text-white transition-colors shrink-0 font-medium"
+          className="text-xs font-mono text-[#7DD3FC] hover:text-[#F3EFE7] transition-colors shrink-0 font-medium"
         >
           {currentLayer.linkText}
         </Link>

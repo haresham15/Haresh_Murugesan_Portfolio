@@ -79,7 +79,7 @@ export const HistorySection: React.FC = () => {
       {/* Section Intro */}
       <div className="max-w-3xl mb-16 sm:mb-20 space-y-4">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
-          Formative Milestones &amp; <span className="italic text-[#F5D998]">Systems Arc.</span>
+          Formative Milestones
         </h2>
         <p className="text-base sm:text-lg font-sans text-[#A7B2C3] leading-relaxed">
           Inflection points that shaped my technical perspective, system intuition, and commitment to high-reliability software.

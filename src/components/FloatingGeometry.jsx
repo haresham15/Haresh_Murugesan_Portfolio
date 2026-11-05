@@ -128,13 +128,13 @@ const FloatingGeometry = () => {
 
  return (
   <motion.div
-   className="w-full h-full bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 relative overflow-hidden"
+   className="w-full h-full bg-glass-bg backdrop-blur-md border border-glass-border rounded-[2px] p-8 relative overflow-hidden"
    initial={{ opacity: 0, y: 20 }}
    animate={{ opacity: 1, y: 0 }}
    transition={{ duration: 0.8, delay: 0.125 , ease: [0.22, 1, 0.36, 1]}}
   >
    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-4 text-center">
-    <h2 className="text-2xl sm:text-3xl font-heading font-semibold text-white tracking-tight mb-1.5 sm:mb-2 z-10">
+    <h2 className="text-2xl sm:text-3xl font-heading font-semibold text-[#F3EFE7] tracking-tight mb-1.5 sm:mb-2 z-10">
      "in·no·va·tion"
     </h2>
     <p className="text-xs sm:text-sm text-light-gray/60 font-sans z-10 max-w-md leading-relaxed">
@@ -148,7 +148,7 @@ const FloatingGeometry = () => {
    </div>
    <canvas
     ref={canvasRef}
-    className="w-full h-full absolute inset-0 rounded-2xl"
+    className="w-full h-full absolute inset-0 rounded-[2px]"
     style={{ background: 'radial-gradient(circle at 50% 50%, rgba(0, 217, 255, 0.05), transparent)' }}
    />
   </motion.div>

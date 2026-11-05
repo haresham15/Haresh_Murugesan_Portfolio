@@ -25,10 +25,10 @@ interface ChicaneGeometry {
   xApex: number;
   xEnd: number;
   yApex: number;
-  curbD: string;
-  calloutPlacement: 'above' | 'below';
-  calloutX: number;
-  calloutY: number;
+  entryCurbD: string;
+  exitCurbD: string;
+  pylonX: number;
+  pylonY: number;
   nodeX: number;
   nodeY: number;
 }
@@ -56,7 +56,7 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
 
     const updateWidth = () => {
       const w = window.innerWidth;
-      const calculatedWidth = Math.max(w < 768 ? 960 : w, 960);
+      const calculatedWidth = Math.max(w < 768 ? 1040 : w, 1140);
       setContainerWidth(calculatedWidth);
     };
 
@@ -65,17 +65,17 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
-  const trackHeight = 290;
-  const Y_mid = 145;
+  const trackHeight = 320;
+  const Y_mid = 215; // Track centerline positioned in lower half so pylons sit cleanly in upper gantry
   const count = items.length;
 
-  // 1. Generate Silky-Smooth Continuous Chicane Curves
+  // 1. Generate Silky-Smooth Continuous Chicane S-Curves
   const { trackPathD, chicanesGeo } = useMemo(() => {
     const W = containerWidth;
     const margin = Math.max(80, W * 0.06);
     const usableW = W - 2 * margin;
     const slotW = usableW / count;
-    const dy = 52; // Vertical deflection of chicane apex
+    const dy = 42; // Vertical deflection of chicane apex
 
     const geos: ChicaneGeometry[] = [];
     let pathD = `M 0 ${Y_mid} L ${margin} ${Y_mid}`;
@@ -83,7 +83,7 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
     for (let i = 0; i < count; i++) {
       const slotStart = margin + i * slotW;
       const slotCenter = slotStart + slotW * 0.5;
-      const curveSpan = slotW * 0.74; // Broad, sweeping horizontal runway
+      const curveSpan = slotW * 0.74; // Sweeping horizontal runway
       const xStart = slotCenter - curveSpan * 0.5;
       const xApex = slotCenter;
       const xEnd = slotCenter + curveSpan * 0.5;
@@ -111,13 +111,13 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
       const cp4y = Y_mid;
       pathD += ` C ${cp3x} ${cp3y}, ${cp4x} ${cp4y}, ${xEnd} ${Y_mid}`;
 
-      // Curb path hugging the inside crown of the apex curve
-      const curbY = isUp ? yApex - 14 : yApex + 14;
-      const curbD = `M ${xApex - 38} ${isUp ? curbY + 4 : curbY - 4} Q ${xApex} ${curbY} ${xApex + 38} ${isUp ? curbY + 4 : curbY - 4}`;
+      // Inside entry apex curb and exit apex curb
+      const curbY = isUp ? yApex - 16 : yApex + 16;
+      const entryCurbD = `M ${xApex - 42} ${isUp ? curbY + 6 : curbY - 6} Q ${xApex - 20} ${curbY} ${xApex} ${curbY}`;
+      const exitCurbD = `M ${xApex} ${curbY} Q ${xApex + 20} ${curbY} ${xApex + 42} ${isUp ? curbY + 6 : curbY - 6}`;
 
-      // Callout placement alternating above vs below with generous breathing room
-      const calloutPlacement = isUp ? 'below' : 'above';
-      const calloutY = isUp ? 220 : 28;
+      // Sector Pylon position elevated in upper gantry zone (y: 16px)
+      const pylonY = 16;
 
       geos.push({
         id: items[i].id,
@@ -126,10 +126,10 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
         xApex,
         xEnd,
         yApex,
-        curbD,
-        calloutPlacement,
-        calloutX: xApex,
-        calloutY,
+        entryCurbD,
+        exitCurbD,
+        pylonX: xApex,
+        pylonY,
         nodeX: xApex,
         nodeY: yApex,
       });
@@ -139,7 +139,7 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
     pathD += ` L ${W} ${Y_mid}`;
 
     return { trackPathD: pathD, chicanesGeo: geos };
-  }, [containerWidth, count, items]);
+  }, [containerWidth, count, items, Y_mid]);
 
   // 2. Compute exact normalized parameter t for each chicane apex along SVG path
   const [targets, setTargets] = useState<ChicaneTarget[]>([]);
@@ -191,7 +191,7 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
   }, [chicanesGeo, count, pathElement]);
 
   // 3. Cinematic Kinematics Hook (Direct DOM Hardware-Accelerated Animation)
-  const { isMoving, boost } = useChicaneCircuitKinematics({
+  const { isMoving, boost, isBraking } = useChicaneCircuitKinematics({
     pathElement,
     vehicleRef,
     activeLineRef,
@@ -203,7 +203,7 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
   // Mobile auto-scroll to keep active chicane centered
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (window.innerWidth < 768 && scrollWrapperRef.current && chicanesGeo[activeIndex]) {
+    if (window.innerWidth < 1024 && scrollWrapperRef.current && chicanesGeo[activeIndex]) {
       const targetX = chicanesGeo[activeIndex].nodeX;
       const scrollLeft = targetX - window.innerWidth / 2;
       scrollWrapperRef.current.scrollTo({
@@ -226,7 +226,7 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
       className={`w-full overflow-hidden relative select-none ${className}`}
       aria-label="Grand Prix Chicane Experience Circuit"
     >
-      {/* Scroll Wrapper for Mobile Viewports */}
+      {/* Scroll Wrapper for Mobile & Smaller Viewports */}
       <div
         ref={scrollWrapperRef}
         className="w-full overflow-x-auto scrollbar-none touch-pan-x"
@@ -246,10 +246,10 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
             <defs>
               {/* Active racing line illuminated gradient */}
               <linearGradient id="active-racing-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#82B7FF" stopOpacity="0.3" />
-                <stop offset="45%" stopColor="#FF6B35" stopOpacity="1" />
-                <stop offset="75%" stopColor="#F5D998" stopOpacity="1" />
-                <stop offset="100%" stopColor="#82B7FF" stopOpacity="0.3" />
+                <stop offset="0%" stopColor="#82B7FF" stopOpacity="0.2" />
+                <stop offset="35%" stopColor="#FF6B35" stopOpacity="1" />
+                <stop offset="70%" stopColor="#F5D998" stopOpacity="1" />
+                <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </linearGradient>
 
               {/* Active apex curb ambient glow filter */}
@@ -257,73 +257,76 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
                 <feGaussianBlur stdDeviation="3.5" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
+
+              {/* Track Bed Outer Shadow */}
+              <filter id="track-shadow" x="-5%" y="-20%" width="110%" height="140%">
+                <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#000000" floodOpacity="0.6" />
+              </filter>
             </defs>
 
-            {/* LAYER 1: OUTER TRACK BOUNDARIES / RUN-OFF
-                30px outer border stroke with 28px inner asphalt ribbon creates crisp 1px flanking rails */}
+            {/* LAYER 1: TRACK BED & RUN-OFF APRON (44px wide dark tarmac ribbon #0B1220 with 1px outer barrier walls) */}
             <path
               d={trackPathD}
-              stroke="rgba(167, 178, 195, 0.22)"
+              stroke="rgba(167, 178, 195, 0.28)"
+              strokeWidth="44"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+              filter="url(#track-shadow)"
+            />
+            <path
+              d={trackPathD}
+              stroke="#0B1220"
+              strokeWidth="42"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+
+            {/* LAYER 2: INNER ASPHALT SURFACE (30px wide deep obsidian asphalt #070B12 with longitudinal track grain) */}
+            <path
+              d={trackPathD}
+              stroke="#070B12"
               strokeWidth="30"
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
             />
+            {/* Subtle longitudinal asphalt grain */}
             <path
               d={trackPathD}
-              stroke="#0C1322"
-              strokeWidth="28"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              stroke="rgba(243, 239, 231, 0.05)"
+              strokeWidth="1"
+              strokeDasharray="2 4"
               fill="none"
             />
 
-            {/* LAYER 2: THE IDEAL RACING LINE (Continuous 2px Spline) */}
-            <path
-              ref={setPathElement}
-              d={trackPathD}
-              stroke="rgba(130, 183, 255, 0.28)"
-              strokeWidth="2"
-              strokeDasharray="9 7"
-              fill="none"
-            />
-
-            {/* Active Racing Line Accent Overlay */}
-            <path
-              ref={activeLineRef}
-              d={trackPathD}
-              stroke="url(#active-racing-line-grad)"
-              strokeWidth="2.5"
-              strokeDasharray="80 280"
-              strokeDashoffset="0"
-              fill="none"
-              opacity="0.85"
-            />
-
-            {/* LAYER 3: AUTHENTIC MOTORSPORT APEX CURBS (Rumble Strips) */}
+            {/* LAYER 3: HIGH-CONTRAST FIA CHICANE RUMBLE CURBS (Entry + Exit Apexes) */}
             {chicanesGeo.map((geo) => {
               const isActive = activeIndex === geo.index;
               const isHovered = hoveredIndex === geo.index;
               const isHighlighted = isActive || isHovered;
 
+              const activeCurbsD = `${geo.entryCurbD} ${geo.exitCurbD}`;
+
               return (
                 <g key={`curbs-${geo.id}`} className="transition-all duration-300">
-                  {/* Base Curb Block */}
+                  {/* Base Curb Block (8px wide) */}
                   <path
-                    d={geo.curbD}
+                    d={activeCurbsD}
                     stroke={isHighlighted ? '#FF6B35' : '#334155'}
-                    strokeWidth="5"
+                    strokeWidth="8"
                     strokeLinecap="round"
                     fill="none"
                     filter={isHighlighted ? 'url(#curb-glow)' : undefined}
                     className="transition-colors duration-250"
                   />
-                  {/* Alternating Ivory Dashes on Top */}
+                  {/* Alternating Serrated FIA Blocks (Ivory on active, Slate on inactive) */}
                   <path
-                    d={geo.curbD}
-                    stroke="#F3EFE7"
-                    strokeWidth="5"
-                    strokeDasharray="7 5"
+                    d={activeCurbsD}
+                    stroke={isHighlighted ? '#F3EFE7' : '#94A3B8'}
+                    strokeWidth="8"
+                    strokeDasharray="9 7"
                     strokeLinecap="round"
                     fill="none"
                   />
@@ -331,26 +334,48 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
               );
             })}
 
-            {/* LAYER 4: INTERACTIVE APEX NODES & FIDUCIAL CROSSHAIRS */}
+            {/* LAYER 4: DYNAMIC ILLUMINATED RACING LINE (2.5px Continuous Ideal Line + Wake) */}
+            <path
+              ref={setPathElement}
+              d={trackPathD}
+              stroke="rgba(130, 183, 255, 0.3)"
+              strokeWidth="2.5"
+              strokeDasharray="8 6"
+              fill="none"
+            />
+
+            {/* Trailing Telemetry Wake (280px illuminating gradient behind the car) */}
+            <path
+              ref={activeLineRef}
+              d={trackPathD}
+              stroke="url(#active-racing-line-grad)"
+              strokeWidth="3"
+              strokeDasharray="280 1400"
+              strokeDashoffset="0"
+              fill="none"
+              opacity="0.9"
+            />
+
+            {/* APEX NODES & INTERACTIVE LEADER LINES */}
             {chicanesGeo.map((geo) => {
               const isActive = activeIndex === geo.index;
               const isHovered = hoveredIndex === geo.index;
 
               return (
                 <g key={`node-${geo.id}`} className="cursor-pointer">
-                  {/* Connecting Hairline from Apex Node to Callout */}
+                  {/* 1px Vertical Leader Line connecting Chicane Apex to Sector Pylon */}
                   <line
                     x1={geo.nodeX}
-                    y1={geo.calloutPlacement === 'above' ? geo.calloutY + 34 : geo.nodeY}
+                    y1={geo.pylonY + 84}
                     x2={geo.nodeX}
-                    y2={geo.calloutPlacement === 'above' ? geo.nodeY : geo.calloutY - 8}
-                    stroke={isActive ? '#FF6B35' : 'rgba(243, 239, 231, 0.14)'}
+                    y2={geo.nodeY}
+                    stroke={isActive ? '#FF6B35' : 'rgba(243, 239, 231, 0.16)'}
                     strokeWidth="1"
                     strokeDasharray="2 3"
                     className="transition-colors duration-200"
                   />
 
-                  {/* Outer Pulsing Target Halo when Active */}
+                  {/* Pulsing Target Reticle around Active Apex */}
                   {isActive && (
                     <circle
                       cx={geo.nodeX}
@@ -358,9 +383,9 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
                       r="18"
                       fill="none"
                       stroke="#FF6B35"
-                      strokeWidth="1"
-                      strokeDasharray="3 3"
-                      className="animate-spin-slow origin-center opacity-70"
+                      strokeWidth="1.2"
+                      strokeDasharray="4 3"
+                      className="animate-spin-slow origin-center opacity-85"
                       style={{ transformOrigin: `${geo.nodeX}px ${geo.nodeY}px` }}
                     />
                   )}
@@ -376,11 +401,11 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
                     className="transition-all duration-200"
                   />
 
-                  {/* Apex Core Center Dot */}
+                  {/* Apex Core Dot */}
                   <circle
                     cx={geo.nodeX}
                     cy={geo.nodeY}
-                    r={isActive ? '3.5' : '2'}
+                    r={isActive ? '4' : '2.5'}
                     fill={isActive ? '#FF6B35' : isHovered ? '#F5D998' : '#82B7FF'}
                     className="transition-all duration-200"
                   />
@@ -388,14 +413,15 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
               );
             })}
 
-            {/* LAYER 5: TOP-DOWN DNA-CORE AERO PROTOTYPE VEHICLE
-                Direct DOM hardware-accelerated transform via GSAP and vehicleRef (Zero React re-render lag) */}
+            {/* LAYER 5: TOP-DOWN DNA-CORE AERO PROTOTYPE VEHICLE */}
             <g ref={vehicleRef} style={{ willChange: 'transform' }}>
-              <TrackAeroPod isMoving={isMoving} boost={boost} />
+              <TrackAeroPod isMoving={isMoving} boost={boost} isBraking={isBraking} />
             </g>
           </svg>
 
-          {/* LAYER 6: INTERACTIVE CHICANE APEX NODES & CLEAN ROLE CALLOUTS */}
+          {/* ===================================================================
+              INTERACTIVE SECTOR PYLONS ABOVE EVERY CHICANE (Fixing Discoverability)
+              =================================================================== */}
           {chicanesGeo.map((geo) => {
             const item = items[geo.index];
             const isActive = activeIndex === geo.index;
@@ -403,19 +429,19 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
 
             return (
               <div
-                key={`callout-${geo.id}`}
+                key={`pylon-${geo.id}`}
                 className="absolute transform -translate-x-1/2 z-20 pointer-events-auto cursor-pointer group"
                 style={{
-                  left: `${geo.calloutX}px`,
-                  top: `${geo.calloutY}px`,
-                  width: '230px',
+                  left: `${geo.pylonX}px`,
+                  top: `${geo.pylonY}px`,
+                  width: '240px',
                 }}
                 onClick={() => handleChicaneClick(geo.index)}
                 onMouseEnter={() => setHoveredIndex(geo.index)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 role="button"
                 tabIndex={0}
-                aria-label={`Select ${item.company} chicane`}
+                aria-label={`Select Sector ${geo.index + 1}: ${item.company}`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -423,24 +449,43 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
                   }
                 }}
               >
-                {/* 44x44px Clickable Hit Target overlaying Apex Node */}
+                {/* 44x44px Clickable Hit Target overlaying Apex Node below */}
                 <div
-                  className="absolute left-1/2 -translate-x-1/2 w-11 h-11 pointer-events-auto"
+                  className="absolute left-1/2 -translate-x-1/2 w-12 h-12 pointer-events-auto"
                   style={{
-                    top: geo.calloutPlacement === 'above' ? `${geo.nodeY - geo.calloutY - 22}px` : `${geo.nodeY - geo.calloutY - 22}px`,
+                    top: `${geo.nodeY - geo.pylonY - 24}px`,
                   }}
                   title={`Apex ${geo.index + 1}: ${item.company}`}
                 />
 
-                {/* Organization & Role Callout: Clean Typography, Zero Decorative Jargon */}
+                {/* Sector Pylon Card */}
                 <div
-                  className={`text-center px-2 py-1 transition-all duration-200 ${
-                    isActive ? 'scale-[1.03]' : 'group-hover:scale-[1.01]'
+                  className={`text-center p-2.5 rounded-[2px] transition-all duration-200 ${
+                    isActive
+                      ? 'bg-[#101B30]/95 border border-[#FF6B35]/40 shadow-[0_0_20px_rgba(255,107,53,0.2)]'
+                      : isHovered
+                      ? 'bg-[#101B30]/60 border border-[#F3EFE7]/15'
+                      : 'bg-[#101B30]/30 border border-[#F3EFE7]/[0.08]'
                   }`}
                 >
-                  {/* Organization Name (Clean Serif, 18px-20px) */}
+                  {/* Sector Badge Pill */}
+                  <div className="inline-block mb-1.5">
+                    <span
+                      className={`text-[10px] font-mono tracking-widest px-2.5 py-0.5 rounded-full uppercase font-bold transition-colors ${
+                        isActive
+                          ? 'bg-[#FF6B35] text-[#070B12]'
+                          : isHovered
+                          ? 'bg-[#101B30] text-[#F5D998] border border-[#F5D998]/40'
+                          : 'bg-[#101B30] text-[#7A889B] border border-[#F3EFE7]/10'
+                      }`}
+                    >
+                      SECTOR {String(geo.index + 1).padStart(2, '0')}
+                    </span>
+                  </div>
+
+                  {/* Organization Title (Bold 17px–19px Serif) */}
                   <h3
-                    className={`font-serif text-[17px] sm:text-[19px] leading-snug tracking-tight transition-colors duration-200 ${
+                    className={`font-serif text-[16px] sm:text-[18px] leading-snug tracking-tight transition-colors duration-200 ${
                       isActive
                         ? 'text-[#F3EFE7] font-medium'
                         : isHovered
@@ -451,13 +496,13 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
                     {item.company}
                   </h3>
 
-                  {/* Role Title & Timeframe (12px Monospace, #FF6B35 active, #64748B idle) */}
+                  {/* Role Title & Timeframe (12px Monospace) */}
                   <div
-                    className={`text-[11px] sm:text-[12px] font-mono mt-0.5 tracking-tight transition-colors duration-200 line-clamp-1 ${
+                    className={`text-[11px] sm:text-[12px] font-mono mt-0.5 tracking-tight transition-colors duration-200 truncate ${
                       isActive
                         ? 'text-[#FF6B35] font-semibold'
                         : isHovered
-                        ? 'text-[#FF6B35]/80'
+                        ? 'text-[#A7B2C3]'
                         : 'text-[#64748B]'
                     }`}
                   >

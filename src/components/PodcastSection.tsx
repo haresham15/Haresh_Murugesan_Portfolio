@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SectionContainer } from './ui/SectionContainer';
 import { GridCrosshair } from './ui/EditorialPrimitives';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const MotionDiv = motion.div as any;
 
 export interface PodcastItem {
   id: string;
@@ -104,7 +107,30 @@ export const podcastItems: PodcastItem[] = [
 
 export const PodcastSection: React.FC = () => {
   const [selectedEpisodeIdx, setSelectedEpisodeIdx] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [scrubPosition, setScrubPosition] = useState(38); // 0-100%
+  const [waveSeed, setWaveSeed] = useState(0);
+
   const featuredEp = podcastItems[selectedEpisodeIdx];
+  const totalCount = podcastItems.length;
+
+  const handlePrev = () => {
+    setSelectedEpisodeIdx((prev) => (prev > 0 ? prev - 1 : totalCount - 1));
+  };
+
+  const handleNext = () => {
+    setSelectedEpisodeIdx((prev) => (prev < totalCount - 1 ? prev + 1 : 0));
+  };
+
+  // Subtle wave motion animation
+  useEffect(() => {
+    if (!isPlaying) return;
+    const interval = setInterval(() => {
+      setWaveSeed((s) => (s + 1) % 100);
+      setScrubPosition((p) => (p >= 99 ? 0 : p + 0.3));
+    }, 150);
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   return (
     <SectionContainer
@@ -114,33 +140,38 @@ export const PodcastSection: React.FC = () => {
       className="py-24 sm:py-32 lg:py-40 border-b border-[#F3EFE7]/[0.08]"
       aria-label="Syntinuum technical journalism podcast"
     >
-      {/* Publication-Inspired Header & Intro */}
+      {/* Publication-Inspired Magazine Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16 sm:mb-20">
         <div className="space-y-4 max-w-2xl">
+          <div className="flex items-center gap-3 text-xs font-mono text-[#A7B2C3]">
+            <span className="text-[#FF6B35] font-semibold">04</span>
+            <span className="text-[#F3EFE7]/30">/</span>
+            <span className="tracking-widest uppercase">Publication &amp; Audio Archive</span>
+          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
-            Syntinuum &amp; <span className="italic text-[#F5D998]">Systems Dialogues.</span>
+            Syntinuum
           </h2>
           <p className="text-base sm:text-lg font-sans text-[#A7B2C3] leading-relaxed">
             Long-form dialogues with engineering founders, research scientists, and technology executives exploring the seam between textbook algorithms and live production fires.
           </p>
         </div>
 
-        {/* Platform Links with Machined 2px Bevel */}
+        {/* Global Platform Links */}
         <div className="flex items-center gap-3 shrink-0 text-xs font-mono">
           <a
             href="https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-3 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors font-medium"
+            className="px-4 py-2.5 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors font-medium cursor-pointer"
           >
-            <span>Listen on Spotify</span>
+            <span>Spotify Show</span>
             <span className="text-[#4CC38A]">↗</span>
           </a>
           <a
             href="https://www.youtube.com/@syntinuum"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-3 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors font-medium"
+            className="px-4 py-2.5 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors font-medium cursor-pointer"
           >
             <span>YouTube Channel</span>
             <span className="text-[#FF6B35]">↗</span>
@@ -148,100 +179,207 @@ export const PodcastSection: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Prominent Featured Episode Showcase (Swiss Zero-Box Architectural Plate) */}
-      <div className="bg-[#070B12] border border-[#F3EFE7]/[0.12] rounded-[2px] p-8 sm:p-12 lg:p-16 mb-16 relative overflow-hidden shadow-[0_8px_32px_rgba(7,11,18,0.8)]">
+      {/* =====================================================================
+          INTERACTIVE AUDIO WAVEFORM & DNA-LIGHTBULB EPISODE CYCLER STAGE
+          ===================================================================== */}
+      <div className="bg-[#070B12] border border-[#F3EFE7]/[0.12] rounded-[2px] p-6 sm:p-10 lg:p-14 mb-14 relative overflow-hidden shadow-[0_12px_44px_rgba(7,11,18,0.85)]">
         {/* Precision Blueprint Corner Fiducials */}
-        <GridCrosshair className="absolute top-2 left-2 z-20 opacity-40 text-[#82B7FF]" />
-        <GridCrosshair className="absolute top-2 right-2 z-20 opacity-40 text-[#82B7FF]" />
-        <GridCrosshair className="absolute bottom-2 left-2 z-20 opacity-40 text-[#82B7FF]" />
-        <GridCrosshair className="absolute bottom-2 right-2 z-20 opacity-40 text-[#82B7FF]" />
+        <GridCrosshair className="absolute top-2 left-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
+        <GridCrosshair className="absolute top-2 right-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
+        <GridCrosshair className="absolute bottom-2 left-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
+        <GridCrosshair className="absolute bottom-2 right-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
 
-        <div className="pointer-events-none absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#F5D998] via-[#FF6B35] to-transparent" />
+        <div className="pointer-events-none absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#F5D998] via-[#FF6B35] to-[#82B7FF]" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-          
-          {/* Left Column (Cols 1–5): Episode Meta, Speaker & Editorial Insight */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="space-y-2">
-              <span className="text-xs font-mono text-[#FF6B35] uppercase tracking-wider block">
-                {featuredEp.chapterTitle}
-              </span>
-              <div className="text-2xl sm:text-3xl font-serif text-[#F3EFE7]">
-                {featuredEp.guest}
-              </div>
-              <div className="text-sm font-sans text-[#F5D998] font-medium">
-                {featuredEp.role} · {featuredEp.organization}
-              </div>
+        {/* Top Cycler & Telemetry Bar */}
+        <div className="pb-6 mb-8 border-b border-[#F3EFE7]/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* DNA Lightbulb Visual Motif + Cycler Controls */}
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-[#101B30] border border-[#FF6B35]/40 rounded-[2px] flex items-center justify-center text-[#FF6B35] shrink-0">
+              {/* Stylized DNA-Bulb vector mark */}
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z" />
+                <path d="M9 21h6" />
+                <path d="M10 9l4 4M14 9l-4 4" stroke="#F5D998" strokeWidth="1.4" />
+              </svg>
             </div>
 
-            {/* Editorial Insight (De-slopped: typographic quotation, zero side-stripe card) */}
-            <div className="pt-4 border-t border-[#F3EFE7]/[0.08] space-y-2">
-              <span className="text-[11px] font-mono text-[#82B7FF] tracking-wider block">
-                Key Perspective:
-              </span>
-              <p className="text-[15px] font-serif italic text-[#F3EFE7] leading-relaxed">
-                "{featuredEp.insight}"
-              </p>
-            </div>
-
-            {/* Metrics Chips */}
-            <div className="flex items-center gap-4 text-xs font-mono text-[#A7B2C3] pt-2">
-              {featuredEp.metrics.map((m) => (
-                <div key={m.label} className="px-3 py-1 bg-[#101B30] border border-[#F3EFE7]/[0.08] rounded-[2px]">
-                  <span className="text-[#7A889B]">{m.label}: </span>
-                  <span className="text-[#F3EFE7] font-semibold">{m.value}</span>
-                </div>
-              ))}
+            <div>
+              <div className="text-[11px] font-mono text-[#FF6B35] uppercase tracking-wider font-semibold">
+                SYNTINUUM WAVEFORM CYCLER
+              </div>
+              <div className="text-xs font-mono text-[#A7B2C3]">
+                Episode {featuredEp.indexTag} / 0{totalCount} · 48kHz Master Audio
+              </div>
             </div>
           </div>
 
-          {/* Right Column (Cols 6–12): Episode Title, Deep Narrative & Action */}
-          <div className="lg:col-span-7 space-y-6 lg:border-l lg:border-[#F3EFE7]/[0.08] lg:pl-12">
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F3EFE7] leading-tight">
-              {featuredEp.title}
-            </h3>
-
-            <p className="text-[15px] sm:text-[16px] font-sans text-[#A7B2C3] leading-[1.72]">
-              {featuredEp.description}
-            </p>
-
-            <div className="text-xs font-mono text-[#7A889B]">
-              <span className="text-[#F5D998]">Topics: </span>
-              <span>{featuredEp.tags.join(' · ')}</span>
-            </div>
-
-            <div className="pt-4 flex flex-wrap items-center gap-4">
-              <a
-                href={featuredEp.spotifyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-semibold px-6 py-3.5 text-xs font-mono inline-flex items-center gap-2 transition-colors select-none rounded-[2px]"
-              >
-                <span>Play Conversation on Spotify</span>
-                <span>↗</span>
-              </a>
-              <a
-                href={featuredEp.youtubeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 px-5 py-3.5 text-xs font-mono inline-flex items-center gap-2 transition-colors select-none font-medium rounded-[2px]"
-              >
-                <span>Watch on YouTube</span>
-                <span>↗</span>
-              </a>
-            </div>
+          {/* Episode Cycler Controls */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="px-3 py-1.5 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] hover:text-[#FF6B35] border border-[#F3EFE7]/15 rounded-[2px] text-xs font-mono transition-colors flex items-center gap-1 cursor-pointer"
+              aria-label="Previous Episode"
+            >
+              <span>←</span>
+              <span>Prev Episode</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              className="px-3 py-1.5 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] hover:text-[#FF6B35] border border-[#F3EFE7]/15 rounded-[2px] text-xs font-mono transition-colors flex items-center gap-1 cursor-pointer"
+              aria-label="Next Episode"
+            >
+              <span>Next Episode</span>
+              <span>→</span>
+            </button>
           </div>
-
         </div>
+
+        {/* Interactive Audio Waveform Spectrum Bar */}
+        <div className="mb-10 bg-[#0A101C] border border-[#F3EFE7]/[0.08] p-4 sm:p-5 rounded-[2px]">
+          <div className="flex items-center justify-between text-[11px] font-mono text-[#7A889B] mb-2.5">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="px-2.5 py-0.5 bg-[#FF6B35] text-[#070B12] font-semibold rounded-[2px] cursor-pointer hover:bg-[#FF8547] transition-colors"
+              >
+                {isPlaying ? 'PAUSE ❚❚' : 'SIMULATE PLAY ▶'}
+              </button>
+              <span className="text-[#A7B2C3]">OPUS 128kbps</span>
+            </div>
+            <div className="tabular-nums text-[#F5D998]">
+              {Math.floor((scrubPosition / 100) * 48)}:
+              {String(Math.floor(((scrubPosition / 100) * 48 * 60) % 60)).padStart(2, '0')} / {featuredEp.duration}
+            </div>
+          </div>
+
+          {/* 36 Waveform Frequency Bars (Clickable Scrub Bar) */}
+          <div
+            className="w-full h-12 flex items-end gap-1 cursor-ew-resize py-1 select-none"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+              setScrubPosition(pct);
+            }}
+            title="Click or drag to scrub episode waveform"
+          >
+            {Array.from({ length: 48 }).map((_, i) => {
+              const pct = (i / 47) * 100;
+              const isPast = pct <= scrubPosition;
+              // Generate organic frequency height based on index and seed
+              const baseHeight = 12 + Math.abs(Math.sin((i + waveSeed * 0.1) * 0.45) * 28) + Math.cos(i * 0.8) * 8;
+              const clampedHeight = Math.round(Math.max(8, Math.min(44, baseHeight)));
+
+              return (
+                <div
+                  key={i}
+                  className="flex-1 rounded-[1px] transition-all duration-150"
+                  style={{
+                    height: `${clampedHeight}px`,
+                    backgroundColor: isPast ? '#FF6B35' : 'rgba(167, 178, 195, 0.22)',
+                    boxShadow: isPast && i === Math.floor((scrubPosition / 100) * 47) ? '0 0 8px #FF6B35' : 'none',
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Episode Content Spread */}
+        <AnimatePresence mode="wait">
+          <MotionDiv
+            key={featuredEp.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start"
+          >
+            {/* Left Column (Cols 1–5): Episode Meta, Speaker & Editorial Insight */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="space-y-2">
+                <span className="text-xs font-mono text-[#FF6B35] uppercase tracking-wider block font-semibold">
+                  {featuredEp.chapterTitle}
+                </span>
+                <div className="text-2xl sm:text-3xl font-serif text-[#F3EFE7] font-normal leading-snug">
+                  {featuredEp.guest}
+                </div>
+                <div className="text-sm font-sans text-[#F5D998] font-medium">
+                  {featuredEp.role} · {featuredEp.organization}
+                </div>
+              </div>
+
+              {/* Editorial Key Perspective */}
+              <div className="pt-4 border-t border-[#F3EFE7]/[0.08] space-y-2">
+                <span className="text-[11px] font-mono text-[#82B7FF] tracking-wider block">
+                  Core Engineering Perspective:
+                </span>
+                <p className="text-[15px] font-serif italic text-[#F3EFE7] leading-relaxed">
+                  "{featuredEp.insight}"
+                </p>
+              </div>
+
+              {/* Metrics Chips */}
+              <div className="flex items-center gap-3 text-xs font-mono text-[#A7B2C3] pt-1">
+                {featuredEp.metrics.map((m) => (
+                  <div key={m.label} className="px-3 py-1.5 bg-[#101B30] border border-[#F3EFE7]/[0.1] rounded-[2px]">
+                    <span className="text-[#7A889B]">{m.label}: </span>
+                    <span className="text-[#F3EFE7] font-semibold">{m.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column (Cols 6–12): Title, Deep Narrative & Action CTAs */}
+            <div className="lg:col-span-7 space-y-6 lg:border-l lg:border-[#F3EFE7]/[0.08] lg:pl-12">
+              <h3 className="text-2xl sm:text-3xl lg:text-[32px] font-serif text-[#F3EFE7] leading-tight font-normal">
+                {featuredEp.title}
+              </h3>
+
+              <p className="text-[15px] sm:text-[16px] font-sans text-[#A7B2C3] leading-[1.74]">
+                {featuredEp.description}
+              </p>
+
+              <div className="text-xs font-mono text-[#7A889B]">
+                <span className="text-[#F5D998]">Explored Topics: </span>
+                <span>{featuredEp.tags.join(' · ')}</span>
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center gap-3.5">
+                <a
+                  href={featuredEp.spotifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-semibold px-6 py-3.5 text-xs font-mono inline-flex items-center gap-2 transition-colors select-none rounded-[2px] shadow-[0_0_15px_rgba(255,107,53,0.25)]"
+                >
+                  <span>Play Conversation on Spotify</span>
+                  <span>↗</span>
+                </a>
+                <a
+                  href={featuredEp.youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 px-5 py-3.5 text-xs font-mono inline-flex items-center gap-2 transition-colors select-none font-medium rounded-[2px]"
+                >
+                  <span>Watch on YouTube</span>
+                  <span>↗</span>
+                </a>
+              </div>
+            </div>
+          </MotionDiv>
+        </AnimatePresence>
       </div>
 
-      {/* 4. Supporting Episode Selector Rows */}
+      {/* Supporting Episode Archive Browser */}
       <div className="space-y-3">
         <div className="text-xs font-mono text-[#7A889B] uppercase tracking-wider px-2">
-          EXPLORE CONVERSATION ARCHIVE
+          SELECT FROM CONVERSATION ARCHIVE
         </div>
 
-        <div className="border border-[#F3EFE7]/[0.08] divide-y divide-[#F3EFE7]/[0.08] bg-[#070B12]">
+        <div className="border border-[#F3EFE7]/[0.08] divide-y divide-[#F3EFE7]/[0.08] bg-[#070B12] rounded-[2px] overflow-hidden">
           {podcastItems.map((ep, idx) => {
             const isSelected = selectedEpisodeIdx === idx;
             return (
@@ -269,8 +407,8 @@ export const PodcastSection: React.FC = () => {
 
                 <div className="flex items-center gap-3 text-xs font-mono text-[#7A889B] shrink-0">
                   <span>{ep.duration}</span>
-                  <span className={isSelected ? 'text-[#FF6B35]' : 'text-[#7A889B]'}>
-                    {isSelected ? '● ACTIVE' : 'SELECT →'}
+                  <span className={isSelected ? 'text-[#FF6B35] font-semibold' : 'text-[#7A889B]'}>
+                    {isSelected ? '● ACTIVE' : 'LOAD EPISODE →'}
                   </span>
                 </div>
               </button>
@@ -278,7 +416,6 @@ export const PodcastSection: React.FC = () => {
           })}
         </div>
       </div>
-
     </SectionContainer>
   );
 };

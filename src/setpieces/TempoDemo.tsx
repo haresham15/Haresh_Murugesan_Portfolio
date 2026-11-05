@@ -48,18 +48,18 @@ export const TempoDemo: React.FC = () => {
   };
 
   return (
-    <div className="w-full rounded-3xl bg-[#0D1118] border border-white/10 p-5 sm:p-7 shadow-token-card flex flex-col justify-between">
+    <div className="w-full rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 p-5 sm:p-7 shadow-[0_4px_24px_rgba(7,11,18,0.7)] flex flex-col justify-between">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-white/10 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#F3EFE7]/10 gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#34D399]" />
-            <span className="text-xs font-mono uppercase tracking-widest text-[#34D399] font-semibold">
+            <span className="w-2 h-2 rounded-full bg-[#4CC38A]" />
+            <span className="text-xs font-mono uppercase tracking-widest text-[#FF6B35] font-semibold">
               pgvector RAG & Crisis Circuit Breaker
             </span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-heading font-bold text-white tracking-tight">
+          <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F3EFE7] tracking-tight">
             Tempo: Vector Embedding Space & Crisis Interceptor
           </h3>
         </div>
@@ -69,7 +69,7 @@ export const TempoDemo: React.FC = () => {
           <button
             type="button"
             onClick={() => setIs3DProjection(!is3DProjection)}
-            className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-[#7DD3FC] hover:text-white transition-colors"
+            className="px-3 py-1.5 rounded-[2px] bg-[#101B30] border border-[#F3EFE7]/10 text-xs font-mono text-[#82B7FF] hover:text-[#F3EFE7] transition-colors cursor-pointer"
           >
             {is3DProjection ? 'View: 3D UMAP' : 'View: 2D PCA'}
           </button>
@@ -80,7 +80,7 @@ export const TempoDemo: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center mb-6">
         
         {/* LEFT: Scatter Vector Space Projection (7 cols) */}
-        <div className="xl:col-span-7 relative w-full aspect-[4/3] rounded-2xl bg-[#050505] border border-white/10 p-4 overflow-hidden">
+        <div className="xl:col-span-7 relative w-full aspect-[4/3] rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 p-4 overflow-hidden">
           
           <svg viewBox="0 0 360 280" className="w-full h-full" fill="none">
             {/* Coordinate grid lines */}
@@ -162,7 +162,7 @@ export const TempoDemo: React.FC = () => {
           </svg>
 
           {/* Cluster Legend Overlay */}
-          <div className="absolute bottom-3 left-3 flex flex-wrap items-center gap-3 text-[10px] font-mono bg-[#050505]/85 p-2 rounded-lg border border-white/5">
+          <div className="absolute bottom-3 left-3 flex flex-wrap items-center gap-3 text-[10px] font-mono bg-[#070B12]/85 p-2 rounded-[2px] border border-[#F3EFE7]/10">
             <span className="flex items-center gap-1.5 text-[#F87171]">
               <span className="w-2 h-2 rounded-full bg-[#F87171]" />
               Crisis (100% Intercept)
@@ -177,7 +177,7 @@ export const TempoDemo: React.FC = () => {
             </span>
           </div>
 
-          <div className="absolute top-3 right-3 text-[10px] font-mono text-[#A6ADB8] bg-[#050505]/80 px-2 py-1 rounded-lg border border-white/5">
+          <div className="absolute top-3 right-3 text-[10px] font-mono text-[#A7B2C3] bg-[#070B12]/80 px-2 py-1 rounded-[2px] border border-[#F3EFE7]/10">
             30-Case Benchmark Projection
           </div>
         </div>
@@ -187,40 +187,40 @@ export const TempoDemo: React.FC = () => {
           
           {/* Preset Buttons */}
           <div className="space-y-2">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#A6ADB8]">
+            <p className="text-xs font-mono uppercase tracking-widest text-[#A7B2C3]">
               Select Benchmark Scenario
             </p>
             <div className="grid grid-cols-1 gap-2">
               <button
                 type="button"
                 onClick={() => handleSelectPreset('b1')}
-                className={`p-3 rounded-xl text-left border transition-all ${
+                className={`p-3 rounded-[2px] text-left border transition-all ${
                   activeNode.id === 'b1'
-                    ? 'bg-[#D8B4FE]/10 border-[#D8B4FE]'
+                    ? 'bg-[#101B30] border-[#FF6B35]'
                     : 'bg-white/[0.02] border-white/5 hover:border-white/15'
                 }`}
               >
-                <span className="text-xs font-bold text-white block mb-0.5">RSD Trigger: Ambiguous Manager Message</span>
-                <span className="text-[11px] font-mono text-[#D8B4FE]">pgvector Cosine 0.824</span>
+                <span className="text-xs font-bold text-[#F3EFE7] block mb-0.5">RSD Trigger: Ambiguous Manager Message</span>
+                <span className="text-[11px] font-mono text-[#F5D998]">pgvector Cosine 0.824</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSelectPreset('b4')}
-                className={`p-3 rounded-xl text-left border transition-all ${
+                className={`p-3 rounded-[2px] text-left border transition-all ${
                   activeNode.id === 'b4'
-                    ? 'bg-[#D8B4FE]/10 border-[#D8B4FE]'
+                    ? 'bg-[#101B30] border-[#FF6B35]'
                     : 'bg-white/[0.02] border-white/5 hover:border-white/15'
                 }`}
               >
-                <span className="text-xs font-bold text-white block mb-0.5">Task Freeze: Overloaded Schedule</span>
-                <span className="text-[11px] font-mono text-[#D8B4FE]">Spatial CV Chunker Trigger</span>
+                <span className="text-xs font-bold text-[#F3EFE7] block mb-0.5">Task Freeze: Overloaded Schedule</span>
+                <span className="text-[11px] font-mono text-[#F5D998]">Spatial CV Chunker Trigger</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSelectPreset('c1')}
-                className={`p-3 rounded-xl text-left border transition-all ${
+                className={`p-3 rounded-[2px] text-left border transition-all ${
                   activeNode.id === 'c1'
                     ? 'bg-[#F87171]/10 border-[#F87171]'
                     : 'bg-white/[0.02] border-white/5 hover:border-white/15'
@@ -233,15 +233,15 @@ export const TempoDemo: React.FC = () => {
           </div>
 
           {/* Active Node Routing Ledger */}
-          <div className="p-4 rounded-2xl bg-[#050505] border border-white/10 text-xs font-mono space-y-2">
-            <div className="flex items-center justify-between pb-2 border-b border-white/5">
-              <span className="text-[#A6ADB8]">Active Query:</span>
-              <span className="text-white font-bold truncate max-w-[200px]">{activeNode.label}</span>
+          <div className="p-4 rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 text-xs font-mono space-y-2">
+            <div className="flex items-center justify-between pb-2 border-b border-[#F3EFE7]/10">
+              <span className="text-[#A7B2C3]">Active Query:</span>
+              <span className="text-[#F3EFE7] font-bold truncate max-w-[200px]">{activeNode.label}</span>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-[#A6ADB8]">Cosine Similarity:</span>
-              <span className="text-[#7DD3FC] font-bold">{activeNode.cosineScore}</span>
+              <span className="text-[#A7B2C3]">Cosine Similarity:</span>
+              <span className="text-[#82B7FF] font-bold">{activeNode.cosineScore}</span>
             </div>
 
             <div className="pt-2 border-t border-white/5">

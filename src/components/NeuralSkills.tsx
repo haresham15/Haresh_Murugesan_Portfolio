@@ -95,7 +95,7 @@ export const NeuralSkills: React.FC = () => {
       {/* Section Intro */}
       <div className="max-w-3xl mb-16 space-y-4">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
-          Technical Index &amp; <span className="italic text-[#F5D998]">System Competencies.</span>
+          Technical Index
         </h2>
         <p className="text-base sm:text-lg font-sans text-[#A7B2C3] leading-relaxed">
           Five structured engineering domains backed by real production deliverables, client-side benchmarks, and collegiate research.

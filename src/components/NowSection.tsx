@@ -15,7 +15,7 @@ export const NowSection: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-16 sm:mb-20">
         <div className="space-y-4 max-w-xl">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
-            Now &amp; <span className="italic text-[#F5D998]">Active Inquiries.</span>
+            Field Notes
           </h2>
           <p className="text-base sm:text-lg font-sans text-[#A7B2C3] leading-relaxed">
             Active engineering focus, research investigations, and personal inquiry in Columbus, OH.

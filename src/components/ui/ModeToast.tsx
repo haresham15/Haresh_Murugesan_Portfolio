@@ -44,24 +44,24 @@ export const ModeToast: React.FC = () => {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-6 right-6 z-50 max-w-sm p-4 rounded-2xl bg-[#0D1118]/95 border border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl animate-in fade-in slide-in-from-bottom-3 duration-200 pointer-events-none"
+      className="fixed bottom-6 right-6 z-50 max-w-sm p-4 rounded-[2px] bg-[#070B12]/95 border border-[#F3EFE7]/15 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl animate-in fade-in slide-in-from-bottom-3 duration-200 pointer-events-none"
     >
       <div className="flex items-start gap-3">
         <span
-          className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${
-            isRecruiter ? 'bg-[#7DD3FC] animate-ping' : 'bg-[#D8B4FE] animate-pulse'
+          className={`w-2 h-2 rounded-[1px] mt-1 shrink-0 ${
+            isRecruiter ? 'bg-[#82B7FF]' : 'bg-[#FF6B35]'
           }`}
         />
         <div>
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-mono font-bold text-white tracking-wide">
+            <p className="text-xs font-mono font-bold text-[#F3EFE7] tracking-wide">
               {toastText}
             </p>
-            <span className="text-[10px] font-mono text-[#A6ADB8] px-1.5 py-0.5 rounded bg-white/5 border border-white/10">
+            <span className="text-[10px] font-mono text-[#A7B2C3] px-1.5 py-0.5 rounded-[2px] bg-[#101B30] border border-[#F3EFE7]/10">
               Key: [R]
             </span>
           </div>
-          <p className="text-[11px] font-sans text-[#A6ADB8] mt-0.5 leading-snug">
+          <p className="text-[11px] font-sans text-[#A7B2C3] mt-0.5 leading-snug">
             {toastSubtext}
           </p>
         </div>

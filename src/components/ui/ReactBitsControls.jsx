@@ -518,12 +518,12 @@ export const SpotlightCard = ({
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative overflow-hidden rounded-2xl bg-[#102038] border border-[#F4EFE6]/10 ${className}`}
+      className={`relative overflow-hidden rounded-[2px] bg-[#102038] border border-[#F4EFE6]/10 ${className}`}
       {...props}
     >
       {!isReduced && pos.active && (
         <div
-          className="pointer-events-none absolute -inset-px rounded-2xl transition-opacity duration-300"
+          className="pointer-events-none absolute -inset-px rounded-[2px] transition-opacity duration-300"
           style={{
             background: `radial-gradient(350px circle at ${pos.x}px ${pos.y}px, ${spotlightColor}, transparent 70%)`,
           }}
@@ -739,7 +739,7 @@ export const AnimatedDock = ({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="absolute bottom-12 left-1/2 -translate-x-1/2 w-64 p-3 rounded-2xl bg-[#0C1626] border border-[#F4EFE6]/15 backdrop-blur-2xl shadow-2xl space-y-1"
+              className="absolute bottom-12 left-1/2 -translate-x-1/2 w-64 p-3 rounded-[2px] bg-[#0C1626] border border-[#F4EFE6]/15 backdrop-blur-2xl shadow-2xl space-y-1"
             >
               <div className="px-3 py-1.5 text-[10px] font-mono text-[#9BA8B8] uppercase border-b border-white/[0.08] mb-1">
                 Telemetry Sectors

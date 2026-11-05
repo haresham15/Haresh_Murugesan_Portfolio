@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { motion, AnimatePresence } from 'framer-motion';
 import { allProjects, Project } from '@/content/projects';
 import { GridCrosshair } from './ui/EditorialPrimitives';
 
@@ -17,6 +18,7 @@ export interface SuperCluster {
   domain: string;
   accentColor: string;
   description: string;
+  count: number;
 }
 
 export interface SubCluster {
@@ -25,6 +27,7 @@ export interface SubCluster {
   label: string;
   shortLabel: string;
   accentColor: string;
+  description: string;
   projectSlugs: string[];
 }
 
@@ -37,83 +40,92 @@ export interface CrossTechEdge {
 // Super Clusters (Tier 1)
 export const SUPER_CLUSTERS: SuperCluster[] = [
   {
-    id: 'cluster-backend',
-    label: 'Backend, AI/ML & Compute Engines',
-    shortLabel: 'Backend & AI',
-    domain: 'Python, PyTorch, FAISS, Computer Vision & Distributed Systems',
-    accentColor: '#FF6B35',
-    description: 'Vector embeddings, sub-millisecond saliency pipelines, and spatial compute runtimes.',
-  },
-  {
     id: 'cluster-frontend',
     label: 'Frontend, Spatial UI & Interactive Systems',
-    shortLabel: 'Frontend & Spatial',
+    shortLabel: 'Frontend & Spatial UI',
     domain: 'Next.js, React, TypeScript, 3D WebGL/Deck.GL & Telemetry Interfaces',
     accentColor: '#82B7FF',
     description: 'Hardware-accelerated rendering, 60fps Web Workers, and zero-latency client state machines.',
+    count: 9,
+  },
+  {
+    id: 'cluster-backend',
+    label: 'Backend, AI/ML & Compute Engines',
+    shortLabel: 'Backend & AI/ML Engines',
+    domain: 'Python, PyTorch, FAISS, Computer Vision & Distributed Systems',
+    accentColor: '#FF6B35',
+    description: 'Vector embeddings, sub-millisecond saliency pipelines, and spatial compute runtimes.',
+    count: 9,
   },
 ];
 
 // Sub Clusters (Tier 2) - 4 under Backend, 3 under Frontend
 export const SUB_CLUSTERS: SubCluster[] = [
+  // Frontend Sub-Clusters (9 projects total)
+  {
+    id: 'sub-spatial-3d',
+    parentId: 'cluster-frontend',
+    label: '3D Spatial UI & Geospatial Dashboards',
+    shortLabel: '3D Spatial UI',
+    accentColor: '#82B7FF',
+    description: 'Hardware-accelerated Deck.GL, Mapbox GL, and 3D point-cloud interfaces.',
+    projectSlugs: ['nyc-housing-market-ai'],
+  },
+  {
+    id: 'sub-telemetry-apps',
+    parentId: 'cluster-frontend',
+    label: 'Real-Time Telemetry & Productivity Systems',
+    shortLabel: 'Real-Time Telemetry',
+    accentColor: '#4CC38A',
+    description: 'Off-main-thread Web Workers, local SQLite ring buffers, and 60fps simulation.',
+    projectSlugs: ['apexis', 'tempo', 'philocracy', 'momwebsite'],
+  },
+  {
+    id: 'sub-media-streaming',
+    parentId: 'cluster-frontend',
+    label: 'Media Streaming & Design Systems',
+    shortLabel: 'Media & Streaming',
+    accentColor: '#F5D998',
+    description: 'Web Audio, DTCG design tokens, and high-fidelity brand platforms.',
+    projectSlugs: ['syntinuum-podcast-website', 'murugesan-rajaram-lab', 'portfolio-website', 'anna-birthday'],
+  },
+
   // Backend Sub-Clusters (9 projects total)
   {
     id: 'sub-cv-medical',
     parentId: 'cluster-backend',
-    label: 'Computer Vision & Medical AI',
+    label: 'Computer Vision & Clinical Diagnostics',
     shortLabel: 'Computer Vision',
     accentColor: '#FF6B35',
+    description: '8.09ms Grad-CAM explainability, HSV color segmentation, and histological AI.',
     projectSlugs: ['healios', 'cv-allergy-wheal'],
   },
   {
     id: 'sub-retrieval-search',
     parentId: 'cluster-backend',
-    label: 'Information Retrieval & Search',
+    label: 'Vector Search & Information Retrieval',
     shortLabel: 'Search & Retrieval',
-    accentColor: '#FF6B35',
+    accentColor: '#FF8547',
+    description: 'FAISS dense semantic search, BM25 sparse fusion, and RAG architectures.',
     projectSlugs: ['tamiltrove', 'tutormatch'],
   },
   {
     id: 'sub-predictive-modeling',
     parentId: 'cluster-backend',
-    label: 'Predictive Modeling & Econometrics',
-    shortLabel: 'Predictive Modeling',
-    accentColor: '#FF8547',
+    label: 'Econometrics & Predictive Machine Learning',
+    shortLabel: 'Econometrics & ML',
+    accentColor: '#FFE9AE',
+    description: 'OSRM isochrone routing, spatial transit optimization, and regression models.',
     projectSlugs: ['routerx-careline', 'cs50-ai-projects', 'carstomer'],
   },
   {
     id: 'sub-cloud-systems',
     parentId: 'cluster-backend',
-    label: 'Cloud & Systems Infrastructure',
-    shortLabel: 'Systems & Core',
-    accentColor: '#FF6B35',
+    label: 'Cloud Infrastructure & Core Algorithms',
+    shortLabel: 'Cloud & Serverless',
+    accentColor: '#82B7FF',
+    description: 'AWS Lambda microservices, DynamoDB schema modeling, and formal Java contracts.',
     projectSlugs: ['software-2-projects', 'software-1-projects'],
-  },
-
-  // Frontend Sub-Clusters (9 projects total)
-  {
-    id: 'sub-spatial-3d',
-    parentId: 'cluster-frontend',
-    label: '3D Spatial & Geospatial Dashboards',
-    shortLabel: 'Spatial & 3D',
-    accentColor: '#82B7FF',
-    projectSlugs: ['nyc-housing-market-ai'],
-  },
-  {
-    id: 'sub-media-streaming',
-    parentId: 'cluster-frontend',
-    label: 'Media, Streaming & Brand Platforms',
-    shortLabel: 'Media & Streaming',
-    accentColor: '#82B7FF',
-    projectSlugs: ['syntinuum-podcast-website', 'murugesan-rajaram-lab', 'portfolio-website', 'anna-birthday'],
-  },
-  {
-    id: 'sub-telemetry-apps',
-    parentId: 'cluster-frontend',
-    label: 'Real-Time Telemetry & Productivity Apps',
-    shortLabel: 'Telemetry & Productivity',
-    accentColor: '#4CC38A',
-    projectSlugs: ['apexis', 'tempo', 'philocracy', 'momwebsite'],
   },
 ];
 
@@ -136,20 +148,16 @@ export const CROSS_TECH_EDGES: CrossTechEdge[] = [
   { source: 'apexis', target: 'healios', sharedTech: 'Real-Time Compute Pipelines' },
 ];
 
-export type TechFilter = 'all' | 'python' | 'nextjs' | 'cv' | 'cloud' | 'spatial';
+export type TechFilter = 'all' | 'ai' | 'cv' | 'nextjs' | 'python' | 'cloud';
 
 export const TECH_FILTERS: { id: TechFilter; label: string }[] = [
-  { id: 'all', label: 'All Stacks' },
-  { id: 'python', label: 'Python / AI' },
-  { id: 'nextjs', label: 'Next.js / TS' },
+  { id: 'all', label: 'All (18)' },
+  { id: 'ai', label: 'AI / ML' },
   { id: 'cv', label: 'Computer Vision' },
-  { id: 'cloud', label: 'Cloud & Core' },
-  { id: 'spatial', label: 'Spatial & 3D' },
+  { id: 'nextjs', label: 'Next.js / TS' },
+  { id: 'python', label: 'Python' },
+  { id: 'cloud', label: 'Cloud / Systems' },
 ];
-
-// ---------------------------------------------------------------------------
-// 2. SIMULATION NODE DEFINITION
-// ---------------------------------------------------------------------------
 
 interface SimNode {
   id: string;
@@ -169,25 +177,23 @@ interface SimNode {
   count?: number;
 }
 
-// ---------------------------------------------------------------------------
-// 3. MAIN COMPONENT: SystemsCodeGraph (Built into Web Application)
-// ---------------------------------------------------------------------------
-
 export const SystemsCodeGraph: React.FC = () => {
   const router = useRouter();
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  // Responsive default: Hierarchy on mobile (<640px), Constellation on desktop
-  const [viewMode, setViewMode] = useState<'hierarchy' | 'constellation'>('constellation');
-  const [selectedSuperCluster, setSelectedSuperCluster] = useState<SuperClusterId>('cluster-backend');
+  // Layout View Mode: Guided Cluster View vs All 18 Nodes Constellation
+  const [viewMode, setViewMode] = useState<'guided' | 'constellation'>('guided');
+  const [selectedSuperCluster, setSelectedSuperCluster] = useState<SuperClusterId | null>('cluster-backend');
   const [selectedSubCluster, setSelectedSubCluster] = useState<string | null>('sub-cv-medical');
   const [selectedProjectSlug, setSelectedProjectSlug] = useState<string | null>('healios');
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [techFilter, setTechFilter] = useState<TechFilter>('all');
+  const [isVisible, setIsVisible] = useState<boolean>(true);
 
   // Dynamic layout dimension tracking
-  const [dimensions, setDimensions] = useState({ width: 1100, height: 640 });
+  const [canvasDim, setCanvasDim] = useState({ width: 720, height: 640 });
 
   // Elastic pointer dragging state
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
@@ -200,139 +206,258 @@ export const SystemsCodeGraph: React.FC = () => {
     return map;
   }, []);
 
+  // IntersectionObserver: Pause RAF/anim when off-screen
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   // Update layout dimensions natively on resize
   useEffect(() => {
     const updateDimensions = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
+      if (canvasContainerRef.current) {
+        const rect = canvasContainerRef.current.getBoundingClientRect();
         const width = Math.max(320, rect.width);
-        const height = width < 640 ? 520 : width < 1024 ? 590 : 650;
-        setDimensions({ width, height });
-        if (width < 640 && viewMode === 'constellation') {
-          setViewMode('hierarchy');
-        }
+        const height = width < 768 ? 480 : 640;
+        setCanvasDim({ width, height });
       }
     };
 
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
     return () => window.removeEventListener('resize', updateDimensions);
-  }, [viewMode]);
+  }, []);
 
   // Tech filter checker
   const matchesFilter = useCallback((p: Project, filter: TechFilter) => {
     if (filter === 'all') return true;
     const text = `${p.stack} ${p.title} ${p.category} ${p.description}`.toLowerCase();
-    if (filter === 'python') return text.includes('python') || text.includes('tensorflow') || text.includes('pytorch') || text.includes('faiss');
-    if (filter === 'nextjs') return text.includes('next.js') || text.includes('react') || text.includes('typescript');
+    if (filter === 'ai') return text.includes('ai') || text.includes('ml') || text.includes('pytorch') || text.includes('faiss') || text.includes('vector');
     if (filter === 'cv') return text.includes('vision') || text.includes('opencv') || text.includes('grad-cam') || text.includes('lidar');
-    if (filter === 'cloud') return text.includes('cloud') || text.includes('java') || text.includes('sqlite') || text.includes('workers');
-    if (filter === 'spatial') return text.includes('spatial') || text.includes('osrm') || text.includes('deck.gl') || text.includes('map');
+    if (filter === 'nextjs') return text.includes('next.js') || text.includes('react') || text.includes('typescript');
+    if (filter === 'python') return text.includes('python') || text.includes('numpy') || text.includes('fastapi');
+    if (filter === 'cloud') return text.includes('cloud') || text.includes('aws') || text.includes('sqlite') || text.includes('lambda') || text.includes('workers');
     return true;
   }, []);
 
   // -------------------------------------------------------------------------
-  // DETERMINISTIC GEOMETRY CALCULATOR FOR NATIVE APPLICATION LAYOUT
-  // Strictly prevents label overlaps through monotonic vertical stratification.
+  // DETERMINISTIC ORBITAL GEOMETRY GENERATOR
+  // Locked concentric orbital lanes with mathematical zero-overlap guarantees.
   // -------------------------------------------------------------------------
   const nodes = useMemo(() => {
-    const { width, height } = dimensions;
+    const { width, height } = canvasDim;
+    const centerX = width / 2;
     const centerY = height / 2;
     const isMobile = width < 640;
-
     const list: SimNode[] = [];
 
-    if (viewMode === 'hierarchy') {
+    if (viewMode === 'guided') {
       // ---------------------------------------------------------------------
-      // HIERARCHY DRILL-DOWN: 3-Column Left-to-Right Architectural Tree
+      // GUIDED CLUSTER VIEW: Hierarchical Focus with Camera Centering
       // ---------------------------------------------------------------------
-      const activeSuper = selectedSuperCluster || 'cluster-backend';
-      const activeSuperObj = SUPER_CLUSTERS.find((s) => s.id === activeSuper)!;
-      const activeSub = selectedSubCluster || (activeSuper === 'cluster-backend' ? 'sub-cv-medical' : 'sub-spatial-3d');
-
-      // Col 1: Active Macro Domain Anchor
-      const col1X = isMobile ? 42 : Math.max(110, width * 0.15);
-      list.push({
-        id: activeSuperObj.id,
-        type: 'super',
-        label: activeSuperObj.shortLabel,
-        sublabel: activeSuperObj.domain,
-        x: col1X,
-        y: centerY,
-        targetX: col1X,
-        targetY: centerY,
-        radius: isMobile ? 18 : 24,
-        color: activeSuperObj.accentColor,
-        superClusterId: activeSuperObj.id,
-        count: 9,
-      });
-
-      // Col 2: Domain Sub-Clusters
-      const currentSubClusters = SUB_CLUSTERS.filter((s) => s.parentId === activeSuper);
-      const subCount = currentSubClusters.length;
-      const subColX = isMobile ? width * 0.44 : Math.max(260, width * 0.42);
-      const subTopPad = isMobile ? 55 : 80;
-      const subSpan = height - subTopPad * 2;
-      const subSpacing = subSpan / Math.max(1, subCount - 1);
-
-      currentSubClusters.forEach((sub, idx) => {
-        const colY = subTopPad + idx * subSpacing;
-
+      if (!selectedSuperCluster) {
+        // LEVEL 1: Clean Macro Overview
+        // Core node in center
         list.push({
-          id: sub.id,
-          type: 'sub',
-          label: sub.shortLabel,
-          sublabel: `${sub.projectSlugs.length} Systems`,
-          x: subColX,
-          y: colY,
-          targetX: subColX,
-          targetY: colY,
-          radius: isMobile ? 13 : 17,
-          color: sub.accentColor,
-          parentId: activeSuperObj.id,
-          superClusterId: activeSuperObj.id,
-          subClusterId: sub.id,
-          count: sub.projectSlugs.length,
+          id: 'root',
+          type: 'root',
+          label: 'CORE // 18 SYSTEMS',
+          sublabel: 'Full Architecture',
+          x: centerX,
+          y: centerY,
+          targetX: centerX,
+          targetY: centerY,
+          radius: isMobile ? 22 : 28,
+          color: '#F3EFE7',
+          count: 18,
         });
-      });
 
-      // Col 3: Production Project Leaf Nodes
-      const targetSub = SUB_CLUSTERS.find((s) => s.id === activeSub) || currentSubClusters[0];
-      if (targetSub) {
-        const pCount = targetSub.projectSlugs.length;
-        const projColX = isMobile ? width - 58 : Math.max(490, width * 0.76);
-        const projTopPad = Math.max(70, centerY - ((pCount - 1) * 80) / 2);
+        // Left Portal: Frontend, Spatial UI & Interactive
+        const portalOffset = isMobile ? width * 0.28 : Math.min(200, width * 0.26);
+        const leftX = centerX - portalOffset;
+        list.push({
+          id: 'cluster-frontend',
+          type: 'super',
+          label: 'Frontend & Spatial UI',
+          sublabel: '[9 Systems] Click to Expand',
+          x: leftX,
+          y: centerY,
+          targetX: leftX,
+          targetY: centerY,
+          radius: isMobile ? 18 : 24,
+          color: '#82B7FF',
+          superClusterId: 'cluster-frontend',
+          count: 9,
+        });
 
-        targetSub.projectSlugs.forEach((slug, idx) => {
-          const proj = projectMap.get(slug);
-          const colY = pCount === 1 ? centerY : projTopPad + idx * 80;
+        // Right Portal: Backend, AI/ML & Compute Engines
+        const rightX = centerX + portalOffset;
+        list.push({
+          id: 'cluster-backend',
+          type: 'super',
+          label: 'Backend & AI/ML Engines',
+          sublabel: '[9 Systems] Click to Expand',
+          x: rightX,
+          y: centerY,
+          targetX: rightX,
+          targetY: centerY,
+          radius: isMobile ? 18 : 24,
+          color: '#FF6B35',
+          superClusterId: 'cluster-backend',
+          count: 9,
+        });
 
+        // Pre-render sub-clusters in subtle 180° orbital arcs around their portals
+        // Frontend Sub-clusters (Left Arc: 120° to 240°)
+        const feSubs = SUB_CLUSTERS.filter((s) => s.parentId === 'cluster-frontend');
+        feSubs.forEach((sub, i) => {
+          const angle = (Math.PI * 0.7) + (i * (Math.PI * 0.6) / Math.max(1, feSubs.length - 1));
+          const r = isMobile ? 80 : 115;
+          const sx = leftX - Math.sin(angle) * r;
+          const sy = centerY + Math.cos(angle) * r;
           list.push({
-            id: slug,
-            type: 'project',
-            label: proj ? proj.title.split('—')[0].trim() : slug,
-            sublabel: proj?.highlight || '',
-            x: projColX,
-            y: colY,
-            targetX: projColX,
-            targetY: colY,
-            radius: isMobile ? 9.5 : 12.5,
-            color: proj?.featured ? '#FF6B35' : '#F3EFE7',
-            parentId: targetSub.id,
-            superClusterId: targetSub.parentId,
-            subClusterId: targetSub.id,
-            project: proj,
+            id: sub.id,
+            type: 'sub',
+            label: sub.shortLabel,
+            sublabel: `${sub.projectSlugs.length} Systems`,
+            x: sx,
+            y: sy,
+            targetX: sx,
+            targetY: sy,
+            radius: isMobile ? 12 : 15,
+            color: sub.accentColor,
+            parentId: 'cluster-frontend',
+            superClusterId: 'cluster-frontend',
+            subClusterId: sub.id,
+            count: sub.projectSlugs.length,
           });
         });
+
+        // Backend Sub-clusters (Right Arc)
+        const beSubs = SUB_CLUSTERS.filter((s) => s.parentId === 'cluster-backend');
+        beSubs.forEach((sub, i) => {
+          const angle = (Math.PI * 0.7) + (i * (Math.PI * 0.6) / Math.max(1, beSubs.length - 1));
+          const r = isMobile ? 80 : 115;
+          const sx = rightX + Math.sin(angle) * r;
+          const sy = centerY + Math.cos(angle) * r;
+          list.push({
+            id: sub.id,
+            type: 'sub',
+            label: sub.shortLabel,
+            sublabel: `${sub.projectSlugs.length} Systems`,
+            x: sx,
+            y: sy,
+            targetX: sx,
+            targetY: sy,
+            radius: isMobile ? 12 : 15,
+            color: sub.accentColor,
+            parentId: 'cluster-backend',
+            superClusterId: 'cluster-backend',
+            subClusterId: sub.id,
+            count: sub.projectSlugs.length,
+          });
+        });
+
+      } else {
+        // LEVEL 2 / LEVEL 3: Focused Cluster Drill-Down
+        const activeSuper = SUPER_CLUSTERS.find((s) => s.id === selectedSuperCluster)!;
+        const currentSubs = SUB_CLUSTERS.filter((s) => s.parentId === selectedSuperCluster);
+        const activeSubObj = SUB_CLUSTERS.find((s) => s.id === selectedSubCluster) || currentSubs[0];
+
+        // 1. Center Anchor: The Active Super-Cluster Portal (Left Column)
+        const anchorX = isMobile ? 54 : Math.max(120, width * 0.18);
+        list.push({
+          id: activeSuper.id,
+          type: 'super',
+          label: activeSuper.shortLabel,
+          sublabel: activeSuper.domain,
+          x: anchorX,
+          y: centerY,
+          targetX: anchorX,
+          targetY: centerY,
+          radius: isMobile ? 20 : 25,
+          color: activeSuper.accentColor,
+          superClusterId: activeSuper.id,
+          count: activeSuper.count,
+        });
+
+        // 2. Middle Column: Sub-Domains in Orbital Arc / Stack
+        const subColX = isMobile ? width * 0.45 : Math.max(260, width * 0.44);
+        const subCount = currentSubs.length;
+        const subSpan = Math.min(height - 120, subCount * (isMobile ? 70 : 85));
+        const subTop = centerY - subSpan / 2 + (isMobile ? 25 : 35);
+        const subStep = subSpan / Math.max(1, subCount - 1);
+
+        currentSubs.forEach((sub, idx) => {
+          const sy = subCount === 1 ? centerY : subTop + idx * subStep;
+          list.push({
+            id: sub.id,
+            type: 'sub',
+            label: sub.shortLabel,
+            sublabel: `${sub.projectSlugs.length} Systems`,
+            x: subColX,
+            y: sy,
+            targetX: subColX,
+            targetY: sy,
+            radius: isMobile ? 13 : 16,
+            color: sub.accentColor,
+            parentId: activeSuper.id,
+            superClusterId: activeSuper.id,
+            subClusterId: sub.id,
+            count: sub.projectSlugs.length,
+          });
+        });
+
+        // 3. Right Column: Expanded Project Leaf Nodes along circular orbital arc
+        if (activeSubObj) {
+          const pSlugs = activeSubObj.projectSlugs;
+          const pCount = pSlugs.length;
+          const projColX = isMobile ? width - 68 : Math.max(480, width * 0.76);
+          const minSeparation = 56;
+          const projSpan = Math.min(height - 100, Math.max(minSeparation * (pCount - 1), 140));
+          const projTop = centerY - projSpan / 2;
+          const projStep = pCount === 1 ? 0 : projSpan / Math.max(1, pCount - 1);
+
+          pSlugs.forEach((slug, idx) => {
+            const proj = projectMap.get(slug);
+            const py = pCount === 1 ? centerY : projTop + idx * projStep;
+            // Slight curve bowing away from center to create orbital arc feeling
+            const arcOffset = pCount > 2 ? Math.sin((idx / (pCount - 1)) * Math.PI) * (isMobile ? 15 : 28) : 0;
+            const px = projColX + arcOffset;
+
+            list.push({
+              id: slug,
+              type: 'project',
+              label: proj ? proj.title.split('—')[0].trim() : slug,
+              sublabel: proj?.highlight || '',
+              x: px,
+              y: py,
+              targetX: px,
+              targetY: py,
+              radius: isMobile ? 10 : 12.5,
+              color: proj?.featured ? '#FF6B35' : '#F3EFE7',
+              parentId: activeSubObj.id,
+              superClusterId: activeSubObj.parentId,
+              subClusterId: activeSubObj.id,
+              project: proj,
+            });
+          });
+        }
       }
     } else {
       // ---------------------------------------------------------------------
-      // FULL CONSTELLATION: Balanced Symmetrical Topology (Zero Label Overlaps)
-      // Left Wing: 9 Backend Projects | Center: Root & Supers | Right Wing: 9 Frontend Projects
+      // CONSTELLATION VIEW: All 18 Systems in Symmetrical Orbital Lanes
+      // Left Wing: 9 Backend Systems | Center: Core | Right Wing: 9 Frontend Systems
       // ---------------------------------------------------------------------
-      const centerX = width / 2;
-
-      // 1. Root Core in Center
+      // Root Core
       list.push({
         id: 'root',
         type: 'root',
@@ -342,15 +467,15 @@ export const SystemsCodeGraph: React.FC = () => {
         y: centerY,
         targetX: centerX,
         targetY: centerY,
-        radius: isMobile ? 18 : 23,
+        radius: isMobile ? 18 : 22,
         color: '#F3EFE7',
         count: 18,
       });
 
-      // 2. Super Clusters Left & Right
-      const superSpread = Math.min(130, width * 0.12);
+      // Super Clusters Left & Right
+      const superSpread = Math.min(130, width * 0.16);
       SUPER_CLUSTERS.forEach((sc, i) => {
-        const isLeft = i === 0;
+        const isLeft = sc.id === 'cluster-backend';
         const sx = centerX + (isLeft ? -superSpread : superSpread);
         const sy = centerY;
 
@@ -363,36 +488,29 @@ export const SystemsCodeGraph: React.FC = () => {
           y: sy,
           targetX: sx,
           targetY: sy,
-          radius: isMobile ? 16 : 19,
+          radius: isMobile ? 15 : 18,
           color: sc.accentColor,
           parentId: 'root',
           superClusterId: sc.id,
-          count: 9,
+          count: sc.count,
         });
       });
 
-      // 3. Monotonic Vertical Project Stratification
-      // 9 Backend Projects on Left, 9 Frontend Projects on Right
-      const topPad = isMobile ? 45 : 60;
+      // Monotonic Vertical Stratification (9 left, 9 right)
+      const topPad = isMobile ? 40 : 54;
       const vertSpan = height - topPad * 2;
-      const vertStep = vertSpan / 8; // Exactly 8 intervals for 9 items = ~65px-72px per slot
+      const vertStep = vertSpan / 8; // 9 positions
+      const projSpread = Math.min(width * 0.36, (width / 2) - 105);
+      const subSpread = projSpread * 0.52;
 
-      // Balanced horizontal spread ensuring at least 140px margin from canvas borders
-      const projSpread = Math.min(width * 0.36, (width / 2) - 130);
-      const subSpread = projSpread * 0.58;
-
-      // --- Left Wing: Backend Sub-Clusters & Projects ---
+      // Backend (Left)
       const backendSubs = SUB_CLUSTERS.filter((s) => s.parentId === 'cluster-backend');
-      let backendGlobalProjIdx = 0;
-
+      let bIdx = 0;
       backendSubs.forEach((sub) => {
-        const subProjCount = sub.projectSlugs.length;
-
-        // Calculate each project node's exact position
         const childYs: number[] = [];
         sub.projectSlugs.forEach((slug) => {
           const proj = projectMap.get(slug);
-          const py = topPad + backendGlobalProjIdx * vertStep;
+          const py = topPad + bIdx * vertStep;
           const px = centerX - projSpread;
           childYs.push(py);
 
@@ -412,43 +530,37 @@ export const SystemsCodeGraph: React.FC = () => {
             subClusterId: sub.id,
             project: proj,
           });
-
-          backendGlobalProjIdx++;
+          bIdx++;
         });
 
-        // Sub-cluster Y is the exact centroid of its child projects
-        const subCentroidY = childYs.reduce((a, b) => a + b, 0) / childYs.length;
+        const subY = childYs.reduce((a, b) => a + b, 0) / childYs.length;
         const subX = centerX - subSpread;
-
         list.push({
           id: sub.id,
           type: 'sub',
           label: sub.shortLabel,
-          sublabel: `${subProjCount} Systems`,
+          sublabel: `${sub.projectSlugs.length} Systems`,
           x: subX,
-          y: subCentroidY,
+          y: subY,
           targetX: subX,
-          targetY: subCentroidY,
-          radius: isMobile ? 12 : 15,
+          targetY: subY,
+          radius: isMobile ? 11 : 14,
           color: sub.accentColor,
           parentId: 'cluster-backend',
           superClusterId: 'cluster-backend',
           subClusterId: sub.id,
-          count: subProjCount,
+          count: sub.projectSlugs.length,
         });
       });
 
-      // --- Right Wing: Frontend Sub-Clusters & Projects ---
+      // Frontend (Right)
       const frontendSubs = SUB_CLUSTERS.filter((s) => s.parentId === 'cluster-frontend');
-      let frontendGlobalProjIdx = 0;
-
+      let fIdx = 0;
       frontendSubs.forEach((sub) => {
-        const subProjCount = sub.projectSlugs.length;
-
         const childYs: number[] = [];
         sub.projectSlugs.forEach((slug) => {
           const proj = projectMap.get(slug);
-          const py = topPad + frontendGlobalProjIdx * vertStep;
+          const py = topPad + fIdx * vertStep;
           const px = centerX + projSpread;
           childYs.push(py);
 
@@ -462,43 +574,40 @@ export const SystemsCodeGraph: React.FC = () => {
             targetX: px,
             targetY: py,
             radius: isMobile ? 8 : 10,
-            color: proj?.featured ? '#FF6B35' : '#F3EFE7',
+            color: proj?.featured ? '#82B7FF' : '#F3EFE7',
             parentId: sub.id,
             superClusterId: sub.parentId,
             subClusterId: sub.id,
             project: proj,
           });
-
-          frontendGlobalProjIdx++;
+          fIdx++;
         });
 
-        // Sub-cluster Y is centroid of its children
-        const subCentroidY = childYs.reduce((a, b) => a + b, 0) / childYs.length;
+        const subY = childYs.reduce((a, b) => a + b, 0) / childYs.length;
         const subX = centerX + subSpread;
-
         list.push({
           id: sub.id,
           type: 'sub',
           label: sub.shortLabel,
-          sublabel: `${subProjCount} Systems`,
+          sublabel: `${sub.projectSlugs.length} Systems`,
           x: subX,
-          y: subCentroidY,
+          y: subY,
           targetX: subX,
-          targetY: subCentroidY,
-          radius: isMobile ? 12 : 15,
+          targetY: subY,
+          radius: isMobile ? 11 : 14,
           color: sub.accentColor,
           parentId: 'cluster-frontend',
           superClusterId: 'cluster-frontend',
           subClusterId: sub.id,
-          count: subProjCount,
+          count: sub.projectSlugs.length,
         });
       });
     }
 
     return list;
-  }, [dimensions, viewMode, selectedSuperCluster, selectedSubCluster, projectMap]);
+  }, [canvasDim, viewMode, selectedSuperCluster, selectedSubCluster, projectMap]);
 
-  // Node Drag Handler (pure tactile pointer movement; zero wheel trapping)
+  // Pointer drag logic
   const handlePointerDown = (id: string, e: React.PointerEvent) => {
     e.stopPropagation();
     setDraggedNodeId(id);
@@ -525,7 +634,6 @@ export const SystemsCodeGraph: React.FC = () => {
     }
   };
 
-  // Helper to obtain current visual position (respects active pointer drag)
   const getNodePos = useCallback(
     (node: SimNode) => {
       if (draggedNodeId === node.id && dragPos) {
@@ -539,7 +647,7 @@ export const SystemsCodeGraph: React.FC = () => {
   // Node Click Handlers
   const handleNodeClick = (node: SimNode) => {
     if (node.type === 'root') {
-      setSelectedSuperCluster('cluster-backend');
+      setSelectedSuperCluster(null);
       setSelectedSubCluster(null);
       return;
     }
@@ -554,23 +662,43 @@ export const SystemsCodeGraph: React.FC = () => {
 
     if (node.type === 'sub') {
       setSelectedSubCluster(node.id);
-      setSelectedSuperCluster(node.superClusterId || 'cluster-backend');
+      setSelectedSuperCluster(node.superClusterId || null);
       return;
     }
 
     if (node.type === 'project' && node.project) {
       setSelectedProjectSlug(node.project.slug);
-      setSelectedSubCluster(node.subClusterId || null);
+      if (node.subClusterId) setSelectedSubCluster(node.subClusterId);
       if (node.superClusterId) setSelectedSuperCluster(node.superClusterId);
     }
   };
 
-  // Active inspected project for the integrated panel
+  // Currently inspected project
   const activeProject = useMemo(() => {
     if (selectedProjectSlug) return projectMap.get(selectedProjectSlug) || null;
     if (hoveredNodeId) return projectMap.get(hoveredNodeId) || null;
     return allProjects[0] || null;
   }, [selectedProjectSlug, hoveredNodeId, projectMap]);
+
+  // Active Cluster Systems (for Right Panel State A)
+  const activeClusterProjects = useMemo(() => {
+    if (selectedSubCluster) {
+      const sub = SUB_CLUSTERS.find((s) => s.id === selectedSubCluster);
+      if (sub) {
+        return sub.projectSlugs
+          .map((slug) => projectMap.get(slug))
+          .filter((p): p is Project => p !== undefined);
+      }
+    }
+    if (selectedSuperCluster) {
+      const subs = SUB_CLUSTERS.filter((s) => s.parentId === selectedSuperCluster);
+      const slugs = subs.flatMap((s) => s.projectSlugs);
+      return slugs
+        .map((slug) => projectMap.get(slug))
+        .filter((p): p is Project => p !== undefined);
+    }
+    return allProjects;
+  }, [selectedSubCluster, selectedSuperCluster, projectMap]);
 
   // Node Opacity based on hover, tech filter, and active branch
   const getNodeOpacity = useCallback(
@@ -587,7 +715,7 @@ export const SystemsCodeGraph: React.FC = () => {
         const hoveredNode = nodes.find((n) => n.id === hoveredNodeId);
         const isParent = hoveredNode?.parentId === node.id || hoveredNode?.superClusterId === node.id;
         if (!isConnected && !isParent && node.type !== 'root') {
-          return 0.2;
+          return 0.22;
         }
       }
 
@@ -619,8 +747,8 @@ export const SystemsCodeGraph: React.FC = () => {
 
   return (
     <div
-      ref={containerRef}
-      className="relative w-full border border-[#F3EFE7]/[0.1] bg-[#070B12] text-[#F3EFE7] overflow-hidden select-none"
+      ref={rootRef}
+      className="relative w-full border border-[#F3EFE7]/[0.1] bg-[#070B12] text-[#F3EFE7] overflow-hidden select-none shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
     >
       {/* Precision Corner Crosshair Fiducials */}
       <GridCrosshair className="absolute top-2 left-2 z-30 opacity-40 text-[#82B7FF]" />
@@ -628,120 +756,98 @@ export const SystemsCodeGraph: React.FC = () => {
       <GridCrosshair className="absolute bottom-2 left-2 z-30 opacity-40 text-[#82B7FF]" />
       <GridCrosshair className="absolute bottom-2 right-2 z-30 opacity-40 text-[#82B7FF]" />
 
-      {/* Top Swiss Hairline Accent */}
-      <div className="pointer-events-none absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#82B7FF] via-[#FF6B35] to-transparent z-30" />
+      {/* Top Hairline Amber/Cyan Accent */}
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#82B7FF] via-[#FF6B35] to-[#F5D998] z-30" />
 
       {/* =====================================================================
-          TOP CONTROLS & BREADCRUMB BAR (Built into Web Application)
+          TOP CONTROLS & BREADCRUMB BAR (Never Get Lost)
           ===================================================================== */}
-      <div className="relative z-20 flex flex-col md:flex-row md:items-center justify-between gap-3 px-5 py-3.5 border-b border-[#F3EFE7]/[0.08] bg-[#070B12]/95 backdrop-blur-md">
+      <div className="relative z-20 flex flex-col md:flex-row md:items-center justify-between gap-3 px-5 py-3 border-b border-[#F3EFE7]/[0.08] bg-[#070B12]/95 backdrop-blur-md">
         
-        {/* Left Side: Interactive Horizontal Path Breadcrumbs (Scrollable on Mobile with hidden scrollbar) */}
-        <div
-          className="flex items-center gap-1.5 overflow-x-auto py-0.5 text-xs [&::-webkit-scrollbar]:hidden"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
+        {/* Left Side: Clickable Breadcrumbs + Reset View Button */}
+        <div className="flex items-center gap-2 overflow-x-auto py-0.5 text-xs scrollbar-none">
           <button
+            type="button"
             onClick={() => {
-              setViewMode('constellation');
+              setSelectedSuperCluster(null);
+              setSelectedSubCluster(null);
+              setSelectedProjectSlug(null);
+              setViewMode('guided');
             }}
             className="flex items-center gap-1.5 px-2.5 py-1 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] transition-colors cursor-pointer shrink-0 font-medium"
+            title="Reset to Root Systems View"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-[#4CC38A]" />
             <span>All Systems</span>
             <span className="font-mono text-[11px] opacity-75">(18)</span>
           </button>
 
-          <span className="text-[#7A889B] shrink-0">→</span>
-          <button
-            onClick={() => {
-              setSelectedSubCluster(null);
-              setViewMode('hierarchy');
-            }}
-            className="px-2.5 py-1 bg-[#101B30] hover:bg-[#17243A] text-[#FF6B35] border border-[#FF6B35]/30 rounded-[2px] transition-colors font-medium cursor-pointer shrink-0"
-          >
-            {selectedSuperCluster === 'cluster-backend' ? 'Backend & AI' : 'Frontend & Spatial'}
-            <span className="ml-1 font-mono text-[11px] opacity-75">(9)</span>
-          </button>
+          {selectedSuperCluster && (
+            <>
+              <span className="text-[#7A889B] shrink-0">/</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedSubCluster(null);
+                  setSelectedProjectSlug(null);
+                }}
+                className="px-2 py-0.5 bg-[#101B30] hover:bg-[#17243A] text-[#FF6B35] border border-[#FF6B35]/30 rounded-[2px] transition-colors font-medium cursor-pointer shrink-0"
+              >
+                {selectedSuperCluster === 'cluster-backend' ? 'Backend & AI' : 'Frontend & Spatial'}
+              </button>
+            </>
+          )}
 
           {selectedSubCluster && (
             <>
-              <span className="text-[#7A889B] shrink-0">→</span>
-              <span className="px-2.5 py-1 bg-[#101B30] text-[#F5D998] border border-[#F5D998]/30 rounded-[2px] font-medium shrink-0">
+              <span className="text-[#7A889B] shrink-0">/</span>
+              <span className="px-2 py-0.5 bg-[#101B30] text-[#F5D998] border border-[#F5D998]/30 rounded-[2px] font-medium shrink-0">
                 {SUB_CLUSTERS.find((s) => s.id === selectedSubCluster)?.shortLabel}
               </span>
             </>
           )}
 
-          {activeProject && (
+          {selectedProjectSlug && activeProject && (
             <>
-              <span className="text-[#7A889B] shrink-0">→</span>
-              <span className="px-2.5 py-1 bg-[#FF6B35]/20 text-[#F3EFE7] border border-[#FF6B35]/40 rounded-[2px] font-semibold truncate max-w-[180px] shrink-0">
+              <span className="text-[#7A889B] shrink-0">/</span>
+              <span className="px-2.5 py-0.5 bg-[#FF6B35]/20 text-[#F3EFE7] border border-[#FF6B35]/40 rounded-[2px] font-semibold truncate max-w-[160px] shrink-0">
                 {activeProject.title.split('—')[0].trim()}
               </span>
             </>
           )}
+
+          {/* Reset View Button */}
+          {(selectedSuperCluster || selectedSubCluster || selectedProjectSlug || techFilter !== 'all') && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedSuperCluster(null);
+                setSelectedSubCluster(null);
+                setSelectedProjectSlug(null);
+                setTechFilter('all');
+              }}
+              className="ml-1 text-[11px] font-mono text-[#A7B2C3] hover:text-[#FF6B35] transition-colors inline-flex items-center gap-1 cursor-pointer shrink-0"
+              title="Reset entire view"
+            >
+              <span>↺</span>
+              <span>Reset</span>
+            </button>
+          )}
         </div>
 
-        {/* Right Side: View Mode & Stack Filters */}
-        <div className="flex items-center flex-wrap gap-2 shrink-0">
-          {/* Quick Domain Switcher (When in Hierarchy Mode) */}
-          {viewMode === 'hierarchy' && (
-            <div className="flex items-center border border-[#F3EFE7]/15 bg-[#101B30] rounded-[2px] overflow-hidden text-xs">
-              <button
-                onClick={() => {
-                  setSelectedSuperCluster('cluster-backend');
-                  setSelectedSubCluster('sub-cv-medical');
-                }}
-                className={`px-2.5 py-1 transition-colors cursor-pointer font-medium ${
-                  selectedSuperCluster === 'cluster-backend' ? 'bg-[#FF6B35] text-[#070B12] font-semibold' : 'text-[#A7B2C3] hover:text-[#F3EFE7]'
-                }`}
-              >
-                Backend &amp; AI
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedSuperCluster('cluster-frontend');
-                  setSelectedSubCluster('sub-spatial-3d');
-                }}
-                className={`px-2.5 py-1 transition-colors cursor-pointer font-medium border-l border-[#F3EFE7]/15 ${
-                  selectedSuperCluster === 'cluster-frontend' ? 'bg-[#82B7FF] text-[#070B12] font-semibold' : 'text-[#A7B2C3] hover:text-[#F3EFE7]'
-                }`}
-              >
-                Frontend &amp; Spatial
-              </button>
-            </div>
-          )}
-
-          {/* View Mode Switcher */}
-          <div className="flex items-center border border-[#F3EFE7]/15 bg-[#101B30] rounded-[2px] overflow-hidden text-xs">
-            <button
-              onClick={() => setViewMode('hierarchy')}
-              className={`px-3 py-1.5 transition-colors cursor-pointer font-medium ${
-                viewMode === 'hierarchy' ? 'bg-[#FF6B35] text-[#070B12] font-semibold' : 'text-[#A7B2C3] hover:text-[#F3EFE7]'
-              }`}
-            >
-              Hierarchy Drill-Down
-            </button>
-            <button
-              onClick={() => setViewMode('constellation')}
-              className={`px-3 py-1.5 transition-colors cursor-pointer font-medium ${
-                viewMode === 'constellation' ? 'bg-[#82B7FF] text-[#070B12] font-semibold' : 'text-[#A7B2C3] hover:text-[#F3EFE7]'
-              }`}
-            >
-              Full Constellation <span className="font-mono text-[11px]">(18)</span>
-            </button>
-          </div>
-
-          {/* Quick Filter Pills (Hidden on very narrow mobile screens to save space) */}
-          <div className="hidden xl:flex items-center gap-1">
+        {/* Center/Right: Stack Filter Pills & View Mode Toggle */}
+        <div className="flex items-center flex-wrap gap-2.5 shrink-0">
+          
+          {/* Tech Filter Pills */}
+          <div className="hidden sm:flex items-center gap-1">
             {TECH_FILTERS.map((tf) => (
               <button
                 key={tf.id}
+                type="button"
                 onClick={() => setTechFilter(tf.id)}
-                className={`px-2 py-1 text-[11px] font-sans rounded-[2px] border transition-colors cursor-pointer ${
+                className={`px-2 py-0.5 text-[11px] font-mono rounded-[2px] border transition-colors cursor-pointer ${
                   techFilter === tf.id
-                    ? 'bg-[#F3EFE7] text-[#070B12] font-semibold border-[#F3EFE7]'
+                    ? 'bg-[#FF6B35] text-[#070B12] font-semibold border-[#FF6B35]'
                     : 'text-[#A7B2C3] border-transparent hover:border-[#F3EFE7]/20 hover:text-[#F3EFE7]'
                 }`}
               >
@@ -749,321 +855,376 @@ export const SystemsCodeGraph: React.FC = () => {
               </button>
             ))}
           </div>
+
+          {/* View Mode Toggle: [Guided Cluster View] vs [All 18 Nodes Constellation] */}
+          <div className="flex items-center border border-[#F3EFE7]/15 bg-[#101B30] rounded-[2px] overflow-hidden text-xs">
+            <button
+              type="button"
+              onClick={() => setViewMode('guided')}
+              className={`px-3 py-1 transition-colors cursor-pointer font-medium ${
+                viewMode === 'guided'
+                  ? 'bg-[#FF6B35] text-[#070B12] font-semibold'
+                  : 'text-[#A7B2C3] hover:text-[#F3EFE7]'
+              }`}
+            >
+              Guided Cluster View
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('constellation')}
+              className={`px-3 py-1 transition-colors cursor-pointer font-medium border-l border-[#F3EFE7]/15 ${
+                viewMode === 'constellation'
+                  ? 'bg-[#82B7FF] text-[#070B12] font-semibold'
+                  : 'text-[#A7B2C3] hover:text-[#F3EFE7]'
+              }`}
+            >
+              All 18 Nodes Constellation
+            </button>
+          </div>
         </div>
       </div>
 
       {/* =====================================================================
-          INTERACTIVE CODEGRAPH STAGE (Zero Wheel Trapping; Pure Page Flow)
+          SPLIT-SCREEN "VECTOR DATABASE STUDIO" LAYOUT (68% Canvas / 32% Inspector)
           ===================================================================== */}
-      <div
-        className="relative w-full overflow-hidden"
-        style={{ height: `${dimensions.height}px` }}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-      >
-        <svg
-          ref={svgRef}
-          className="w-full h-full block"
-          style={{ touchAction: 'pan-y' }}
+      <div className="relative w-full flex flex-col lg:flex-row items-stretch lg:h-[640px]">
+        
+        {/* LEFT 68% (Desktop): Interactive Orbital Vector Canvas */}
+        <div
+          ref={canvasContainerRef}
+          className="relative w-full lg:w-[68%] h-[480px] lg:h-full bg-[#070B12] overflow-hidden"
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
         >
-          <defs>
-            <radialGradient id="stageGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#101B30" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#070B12" stopOpacity="0" />
-            </radialGradient>
+          <svg
+            ref={svgRef}
+            className="w-full h-full block"
+            style={{ touchAction: 'pan-y' }}
+          >
+            <defs>
+              <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
 
-            <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
+            {/* Concentric Latent Coordinate Rings */}
+            <circle cx={canvasDim.width / 2} cy={canvasDim.height / 2} r={80} fill="none" stroke="rgba(167, 178, 195, 0.05)" strokeDasharray="3 6" />
+            <circle cx={canvasDim.width / 2} cy={canvasDim.height / 2} r={170} fill="none" stroke="rgba(167, 178, 195, 0.04)" strokeDasharray="4 8" />
+            <circle cx={canvasDim.width / 2} cy={canvasDim.height / 2} r={260} fill="none" stroke="rgba(167, 178, 195, 0.03)" strokeDasharray="4 8" />
+            <circle cx={canvasDim.width / 2} cy={canvasDim.height / 2} r={350} fill="none" stroke="rgba(167, 178, 195, 0.02)" strokeDasharray="4 8" />
+            
+            {/* Subtle Structural Axis Lines */}
+            <line x1="0" y1={canvasDim.height / 2} x2={canvasDim.width} y2={canvasDim.height / 2} stroke="rgba(167, 178, 195, 0.04)" strokeWidth="1" />
+            <line x1={canvasDim.width / 2} y1="0" x2={canvasDim.width / 2} y2={canvasDim.height} stroke="rgba(167, 178, 195, 0.04)" strokeWidth="1" />
 
-          {/* Concentric Latent Radial Rings */}
-          <circle cx={dimensions.width / 2} cy={dimensions.height / 2} r={130} fill="none" stroke="rgba(167, 178, 195, 0.05)" strokeDasharray="4 8" />
-          <circle cx={dimensions.width / 2} cy={dimensions.height / 2} r={260} fill="none" stroke="rgba(167, 178, 195, 0.04)" strokeDasharray="4 8" />
-          
-          {/* Subtle Structural Axis */}
-          <line x1="0" y1={dimensions.height / 2} x2={dimensions.width} y2={dimensions.height / 2} stroke="rgba(167, 178, 195, 0.05)" strokeWidth="1" />
-          <line x1={dimensions.width / 2} y1="0" x2={dimensions.width / 2} y2={dimensions.height} stroke="rgba(167, 178, 195, 0.05)" strokeWidth="1" />
+            {/* 1. Hierarchy Parent-to-Child Edges & Streaming Data Packets */}
+            {nodes.map((child) => {
+              if (!child.parentId) return null;
+              const parent = nodes.find((n) => n.id === child.parentId);
+              if (!parent) return null;
 
-          {/* 1. Hierarchy Parent-to-Child Edges */}
-          {nodes.map((child) => {
-            if (!child.parentId) return null;
-            const parent = nodes.find((n) => n.id === child.parentId);
-            if (!parent) return null;
+              const childPos = getNodePos(child);
+              const parentPos = getNodePos(parent);
 
-            const childPos = getNodePos(child);
-            const parentPos = getNodePos(parent);
+              const isHovered = hoveredNodeId === child.id || hoveredNodeId === parent.id;
+              const isSelected = selectedProjectSlug === child.id || selectedSubCluster === child.id || selectedSuperCluster === child.id;
+              const active = isHovered || isSelected;
 
-            const isHovered = hoveredNodeId === child.id || hoveredNodeId === parent.id;
-            const isSelected = selectedProjectSlug === child.id || selectedSubCluster === child.id || selectedSuperCluster === child.id;
-            const active = isHovered || isSelected;
+              const midX = (parentPos.x + childPos.x) / 2;
+              const pathD = `M ${parentPos.x} ${parentPos.y} Q ${midX} ${parentPos.y} ${childPos.x} ${childPos.y}`;
 
-            const midX = (parentPos.x + childPos.x) / 2;
-            const pathD = `M ${parentPos.x} ${parentPos.y} Q ${midX} ${parentPos.y} ${childPos.x} ${childPos.y}`;
+              return (
+                <g key={`edge-${parent.id}-${child.id}`} opacity={getNodeOpacity(child)}>
+                  <path
+                    d={pathD}
+                    fill="none"
+                    stroke={active ? child.color : 'rgba(167, 178, 195, 0.16)'}
+                    strokeWidth={active ? 2 : 1}
+                    className="transition-colors duration-200"
+                  />
+                  {active && isVisible && (
+                    <circle
+                      r="2.5"
+                      fill={child.color === '#FF6B35' ? '#F5D998' : '#82B7FF'}
+                      className="pointer-events-none"
+                    >
+                      <animateMotion
+                        path={pathD}
+                        dur="1.8s"
+                        repeatCount="indefinite"
+                        rotate="auto"
+                      />
+                    </circle>
+                  )}
+                </g>
+              );
+            })}
 
-            return (
-              <g key={`edge-${parent.id}-${child.id}`} opacity={getNodeOpacity(child)}>
-                <path
-                  d={pathD}
-                  fill="none"
-                  stroke={active ? child.color : 'rgba(167, 178, 195, 0.18)'}
-                  strokeWidth={active ? 2 : 1}
-                  className="transition-colors duration-200"
+            {/* 2. Semantic Cross-Tech Cosine-Similarity Edges */}
+            {CROSS_TECH_EDGES.map((edge, idx) => {
+              const src = nodes.find((n) => n.id === edge.source);
+              const tgt = nodes.find((n) => n.id === edge.target);
+              if (!src || !tgt) return null;
+
+              const srcPos = getNodePos(src);
+              const tgtPos = getNodePos(tgt);
+
+              const isHovered = hoveredNodeId === src.id || hoveredNodeId === tgt.id;
+              const isSelected = selectedProjectSlug === src.id || selectedProjectSlug === tgt.id;
+              const active = isHovered || isSelected;
+
+              return (
+                <line
+                  key={`cross-${idx}-${edge.source}-${edge.target}`}
+                  x1={srcPos.x}
+                  y1={srcPos.y}
+                  x2={tgtPos.x}
+                  y2={tgtPos.y}
+                  stroke={active ? '#82B7FF' : 'rgba(130, 183, 255, 0.1)'}
+                  strokeWidth={active ? 1.8 : 0.8}
+                  strokeDasharray="4 4"
+                  opacity={active ? 0.95 : 0.18}
+                  className="transition-all duration-300"
                 />
-                {active && (
-                  <circle
-                    r="2.5"
-                    fill={child.color === '#FF6B35' ? '#F5D998' : '#82B7FF'}
-                    className="pointer-events-none"
-                  >
-                    <animateMotion
-                      path={pathD}
-                      dur="1.8s"
-                      repeatCount="indefinite"
-                      rotate="auto"
-                    />
-                  </circle>
-                )}
-              </g>
-            );
-          })}
+              );
+            })}
 
-          {/* 2. Semantic Cross-Cluster Cosine-Similarity Edges */}
-          {CROSS_TECH_EDGES.map((edge, idx) => {
-            const src = nodes.find((n) => n.id === edge.source);
-            const tgt = nodes.find((n) => n.id === edge.target);
-            if (!src || !tgt) return null;
+            {/* 3. Render Graph Nodes */}
+            {nodes.map((node) => {
+              const pos = getNodePos(node);
+              const isHovered = hoveredNodeId === node.id;
+              const isSelected = selectedProjectSlug === node.id || selectedSubCluster === node.id || selectedSuperCluster === node.id;
+              const opacity = getNodeOpacity(node);
 
-            const srcPos = getNodePos(src);
-            const tgtPos = getNodePos(tgt);
-
-            const isHovered = hoveredNodeId === src.id || hoveredNodeId === tgt.id;
-            const isSelected = selectedProjectSlug === src.id || selectedProjectSlug === tgt.id;
-            const active = isHovered || isSelected;
-
-            return (
-              <line
-                key={`cross-${idx}-${edge.source}-${edge.target}`}
-                x1={srcPos.x}
-                y1={srcPos.y}
-                x2={tgtPos.x}
-                y2={tgtPos.y}
-                stroke={active ? '#82B7FF' : 'rgba(130, 183, 255, 0.12)'}
-                strokeWidth={active ? 1.8 : 0.8}
-                strokeDasharray="4 4"
-                opacity={active ? 0.95 : 0.22}
-                className="transition-all duration-300"
-              />
-            );
-          })}
-
-          {/* 3. Render Graph Nodes */}
-          {nodes.map((node) => {
-            const pos = getNodePos(node);
-            const isHovered = hoveredNodeId === node.id;
-            const isSelected = selectedProjectSlug === node.id || selectedSubCluster === node.id || selectedSuperCluster === node.id;
-            const opacity = getNodeOpacity(node);
-
-            return (
-              <g
-                key={node.id}
-                transform={`translate(${pos.x}, ${pos.y})`}
-                opacity={opacity}
-                className="cursor-pointer transition-transform duration-300 ease-out select-none"
-                onMouseEnter={() => setHoveredNodeId(node.id)}
-                onMouseLeave={() => setHoveredNodeId(null)}
-                onClick={() => handleNodeClick(node)}
-                onPointerDown={(e) => handlePointerDown(node.id, e)}
-                tabIndex={0}
-                role="button"
-                aria-label={`${node.label} ${node.type} node`}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleNodeClick(node);
+              return (
+                <g
+                  key={node.id}
+                  transform={`translate(${pos.x}, ${pos.y})`}
+                  opacity={opacity}
+                  className="cursor-pointer transition-transform duration-300 ease-out select-none"
+                  onMouseEnter={() => setHoveredNodeId(node.id)}
+                  onMouseLeave={() => setHoveredNodeId(null)}
+                  onClick={() => handleNodeClick(node)}
+                  onPointerDown={(e) => handlePointerDown(node.id, e)}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${node.label} ${node.type} node`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleNodeClick(node);
+                      if (node.type === 'project' && node.project) {
+                        router.push(`/projects/${node.project.slug}`);
+                      }
+                    }
+                  }}
+                  onDoubleClick={() => {
                     if (node.type === 'project' && node.project) {
                       router.push(`/projects/${node.project.slug}`);
                     }
-                  }
-                }}
-              >
-                {/* Active Rotating Reticle Ring */}
-                {(isHovered || isSelected) && (
+                  }}
+                >
+                  {/* Active Rotating Reticle Ring (Level 3 Target) */}
+                  {(isHovered || isSelected) && (
+                    <circle
+                      r={node.radius + 6}
+                      fill="none"
+                      stroke={node.color}
+                      strokeWidth="1.5"
+                      strokeDasharray="4 3"
+                      className="animate-spin-slow"
+                    />
+                  )}
+
+                  {/* Outer Ring for Clusters */}
+                  {node.type !== 'project' && (
+                    <circle
+                      r={node.radius + 3}
+                      fill="none"
+                      stroke={node.color}
+                      strokeWidth="1"
+                      opacity="0.4"
+                    />
+                  )}
+
+                  {/* Core Node Circle */}
                   <circle
-                    r={node.radius + 6}
-                    fill="none"
+                    r={node.radius}
+                    fill={node.type === 'project' ? (isHovered || isSelected ? node.color : '#101B30') : '#070B12'}
                     stroke={node.color}
-                    strokeWidth="1.5"
-                    strokeDasharray="4 3"
-                    className="animate-spin-slow"
+                    strokeWidth={node.type === 'root' ? 3 : node.type === 'super' ? 2.5 : 2}
+                    filter={isHovered || isSelected ? 'url(#nodeGlow)' : undefined}
                   />
-                )}
 
-                {/* Outer Ring for Clusters */}
-                {node.type !== 'project' && (
-                  <circle
-                    r={node.radius + 3}
-                    fill="none"
-                    stroke={node.color}
-                    strokeWidth="1"
-                    opacity="0.35"
-                  />
-                )}
-
-                {/* Core Node Circle */}
-                <circle
-                  r={node.radius}
-                  fill={node.type === 'project' ? (isHovered || isSelected ? node.color : '#101B30') : '#070B12'}
-                  stroke={node.color}
-                  strokeWidth={node.type === 'root' ? 3 : node.type === 'super' ? 2.5 : 2}
-                  filter={isHovered || isSelected ? 'url(#nodeGlow)' : undefined}
-                />
-
-                {/* Count Badge inside Clusters */}
-                {node.count !== undefined && (
-                  <text
-                    y="1"
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill={node.type === 'root' ? '#070B12' : '#F3EFE7'}
-                    fontSize={node.type === 'root' ? '12' : '10'}
-                    fontFamily="monospace"
-                    fontWeight="600"
-                    className="pointer-events-none select-none"
-                  >
-                    {node.count}
-                  </text>
-                )}
-
-                {/* Project Center Dot */}
-                {node.type === 'project' && (
-                  <circle
-                    r="3.5"
-                    fill={isHovered || isSelected ? '#070B12' : node.color}
-                    className="pointer-events-none"
-                  >
-                    {isHovered && <animate attributeName="r" values="3.5;5;3.5" dur="1.2s" repeatCount="indefinite" />}
-                  </circle>
-                )}
-
-                {/* Node Label with High-Contrast Text Halo */}
-                <g className="pointer-events-none select-none">
-                  <text
-                    y={node.radius + 13}
-                    textAnchor="middle"
-                    fill="#F3EFE7"
-                    stroke="#070B12"
-                    strokeWidth="3.5"
-                    style={{ paintOrder: 'stroke fill' }}
-                    fontSize={node.type === 'super' ? '12.5' : node.type === 'sub' ? '11.5' : '11'}
-                    fontFamily={node.type === 'super' ? 'Geist Serif, serif' : 'Geist, sans-serif'}
-                    fontWeight={node.type === 'super' ? '500' : '400'}
-                    className="tracking-tight"
-                  >
-                    {node.label}
-                  </text>
-
-                  {/* Distinction / Highlight for Project Nodes */}
-                  {node.project && (
+                  {/* Count Badge inside Clusters */}
+                  {node.count !== undefined && (
                     <text
-                      y={node.radius + 24}
+                      y="1"
                       textAnchor="middle"
-                      fill="#F5D998"
-                      stroke="#070B12"
-                      strokeWidth="3"
-                      style={{ paintOrder: 'stroke fill' }}
-                      fontSize="9"
+                      dominantBaseline="middle"
+                      fill={node.type === 'root' ? '#070B12' : '#F3EFE7'}
+                      fontSize={node.type === 'root' ? '12' : '10'}
                       fontFamily="monospace"
-                      className="tracking-wider opacity-90"
+                      fontWeight="600"
+                      className="pointer-events-none select-none"
                     >
-                      {node.project.highlight}
+                      {node.count}
                     </text>
                   )}
-                </g>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
 
-      {/* =====================================================================
-          INTEGRATED ARCHITECTURAL SYSTEM INSPECTION DRAWER (Built into Page Grid)
-          ===================================================================== */}
-      {activeProject ? (
-        <div className="border-t border-[#F3EFE7]/[0.1] bg-[#0A101C] p-6 sm:p-8 relative">
-          <GridCrosshair className="absolute top-2 right-2 opacity-50 text-[#82B7FF]" />
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-            {/* Left Column (65% Width — Title, Domain & Executive Summary) */}
-            <div className="lg:col-span-8 space-y-3">
-              <div className="flex items-center gap-2.5 text-xs text-[#8A99AD] font-sans">
-                <span className="text-[#FF6B35] font-medium">{activeProject.category}</span>
-                <span className="text-[#7A889B] select-none">·</span>
-                <span className="text-[#82B7FF] font-mono">Year {activeProject.year}</span>
-                <span className="text-[#7A889B] select-none">·</span>
-                <span className="text-[#4CC38A]">Verified Production System</span>
-              </div>
-
-              <h4 className="text-xl sm:text-2xl font-serif text-[#F3EFE7] tracking-tight font-normal">
-                {activeProject.title}
-              </h4>
-
-              <div className="text-xs sm:text-sm font-mono text-[#F5D998] font-medium flex items-center gap-2">
-                <span className="text-[#FF6B35]">★</span>
-                <span>{activeProject.highlight}</span>
-              </div>
-
-              <p className="text-xs sm:text-sm font-sans text-[#A7B2C3] leading-relaxed max-w-3xl pt-1">
-                {activeProject.description}
-              </p>
-
-              {/* Related Cosine-Similarity Cross-Links */}
-              {relatedNeighbors.length > 0 && (
-                <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
-                  <span className="text-[#7A889B] font-medium">Related Architecture:</span>
-                  {relatedNeighbors.map((rn, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        if (rn.project) setSelectedProjectSlug(rn.project.slug);
-                      }}
-                      className="px-2.5 py-1 bg-[#101B30] hover:bg-[#17243A] text-[#82B7FF] border border-[#82B7FF]/20 rounded-[2px] transition-colors cursor-pointer text-xs font-sans flex items-center gap-1.5"
+                  {/* Project Center Dot */}
+                  {node.type === 'project' && (
+                    <circle
+                      r="3.5"
+                      fill={isHovered || isSelected ? '#070B12' : node.color}
+                      className="pointer-events-none"
                     >
-                      <span className="font-medium text-[#F3EFE7]">{rn.project?.title.split('—')[0].trim()}</span>
-                      <span className="text-[#7A889B] font-mono text-[10px]">({rn.tech})</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+                      {isHovered && <animate attributeName="r" values="3.5;5;3.5" dur="1.2s" repeatCount="indefinite" />}
+                    </circle>
+                  )}
 
-            {/* Right Column (35% Width — Tech Stack & Direct Route Actions) */}
-            <div className="lg:col-span-4 space-y-4 lg:border-l lg:border-[#F3EFE7]/[0.08] lg:pl-8">
-              <div className="space-y-2">
-                <span className="text-[11px] font-mono text-[#7A889B] uppercase tracking-wider block">
-                  Core Technologies
-                </span>
-                {/* Clean middle-dot typographic format per GEMINI.md Rule 9 */}
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#C4CDD8] font-sans">
-                  {activeProject.stack.split(',').map((tech, i, arr) => (
-                    <React.Fragment key={i}>
-                      <span className="text-[#F3EFE7] font-medium">{tech.trim()}</span>
-                      {i < arr.length - 1 && <span className="text-[#8A99AD] select-none">·</span>}
-                    </React.Fragment>
-                  ))}
+                  {/* Node Label with High-Contrast Text Halo */}
+                  <g className="pointer-events-none select-none">
+                    <text
+                      y={node.radius + 13}
+                      textAnchor="middle"
+                      fill="#F3EFE7"
+                      stroke="#070B12"
+                      strokeWidth="3.5"
+                      style={{ paintOrder: 'stroke fill' }}
+                      fontSize={node.type === 'super' ? '12.5' : node.type === 'sub' ? '11.5' : '11'}
+                      fontFamily={node.type === 'super' ? 'Geist Serif, serif' : 'Geist, sans-serif'}
+                      fontWeight={node.type === 'super' ? '500' : '400'}
+                      className="tracking-tight"
+                    >
+                      {node.label}
+                    </text>
+
+                    {/* Distinction / Highlight for Project Nodes */}
+                    {node.project && (
+                      <text
+                        y={node.radius + 24}
+                        textAnchor="middle"
+                        fill="#F5D998"
+                        stroke="#070B12"
+                        strokeWidth="3"
+                        style={{ paintOrder: 'stroke fill' }}
+                        fontSize="9"
+                        fontFamily="monospace"
+                        className="tracking-wider opacity-90"
+                      >
+                        {node.project.highlight}
+                      </text>
+                    )}
+                  </g>
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Interactive Hint Banner at Bottom-Left of Canvas */}
+          <div className="absolute bottom-3 left-4 pointer-events-none z-10 flex items-center gap-2 text-[11px] font-mono text-[#7A889B] bg-[#070B12]/80 px-2.5 py-1 rounded-[2px] border border-[#F3EFE7]/10">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B35] animate-pulse" />
+            <span>Click clusters to drill down · Double-click project to open case study</span>
+          </div>
+        </div>
+
+        {/* RIGHT 32% (Desktop): Persistent System Inspector & Directory Panel */}
+        <div className="relative w-full lg:w-[32%] bg-[#0C1322] border-t lg:border-t-0 lg:border-l border-[#A7B2C3]/[0.12] flex flex-col justify-between overflow-y-auto">
+          <GridCrosshair className="absolute top-2 right-2 opacity-30 text-[#82B7FF] pointer-events-none" />
+
+          {/* STATE B: Project Node Selected / Hovered -> Full System Dossier Card */}
+          {selectedProjectSlug && activeProject ? (
+            <div className="p-6 sm:p-7 space-y-5 flex-1 flex flex-col justify-between">
+              <div className="space-y-4">
+                
+                {/* Back to Cluster Directory Button */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedProjectSlug(null)}
+                  className="text-xs font-mono text-[#82B7FF] hover:text-[#FF6B35] transition-colors inline-flex items-center gap-1.5 cursor-pointer pb-1 border-b border-transparent hover:border-[#FF6B35]"
+                >
+                  <span>←</span>
+                  <span>Back to Cluster Directory</span>
+                </button>
+
+                {/* Project Header Meta */}
+                <div className="space-y-1.5 pt-1">
+                  <div className="flex items-center gap-2 text-[11px] font-mono text-[#8A99AD]">
+                    <span className="text-[#FF6B35] font-semibold">{activeProject.category}</span>
+                    <span className="text-[#7A889B]">·</span>
+                    <span className="text-[#82B7FF]">{activeProject.year}</span>
+                    <span className="text-[#7A889B]">·</span>
+                    <span className="text-[#4CC38A]">Verified System</span>
+                  </div>
+
+                  <h4 className="text-xl sm:text-2xl font-serif text-[#F3EFE7] leading-snug tracking-tight">
+                    {activeProject.title}
+                  </h4>
+
+                  {/* Highlight Distinction Badge */}
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#101B30] border border-[#F5D998]/30 rounded-[2px] text-xs font-mono text-[#F5D998] font-medium mt-1">
+                    <span className="text-[#FF6B35]">★</span>
+                    <span>{activeProject.highlight}</span>
+                  </div>
                 </div>
+
+                {/* Architectural Summary */}
+                <p className="text-xs sm:text-[13px] font-sans text-[#A7B2C3] leading-relaxed pt-1">
+                  {activeProject.description}
+                </p>
+
+                {/* Tech Stack (Middle-Dot format per GEMINI.md Rule 9) */}
+                <div className="pt-2 border-t border-[#F3EFE7]/[0.08] space-y-1.5">
+                  <span className="text-[10px] font-mono text-[#7A889B] uppercase tracking-wider block">
+                    Core Architecture &amp; Stack:
+                  </span>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#C4CDD8] font-sans">
+                    {activeProject.stack.split(',').map((tech, i, arr) => (
+                      <React.Fragment key={i}>
+                        <span className="text-[#F3EFE7] font-medium">{tech.trim()}</span>
+                        {i < arr.length - 1 && <span className="text-[#8A99AD] select-none">·</span>}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Related Systems (Cosine-Similarity Recommendations) */}
+                {relatedNeighbors.length > 0 && (
+                  <div className="pt-2 border-t border-[#F3EFE7]/[0.08] space-y-1.5">
+                    <span className="text-[10px] font-mono text-[#7A889B] uppercase tracking-wider block">
+                      Related Architecture:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {relatedNeighbors.slice(0, 3).map((rn, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            if (rn.project) setSelectedProjectSlug(rn.project.slug);
+                          }}
+                          className="px-2 py-0.5 bg-[#101B30] hover:bg-[#17243A] text-[#82B7FF] border border-[#82B7FF]/20 rounded-[2px] transition-colors cursor-pointer text-[11px] font-sans flex items-center gap-1"
+                        >
+                          <span className="text-[#F3EFE7]">{rn.project?.title.split('—')[0].trim()}</span>
+                          <span className="text-[#7A889B] font-mono text-[9.5px]">({rn.tech})</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="pt-2 flex flex-col sm:flex-row lg:flex-col gap-2.5">
+              {/* Action Buttons: Solid #FF6B35 Primary CTA + Secondary Link */}
+              <div className="pt-5 border-t border-[#F3EFE7]/[0.08] space-y-2">
                 <Link
                   href={`/projects/${activeProject.slug}`}
-                  className="w-full py-3 px-5 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] text-xs font-sans font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 select-none cursor-pointer rounded-[2px]"
+                  className="w-full py-3 px-4 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] text-xs font-mono font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 select-none cursor-pointer rounded-[2px] shadow-[0_0_15px_rgba(255,107,53,0.25)]"
                 >
-                  <span>Open Deep Technical Case Study</span>
+                  <span>Launch Full Case Study</span>
                   <span>→</span>
                 </Link>
 
@@ -1072,7 +1233,7 @@ export const SystemsCodeGraph: React.FC = () => {
                     href={activeProject.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-2.5 px-4 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 text-xs font-sans font-medium transition-colors flex items-center justify-center gap-2 select-none cursor-pointer rounded-[2px]"
+                    className="w-full py-2.5 px-4 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 text-xs font-mono font-medium transition-colors flex items-center justify-center gap-2 select-none cursor-pointer rounded-[2px]"
                   >
                     <span>View Repository Source</span>
                     <span>↗</span>
@@ -1080,24 +1241,94 @@ export const SystemsCodeGraph: React.FC = () => {
                 )}
               </div>
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="border-t border-[#F3EFE7]/[0.1] bg-[#0A101C] p-6 text-center text-xs font-sans text-[#7A889B]">
-          Active Vector Topology: 18 Systems Indexed. Click any node above to inspect architecture benchmarks and open case studies.
-        </div>
-      )}
+          ) : (
+            /* STATE A: Cluster Selected / Idle -> List of Systems in Active Cluster */
+            <div className="p-5 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
+              <div className="space-y-4">
+                {/* Active Cluster Title & Meta */}
+                <div className="space-y-1 pb-3 border-b border-[#F3EFE7]/[0.08]">
+                  <div className="text-[10px] font-mono text-[#7A889B] uppercase tracking-wider">
+                    {selectedSubCluster
+                      ? 'ACTIVE SUB-DOMAIN DIRECTORY'
+                      : selectedSuperCluster
+                      ? 'ACTIVE SUPER-CLUSTER DIRECTORY'
+                      : 'SYSTEMS ARCHITECTURE INDEX'}
+                  </div>
+                  <h4 className="text-lg font-serif text-[#F3EFE7]">
+                    {selectedSubCluster
+                      ? SUB_CLUSTERS.find((s) => s.id === selectedSubCluster)?.label
+                      : selectedSuperCluster
+                      ? SUPER_CLUSTERS.find((s) => s.id === selectedSuperCluster)?.label
+                      : 'All 18 Production Systems'}
+                  </h4>
+                  <p className="text-xs font-sans text-[#A7B2C3]">
+                    {selectedSubCluster
+                      ? SUB_CLUSTERS.find((s) => s.id === selectedSubCluster)?.description
+                      : 'Select any system row below to inspect architectural telemetry and benchmarks.'}
+                  </p>
+                </div>
 
-      {/* Bottom Architectural Datum Line */}
-      <div className="px-5 py-3 border-t border-[#F3EFE7]/[0.08] bg-[#070B12]/95 flex flex-wrap items-center justify-between text-[11px] font-sans text-[#7A889B] gap-2">
+                {/* Clickable Indexed Systems List */}
+                <div className="space-y-1.5 max-h-[380px] overflow-y-auto pr-1">
+                  {activeClusterProjects.map((proj, idx) => {
+                    const isSelected = selectedProjectSlug === proj.slug;
+                    return (
+                      <button
+                        key={proj.slug}
+                        type="button"
+                        onClick={() => {
+                          setSelectedProjectSlug(proj.slug);
+                        }}
+                        onMouseEnter={() => setHoveredNodeId(proj.slug)}
+                        onMouseLeave={() => setHoveredNodeId(null)}
+                        className={`w-full p-2.5 text-left rounded-[2px] border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                          isSelected
+                            ? 'bg-[#17243A] border-[#FF6B35]/40 text-[#F3EFE7]'
+                            : 'bg-[#101B30]/60 hover:bg-[#101B30] border-[#F3EFE7]/[0.06] text-[#A7B2C3] hover:text-[#F3EFE7]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 truncate">
+                          <span className="font-mono text-[11px] text-[#FF6B35] font-semibold shrink-0">
+                            {String(idx + 1).padStart(2, '0')}
+                          </span>
+                          <span className="font-sans text-xs font-medium text-[#F3EFE7] truncate">
+                            {proj.title.split('—')[0].trim()}
+                          </span>
+                        </div>
+                        <div className="shrink-0 flex items-center gap-1.5 text-[10px] font-mono text-[#F5D998]">
+                          <span className="hidden sm:inline opacity-80">{proj.year}</span>
+                          <span className="text-[#FF6B35]">→</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Bottom Quick Help Prompt */}
+              <div className="pt-3 border-t border-[#F3EFE7]/[0.08] text-[11px] font-mono text-[#7A889B] flex items-center justify-between">
+                <span>Total Indexed: {activeClusterProjects.length}</span>
+                <Link href="/projects" className="text-[#FF6B35] hover:text-[#F5D998] transition-colors">
+                  Tabular Ledger →
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom Datum Line */}
+      <div className="px-5 py-2.5 border-t border-[#F3EFE7]/[0.08] bg-[#070B12]/95 flex flex-wrap items-center justify-between text-[11px] font-mono text-[#7A889B] gap-2">
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-[#4CC38A]" />
-          <span>Click any system node to inspect telemetry · Drag nodes to explore topology</span>
+          <span>Vector Latent Coordinates · Deterministic Concentric Orbital Lanes</span>
         </div>
-        <Link href="/projects" className="text-[#FF6B35] hover:text-[#F5D998] transition-colors cursor-pointer font-medium flex items-center gap-1">
-          <span>Searchable Ledger Sheet</span>
-          <span>→</span>
-        </Link>
+        <div className="flex items-center gap-4">
+          <span>18 Verified Systems</span>
+          <Link href="/projects" className="text-[#FF6B35] hover:text-[#F5D998] transition-colors">
+            Open Full Ledger →
+          </Link>
+        </div>
       </div>
     </div>
   );

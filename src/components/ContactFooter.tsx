@@ -22,7 +22,7 @@ export const ContactFooter: React.FC = () => {
   };
 
   return (
-    <footer id="contact" className="relative w-full bg-[#070B12] text-[#F3EFE7]" aria-label="Contact and colophon">
+    <footer id="contact" className="relative w-full bg-transparent text-[#F3EFE7]" aria-label="Contact and colophon">
       <SectionContainer
         variant="editorial"
         bgMode="clean"
@@ -33,7 +33,7 @@ export const ContactFooter: React.FC = () => {
           <h2 className="text-4xl sm:text-6xl lg:text-7xl text-[#F3EFE7] leading-[1.05] tracking-tight">
             <span className="font-raleway font-bold block sm:inline">Have an interesting problem? </span>
             <span className="font-serif italic font-normal text-[#F5D998] block sm:inline">
-              Let’s talk about how I could help.
+              Let’s talk about how I could help
             </span>
           </h2>
 

@@ -200,7 +200,7 @@ export const ScrollyExperience: React.FC = () => {
       <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6 mb-8 sm:mb-10">
         <div className="max-w-2xl space-y-2.5">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
-            Experience &amp; <span className="italic text-[#F5D998]">Proven Systems.</span>
+            Experience
           </h2>
           <p className="text-sm sm:text-base font-sans text-[#A7B2C3] leading-relaxed">
             Autonomous software engineering, deep learning research, and mobility telematics delivered across enterprise workflows, collegiate diagnostics, and venture roadmaps.

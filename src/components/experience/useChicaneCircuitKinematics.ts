@@ -36,6 +36,7 @@ export function useChicaneCircuitKinematics({
 }: UseChicaneCircuitKinematicsProps) {
   const [isMoving, setIsMoving] = useState<boolean>(false);
   const [boost, setBoost] = useState<'normal' | 'high'>('normal');
+  const [isBraking, setIsBraking] = useState<boolean>(false);
 
   // Progress object driven by GSAP
   const progressRef = useRef<{ t: number }>({ t: 0 });
@@ -121,6 +122,7 @@ export function useChicaneCircuitKinematics({
         `translate(${tf.x.toFixed(2)}, ${tf.y.toFixed(2)}) rotate(${tf.angle.toFixed(2)})`
       );
 
+      // Active racing line trailing wake behind car
       if (activeLineRef?.current) {
         activeLineRef.current.setAttribute('stroke-dashoffset', `${(-t * 1400).toFixed(1)}`);
       }
@@ -159,6 +161,7 @@ export function useChicaneCircuitKinematics({
       applyTransform(targetT);
       setIsMoving(false);
       setBoost('normal');
+      setIsBraking(false);
       onArrivalRef.current?.(toIndex);
       return;
     }
@@ -176,19 +179,21 @@ export function useChicaneCircuitKinematics({
       applyTransform(targetT);
       setIsMoving(false);
       setBoost('normal');
+      setIsBraking(false);
       onArrivalRef.current?.(toIndex);
       return;
     }
 
     // =========================================================================
-    // 3.1 FORWARD MOVEMENT (toIndex > fromIndex)
-    // Slower, cinematic progression: 1400ms to 1750ms
+    // 1. FORWARD MOVEMENT (toIndex > fromIndex)
+    // Smoothly accelerate forward: ~700ms, leaning into apexes
     // =========================================================================
     if (toIndex > fromIndex || (currentT < targetT && toIndex === fromIndex)) {
       setIsMoving(true);
       setBoost('normal');
+      setIsBraking(false);
 
-      const duration = Math.max(1.3, Math.min(1.8, 1.15 + Math.abs(toIndex - fromIndex) * 0.16));
+      const duration = 0.70 + Math.abs(toIndex - fromIndex) * 0.08;
 
       const tl = gsap.timeline({
         onComplete: () => {
@@ -196,6 +201,8 @@ export function useChicaneCircuitKinematics({
           applyTransform(targetT);
           setIsMoving(false);
           setBoost('normal');
+          setIsBraking(true);
+          setTimeout(() => setIsBraking(false), 300);
           timelineRef.current = null;
           onArrivalRef.current?.(toIndex);
         },
@@ -215,18 +222,19 @@ export function useChicaneCircuitKinematics({
     }
 
     // =========================================================================
-    // 3.2 NON-REVERSING WRAP-AROUND MOVEMENT (toIndex < fromIndex)
-    // NEVER DRIVE IN REVERSE OR FLIP 180° BACKWARD!
-    // Phase A: Accelerate rightward off the right edge (currentT → 1.07)
-    // Phase B: Instant teleport off-screen left (1.07 → -0.07)
-    // Phase C: Re-enter from left edge and brake onto target (-0.07 → targetT)
+    // 2. NON-REVERSING WRAP-AROUND MOVEMENT (toIndex < fromIndex)
+    // NEVER DRIVE BACKWARD OR FLIP 180° REVERSE!
+    // Phase A: Accelerate rightward off the right edge (currentT → 1.06) in 420ms
+    // Phase B: Instant teleport off-screen left (1.06 → -0.06)
+    // Phase C: Re-enter from left edge and brake onto target (-0.06 → targetT) in 520ms
     // =========================================================================
     setIsMoving(true);
     setBoost('high');
+    setIsBraking(false);
 
-    const exitTargetT = 1.07;
-    const exitDuration = 0.72; // Clearly visible rightward exit acceleration
-    const entryDuration = Math.max(1.15, Math.min(1.5, 1.05 + targetT * 0.35));
+    const exitTargetT = 1.06;
+    const exitDuration = 0.42;
+    const entryDuration = 0.52;
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -234,6 +242,8 @@ export function useChicaneCircuitKinematics({
         applyTransform(targetT);
         setIsMoving(false);
         setBoost('normal');
+        setIsBraking(true);
+        setTimeout(() => setIsBraking(false), 350);
         timelineRef.current = null;
         onArrivalRef.current?.(toIndex);
       },
@@ -251,10 +261,11 @@ export function useChicaneCircuitKinematics({
 
     // Phase B: Instant wrap to left edge
     tl.set(progressRef.current, {
-      t: -0.07,
+      t: -0.06,
       onComplete: () => {
         setBoost('normal');
-        applyTransform(-0.07);
+        setIsBraking(true);
+        applyTransform(-0.06);
       },
     });
 
@@ -281,6 +292,7 @@ export function useChicaneCircuitKinematics({
   return {
     isMoving,
     boost,
+    isBraking,
   };
 }
 

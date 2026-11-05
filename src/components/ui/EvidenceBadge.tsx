@@ -39,7 +39,7 @@ export const EvidenceBadge: React.FC<EvidenceBadgeProps> = ({
       {showTooltip && record && (
         <div
           role="tooltip"
-          className="absolute bottom-full left-0 mb-2 w-72 sm:w-80 p-3.5 rounded-xl bg-[#0D1118] border border-[#7DD3FC]/40 shadow-2xl z-50 text-xs font-sans text-[#E0E0E0] animate-in fade-in duration-150"
+          className="absolute bottom-full left-0 mb-2 w-72 sm:w-80 p-3.5 rounded-[2px] bg-[#070B12] border border-[#FF6B35]/40 shadow-2xl z-50 text-xs font-sans text-[#F3EFE7] animate-in fade-in duration-150"
         >
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 font-mono text-[11px]">
             <span className="text-[#7DD3FC] font-semibold">{record.metricLabel}</span>

@@ -23,7 +23,7 @@ export const BentoHero: React.FC = () => {
   return (
     <section
       id="hero"
-      className="relative w-full h-[100svh] min-h-[100svh] flex flex-col justify-between overflow-hidden bg-[#070B12] text-[#F3EFE7]"
+      className="relative w-full h-[100svh] min-h-[100svh] flex flex-col justify-between overflow-hidden bg-transparent text-[#F3EFE7]"
       aria-label="Ballistic ASCII DNA-Lightbulb Stage and Introduction"
     >
       {/* Ambient Architectural Atmospheric Gradient: Left Orange Radiant Glow */}

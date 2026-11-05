@@ -149,7 +149,7 @@ const AWSSkills = () => {
               <span className="px-3 py-1 rounded-full text-xs font-mono font-medium bg-cine-lavender/15 text-cine-lavender border border-cine-lavender/30">
                 CAS (Chemical Abstracts Service) Work
               </span>
-              <span className="px-3 py-1 rounded-full text-xs font-mono font-medium bg-white/5 text-light-gray/60 border border-white/10">
+              <span className="px-3 py-1 rounded-full text-xs font-mono font-medium bg-white/5 text-light-gray/60 border border-[#F3EFE7]/10">
                 C4 Model
               </span>
             </div>
@@ -168,9 +168,9 @@ const AWSSkills = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-16 sm:mb-20 p-6 sm:p-8 rounded-2xl bg-black/50 backdrop-blur-xl border border-white/10 relative overflow-hidden"
+          className="mb-16 sm:mb-20 p-6 sm:p-8 rounded-[2px] bg-[#101B30]/50 backdrop-blur-xl border border-[#F3EFE7]/10 relative overflow-hidden"
         >
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/10 mb-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-[#F3EFE7]/10 mb-6">
             <div>
               <div className="flex items-center gap-2 text-xs font-mono text-cine-teal uppercase tracking-wider mb-1">
                 <span className="w-2 h-2 rounded-full bg-cine-teal" />
@@ -181,10 +181,10 @@ const AWSSkills = () => {
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-md text-xs font-mono text-light-gray/70 bg-white/5 border border-white/10">
+              <span className="px-3 py-1 rounded-md text-xs font-mono text-light-gray/70 bg-white/5 border border-[#F3EFE7]/10">
                 Trunk-Based CI/CD
               </span>
-              <span className="px-3 py-1 rounded-md text-xs font-mono text-light-gray/70 bg-white/5 border border-white/10">
+              <span className="px-3 py-1 rounded-md text-xs font-mono text-light-gray/70 bg-white/5 border border-[#F3EFE7]/10">
                 Least Privilege IAM
               </span>
             </div>
@@ -192,38 +192,38 @@ const AWSSkills = () => {
 
           {/* Flow Diagram */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+            <div className="p-4 rounded-[2px] bg-white/[0.03] border border-[#F3EFE7]/10 flex flex-col justify-between">
               <span className="text-[11px] font-mono text-cine-lavender mb-2">01 Ingress & Auth</span>
               <h4 className="text-white font-heading font-semibold text-sm mb-1">API Gateway + IAM</h4>
               <p className="text-light-gray/60 text-xs font-sans">JWT token validation, CORS control, and usage rate limits.</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+            <div className="p-4 rounded-[2px] bg-white/[0.03] border border-[#F3EFE7]/10 flex flex-col justify-between">
               <span className="text-[11px] font-mono text-cine-teal mb-2">02 Compute & Buffering</span>
               <h4 className="text-white font-heading font-semibold text-sm mb-1">Lambda + SQS</h4>
               <p className="text-light-gray/60 text-xs font-sans">Event-driven asynchronous compute with queue burst smoothing.</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+            <div className="p-4 rounded-[2px] bg-white/[0.03] border border-[#F3EFE7]/10 flex flex-col justify-between">
               <span className="text-[11px] font-mono text-cine-teal mb-2">03 Foundation AI</span>
               <h4 className="text-white font-heading font-semibold text-sm mb-1">Amazon Bedrock</h4>
               <p className="text-light-gray/60 text-xs font-sans">Managed LLMs for scientific synthesis and semantic extraction.</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+            <div className="p-4 rounded-[2px] bg-white/[0.03] border border-[#F3EFE7]/10 flex flex-col justify-between">
               <span className="text-[11px] font-mono text-cine-lavender mb-2">04 Persistence</span>
               <h4 className="text-white font-heading font-semibold text-sm mb-1">DynamoDB & S3</h4>
               <p className="text-light-gray/60 text-xs font-sans">Sub-10ms metadata indexing + high-durability multi-GB object storage.</p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col justify-between">
+            <div className="p-4 rounded-[2px] bg-white/[0.03] border border-[#F3EFE7]/10 flex flex-col justify-between">
               <span className="text-[11px] font-mono text-cine-teal mb-2">05 Observability</span>
               <h4 className="text-white font-heading font-semibold text-sm mb-1">CloudWatch Alarms</h4>
               <p className="text-light-gray/60 text-xs font-sans">Structured JSON logging, error rate tracking, and SLA alerts.</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-white/10 text-xs font-sans text-light-gray/70">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-[#F3EFE7]/10 text-xs font-sans text-light-gray/70">
             <div className="flex items-start gap-2">
               <span className="text-cine-teal font-mono">✓</span>
               <span><strong>Zero Idle Cost:</strong> Serverless pay-per-execution model eliminated idle cluster operational overhead.</span>
@@ -251,7 +251,7 @@ const AWSSkills = () => {
                 className={`px-3.5 py-1.5 rounded-full text-xs font-sans font-medium transition-all duration-300 border ${
                   isActive
                     ? 'bg-cine-teal/15 border-cine-teal text-white shadow-cine-glow-teal'
-                    : 'bg-black/30 border-white/10 text-light-gray/60 hover:text-white hover:border-white/20'
+                    : 'bg-[#101B30]/30 border-[#F3EFE7]/10 text-light-gray/60 hover:text-white hover:border-white/20'
                 }`}
               >
                 {cat} <span className="text-[10px] font-mono text-light-gray/40 ml-1">({count})</span>
@@ -265,21 +265,21 @@ const AWSSkills = () => {
           {filteredSkills.map((skill, idx) => (
             <motion.div 
               key={skill.title}
-              className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-7 hover:border-cine-teal transition-all duration-300 flex flex-col justify-between group hover:shadow-cine-glow-teal"
+              className="bg-[#101B30]/40 backdrop-blur-md border border-[#F3EFE7]/10 rounded-[2px] p-6 sm:p-7 hover:border-cine-teal transition-all duration-300 flex flex-col justify-between group hover:shadow-cine-glow-teal"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: idx * 0.05, ease: [0.22, 1, 0.36, 1] }}
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-5">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 group-hover:border-cine-teal/40 transition-colors p-2.5">
+                  <div className="w-12 h-12 rounded-[2px] flex items-center justify-center bg-white/5 border border-[#F3EFE7]/10 group-hover:border-cine-teal/40 transition-colors p-2.5">
                     <img 
                       src={`/icons/${skill.icon}`} 
                       alt={skill.title}
                       className="w-7 h-7 object-contain"
                     />
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-medium bg-white/5 border border-white/10 text-light-gray/70">
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-medium bg-white/5 border border-[#F3EFE7]/10 text-light-gray/70">
                     {skill.badge}
                   </span>
                 </div>
@@ -304,7 +304,7 @@ const AWSSkills = () => {
         </div>
 
         {/* Core Architecture Principles */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 sm:p-8 rounded-2xl bg-black/30 border border-white/10 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 sm:p-8 rounded-[2px] bg-[#101B30]/30 border border-[#F3EFE7]/10 mb-16">
           <div>
             <div className="w-8 h-8 rounded-lg bg-cine-teal/10 border border-cine-teal/30 flex items-center justify-center text-cine-teal font-mono text-sm mb-3">
               01

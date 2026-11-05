@@ -13,12 +13,12 @@ export const SkillsSection: React.FC = () => {
     <section id="skills" className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 py-16 sm:py-24">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 pb-6 border-b border-white/10 gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 pb-6 border-b border-[#F3EFE7]/10 gap-4">
         <div>
           <p className="text-xs font-mono uppercase tracking-widest text-[#7DD3FC] mb-2">
             Technical Capabilities
           </p>
-          <h2 className="text-3xl sm:text-5xl font-heading font-bold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-5xl font-heading font-bold text-[#F3EFE7] tracking-tight">
             Evidence-Linked Skills
           </h2>
         </div>
@@ -37,14 +37,14 @@ export const SkillsSection: React.FC = () => {
         {skillDomains.map((domain: SkillDomain) => (
           <div
             key={domain.id}
-            className="p-6 sm:p-7 rounded-3xl bg-[#0D1118]/80 border border-white/10 shadow-token-card hover:border-[#7DD3FC]/30 hover:shadow-token-card-hover transition-all duration-300 flex flex-col justify-between"
+            className="p-6 sm:p-7 rounded-[2px] bg-[#070B12]/80 border border-[#F3EFE7]/10  hover:border-[#7DD3FC]/30 hover: transition-all duration-300 flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg sm:text-xl font-heading font-bold text-white tracking-tight">
+                <h3 className="text-lg sm:text-xl font-heading font-bold text-[#F3EFE7] tracking-tight">
                   {domain.title}
                 </h3>
-                <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-white/5 text-[#A6ADB8] border border-white/10">
+                <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-white/5 text-[#A6ADB8] border border-[#F3EFE7]/10">
                   {domain.skills.length} skills
                 </span>
               </div>
@@ -58,7 +58,7 @@ export const SkillsSection: React.FC = () => {
                 {domain.skills.map((skill) => (
                   <div
                     key={skill.name}
-                    className="p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/15 transition-all"
+                    className="p-3 rounded-[2px] bg-white/[0.02] border border-[#F3EFE7]/[0.08] hover:border-[#F3EFE7]/15 transition-all"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs sm:text-sm font-sans font-semibold text-[#E0E0E0]">
@@ -78,7 +78,7 @@ export const SkillsSection: React.FC = () => {
                         <Link
                           key={idx}
                           href={p.href}
-                          className="text-[#D8B4FE] hover:text-white transition-colors underline decoration-dotted"
+                          className="text-[#D8B4FE] hover:text-[#F3EFE7] transition-colors underline decoration-dotted"
                         >
                           {p.title}
                         </Link>
@@ -89,7 +89,7 @@ export const SkillsSection: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 text-right">
+            <div className="mt-6 pt-4 border-t border-[#F3EFE7]/[0.08] text-right">
               <span className="text-[10px] font-mono text-[#A6ADB8]">
                 Verified against repository codebases
               </span>

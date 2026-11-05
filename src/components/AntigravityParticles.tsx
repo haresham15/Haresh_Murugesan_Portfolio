@@ -3,9 +3,17 @@ import { useMotionPreference } from './MotionPreference';
 
 /**
  * AntigravityParticles
- * A gentle, refined ambient background particle canvas.
- * Layered at z-0 strictly behind content, with quiet resting opacity
- * and soft, localized cursor deflection.
+ * A refined, subtle ambient background particle canvas with Google Antigravity fluid curl.
+ * Layered at z-0 strictly in the background beneath all modals, cards, and editorial text.
+ *
+ * Characteristics:
+ * - Subtle ambient presence: calibrated 56px staggered grid spacing (70px on mobile)
+ * - Layered at z-0 pointer-events-none strictly behind page content and modals
+ * - Refined, de-sloppified palette (resting alpha ~0.06 in titanium-slate, warming up to ~0.28 amber under cursor)
+ * - Gentle Google Antigravity fluid curl: radial deflection, tangential vortex curl, and soft velocity slipstream
+ * - Slender, crisp micro-filaments aligned to kinetic velocity (no oversized glowing coronas)
+ * - Whisper-thin, faint constellation filaments under cursor excitation
+ * - Full reduced-motion compliance and background tab throttling
  */
 interface AntigravityParticlesProps {
   className?: string;
@@ -32,12 +40,12 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
     let height = 0;
     let dpr = 1;
 
-    // Soft Prussian Slate resting tint
-    const baseColor: ColorRGB = { r: 130, g: 155, b: 195 };
+    // Resting background tint (Soft Titanium / Prussian Slate)
+    const baseColor: ColorRGB = { r: 135, g: 155, b: 185 };
 
-    // Toned-down subtle warm amber/orange accent
-    const colorOrange: ColorRGB = { r: 255, g: 107, b: 53 };
-    const colorAmber: ColorRGB = { r: 245, g: 217, b: 152 };
+    // Subtle warm amber & ember accent ramp (understated, non-radioactive)
+    const colorOrange: ColorRGB = { r: 255, g: 125, b: 55 }; // Amber Orange
+    const colorPeach: ColorRGB = { r: 245, g: 195, b: 135 }; // Warm Peach-Gold
 
     const mouse = {
       x: -1000,
@@ -47,11 +55,10 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
       vx: 0,
       vy: 0,
       active: false,
-      radius: 140, // Localized, restrained field
+      radius: 180, // Comfortable, refined interaction radius
     };
 
-    // Spacious airy grid spacing (72px desktop, 88px mobile)
-    let SPACING = 72;
+    let SPACING = 56;
 
     class Particle {
       x0: number;
@@ -60,6 +67,7 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
       y: number;
       vx: number;
       vy: number;
+      angle: number;
       dotRadius: number;
       excitation: number;
       proximity: number;
@@ -72,7 +80,8 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
         this.y = y;
         this.vx = 0;
         this.vy = 0;
-        this.dotRadius = 0.8 + Math.random() * 0.5; // Fine 0.8px to 1.3px
+        this.angle = (Math.random() - 0.5) * 0.4;
+        this.dotRadius = 0.85 + Math.random() * 0.45; // 0.85px to 1.3px crisp architectural dots
         this.excitation = 0;
         this.proximity = 0;
         this.seed = Math.random() * 1000;
@@ -81,38 +90,46 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
       update(time: number) {
         this.proximity = 0;
 
+        // Interactive cursor repulsion, vortex swirl & slipstream wake
         if (mouse.active) {
           const dx = this.x - mouse.x;
           const dy = this.y - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < mouse.radius && dist > 0.001) {
-            const factor = Math.pow(1 - dist / mouse.radius, 1.6);
+            // Smooth quadratic falloff
+            const factor = Math.pow(1 - dist / mouse.radius, 1.5);
             this.proximity = factor;
 
             const normX = dx / dist;
             const normY = dy / dist;
 
-            // Restrained gentle radial deflection
-            const repelForce = factor * 0.75;
+            // Gentle radial deflection (antigravity repulsion)
+            const repelForce = factor * 1.35;
             this.vx += normX * repelForce;
             this.vy += normY * repelForce;
 
-            // Gentle tangential drift
-            const swirlForce = factor * 0.35;
+            // Tangential vortex swirl (fluid Google Antigravity vortex curl)
+            const swirlForce = factor * 0.85;
             this.vx += -normY * swirlForce;
             this.vy += normX * swirlForce;
 
-            this.excitation = Math.min(1, this.excitation + factor * 0.4);
+            // Subtle fluid slipstream from cursor velocity
+            this.vx += mouse.vx * factor * 0.04;
+            this.vy += mouse.vy * factor * 0.04;
+
+            // Excitation accumulation
+            this.excitation = Math.min(1, this.excitation + factor * 0.5);
           }
         }
 
-        // Calibrated gentle spring return
-        const springK = 0.032;
+        // Calibrated elastic spring return to anchor
+        const springK = 0.035;
         const damping = 0.88;
 
-        const idleX = this.x0 + Math.sin(time * 0.0006 + this.seed) * 0.4;
-        const idleY = this.y0 + Math.cos(time * 0.0007 + this.seed) * 0.4;
+        // Ambient breathing drift (subtle 0.35px)
+        const idleX = this.x0 + Math.sin(time * 0.0006 + this.seed) * 0.35;
+        const idleY = this.y0 + Math.cos(time * 0.0007 + this.seed) * 0.35;
 
         const ax = (idleX - this.x) * springK;
         const ay = (idleY - this.y) * springK;
@@ -123,43 +140,90 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
         this.x += this.vx;
         this.y += this.vy;
 
-        this.excitation *= 0.92;
+        // Smooth dissipation of excitation
+        this.excitation *= 0.93;
+
+        // Dynamic orientation alignment to velocity vector
+        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (speed > 0.06) {
+          const targetAngle = Math.atan2(this.vy, this.vx);
+          let diff = targetAngle - this.angle;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          this.angle += diff * 0.14;
+        }
+      }
+
+      applyImpulse(ix: number, iy: number, power: number) {
+        const dx = this.x - ix;
+        const dy = this.y - iy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 260 && dist > 0.001) {
+          const factor = Math.pow(1 - dist / 260, 1.4);
+          const normX = dx / dist;
+          const normY = dy / dist;
+          this.vx += normX * factor * power * 1.5;
+          this.vy += normY * factor * power * 1.5;
+          this.excitation = Math.min(1, this.excitation + factor * 0.6);
+        }
       }
 
       draw(context: CanvasRenderingContext2D) {
         const activeLevel = Math.max(this.proximity, this.excitation);
 
-        // Very quiet resting opacity (0.04), warming up to 0.28 under mouse
-        let alpha = 0.04 + activeLevel * 0.24;
+        // Quiet, subtle resting alpha (0.06), scaling up to a gentle 0.28 under cursor
+        let alpha = 0.06 + activeLevel * 0.22;
         alpha = Math.min(0.28, alpha);
 
-        // Soft subtle color shift
+        // Subtle color shift along the muted warm amber palette
         let r = baseColor.r;
         let g = baseColor.g;
         let b = baseColor.b;
 
-        if (activeLevel > 0.05) {
-          const t = Math.min(1, activeLevel * 1.5);
-          r = Math.round(baseColor.r + (colorOrange.r - baseColor.r) * t);
-          g = Math.round(baseColor.g + (colorOrange.g - baseColor.g) * t);
-          b = Math.round(baseColor.b + (colorOrange.b - baseColor.b) * t);
+        if (activeLevel > 0.03) {
+          if (activeLevel < 0.45) {
+            const t = activeLevel / 0.45;
+            r = Math.round(baseColor.r + (colorOrange.r - baseColor.r) * t);
+            g = Math.round(colorOrange.g + (colorOrange.g - baseColor.g) * t);
+            b = Math.round(colorOrange.b + (colorOrange.b - baseColor.b) * t);
+          } else {
+            const t = (activeLevel - 0.45) / 0.55;
+            r = Math.round(colorOrange.r + (colorPeach.r - colorOrange.r) * t);
+            g = Math.round(colorOrange.g + (colorPeach.g - colorOrange.g) * t);
+            b = Math.round(colorOrange.b + (colorPeach.b - colorOrange.b) * t);
+          }
         }
 
-        const curRadius = this.dotRadius + activeLevel * 0.4;
+        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
 
-        // Subtle soft corona only on direct proximity
-        if (activeLevel > 0.3) {
+        // When moving actively under cursor wake, render as a clean, slender micro-filament
+        if (speed > 0.12 && activeLevel > 0.08) {
+          const filamentLen = Math.min(10, 2.5 + speed * 2.2);
+          const halfLen = filamentLen * 0.5;
+
+          context.save();
+          context.translate(this.x, this.y);
+          context.rotate(this.angle);
+
+          // Kinetic filament body - clean and slender, zero blurry halo
           context.beginPath();
-          context.arc(this.x, this.y, curRadius * 2.2, 0, Math.PI * 2);
-          context.fillStyle = `rgba(${colorAmber.r}, ${colorAmber.g}, ${colorAmber.b}, ${alpha * 0.35})`;
+          context.moveTo(-halfLen, 0);
+          context.lineTo(halfLen, 0);
+          context.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha * 0.9})`;
+          context.lineWidth = 1.1;
+          context.lineCap = 'round';
+          context.stroke();
+
+          context.restore();
+        } else {
+          // Render as a crisp, quiet dot (no oversized glow corona)
+          const curRadius = this.dotRadius + activeLevel * 0.4;
+
+          context.beginPath();
+          context.arc(this.x, this.y, curRadius, 0, Math.PI * 2);
+          context.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
           context.fill();
         }
-
-        // Clean micro dot
-        context.beginPath();
-        context.arc(this.x, this.y, curRadius, 0, Math.PI * 2);
-        context.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        context.fill();
       }
     }
 
@@ -185,7 +249,9 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
       width = window.innerWidth;
       height = window.innerHeight;
 
-      SPACING = width < 768 ? 88 : 72;
+      // Adjust spacing: 70px on mobile screens, 56px on desktop
+      SPACING = width < 768 ? 70 : 56;
+      mouse.radius = width < 768 ? 140 : 180;
 
       canvas.width = width * dpr;
       canvas.height = height * dpr;
@@ -203,6 +269,7 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
     handleResize();
     window.addEventListener('resize', handleResize, { passive: true });
 
+    // Track pointer movement with smooth velocity
     const handlePointerMove = (e: MouseEvent | TouchEvent) => {
       let currentX = 0;
       let currentY = 0;
@@ -224,13 +291,29 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
         mouse.prevY = currentY;
         mouse.active = true;
       } else {
-        mouse.vx = (currentX - mouse.prevX) * 0.5;
-        mouse.vy = (currentY - mouse.prevY) * 0.5;
+        mouse.vx = currentX - mouse.prevX;
+        mouse.vy = currentY - mouse.prevY;
         mouse.prevX = currentX;
         mouse.prevY = currentY;
         mouse.x = currentX;
         mouse.y = currentY;
       }
+    };
+
+    const handlePointerDown = (e: MouseEvent | TouchEvent) => {
+      let currentX = 0;
+      let currentY = 0;
+
+      if ('clientX' in e) {
+        currentX = e.clientX;
+        currentY = e.clientY;
+      } else if (e.touches && e.touches.length > 0 && e.touches[0]) {
+        currentX = e.touches[0].clientX;
+        currentY = e.touches[0].clientY;
+      }
+
+      // Gentle, subtle shockwave impulse on click or tap
+      particles.forEach((p) => p.applyImpulse(currentX, currentY, 1.4));
     };
 
     const handleMouseLeave = () => {
@@ -240,25 +323,61 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
     };
 
     window.addEventListener('mousemove', handlePointerMove, { passive: true });
+    window.addEventListener('mousedown', handlePointerDown, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave, { passive: true });
     window.addEventListener('touchmove', handlePointerMove, { passive: true });
+    window.addEventListener('touchstart', handlePointerDown, { passive: true });
     window.addEventListener('touchend', handleMouseLeave, { passive: true });
 
+    // 60fps render loop with battery saving
     let isRunning = !isReduced;
     const render = (time: number) => {
       if (!isRunning) return;
 
-      mouse.vx *= 0.8;
-      mouse.vy *= 0.8;
+      mouse.vx *= 0.76;
+      mouse.vy *= 0.76;
 
       ctx.clearRect(0, 0, width, height);
 
       const len = particles.length;
+      const activeParticles: Particle[] = [];
+
       for (let i = 0; i < len; i++) {
         const p = particles[i];
         if (p) {
           p.update(time);
+          if (p.proximity > 0.2 || p.excitation > 0.25) {
+            activeParticles.push(p);
+          }
           p.draw(ctx);
+        }
+      }
+
+      // Draw very delicate, whisper-thin constellation linkages between active cluster particles
+      const activeCount = activeParticles.length;
+      if (activeCount > 1 && activeCount < 35) {
+        ctx.lineWidth = 0.5;
+        const maxDist = SPACING * 1.4;
+        for (let i = 0; i < activeCount; i++) {
+          const p1 = activeParticles[i];
+          if (!p1) continue;
+          for (let j = i + 1; j < activeCount; j++) {
+            const p2 = activeParticles[j];
+            if (!p2) continue;
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < maxDist) {
+              const linkFactor = (1 - dist / maxDist) * Math.min(p1.proximity, p2.proximity);
+              if (linkFactor > 0.05) {
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.strokeStyle = `rgba(255, 140, 70, ${linkFactor * 0.12})`;
+                ctx.stroke();
+              }
+            }
+          }
         }
       }
 
@@ -287,8 +406,10 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('touchstart', handlePointerDown);
       window.removeEventListener('touchend', handleMouseLeave);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };

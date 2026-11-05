@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMotionPreference } from './MotionPreference';
 
 interface WheelNavTriggerProps {
@@ -6,9 +6,19 @@ interface WheelNavTriggerProps {
   onToggle: () => void;
 }
 
+interface SmokePuff {
+  id: number;
+  x: number;
+  y: number;
+  scale: number;
+  opacity: number;
+  blur: number;
+}
+
 export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onToggle }) => {
   const { isReduced } = useMotionPreference();
   const [isHovered, setIsHovered] = useState(false);
+  const [smokePuffs, setSmokePuffs] = useState<SmokePuff[]>([]);
 
   // 6 Primary Twin Y-Spoke Angles
   const spokeAngles = [0, 60, 120, 180, 240, 300];
@@ -16,23 +26,69 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
   // 12 Outer Perimeter Tick Mark Angles (every 30°)
   const tickAngles = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
 
-  // Smooth, instantaneous rotation calculation
+  // Emit volumetric burnout smoke burst on click
+  const triggerBurnoutSmoke = () => {
+    if (isReduced) return;
+    const count = 10;
+    const newPuffs: SmokePuff[] = [];
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+      const dist = 24 + Math.random() * 22;
+      newPuffs.push({
+        id: Date.now() + i,
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * dist + (Math.random() * 6),
+        scale: 1.2 + Math.random() * 1.5,
+        opacity: 0.75 + Math.random() * 0.2,
+        blur: 10 + Math.random() * 8,
+      });
+    }
+    setSmokePuffs(newPuffs);
+
+    setTimeout(() => {
+      setSmokePuffs([]);
+    }, 700);
+  };
+
+  const handleClick = () => {
+    triggerBurnoutSmoke();
+    onToggle();
+  };
+
+  // Smooth rotation: 25deg on hover, 90deg when open
   const getRotationStyle = () => {
     if (isReduced) return {};
-    const angle = isOpen ? 90 : isHovered ? 20 : 0;
+    const angle = isOpen ? 90 : isHovered ? 25 : 0;
     return {
       transform: `rotate(${angle}deg)`,
-      transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1)',
+      transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)',
       willChange: 'transform',
     };
   };
 
   return (
     <div className="relative flex items-center justify-center">
+      {/* Volumetric Burnout Smoke Burst (Expanding organic smoke clouds on click) */}
+      {smokePuffs.map((puff) => (
+        <div
+          key={puff.id}
+          className="absolute rounded-full pointer-events-none transition-all duration-700 ease-out z-0"
+          style={{
+            width: '48px',
+            height: '48px',
+            transform: `translate(${puff.x}px, ${puff.y}px) scale(${puff.scale})`,
+            opacity: 0,
+            filter: `blur(${puff.blur}px)`,
+            background:
+              'radial-gradient(circle, rgba(255, 107, 53, 0.45) 0%, rgba(245, 217, 152, 0.25) 45%, rgba(167, 178, 195, 0.15) 70%, transparent 100%)',
+          }}
+        />
+      ))}
+
       {/* Precision Engineered Wheel Rim Trigger Button */}
       <button
         type="button"
-        onClick={onToggle}
+        onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="group relative z-10 w-[48px] h-[48px] sm:w-[56px] sm:h-[56px] rounded-full p-0 flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-[#FF6B35] focus-visible:outline-offset-4 select-none"
@@ -46,14 +102,14 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
           }`}
           style={{
             background:
-              'radial-gradient(circle, rgba(255, 107, 53, 0.24) 0%, rgba(245, 217, 152, 0.08) 50%, transparent 72%)',
+              'radial-gradient(circle, rgba(255, 107, 53, 0.28) 0%, rgba(245, 217, 152, 0.1) 50%, transparent 72%)',
           }}
         />
 
         {/* Scalable High-Precision SVG Turbofan Alloy Wheel */}
         <svg
           viewBox="-100 -100 200 200"
-          className="w-full h-full shadow-[0_4px_16px_rgba(7,11,18,0.8)] group-hover:shadow-[0_0_20px_rgba(255,107,53,0.3)] rounded-full"
+          className="w-full h-full shadow-[0_4px_16px_rgba(7,11,18,0.8)] group-hover:shadow-[0_0_24px_rgba(255,107,53,0.35)] rounded-full"
           style={getRotationStyle()}
           aria-hidden="true"
         >

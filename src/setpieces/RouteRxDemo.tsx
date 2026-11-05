@@ -21,31 +21,31 @@ export const RouteRxDemo: React.FC = () => {
   const currentZone = zoneData.find((z) => z.id === selectedZone) || zoneData[1];
 
   return (
-    <div className="w-full rounded-3xl bg-[#0D1118] border border-white/10 p-5 sm:p-7 shadow-token-card flex flex-col justify-between">
+    <div className="w-full rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 p-5 sm:p-7 shadow-[0_4px_24px_rgba(7,11,18,0.7)] flex flex-col justify-between">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-white/10 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#F3EFE7]/10 gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#7DD3FC]" />
-            <span className="text-xs font-mono uppercase tracking-widest text-[#7DD3FC] font-semibold">
+            <span className="w-2 h-2 rounded-full bg-[#82B7FF]" />
+            <span className="text-xs font-mono uppercase tracking-widest text-[#FF6B35] font-semibold">
               ASA DataFest 2026 1st Place Platform
             </span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-heading font-bold text-white tracking-tight">
+          <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F3EFE7] tracking-tight">
             RouteRx (Careline): Healthcare Transit Desert Optimizer
           </h3>
         </div>
 
         {/* Mode Toggle Switcher */}
-        <div className="flex items-center rounded-xl bg-white/5 border border-white/10 p-1 text-xs font-mono">
+        <div className="flex items-center rounded-[2px] bg-[#101B30] border border-[#F3EFE7]/10 p-1 text-xs font-mono">
           <button
             type="button"
             onClick={() => handleModeToggle('baseline')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
+            className={`px-3 py-1.5 rounded-[2px] transition-all ${
               transitMode === 'baseline'
                 ? 'bg-[#F87171]/20 text-[#F87171] border border-[#F87171]/40 font-semibold'
-                : 'text-[#A6ADB8] hover:text-white'
+                : 'text-[#A7B2C3] hover:text-[#F3EFE7]'
             }`}
           >
             Baseline GTFS Bus
@@ -68,7 +68,7 @@ export const RouteRxDemo: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center mb-6">
         
         {/* LEFT: Stylized Spatial Map of Topeka, KS (7 cols) */}
-        <div className="xl:col-span-7 relative w-full aspect-[16/11] rounded-2xl bg-[#050505] border border-white/10 p-4 overflow-hidden">
+        <div className="xl:col-span-7 relative w-full aspect-[16/11] rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 p-4 overflow-hidden">
           
           <svg viewBox="0 0 360 260" className="w-full h-full" fill="none">
             {/* Base Geographic Mesh (Shawnee County Bounding Box) */}
@@ -149,8 +149,8 @@ export const RouteRxDemo: React.FC = () => {
           </svg>
 
           {/* Map Status Badge */}
-          <div className="absolute top-3 left-3 text-[10px] font-mono bg-[#050505]/85 p-2 rounded-lg border border-white/5 flex flex-col gap-0.5">
-            <span className="text-white font-semibold">Topeka, KS Geographic Canvas</span>
+          <div className="absolute top-3 left-3 text-[10px] font-mono bg-[#070B12]/85 p-2 rounded-[2px] border border-[#F3EFE7]/10 flex flex-col gap-0.5">
+            <span className="text-[#F3EFE7] font-semibold">Topeka, KS Geographic Canvas</span>
             <span>Shawnee County Census Blocks: 141</span>
             <span className={transitMode === 'routerx' ? 'text-[#34D399]' : 'text-[#F87171]'}>
               {transitMode === 'routerx' ? 'Bi-Directional Fleet: Active' : 'Transit Deserts: 43 Isolated Blocks'}
@@ -172,17 +172,17 @@ export const RouteRxDemo: React.FC = () => {
                   key={zone.id}
                   type="button"
                   onClick={() => setSelectedZone(zone.id)}
-                  className={`p-3 rounded-xl text-left border transition-all ${
+                  className={`p-3 rounded-[2px] text-left border transition-all ${
                     zone.id === selectedZone
-                      ? 'bg-white/10 border-white text-white'
-                      : 'bg-white/[0.02] border-white/5 text-[#A6ADB8] hover:border-white/15 hover:text-white'
+                      ? 'bg-white/10 border-[#F3EFE7] text-[#F3EFE7]'
+                      : 'bg-white/[0.02] border-white/5 text-[#A7B2C3] hover:border-white/15 hover:text-[#F3EFE7]'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-0.5">
                     <span className="text-xs font-bold">{zone.name}</span>
-                    <span className="text-[10px] font-mono text-[#7DD3FC]">{zone.status}</span>
+                    <span className="text-[10px] font-mono text-[#FF6B35]">{zone.status}</span>
                   </div>
-                  <span className="text-[11px] font-mono text-[#A6ADB8]">
+                  <span className="text-[11px] font-mono text-[#A7B2C3]">
                     {zone.blocks} Census Blocks · {zone.unservedRatio} unserved by bus
                   </span>
                 </button>
@@ -191,22 +191,22 @@ export const RouteRxDemo: React.FC = () => {
           </div>
 
           {/* Metric Comparison Card */}
-          <div className="p-4 rounded-2xl bg-[#050505] border border-white/10 text-xs font-mono space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-white/5">
-              <span className="text-[#A6ADB8]">Average Patient Transit Wait:</span>
-              <span className={transitMode === 'routerx' ? 'text-[#34D399] font-bold text-sm' : 'text-[#F87171] font-bold text-sm'}>
+          <div className="p-4 rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 text-xs font-mono space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#F3EFE7]/10">
+              <span className="text-[#A7B2C3]">Average Patient Transit Wait:</span>
+              <span className={transitMode === 'routerx' ? 'text-[#4CC38A] font-bold text-sm' : 'text-[#F87171] font-bold text-sm'}>
                 {transitMode === 'routerx' ? currentZone.optimizedWait : currentZone.baselineWait}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-[#A6ADB8]">Fleet Budget Utilization:</span>
-              <span className="text-[#7DD3FC] font-bold">~40% Cost Reduction</span>
+              <span className="text-[#A7B2C3]">Fleet Budget Utilization:</span>
+              <span className="text-[#82B7FF] font-bold">~40% Cost Reduction</span>
             </div>
 
-            <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px]">
-              <span className="text-[#A6ADB8]">Inpatient Bed Turnaround:</span>
-              <span className="text-white font-semibold">Immediate Discharge Route</span>
+            <div className="pt-2 border-t border-[#F3EFE7]/10 flex items-center justify-between text-[11px]">
+              <span className="text-[#A7B2C3]">Inpatient Bed Turnaround:</span>
+              <span className="text-[#F3EFE7] font-semibold">Immediate Discharge Route</span>
             </div>
           </div>
 

@@ -138,18 +138,18 @@ export const ApexisDemo: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full rounded-3xl bg-[#0D1118] border border-white/10 p-5 sm:p-7 shadow-token-card flex flex-col justify-between"
+      className="w-full rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 p-5 sm:p-7 shadow-[0_4px_24px_rgba(7,11,18,0.7)] flex flex-col justify-between"
     >
       {/* Set Piece Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-white/10 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#F3EFE7]/10 gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] animate-ping" />
-            <span className="text-xs font-mono uppercase tracking-widest text-[#7DD3FC] font-semibold">
+            <span className="w-2 h-2 rounded-full bg-[#4CC38A]" />
+            <span className="text-xs font-mono uppercase tracking-widest text-[#FF6B35] font-semibold">
               Live Architecture Inspection
             </span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-heading font-bold text-white tracking-tight">
+          <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F3EFE7] tracking-tight">
             Apexis: 60fps Web Worker Telemetry Simulator
           </h3>
         </div>
@@ -159,10 +159,10 @@ export const ApexisDemo: React.FC = () => {
           <button
             type="button"
             onClick={togglePlay}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium border transition-colors ${
+            className={`px-3 py-1.5 rounded-[2px] text-xs font-mono font-medium border transition-colors ${
               isPlaying
-                ? 'bg-[#7DD3FC]/15 border-[#7DD3FC] text-[#7DD3FC]'
-                : 'bg-white/5 border-white/10 text-[#A6ADB8] hover:text-white'
+                ? 'bg-[#FF6B35]/15 border-[#FF6B35] text-[#FF6B35]'
+                : 'bg-white/5 border-white/10 text-[#A7B2C3] hover:text-[#F3EFE7]'
             }`}
             aria-label={isPlaying ? 'Pause telemetry replay' : 'Play telemetry replay'}
           >
@@ -172,23 +172,23 @@ export const ApexisDemo: React.FC = () => {
           <button
             type="button"
             onClick={handleReset}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-mono text-[#A6ADB8] hover:text-white bg-white/5 border border-white/10 transition-colors"
+            className="px-2.5 py-1.5 rounded-[2px] text-xs font-mono text-[#A7B2C3] hover:text-[#F3EFE7] bg-white/5 border border-white/10 transition-colors"
             aria-label="Reset simulation"
           >
             ↺ Reset
           </button>
 
           {/* Speed Pill toggles */}
-          <div className="flex items-center rounded-lg bg-white/5 border border-white/10 p-0.5 text-xs font-mono">
+          <div className="flex items-center rounded-[2px] bg-[#101B30] border border-[#F3EFE7]/10 p-0.5 text-xs font-mono">
             {[1, 2, 4].map((mult) => (
               <button
                 key={mult}
                 type="button"
                 onClick={() => handleSpeedChange(mult)}
-                className={`px-2 py-1 rounded-md transition-all ${
+                className={`px-2 py-1 rounded-[2px] transition-all ${
                   speedMultiplier === mult
-                    ? 'bg-[#7DD3FC] text-[#050505] font-semibold'
-                    : 'text-[#A6ADB8] hover:text-white'
+                    ? 'bg-[#FF6B35] text-[#070B12] font-semibold'
+                    : 'text-[#A7B2C3] hover:text-[#F3EFE7]'
                 }`}
               >
                 {mult}x
@@ -202,7 +202,7 @@ export const ApexisDemo: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center">
         
         {/* LEFT: Circuit Simulation Map (7 cols) */}
-        <div className="xl:col-span-7 relative w-full aspect-[16/11] rounded-2xl bg-[#050505] border border-white/10 p-4 flex items-center justify-center overflow-hidden">
+        <div className="xl:col-span-7 relative w-full aspect-[16/11] rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 p-4 flex items-center justify-center overflow-hidden">
           
           <svg viewBox="0 0 340 320" className="w-full h-full" fill="none">
             {/* Track Grid lines */}
@@ -275,13 +275,13 @@ export const ApexisDemo: React.FC = () => {
           </svg>
 
           {/* Circuit Overlay Readout */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1 text-[10px] font-mono text-[#A6ADB8] bg-[#050505]/80 p-2 rounded-lg border border-white/5">
-            <span className="text-white font-semibold">OpenF1 Track Topology</span>
+          <div className="absolute top-3 left-3 flex flex-col gap-1 text-[10px] font-mono text-[#A7B2C3] bg-[#070B12]/80 p-2 rounded-[2px] border border-[#F3EFE7]/10">
+            <span className="text-[#F3EFE7] font-semibold">OpenF1 Track Topology</span>
             <span>Length: 5.412 km · 16 Turns</span>
             <span className="text-[#34D399]">Replay Loop Active</span>
           </div>
 
-          <div className="absolute bottom-3 right-3 text-[10px] font-mono text-[#A6ADB8] bg-[#050505]/80 px-2 py-1 rounded-lg border border-white/5">
+          <div className="absolute bottom-3 right-3 text-[10px] font-mono text-[#A7B2C3] bg-[#070B12]/90 px-2 py-1 rounded-[2px] border border-[#F3EFE7]/10">
             Deterministic Replay Telemetry
           </div>
         </div>
@@ -290,13 +290,13 @@ export const ApexisDemo: React.FC = () => {
         <div className="xl:col-span-5 flex flex-col justify-between space-y-4">
           
           {/* Architecture Boundary Pipeline */}
-          <div className="p-4 rounded-2xl bg-[#050505] border border-white/10 space-y-3">
+          <div className="p-4 rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 space-y-3">
             <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-white font-semibold">Boundary Telemetry</span>
+              <span className="text-[#F3EFE7] font-semibold">Boundary Telemetry</span>
               <button
                 type="button"
                 onClick={() => setShowMessageFlow(!showMessageFlow)}
-                className="text-[10px] text-[#7DD3FC] hover:underline"
+                className="text-[10px] text-[#FF6B35] hover:underline cursor-pointer"
               >
                 {showMessageFlow ? 'Hide Flow' : 'Show Flow'}
               </button>
@@ -304,61 +304,58 @@ export const ApexisDemo: React.FC = () => {
 
             {/* Architecture diagram nodes */}
             <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-              <div className="p-2 rounded-lg bg-[#7DD3FC]/10 border border-[#7DD3FC]/30">
-                <p className="text-[10px] text-[#A6ADB8]">Thread</p>
-                <p className="text-[#7DD3FC] font-bold">UI Main</p>
-                <p className="text-[9px] text-[#A6ADB8]/80 mt-1">DOM Render</p>
+              <div className="p-2 rounded-[2px] bg-[#82B7FF]/10 border border-[#82B7FF]/30">
+                <p className="text-[10px] text-[#A7B2C3]">Thread</p>
+                <p className="text-[#82B7FF] font-bold">UI Main</p>
+                <p className="text-[9px] text-[#A7B2C3]/80 mt-1">DOM Render</p>
               </div>
 
-              <div className="p-2 rounded-lg bg-[#D8B4FE]/10 border border-[#D8B4FE]/30 relative">
-                {showMessageFlow && isPlaying && (
-                  <span className="absolute -top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#D8B4FE] animate-ping" />
-                )}
-                <p className="text-[10px] text-[#A6ADB8]">Off-Thread</p>
-                <p className="text-[#D8B4FE] font-bold">Web Worker</p>
-                <p className="text-[9px] text-[#A6ADB8]/80 mt-1">Physics 60Hz</p>
+              <div className="p-2 rounded-[2px] bg-[#F5D998]/10 border border-[#F5D998]/30 relative">
+                <p className="text-[10px] text-[#A7B2C3]">Off-Thread</p>
+                <p className="text-[#F5D998] font-bold">Web Worker</p>
+                <p className="text-[9px] text-[#A7B2C3]/80 mt-1">Physics 60Hz</p>
               </div>
 
-              <div className="p-2 rounded-lg bg-[#34D399]/10 border border-[#34D399]/30">
-                <p className="text-[10px] text-[#A6ADB8]">Memory</p>
-                <p className="text-[#34D399] font-bold">postMessage</p>
-                <p className="text-[9px] text-[#A6ADB8]/80 mt-1">Zero Lock</p>
+              <div className="p-2 rounded-[2px] bg-[#4CC38A]/10 border border-[#4CC38A]/30">
+                <p className="text-[10px] text-[#A7B2C3]">Memory</p>
+                <p className="text-[#4CC38A] font-bold">postMessage</p>
+                <p className="text-[9px] text-[#A7B2C3]/80 mt-1">Zero Lock</p>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-[#A6ADB8]">
-              <span>Compute Latency: <strong className="text-white">{workerLatencyMs} ms</strong></span>
-              <span>Worker Frames: <strong className="text-white">{workerFrameCount}</strong></span>
+            <div className="pt-2 border-t border-[#F3EFE7]/10 flex items-center justify-between text-[11px] font-mono text-[#A7B2C3]">
+              <span>Compute Latency: <strong className="text-[#F3EFE7]">{workerLatencyMs} ms</strong></span>
+              <span>Worker Frames: <strong className="text-[#F3EFE7]">{workerFrameCount}</strong></span>
             </div>
           </div>
 
           {/* Selected Driver Telemetry HUD */}
-          <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3">
+          <div className="p-4 rounded-[2px] bg-[#101B30]/40 border border-[#F3EFE7]/10 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-base font-heading font-bold text-white flex items-center gap-2">
+                <p className="text-base font-raleway font-bold text-[#F3EFE7] flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: selectedCar.color }} />
                   <span>{selectedCar.driver}</span>
-                  <span className="text-xs font-mono text-[#A6ADB8] font-normal">({selectedCar.team})</span>
+                  <span className="text-xs font-mono text-[#A7B2C3] font-normal">({selectedCar.team})</span>
                 </p>
               </div>
-              <span className="text-xs font-mono text-[#7DD3FC] font-semibold">
+              <span className="text-xs font-mono text-[#FF6B35] font-semibold">
                 {selectedCar.delta === 0 ? 'INTERVAL: LEADER' : `+${selectedCar.delta}s`}
               </span>
             </div>
 
             {/* Gauges: Speed & Gear */}
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
-              <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
-                <span className="text-[#A6ADB8] block text-[10px]">CURRENT SPEED</span>
-                <span className="text-2xl font-bold text-white">{selectedCar.speed}</span>
-                <span className="text-[#A6ADB8] ml-1">km/h</span>
+              <div className="p-2.5 rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10">
+                <span className="text-[#A7B2C3] block text-[10px]">CURRENT SPEED</span>
+                <span className="text-2xl font-bold text-[#F3EFE7]">{selectedCar.speed}</span>
+                <span className="text-[#A7B2C3] ml-1">km/h</span>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
-                <span className="text-[#A6ADB8] block text-[10px]">GEARBOX</span>
-                <span className="text-2xl font-bold text-[#7DD3FC]">G{selectedCar.gear}</span>
-                <span className="text-[#A6ADB8] ml-1">Tire: {selectedCar.tireWear}%</span>
+              <div className="p-2.5 rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10">
+                <span className="text-[#A7B2C3] block text-[10px]">GEARBOX</span>
+                <span className="text-2xl font-bold text-[#FF6B35]">G{selectedCar.gear}</span>
+                <span className="text-[#A7B2C3] ml-1">Tire: {selectedCar.tireWear}%</span>
               </div>
             </div>
 

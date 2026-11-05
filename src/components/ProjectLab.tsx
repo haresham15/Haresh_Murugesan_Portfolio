@@ -1146,13 +1146,13 @@ export const ProjectLab: React.FC = () => {
       {/* SECTION 1.1: CLEAN SECTION INTRODUCTION */}
       <div className="max-w-[1360px] mx-auto mb-20 sm:mb-28">
         <div className="border-b border-[#F3EFE7]/[0.1] pb-8">
-          <div className="flex items-center gap-3 mb-4 text-xs font-mono uppercase tracking-[0.2em] text-[#A7B2C3]">
-            <span className="text-[#FF6B35] font-semibold">01 // EXHIBITION</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
-            <span>ARCHITECTURAL BLUEPRINT EXHIBITION</span>
+          <div className="flex items-center gap-3 mb-4 text-xs font-mono text-[#A7B2C3]">
+            <span className="text-[#FF6B35] font-semibold">01</span>
+            <span className="text-[#F3EFE7]/30">/</span>
+            <span className="tracking-widest uppercase">Selected Works</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl text-[#F3EFE7] leading-[1.1] tracking-tight">
-            <span className="font-raleway font-bold">Selected Works</span> &amp; <span className="font-serif italic font-normal text-[#F5D998]">Engineered Systems.</span>
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F3EFE7] leading-[1.1] tracking-tight">
+            Selected Works
           </h2>
           <p className="text-base sm:text-lg font-sans text-[#A7B2C3] max-w-2xl leading-relaxed pt-4">
             High-reliability systems, explainable computer vision pipelines, and real-time telemetry architectures built with verifiable benchmarks.

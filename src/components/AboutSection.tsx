@@ -57,7 +57,7 @@ export const AboutSection: React.FC = () => {
           <ScrollReveal>
             <h2 className="text-[2.25rem] sm:text-[2.85rem] lg:text-[3.35rem] text-[#F3EFE7] leading-[1.08] tracking-[-0.025em]">
               <span className="font-raleway font-bold">I build software where computational speed meets real-world </span>
-              <span className="font-serif italic font-normal text-[#F5D998]">physical and human systems.</span>
+              <span className="font-serif font-normal text-[#F5D998]">physical and human systems</span>
             </h2>
           </ScrollReveal>
 

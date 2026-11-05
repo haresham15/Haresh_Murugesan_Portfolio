@@ -4,7 +4,7 @@ import AntigravityParticles from './AntigravityParticles';
 
 const FractalGlassBackground = () => {
   return (
-    <div className="fixed inset-0 z-[-1] overflow-hidden bg-[#050505]">
+    <div className="fixed inset-0 z-[-1] overflow-hidden bg-[#070B12]">
       {/* Vertical Color Streaks */}
       <div className="absolute inset-0 opacity-60">
         {/* Cyan Streak */}
@@ -72,7 +72,7 @@ const FractalGlassBackground = () => {
       <AntigravityParticles />
 
       {/* Vignette */}
-      <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-[#050505] opacity-75 pointer-events-none" />
+      <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-[#070B12] opacity-75 pointer-events-none" />
     </div>
   );
 };
