@@ -35,6 +35,7 @@ export default function Header() {
 
   const navLinks = [
     { label: 'Work', href: '/#projects' },
+    { label: 'Archive', href: '/projects' },
     { label: 'Experience', href: '/#experience' },
     { label: 'Syntinuum', href: '/#podcast' },
     { label: 'Technical Index', href: '/#skills' },
@@ -82,15 +83,24 @@ export default function Header() {
             aria-label="Primary Navigation"
             className="hidden md:flex items-center border border-[#F4EFE6]/10 divide-x divide-[#F4EFE6]/10 bg-[#07090D]/80 text-xs font-mono"
           >
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="px-4 py-2 text-[#C4CDD8] hover:text-[#FFB86C] hover:bg-[#0C1729] transition-colors select-none"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive =
+                router.pathname === link.href ||
+                (link.href !== '/' && router.asPath.startsWith(link.href) && !link.href.includes('#'));
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`px-4 py-2 transition-colors select-none ${
+                    isActive
+                      ? 'text-[#FFB86C] bg-[#0C1729]'
+                      : 'text-[#C4CDD8] hover:text-[#FFB86C] hover:bg-[#0C1729]'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right Action: Résumé & Mobile Hamburger */}

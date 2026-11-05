@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { allProjects, Project } from '../content/projects';
+import { archiveProjects } from '../content/projects';
 import { GridCrosshair } from './ui/GridCrosshair';
 
 // ---------------------------------------------------------------------------
@@ -330,37 +330,14 @@ const CarelineTransitVisual: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------------
-// Main Export: ProjectLab (0px Swiss Architectural Blueprint Bands + F1 Archive)
+// Main Export: ProjectLab (0px Swiss Architectural Blueprint Bands)
 // ---------------------------------------------------------------------------
 export const ProjectLab: React.FC = () => {
-  const [archiveSearch, setArchiveSearch] = useState('');
-  const [archiveCategory, setArchiveCategory] = useState('all');
-
-  const filteredArchive = useMemo(() => {
-    return allProjects.filter((p: Project) => {
-      const matchDomain =
-        archiveCategory === 'all' ||
-        (archiveCategory === 'ai-ml' && p.category.includes('AI')) ||
-        (archiveCategory === 'systems' && p.category.includes('Systems')) ||
-        (archiveCategory === 'research' && p.category.includes('Research'));
-
-      if (!matchDomain) return false;
-      if (!archiveSearch.trim()) return true;
-
-      const q = archiveSearch.toLowerCase();
-      return (
-        p.title.toLowerCase().includes(q) ||
-        p.stack.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
-      );
-    });
-  }, [archiveSearch, archiveCategory]);
-
   return (
     <section
       id="projects"
       className="relative w-full border-b border-[#F4EFE6]/10 bg-[#07090D]"
-      aria-label="Selected engineering projects and timing sheet archive"
+      aria-label="Selected engineering projects and systems archive gateway"
     >
       <GridCrosshair className="absolute -top-[4.5px] -left-[4.5px]" active />
       <GridCrosshair className="absolute -top-[4.5px] -right-[4.5px]" />
@@ -597,85 +574,82 @@ export const ProjectLab: React.FC = () => {
       </div>
 
       {/* ------------------------------------------------------------------ */}
-      {/* COMPLETE PROJECT ARCHIVE (0px F1 TIMING SHEET LEDGER)               */}
+      {/* GATEWAY TO DEDICATED PROJECT ARCHIVE (0px Swiss Architectural Bay) */}
       {/* ------------------------------------------------------------------ */}
-      <div className="p-6 sm:p-8 lg:p-12 space-y-8 bg-[#07090D]">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#F4EFE6]/10 pb-6">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-[#8A99AD] uppercase tracking-wider mb-2">
-              <span className="text-[#FFB86C] font-semibold">COMPLETE REPOSITORY INDEX</span>
+      <div className="p-6 sm:p-8 lg:p-12 border-t border-[#F4EFE6]/10 space-y-8 bg-[#07090D] relative">
+        <GridCrosshair className="absolute -top-[4.5px] -left-[4.5px]" active />
+        <GridCrosshair className="absolute -top-[4.5px] -right-[4.5px]" />
+
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-[#F4EFE6]/10 pb-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs font-mono text-[#8A99AD] uppercase tracking-wider">
+              <span className="text-[#FFB86C] font-semibold">03.5 // COMPLETE REPOSITORY LEDGER</span>
               <span>18 ARCHIVED SYSTEMS</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-serif text-[#F4EFE6]">
-              Project Archive &amp; Telemetry Timing Sheet
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F4EFE6] tracking-tight">
+              Engineering Systems Archive
             </h3>
+            <p className="text-sm sm:text-base font-sans text-[#A6ADB8] max-w-2xl leading-relaxed">
+              Explore the dedicated timing sheet archive featuring all 18 production systems, AI pipelines, and collegiate research prototypes with interactive keyword search, domain filters, and benchmark telemetry.
+            </p>
           </div>
 
-          {/* Search & Domain Filter Bar */}
-          <div className="flex flex-wrap items-center gap-3">
-            <input
-              type="text"
-              value={archiveSearch}
-              onChange={(e) => setArchiveSearch(e.target.value)}
-              placeholder="Filter by title, stack..."
-              className="px-4 py-2 bg-[#0C1729] border border-[#F4EFE6]/15 text-xs font-mono text-[#F4EFE6] placeholder-[#8A99AD] focus:outline-none focus:border-[#FFB86C] w-64"
-            />
-            <select
-              value={archiveCategory}
-              onChange={(e) => setArchiveCategory(e.target.value)}
-              className="px-3 py-2 bg-[#0C1729] border border-[#F4EFE6]/15 text-xs font-mono text-[#F4EFE6] focus:outline-none focus:border-[#FFB86C] cursor-pointer"
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            <Link
+              href="/projects"
+              className="px-6 py-4 bg-[#FF6B2B] hover:bg-[#FF8147] text-[#07090D] text-xs font-mono font-semibold transition-colors flex items-center justify-between sm:justify-center gap-3 select-none group"
             >
-              <option value="all">All Domains</option>
-              <option value="ai-ml">AI &amp; Vision</option>
-              <option value="systems">Systems &amp; Full-Stack</option>
-              <option value="research">Research &amp; Spatial</option>
-            </select>
+              <span>Explore Complete Archive (18)</span>
+              <span className="text-sm group-hover:translate-x-1 transition-transform">→</span>
+            </Link>
           </div>
         </div>
 
-        {/* F1 SECTOR TIMING SHEET ROWS */}
+        {/* 3 Streamlined Preview Rows with Direct Jump to Full Archive */}
         <div className="border border-[#F4EFE6]/10 divide-y divide-[#F4EFE6]/10">
-          <div className="hidden lg:grid grid-cols-12 gap-4 py-3 px-6 text-[11px] font-mono text-[#8A99AD] uppercase tracking-wider bg-[#0C1729]/60">
+          <div className="hidden lg:grid grid-cols-12 gap-4 py-2.5 px-6 text-[11px] font-mono text-[#8A99AD] uppercase tracking-wider bg-[#0C1729]/60">
             <div className="col-span-1">INDEX</div>
-            <div className="col-span-4">SYSTEM / REPOSITORY</div>
-            <div className="col-span-3">CORE DOMAIN &amp; STACK</div>
-            <div className="col-span-2">VERIFIED BENCHMARK</div>
-            <div className="col-span-2 text-right">ACTION</div>
+            <div className="col-span-4">FEATURED ARCHIVE SYSTEM</div>
+            <div className="col-span-4">STACK &amp; DOMAIN</div>
+            <div className="col-span-3 text-right">TELEMETRY</div>
           </div>
 
-          {filteredArchive.map((proj, idx) => (
+          {archiveProjects.slice(0, 3).map((proj, idx) => (
             <Link
               key={proj.slug}
               href={`/projects/${proj.slug}`}
-              className="py-4 px-6 hover:bg-[#0C1729] transition-all group flex flex-col lg:grid lg:grid-cols-12 gap-2 lg:gap-4 items-start lg:items-center relative"
+              className="py-3.5 px-6 hover:bg-[#0C1729] transition-all group flex flex-col lg:grid lg:grid-cols-12 gap-2 lg:gap-4 items-start lg:items-center relative"
             >
-              <div className="lg:col-span-1 text-xs font-mono text-[#FFB86C] flex items-center gap-1.5 tabular-nums">
-                <span>{(idx + 1).toString().padStart(2, '0')}</span>
+              <div className="lg:col-span-1 text-xs font-mono text-[#FFB86C] tabular-nums">
+                {(idx + 5).toString().padStart(2, '0')}{' '}
                 <span className="text-[#8A99AD] text-[10px]">/{proj.year}</span>
               </div>
-
-              <div className="lg:col-span-4 space-y-0.5">
-                <h4 className="text-lg font-serif text-[#F4EFE6] group-hover:text-[#FFB86C] transition-colors leading-snug">
+              <div className="lg:col-span-4">
+                <span className="text-base font-serif text-[#F4EFE6] group-hover:text-[#FFB86C] transition-colors">
                   {proj.title}
-                </h4>
-                <p className="text-xs font-sans text-[#8A99AD] line-clamp-1">
-                  {proj.description}
-                </p>
+                </span>
               </div>
-
-              <div className="lg:col-span-3 text-xs font-mono text-[#70A5FF] truncate">
+              <div className="lg:col-span-4 text-xs font-mono text-[#70A5FF] truncate">
                 {proj.stack}
               </div>
-
-              <div className="lg:col-span-2 text-xs font-mono text-[#FFE9AE] tabular-nums font-medium">
-                {proj.highlight || proj.statusBadge}
-              </div>
-
-              <div className="lg:col-span-2 lg:text-right text-xs font-mono text-[#FFB86C] group-hover:text-[#FFE9AE]">
-                <span>Case Study ↗</span>
+              <div className="lg:col-span-3 lg:text-right text-xs font-mono text-[#FFE9AE]">
+                <span>{proj.highlight || proj.statusBadge} ↗</span>
               </div>
             </Link>
           ))}
+
+          <div className="py-3.5 px-6 bg-[#0C1729]/30 flex items-center justify-between text-xs font-mono">
+            <span className="text-[#8A99AD]">
+              + 11 additional systems in the dedicated archive
+            </span>
+            <Link
+              href="/projects"
+              className="text-[#FFB86C] hover:text-[#FFE9AE] inline-flex items-center gap-1.5 font-medium transition-colors"
+            >
+              <span>View All 18 Systems in Archive Ledger</span>
+              <span>→</span>
+            </Link>
+          </div>
         </div>
       </div>
     </section>
