@@ -44,7 +44,9 @@ export function useChicaneCircuitKinematics({
   const prevIndexRef = useRef<number>(0);
   const isInitializedRef = useRef<boolean>(false);
   const onArrivalRef = useRef(onArrival);
-  onArrivalRef.current = onArrival;
+  useEffect(() => {
+    onArrivalRef.current = onArrival;
+  }, [onArrival]);
 
   // Compute (x, y, angle) directly from SVG path
   const computeTransform = useCallback(
