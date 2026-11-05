@@ -2,14 +2,20 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { BlurText } from './ui/ReactBitsControls';
-import { ThermalApertureFallback } from './ThermalApertureCanvas';
-import { GridCrosshair } from './ui/GridCrosshair';
 
-const ThermalApertureCanvas = dynamic(
-  () => import('./ThermalApertureCanvas').then((mod) => mod.ThermalApertureCanvas),
+const AsciiDnaLightbulbCanvas = dynamic(
+  () => import('./AsciiDnaLightbulbCanvas').then((mod) => mod.AsciiDnaLightbulbCanvas),
   {
     ssr: false,
-    loading: () => <ThermalApertureFallback />,
+    loading: () => (
+      <div
+        className="absolute inset-0 w-full h-full bg-[#070B12] pointer-events-none"
+        style={{
+          backgroundImage:
+            'radial-gradient(ellipse at 25% 42%, rgba(255, 107, 53, 0.20) 0%, transparent 60%), radial-gradient(ellipse at 74% 35%, rgba(255, 107, 53, 0.12) 0%, transparent 65%)',
+        }}
+      />
+    ),
   }
 );
 
@@ -17,135 +23,88 @@ export const BentoHero: React.FC = () => {
   return (
     <section
       id="hero"
-      className="relative w-full min-h-[94vh] flex flex-col justify-between overflow-hidden bg-[#07090D] border-b border-[#F4EFE6]/10"
-      aria-label="Architectural Stage and Introduction"
+      className="relative w-full h-[100svh] min-h-[100svh] flex flex-col justify-between overflow-hidden bg-[#070B12] text-[#F3EFE7]"
+      aria-label="Ballistic ASCII DNA-Lightbulb Stage and Introduction"
     >
-      {/* 1. Volumetric 3D Stage & WebGL Lamellar Louvre Array */}
-      <ThermalApertureCanvas />
-
-      {/* 2. Top Architectural Header Bar (Flush 1px Swiss Hairline System) */}
-      <div className="relative z-20 w-full border-b border-[#F4EFE6]/10 h-16 px-6 sm:px-8 flex items-center justify-between bg-[#07090D]/90 backdrop-blur-md">
-        <div className="flex items-center gap-4 text-xs font-mono tracking-[0.16em] uppercase text-[#F4EFE6]">
-          <span className="font-semibold text-[#FFB86C]">HARESH MURUGESAN</span>
-          <span className="text-[#F4EFE6]/30">{'//'}</span>
-          <span className="text-[#8A99AD] hidden sm:inline">COLUMBUS, OH · MAY 2028</span>
-        </div>
-
-        {/* Flush Architectural Grid Links with 1px Hairlines */}
-        <nav className="h-full hidden md:flex items-center text-xs font-mono tracking-wider">
-          <Link
-            href="#projects"
-            className="h-full px-6 flex items-center border-l border-[#F4EFE6]/10 text-[#C4CDD8] hover:text-[#FFB86C] hover:bg-[#0C1729] transition-colors"
-          >
-            Works
-          </Link>
-          <Link
-            href="#experience"
-            className="h-full px-6 flex items-center border-l border-[#F4EFE6]/10 text-[#C4CDD8] hover:text-[#FFB86C] hover:bg-[#0C1729] transition-colors"
-          >
-            Experience
-          </Link>
-          <Link
-            href="#podcast"
-            className="h-full px-6 flex items-center border-l border-[#F4EFE6]/10 text-[#C4CDD8] hover:text-[#FFB86C] hover:bg-[#0C1729] transition-colors"
-          >
-            Syntinuum
-          </Link>
-          <Link
-            href="#skills"
-            className="h-full px-6 flex items-center border-l border-[#F4EFE6]/10 text-[#C4CDD8] hover:text-[#FFB86C] hover:bg-[#0C1729] transition-colors"
-          >
-            Technical Index
-          </Link>
-          <a
-            href="/Haresh_Murugesan_Resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="h-full px-6 flex items-center border-l border-[#F4EFE6]/10 text-[#FFB86C] hover:text-[#FFE9AE] hover:bg-[#0C1729] transition-colors font-medium"
-          >
-            Résumé ↗
-          </a>
-        </nav>
-
-        {/* Precision Crosshair Fiducial at Top-Right */}
-        <GridCrosshair className="absolute -bottom-[4.5px] right-6 sm:right-8" />
+      {/* Ambient Architectural Atmospheric Gradient: Left Orange Radiant Glow */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+        {/* Left-Side Radiant Orange Atmosphere */}
+        <div
+          className="absolute -top-[12%] -left-[10%] w-[70vw] h-[105vh] sm:w-[58vw] sm:h-[115vh] opacity-90"
+          style={{
+            background:
+              'radial-gradient(ellipse 65% 55% at 28% 42%, rgba(255, 107, 53, 0.22) 0%, rgba(255, 138, 72, 0.13) 32%, rgba(245, 217, 152, 0.05) 58%, transparent 80%)',
+          }}
+        />
+        {/* Secondary Lower-Left Ignition Launch Origin Warm Bloom */}
+        <div
+          className="absolute bottom-[2%] left-[8%] w-[48vw] h-[48vh] opacity-80"
+          style={{
+            background:
+              'radial-gradient(circle at 35% 65%, rgba(255, 107, 53, 0.18) 0%, rgba(245, 217, 152, 0.05) 45%, transparent 75%)',
+          }}
+        />
       </div>
 
-      {/* 3. Hero Main Blueprint Grid: Upper-Left Diagonal Title + Lower-Right Spec Sheet */}
-      <div className="relative z-10 w-full flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-14 my-auto">
+      {/* 1. Interactive 45° Ballistic ASCII DNA-Lightbulb & Concept D CFD Wind-Tunnel Canvas */}
+      <div className="absolute inset-0 z-0">
+        <AsciiDnaLightbulbCanvas />
+        {/* Soft bottom dissipation mask into next section */}
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#070B12] via-[#070B12]/80 to-transparent pointer-events-none z-10" />
+      </div>
+
+      {/* 2. Top Spacer to accommodate floating clean Header */}
+      <div className="w-full pt-20 sm:pt-24 pointer-events-none" />
+
+      {/* 3. Hero Main Stage: Concise Monumental Serif Headline + Clean Lower-Left Editorial Module */}
+      <div className="relative z-20 w-full max-w-[1520px] mx-auto px-6 sm:px-10 lg:px-16 my-auto flex flex-col justify-center pointer-events-none">
         
-        {/* UPPER-LEFT: Authoritative Diagonal Title Stage (-8deg Desktop, 0deg Mobile) */}
-        <div className="max-w-4xl pt-6 sm:pt-10">
-          <div className="origin-left transform transition-transform duration-500 rotate-0 md:-rotate-[8deg]">
-            {/* Super-Header Telemetry Rail */}
-            <div className="inline-flex items-center gap-3 text-xs font-mono tracking-[0.18em] uppercase text-[#FFB86C] mb-6">
-              <span className="w-2.5 h-[1.5px] bg-[#FF6B2B] shrink-0" />
-              <span>00 // RESEARCH &amp; SYSTEMS ARCHITECTURE</span>
-            </div>
-
-            {/* Monumental Display Headline in Geist Serif Triangle */}
-            <h1 className="font-serif font-normal text-[#F4EFE6] text-[3.2rem] sm:text-[4.75rem] lg:text-[6.2rem] leading-[0.95] tracking-[-0.03em] drop-shadow-[0_16px_40px_rgba(7,9,13,0.95)]">
-              <span className="block text-[#F4EFE6]">
-                <BlurText text="Curious about intelligence." />
-              </span>
-              <span className="block italic text-[#FFE9AE] mt-3 sm:mt-5 pl-0 sm:pl-8 md:pl-16 font-serif">
-                <BlurText text="Obsessed with making it work." delay={0.06} />
-              </span>
-            </h1>
-          </div>
+        {/* Primary Statement (Left Safe Zone strictly clear of 45° thrust line) */}
+        <div id="hero-headline-block" className="max-w-3xl pointer-events-auto">
+          <h1 className="text-[#F3EFE7] text-[2.75rem] sm:text-[4rem] md:text-[5rem] lg:text-[6.25rem] leading-[1.02] tracking-[-0.03em]">
+            <span className="block font-raleway font-bold text-[#F3EFE7] drop-shadow-[0_8px_24px_rgba(7,11,18,0.9)]">
+              <BlurText text="Curious about intelligence." />
+            </span>
+            <span className="block font-serif italic font-normal text-[#F5D998] mt-2.5 sm:mt-5 pl-0 sm:pl-8 md:pl-12 drop-shadow-[0_12px_32px_rgba(7,11,18,0.95)]">
+              <BlurText text="Obsessed with making it work." delay={0.06} />
+            </span>
+          </h1>
         </div>
 
-        {/* LOWER-RIGHT ARCHITECTURAL SPEC SHEET & FLUSH ACTION CELLS */}
-        <div className="w-full flex justify-end mt-12 sm:mt-16">
-          <div className="w-full max-w-[560px] bg-[#07090D]/90 backdrop-blur-md border-t border-l border-[#F4EFE6]/12 relative">
-            {/* Corner Crosshair Fiducials */}
-            <GridCrosshair className="absolute -top-[4.5px] -left-[4.5px]" active />
-            <GridCrosshair className="absolute -top-[4.5px] -right-[4.5px]" />
+        {/* Concise Sub-Module (Lower-Left / Editorial Alignment: Borderless, zero box clutter) */}
+        <div id="hero-subcopy-block" className="w-full max-w-[540px] mt-10 sm:mt-14 lg:mt-16 pointer-events-auto">
+          <div className="space-y-4">
+            {/* Concise Lead (17px-18px, max 46ch, #A7B2C3) */}
+            <p className="text-[16px] sm:text-[17.5px] text-[#A7B2C3] font-sans leading-[1.6] font-normal max-w-[46ch]">
+              Building high-speed computational systems where machine intelligence meets physical reality.
+            </p>
 
-            {/* Editorial Positioning Cell */}
-            <div className="p-6 sm:p-8 space-y-4">
-              <div className="flex items-center justify-between text-[11px] font-mono text-[#8A99AD] uppercase tracking-wider">
-                <span>SPEC // 00.1 POSITIONING</span>
-                <span className="text-[#FFB86C]">OHIO STATE (AI SPEC)</span>
-              </div>
-              <p className="text-[16px] sm:text-[17px] text-[#C4CDD8] font-sans leading-[1.65] font-normal">
-                Computer Science &amp; Engineering researcher and builder at The Ohio State University architecting 3D clinical vision pipelines, deterministic simulation engines, and spatial telemetry architectures.
-              </p>
-            </div>
-
-            {/* Flush Architectural CTA Bar (Zero-Radius 0px Cells with Shared 1px Hairline) */}
-            <div className="flex items-stretch border-t border-[#F4EFE6]/12 text-xs font-mono">
+            {/* Single Primary Editorial CTA */}
+            <div className="pt-2">
               <Link
-                href="#projects"
-                className="flex-1 bg-[#FF6B2B] hover:bg-[#FF8147] text-[#07090D] font-semibold px-6 sm:px-8 py-5 flex items-center justify-between transition-colors select-none group"
+                href="/#projects"
+                className="group inline-flex items-center gap-3 text-sm font-mono text-[#F3EFE7] hover:text-[#F5D998] transition-colors py-1 select-none"
               >
-                <span>Explore Selected Works</span>
-                <span className="text-base group-hover:translate-y-0.5 transition-transform">↓</span>
+                <span className="border-b border-[#FF6B35] pb-0.5 font-medium tracking-wide">
+                  Explore Work
+                </span>
+                <span className="text-base text-[#FF6B35] group-hover:translate-x-1.5 transition-transform duration-300">
+                  →
+                </span>
               </Link>
-              <a
-                href="/Haresh_Murugesan_Resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 bg-[#0C1729] hover:bg-[#132542] text-[#F4EFE6] border-l border-[#F4EFE6]/15 px-6 sm:px-8 py-5 flex items-center justify-between transition-colors select-none font-medium group"
-              >
-                <span>Curriculum Vitae (PDF)</span>
-                <span className="text-sm text-[#FFB86C] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
-              </a>
             </div>
           </div>
         </div>
 
       </div>
 
-      {/* 4. Bottom Architectural Datum Line */}
-      <div className="relative z-10 w-full h-11 border-t border-[#F4EFE6]/10 px-6 sm:px-8 flex items-center justify-between text-xs font-mono text-[#8A99AD] bg-[#07090D]/95">
-        <div className="flex items-center gap-3">
-          <span className="text-[#FFB86C]">00</span>
-          <span>LATENCY // DETERMINISM // VERIFIABLE BENCHMARKS</span>
-        </div>
-        <div className="hidden sm:flex items-center gap-6">
-          <span>SCROLL PROGRESS 00%</span>
-          <span className="text-[#FF6B2B]">● VERIFIED CLIENT RUNTIME</span>
+      {/* 4. Restrained Exit Transition (Clean scroll prompt) */}
+      <div className="relative z-20 w-full max-w-[1520px] mx-auto px-6 sm:px-10 lg:px-16 pb-6 pt-2 flex items-center justify-end text-xs font-mono text-[#7A889B] pointer-events-none">
+        <div className="flex items-center gap-2 text-[#A7B2C3] pointer-events-auto">
+          <Link href="#about" className="hover:text-[#F3EFE7] transition-colors inline-flex items-center gap-2">
+            <span>SCROLL TO EXPLORE</span>
+            <span className="text-[#FF6B35] animate-bounce">↓</span>
+          </Link>
         </div>
       </div>
     </section>

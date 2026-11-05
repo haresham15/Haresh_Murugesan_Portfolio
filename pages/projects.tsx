@@ -9,16 +9,21 @@ import AntigravityParticles from '@/components/AntigravityParticles';
 import { MotionPreferenceProvider } from '@/components/MotionPreference';
 import { GridCrosshair } from '@/components/ui/GridCrosshair';
 import { allProjects, Project } from '@/content/projects';
+import SystemsCodeGraph from '@/components/SystemsCodeGraph';
 
 export default function ProjectsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'All' | 'AI & Vision' | 'Full-Stack Systems' | 'Research & Data' | 'Systems & Core'>('All');
   const [sortBy, setSortBy] = useState<'latest' | 'flagship' | 'title'>('latest');
+  const [viewFormat, setViewFormat] = useState<'topology' | 'table'>('topology');
 
-  // Sync category with URL query param if present
+  // Sync category & view format with URL query params if present
   useEffect(() => {
     if (router.isReady) {
+      if (router.query.view && (router.query.view === 'topology' || router.query.view === 'table')) {
+        setViewFormat(router.query.view as any);
+      }
       if (router.query.category) {
         const cat = String(router.query.category);
         if (['All', 'AI & Vision', 'Full-Stack Systems', 'Research & Data', 'Systems & Core'].includes(cat)) {
@@ -160,8 +165,6 @@ export default function ProjectsPage() {
               <Link href="/" className="hover:text-[#FFB86C] transition-colors">HOME</Link>
               <span className="text-[#F4EFE6]/25">/</span>
               <span className="text-[#FFB86C] font-semibold">PROJECT ARCHIVE</span>
-              <span className="text-[#F4EFE6]/25">/</span>
-              <span>INDEX // 04.0</span>
             </div>
             <div className="flex items-center gap-4 text-[11px]">
               <span className="hidden sm:inline">18 VERIFIED REPOSITORIES</span>
@@ -175,11 +178,7 @@ export default function ProjectsPage() {
             <GridCrosshair className="absolute -top-[4.5px] -right-[4.5px]" />
 
             <div className="max-w-4xl space-y-5">
-              <div className="inline-flex items-center gap-3 text-xs font-mono tracking-[0.18em] uppercase text-[#FFB86C]">
-                <span className="w-2.5 h-[1.5px] bg-[#FF6B2B] shrink-0" />
-                <span>04 // SYSTEMATIC REPOSITORY INDEX</span>
-              </div>
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4EFE6] tracking-tight leading-[1.05]">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-raleway font-bold text-[#F4EFE6] tracking-tight leading-[1.05]">
                 Engineering Systems Archive
               </h1>
               <p className="text-base sm:text-lg font-sans text-[#C4CDD8] max-w-3xl leading-[1.7] font-normal">
@@ -191,29 +190,69 @@ export default function ProjectsPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 border border-[#F4EFE6]/10 divide-x divide-y lg:divide-y-0 divide-[#F4EFE6]/10 mt-10 bg-[#0C1729]/30">
               <div className="p-5 sm:p-6 space-y-1">
                 <span className="text-[11px] font-mono text-[#8A99AD] uppercase tracking-wider block">TOTAL SYSTEMS</span>
-                <div className="text-3xl sm:text-4xl font-serif text-[#FFB86C] tabular-nums font-normal">18</div>
+                <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#FFB86C] tabular-nums">18</div>
                 <span className="text-xs font-sans text-[#9BA8B8] block">Documented codebases</span>
               </div>
               <div className="p-5 sm:p-6 space-y-1">
                 <span className="text-[11px] font-mono text-[#8A99AD] uppercase tracking-wider block">FLAGSHIP DEEP-DIVES</span>
-                <div className="text-3xl sm:text-4xl font-serif text-[#F4EFE6] tabular-nums font-normal">04</div>
+                <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#F4EFE6] tabular-nums">04</div>
                 <span className="text-xs font-sans text-[#9BA8B8] block">Interactive case studies</span>
               </div>
               <div className="p-5 sm:p-6 space-y-1">
                 <span className="text-[11px] font-mono text-[#8A99AD] uppercase tracking-wider block">EDGE DISTRIBUTION</span>
-                <div className="text-3xl sm:text-4xl font-serif text-[#4CC38A] tabular-nums font-normal">100%</div>
+                <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#4CC38A] tabular-nums">100%</div>
                 <span className="text-xs font-sans text-[#9BA8B8] block">Pre-rendered SSG export</span>
               </div>
               <div className="p-5 sm:p-6 space-y-1">
                 <span className="text-[11px] font-mono text-[#8A99AD] uppercase tracking-wider block">ACADEMIC RECOGNITION</span>
-                <div className="text-3xl sm:text-4xl font-serif text-[#FFE9AE] tabular-nums font-normal">2×</div>
+                <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#FFE9AE] tabular-nums">2×</div>
                 <span className="text-xs font-sans text-[#9BA8B8] block">ASA DataFest 1st Place</span>
               </div>
             </div>
           </section>
 
-          {/* 3. INTERACTIVE CONTROL PANEL (0px Hairlines) */}
-          <section className="p-6 sm:p-8 lg:p-10 border-b border-[#F4EFE6]/10 bg-[#07090D] relative space-y-6">
+          {/* PRIMARY VIEW SWITCHER: Systems Topology vs Timing Sheet Ledger */}
+          <section className="px-6 sm:px-8 lg:px-10 py-4 bg-[#0C1729]/80 border-b border-[#F4EFE6]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4CC38A]" />
+              <span className="font-mono text-[#8A99AD] uppercase tracking-wider text-[11px]">Exploration Mode:</span>
+            </div>
+            <div className="flex items-center border border-[#F4EFE6]/15 bg-[#07090D] rounded-[2px] overflow-hidden text-xs">
+              <button
+                type="button"
+                onClick={() => setViewFormat('topology')}
+                className={`px-4 py-2 font-medium transition-colors cursor-pointer flex items-center gap-2 ${
+                  viewFormat === 'topology'
+                    ? 'bg-[#FF6B35] text-[#07090D] font-semibold'
+                    : 'text-[#C4CDD8] hover:text-[#FFB86C]'
+                }`}
+              >
+                <span>Interactive Vector Topology</span>
+                <span className="font-mono text-[11px] opacity-80">(18)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewFormat('table')}
+                className={`px-4 py-2 font-medium transition-colors cursor-pointer flex items-center gap-2 border-l border-[#F4EFE6]/15 ${
+                  viewFormat === 'table'
+                    ? 'bg-[#82B7FF] text-[#07090D] font-semibold'
+                    : 'text-[#C4CDD8] hover:text-[#FFB86C]'
+                }`}
+              >
+                <span>Timing Sheet Ledger</span>
+              </button>
+            </div>
+          </section>
+
+          {/* 3. CONDITIONAL VIEW: TOPOLOGY GRAPH OR LEDGER */}
+          {viewFormat === 'topology' ? (
+            <section className="bg-[#07090D] border-b border-[#F4EFE6]/10">
+              <SystemsCodeGraph />
+            </section>
+          ) : (
+            <>
+              {/* 3. INTERACTIVE CONTROL PANEL (0px Hairlines) */}
+              <section className="p-6 sm:p-8 lg:p-10 border-b border-[#F4EFE6]/10 bg-[#07090D] relative space-y-6">
             <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
               
               {/* Search Bar */}
@@ -252,7 +291,7 @@ export default function ProjectsPage() {
 
               {/* Sort Dropdown */}
               <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-[#8A99AD] uppercase tracking-wider hidden sm:inline">SORT //</span>
+                <span className="text-xs font-mono text-[#8A99AD] uppercase tracking-wider hidden sm:inline">Sort:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
@@ -374,7 +413,7 @@ export default function ProjectsPage() {
                           {proj.stack}
                         </div>
                         <div className="text-[11px] font-mono text-[#8A99AD]">
-                          <span className="text-[#F4EFE6]/30 uppercase text-[10px]">CATEGORY //</span> {proj.category}
+                          <span className="text-[#F4EFE6]/30 uppercase text-[10px]">Category:</span> {proj.category}
                         </div>
                       </div>
 
@@ -441,6 +480,8 @@ export default function ProjectsPage() {
               )}
             </div>
           </section>
+            </>
+          )}
 
           {/* 5. AUTHORITY CLOSING & CONTACT (Rendered Once) */}
           <ContactFooter />

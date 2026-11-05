@@ -167,7 +167,7 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-heading font-extrabold text-text-primary tracking-tight leading-[1.1] mb-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-raleway font-extrabold text-text-primary tracking-tight leading-[1.1] mb-6">
               {project.title}
             </h1>
 

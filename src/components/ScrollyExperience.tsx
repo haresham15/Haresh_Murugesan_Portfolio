@@ -1,353 +1,253 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { GridCrosshair } from './ui/GridCrosshair';
+import React, { useState, useEffect, useCallback } from 'react';
+import { SectionContainer } from './ui/SectionContainer';
+import { ChicaneCircuitTrack } from './experience/ChicaneCircuitTrack';
+import { ExperienceDossierStage, DetailedExperienceRecord } from './experience/ExperienceDossierStage';
 
-const MotionDiv = motion.div as any;
+export interface ExperienceItem extends DetailedExperienceRecord {}
 
-interface ExperienceItem {
-  id: string;
-  index: string;
-  year: string;
-  period: string;
-  role: string;
-  company: string;
-  division?: string;
-  classification: string;
-  category: 'Employment' | 'Research' | 'Leadership' | 'Podcast';
-  contextSentence: string;
-  bullets: [string, string];
-  expandedBullets?: string[];
-  stack: string[];
-  verifiedOutcome: string;
-}
-
-const experiences: ExperienceItem[] = [
+export const experiences: ExperienceItem[] = [
   {
     id: 'cas',
-    index: '01 / 05',
     year: '2026',
-    period: 'May 2026 – Aug 2026',
-    role: 'Technology Intern — Systems & Software Engineering',
+    period: 'Summer 2026 (May – Aug 2026)',
+    role: 'Technology Intern — Systems & AI Software Development',
     company: 'Chemical Abstracts Service (CAS)',
-    division: 'DA&I Division, ACE Team',
+    teamOrDivision: 'DA&I Division, ACE Team',
+    location: 'Columbus, OH',
     classification: 'INDUSTRY SOFTWARE & SYSTEMS',
-    category: 'Employment',
-    contextSentence: 'Engineered serverless microservices and high-throughput data pipelines for enterprise scientific research retrieval across 12 distinct data use cases.',
+    leadSummary:
+      'Architected serverless web applications and agentic workflow integrations across 12 distinct internal use cases, streamlining high-throughput scientific data ingestion and enterprise research retrieval.',
     bullets: [
-      'Architected resilient AWS infrastructure (S3, DynamoDB, Lambda) to parse and index high-volume chemical research metadata with sub-second retrieval.',
-      'Authored C4 model system architecture diagrams and standardized trunk-based CI/CD pipelines enforcing strict schema validation.',
+      'Architected resilient AWS cloud infrastructure utilizing S3, DynamoDB, and Lambda microservices to process high-volume chemical research metadata with sub-second retrieval latency.',
+      'Implemented serverless web applications and agentic workflow integrations across 12 internal use cases, streamlining scientific data ingestion and analysis pipelines.',
+      'Authored comprehensive C4 system architecture diagrams and standardized trunk-based CI/CD deployment pipelines enforcing strict schema validation and IAM least-privilege security policies.',
     ],
-    expandedBullets: [
-      'Standardized AWS IAM least-privilege security policies and CloudWatch alarms across microservices.',
-      'Partnered directly with principal data architects to map enterprise data ingestion topologies.',
+    skillsDemonstrated: [
+      'AWS Lambda',
+      'Amazon DynamoDB',
+      'Amazon S3',
+      'Agentic Workflows',
+      'Python',
+      'TypeScript',
+      'C4 Architecture',
+      'Trunk-based CI/CD',
     ],
-    stack: ['AWS Lambda', 'DynamoDB', 'S3', 'Python', 'TypeScript', 'C4 Architecture'],
     verifiedOutcome: 'Delivered 12 serverless workflows processing scientific research datasets with sub-second retrieval.',
+    evidenceIds: ['cas-aws-scale'],
   },
   {
     id: 'osu-research',
-    index: '02 / 05',
     year: '2026',
-    period: 'June 2026 – Present',
-    role: 'Undergraduate Research Assistant — Computer Vision & Digital Pathology',
+    period: 'Summer 2026 – Present (June 2026 – Present)',
+    role: 'Undergraduate AI/ML Researcher',
     company: 'The Ohio State University',
-    division: 'Digital Pathology & Clinical Diagnostics Lab',
+    teamOrDivision: 'Digital Pathology & Clinical Diagnostics Lab',
+    location: 'Columbus, OH',
     classification: 'ACADEMIC AI/ML RESEARCH',
-    category: 'Research',
-    contextSentence: 'Building computer vision segmentation pipelines and image-processing algorithms for automated histological feature extraction and clinical boundary identification.',
+    leadSummary:
+      'Developing deep learning and computer vision architectures (CNNs, segmentation models) to automate histological tissue feature extraction and clinical boundary identification.',
     bullets: [
       'Developed computer vision segmentation pipelines reducing false-positive boundary artifacts across clinical image benchmarks.',
-      'Implemented custom evaluation scripts calculating Dice coefficient and intersection-over-union (IoU) metrics against board-certified pathologist ground-truth annotations.',
+      'Implemented custom evaluation scripts calculating Dice coefficient and intersection-over-union (IoU) metrics against board-certified pathologist annotations under varying stain intensity distributions.',
+      'Collaborating with multidisciplinary clinical research faculty to translate computational saliency maps into explainable decision-support tools for pathology workflows.',
     ],
-    expandedBullets: [
-      'Evaluated measurement reproducibility across clinical image benchmarks under varying stain intensity distributions.',
+    skillsDemonstrated: [
+      'Computer Vision',
+      'PyTorch',
+      'TensorFlow',
+      'OpenCV',
+      'Digital Pathology',
+      'Explainable AI',
+      'Medical Image Segmentation',
     ],
-    stack: ['Python', 'TensorFlow', 'PyTorch', 'OpenCV', 'Computer Vision'],
     verifiedOutcome: 'Automated tissue feature extraction pipelines with rigorous cross-validated benchmark evaluations.',
+    projectSlugs: ['cv-allergy-wheal', 'healios'],
+    evidenceIds: ['healios-xai-saliency', 'healios-hsv-segmentation'],
   },
   {
     id: 'honda-99p',
-    index: '03 / 05',
-    year: '2025',
-    period: 'May 2025 – Present',
-    role: 'Innovation Analyst Intern',
-    company: 'Honda Research Institute / 99P Labs',
-    division: 'Connected Mobility Data Accelerator',
+    year: '2025–2026',
+    period: 'Feb 2026 – Present',
+    role: 'Innovation Analyst',
+    company: 'Center for Innovation Strategies at OSU',
+    teamOrDivision: 'Honda 99P Labs Connected Mobility Data Accelerator',
+    location: 'Columbus, OH',
     classification: 'CONNECTED VEHICLE TELEMATICS',
-    category: 'Employment',
-    contextSentence: 'Analyzed connected-vehicle telemetry datasets to identify fleet mobility edge cases and spatial energy consumption dynamics.',
+    leadSummary:
+      'Synthesized mobility telemetry and spatial datasets across 1,000+ vehicle trip models to uncover urban driving energy efficiency patterns and battery degradation trends.',
     bullets: [
-      'Built and evaluated 1,000+ data models and spatial visualizations across connected-vehicle telemetry datasets in the 99P Labs developer ecosystem.',
-      'Identified fleet telematics edge cases and synthesized actionable mobility insights presented directly to senior research leadership.',
+      'Built and evaluated 1,000+ data models and spatial visualizations across connected-vehicle telemetry datasets in the 99P Labs ecosystem.',
+      'Constructed geospatial data pipelines and interactive dashboards evaluating connected-vehicle sensor feeds, translating complex telemetry into clear strategic recommendations.',
+      'Presented technical data architecture, mobility insights, and predictive modeling findings directly to Honda Research Institute and 99P Labs engineering leadership.',
     ],
-    expandedBullets: [
-      'Created geospatial heatmaps analyzing urban route congestion and EV battery depletion rates under varying ambient temperatures.',
+    skillsDemonstrated: [
+      'Connected Vehicle Telemetry',
+      'Spatial Data Analytics',
+      'Python',
+      'Pandas',
+      'Geospatial Visualization',
+      'Stakeholder Communication',
     ],
-    stack: ['Python', 'Pandas', 'Spatial Telemetry', 'Data Modeling', 'Geospatial Analysis'],
     verifiedOutcome: '1,000+ telemetry models developed; strategic findings presented to Honda Research leadership.',
+    evidenceIds: ['routerx-careline-transit-gap'],
   },
   {
     id: 'philocracy',
-    index: '04 / 05',
-    year: '2024',
-    period: '2024 – 2025',
-    role: 'CEO & Director of Finances',
+    year: '2024–2025',
+    period: 'Dec 2025 – Present',
+    role: 'Founder & Co-CEO',
     company: 'Philocracy',
-    division: 'Structured Deliberation Platform',
+    teamOrDivision: 'Structured Deliberation Platform & Social Impact',
+    location: 'Columbus, OH',
     classification: 'PRODUCT ARCHITECTURE & GOVERNANCE',
-    category: 'Leadership',
-    contextSentence: 'Led product engineering and operational roadmap for an online debate platform modeling complex philosophical arguments.',
+    leadSummary:
+      'Directing technical architecture for structured argument-tree platforms while leading fiscal strategy, production sourcing, and operations for a philanthropic social enterprise.',
     bullets: [
-      'Directed engineering architecture for a structured debate platform utilizing nested argument-tree data schemas in TypeScript.',
-      'Managed financial allocation and operational budgets while leading full-lifecycle frontend and API development using Next.js and Tailwind CSS.',
+      'Founded and scaled a non-profit streetwear and social-impact organization, directing fiscal strategy, production sourcing, and digital community engagement.',
+      'Directed engineering architecture for a structured debate platform utilizing nested argument-tree data schemas in TypeScript with zero circular dependencies.',
+      'Reinvested 100% of net proceeds into community outreach and philanthropic initiatives while maintaining lean inventory operations and transparent financial reporting.',
     ],
-    expandedBullets: [
-      'Designed cycle-free recursive graph schemas ensuring reliable argument traversal and zero circular dependencies.',
+    skillsDemonstrated: [
+      'Next.js',
+      'React',
+      'TypeScript',
+      'Tailwind CSS',
+      'Recursive Tree Schemas',
+      'Fiscal Allocation',
+      'Operations Management',
     ],
-    stack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Tree Schemas'],
     verifiedOutcome: 'Engineered nested argument-tree deliberation engine and directed company product roadmap.',
+    projectSlugs: ['philocracy'],
   },
   {
     id: 'syntinuum',
-    index: '05 / 05',
-    year: '2023',
-    period: 'August 2023 – Present',
-    role: 'Founder & Host',
-    company: 'Syntinuum: Endless Evolutions Podcast',
-    division: 'Engineering Conversations Series',
+    year: '2023–2025',
+    period: 'Dec 2025 – Present',
+    role: 'Host & Producer (Season 3)',
+    company: 'Syntinuum Podcast',
+    teamOrDivision: 'Engineering Conversations Series (Formerly Adapt)',
+    location: 'Columbus, OH',
     classification: 'TECHNICAL JOURNALISM & SYSTEMS DIALOGUES',
-    category: 'Podcast',
-    contextSentence: 'Producing and hosting technical dialogues exploring architectural systems, algorithmic research, and startup engineering trade-offs.',
+    leadSummary:
+      'Engineered and produce an engineering leadership podcast exploring system architecture, scaling dilemmas, and technical tradeoffs with startup founders, researchers, and executives.',
     bullets: [
-      'Conducted 10+ long-form interviews with engineering founders, research scientists, and technology executives across healthcare, aerospace, and software.',
-      'Reached 100K+ combined impressions across Spotify, Apple Podcasts, and YouTube through technical engineering journalism.',
+      'Conducted long-form interviews with engineering founders, research scientists, and technology executives across healthcare, aerospace, and software.',
+      'Grew listenership to over 100K+ combined cross-platform impressions across Spotify, Apple Podcasts, and YouTube through technical engineering journalism.',
+      'Engineered a custom audio-streaming web platform with continuous playback and episode metadata parsing to support seamless listener discovery.',
     ],
-    expandedBullets: [
-      'Researched and authored technical discussion briefs dissecting distributed consensus, microservice decoupling, and biomedical regulatory requirements.',
+    skillsDemonstrated: [
+      'Technical Communication',
+      'Audio Engineering',
+      'React',
+      'Next.js',
+      'System Architecture Interviewing',
     ],
-    stack: ['Audio Engineering', 'Technical Journalism', 'Systems Research', 'Founder Dialogues'],
     verifiedOutcome: '10+ technical founder interviews produced; 100K+ impressions generated.',
+    projectSlugs: ['syntinuum-podcast-website'],
   },
 ];
 
 export const ScrollyExperience: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const totalCount = experiences.length;
 
-  const toggleExpand = (id: string) => {
-    setExpandedId((prev) => (prev === id ? null : id));
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const rows = document.querySelectorAll('.experience-bay');
-      const viewportCenter = window.innerHeight * 0.45;
-      let closestIdx = 0;
-      let minDiff = Infinity;
-
-      rows.forEach((row, idx) => {
-        const rect = row.getBoundingClientRect();
-        const diff = Math.abs(rect.top - viewportCenter);
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestIdx = idx;
-        }
-      });
-
-      setActiveIndex(closestIdx);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+  const handleSelectIndex = useCallback((index: number) => {
+    setActiveIndex(index);
   }, []);
 
-  const activeItem = experiences[activeIndex] || experiences[0];
+  const handlePrev = useCallback(() => {
+    setActiveIndex((prev) => (prev > 0 ? prev - 1 : totalCount - 1));
+  }, [totalCount]);
+
+  const handleNext = useCallback(() => {
+    setActiveIndex((prev) => (prev < totalCount - 1 ? prev + 1 : 0));
+  }, [totalCount]);
+
+  // Keyboard navigation when user is on the section
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        document.activeElement instanceof HTMLInputElement ||
+        document.activeElement instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handlePrev();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handlePrev, handleNext]);
+
+  const activeRecord = experiences[activeIndex] || experiences[0];
 
   return (
-    <section
+    <SectionContainer
       id="experience"
-      ref={containerRef}
-      className="relative w-full border-b border-[#F4EFE6]/10 bg-[#07090D]"
-      aria-label="Experience and verified research engineering history"
+      variant="full"
+      bgMode="clean"
+      className="py-16 sm:py-20 lg:py-24 border-b border-[#F3EFE7]/[0.08]"
+      aria-label="Experience & Proven Systems"
     >
-      {/* Precision Corner Crosshair */}
-      <GridCrosshair className="absolute -top-[4.5px] -left-[4.5px]" active />
-      <GridCrosshair className="absolute -top-[4.5px] -right-[4.5px]" />
-
-      {/* 12-Column Split-Screen Vernier Blueprint Architecture */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 relative">
-        
-        {/* LEFT STICKY VERNIER RAIL (Cols 1–4, Desktop) */}
-        <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#F4EFE6]/10 p-6 sm:p-8 lg:p-12 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] flex flex-col justify-between bg-[#07090D]/95 z-10">
-          
-          <div className="space-y-6">
-            <div className="flex items-center justify-between text-xs font-mono text-[#8A99AD] uppercase tracking-wider">
-              <span className="text-[#FFB86C] font-semibold">02 // VERIFIED TELEMETRY</span>
-              <span className="tabular-nums">{activeItem.index}</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F4EFE6] leading-none tracking-tight">
-              Experience
-            </h2>
-
-            <p className="text-sm font-sans text-[#9BA8B8] leading-relaxed pt-2">
-              Engineering internships, collegiate artificial intelligence research, and executive product leadership grounded in verified deliverables.
-            </p>
-          </div>
-
-          {/* Live Mechanical Vernier Scale & Dynamic Focal Readout */}
-          <div className="space-y-6 pt-8 border-t border-[#F4EFE6]/10">
-            {/* Monumental Year Display */}
-            <div className="space-y-1">
-              <span className="text-[11px] font-mono text-[#8A99AD] uppercase block tracking-wider">
-                CHRONO DATUM //
-              </span>
-              <div className="text-5xl lg:text-6xl font-serif text-[#FFB86C] tabular-nums font-normal">
-                {activeItem.year}
-              </div>
-              <div className="text-xs font-mono text-[#F4EFE6] tracking-wider uppercase pt-1">
-                {activeItem.classification}
-              </div>
-            </div>
-
-            {/* Vernier Millimeter Tick Track */}
-            <div className="w-full flex items-center justify-between gap-1 pt-4">
-              {Array.from({ length: 24 }).map((_, i) => {
-                const isSelected = Math.floor((i / 24) * experiences.length) === activeIndex;
-                const isMajor = i % 6 === 0;
-                return (
-                  <div
-                    key={i}
-                    className={`transition-all duration-200 ${
-                      isSelected
-                        ? 'w-[2px] h-7 bg-[#FF6B2B] shadow-[0_0_8px_#FF6B2B]'
-                        : isMajor
-                        ? 'w-[1.5px] h-5 bg-[#F4EFE6]/40'
-                        : 'w-[1px] h-3 bg-[#F4EFE6]/15'
-                    }`}
-                  />
-                );
-              })}
-            </div>
-
-            <div className="text-[11px] font-mono text-[#8A99AD] flex justify-between pt-1">
-              <span>00 START (2023)</span>
-              <span className="text-[#FFB86C]">ACTIVE (2026)</span>
-            </div>
-          </div>
-
+      {/* 1. SECTION INTRO (Editorial Headline & Subtext) */}
+      <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6 mb-8 sm:mb-10">
+        <div className="max-w-2xl space-y-2.5">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
+            Experience &amp; <span className="italic text-[#F5D998]">Proven Systems.</span>
+          </h2>
+          <p className="text-sm sm:text-base font-sans text-[#A7B2C3] leading-relaxed">
+            Autonomous software engineering, deep learning research, and mobility telematics delivered across enterprise workflows, collegiate diagnostics, and venture roadmaps.
+          </p>
         </div>
-
-        {/* RIGHT SCRUBBED EVIDENCE STREAM (Cols 5–12) */}
-        <div className="lg:col-span-8 divide-y divide-[#F4EFE6]/10">
-          {experiences.map((exp, idx) => {
-            const isCurrentFocus = activeIndex === idx;
-            const isExpanded = expandedId === exp.id;
-
-            return (
-              <div
-                key={exp.id}
-                className={`experience-bay py-12 lg:py-16 px-6 sm:px-10 lg:px-14 transition-colors duration-300 relative ${
-                  isCurrentFocus ? 'bg-[#0C1729]/35' : 'hover:bg-[#0C1729]/20'
-                }`}
-              >
-                {/* 1px Specular Catchlight when focused */}
-                {isCurrentFocus && (
-                  <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#FFB86C] to-transparent pointer-events-none" />
-                )}
-
-                <div className="space-y-6">
-                  {/* Top Gutter: Company & Dates */}
-                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-[#F4EFE6]/10 pb-4">
-                    <div className="space-y-1">
-                      <h3 className="text-2xl sm:text-3xl font-serif text-[#F4EFE6] tracking-tight">
-                        {exp.company}
-                      </h3>
-                      {exp.division && (
-                        <div className="text-xs font-mono text-[#8A99AD]">
-                          {exp.division}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-xs font-mono text-[#FFB86C] tabular-nums sm:text-right shrink-0">
-                      {exp.period}
-                    </div>
-                  </div>
-
-                  {/* Role Title */}
-                  <div className="text-sm sm:text-base font-mono text-[#70A5FF]">
-                    {exp.role}
-                  </div>
-
-                  {/* Bold Context Sentence */}
-                  <p className="text-[17px] sm:text-[18px] font-sans text-[#F4EFE6] leading-[1.65]">
-                    {exp.contextSentence}
-                  </p>
-
-                  {/* Concrete Evidence Bullets */}
-                  <ul className="space-y-3 text-[15px] sm:text-[16px] font-sans text-[#9BA8B8] leading-[1.7]">
-                    {exp.bullets.map((bullet, bIdx) => (
-                      <li key={bIdx} className="flex items-start gap-3">
-                        <span className="text-[#FF6B2B] text-sm select-none font-mono mt-0.5">▸</span>
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* Architecture & Outcomes Expandable Drawer */}
-                  {exp.expandedBullets && exp.expandedBullets.length > 0 && (
-                    <div className="pt-2">
-                      <button
-                        onClick={() => toggleExpand(exp.id)}
-                        className="text-xs font-mono text-[#FFB86C] hover:text-[#FFE9AE] inline-flex items-center gap-1.5 transition-colors cursor-pointer select-none py-1"
-                        aria-expanded={isExpanded}
-                      >
-                        <span>{isExpanded ? '[ − CLOSE ARCHITECTURAL SPECIFICATION ]' : '[ + INSPECT ARCHITECTURE & OUTCOMES ]'}</span>
-                      </button>
-
-                      <AnimatePresence>
-                        {isExpanded && (
-                          <MotionDiv
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                            className="overflow-hidden pt-4 space-y-2.5 text-[14px] font-sans text-[#C4CDD8] pl-4 border-l border-[#FF6B2B]/40 my-3"
-                          >
-                            {exp.expandedBullets.map((eb, ebIdx) => (
-                              <div key={ebIdx}>
-                                <span>{eb}</span>
-                              </div>
-                            ))}
-                            <div className="text-xs font-mono text-[#FFB86C] pt-2">
-                              VERIFIED BENCHMARK: {exp.verifiedOutcome}
-                            </div>
-                          </MotionDiv>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  )}
-
-                  {/* Inline Middle-Dot Tech Stack (BAN Cramped Pills) */}
-                  <div className="pt-3 border-t border-[#F4EFE6]/10 text-xs font-mono text-[#8A99AD] flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                    <span className="text-[#FF6B2B] font-semibold uppercase tracking-wider text-[11px]">STACK //</span>
-                    {exp.stack.map((tech, tIdx) => (
-                      <React.Fragment key={tIdx}>
-                        <span className="hover:text-[#F4EFE6] transition-colors">{tech}</span>
-                        {tIdx < exp.stack.length - 1 && <span className="text-[#F4EFE6]/25 select-none">·</span>}
-                      </React.Fragment>
-                    ))}
-                  </div>
-
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
       </div>
-    </section>
+
+      {/* 2. HORIZONTAL CHICANE RACE TRACK (100vw Full-Bleed Spline & Top-Down DNA Aero Prototype) */}
+      <div className="w-screen relative left-1/2 -translate-x-1/2 mb-6 sm:mb-8">
+        <ChicaneCircuitTrack
+          items={experiences.map((exp) => ({
+            id: exp.id,
+            role: exp.role,
+            company: exp.company,
+            period: exp.period,
+            year: exp.year,
+          }))}
+          activeIndex={activeIndex}
+          onSelectIndex={handleSelectIndex}
+        />
+      </div>
+
+      {/* 3. SYNCHRONIZED EXPERIENCE DOSSIER STAGE (Compact Swiss Architectural Stage) */}
+      <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6">
+        <ExperienceDossierStage
+          record={activeRecord}
+          currentIndex={activeIndex}
+          totalCount={totalCount}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
+      </div>
+
+      {/* 4. EDITORIAL TRANSITION INTO SELECTED WORKS */}
+      <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6 pt-10 sm:pt-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-[#F3EFE7]/[0.08] mt-12">
+        <div className="text-xs font-mono text-[#7A889B] uppercase tracking-wider">
+          Verified Systems &amp; Benchmark Evidence
+        </div>
+        <a
+          href="#projects"
+          className="text-[#FF6B35] hover:text-[#F5D998] transition-colors inline-flex items-center gap-2 text-xs font-mono uppercase font-semibold"
+        >
+          <span>Explore Selected Engineering Case Studies</span>
+          <span>↓</span>
+        </a>
+      </div>
+    </SectionContainer>
   );
 };
 

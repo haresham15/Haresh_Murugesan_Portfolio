@@ -1,457 +1,181 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { GridCrosshair } from './ui/GridCrosshair';
+import { SectionContainer } from './ui/SectionContainer';
+import { GridCrosshair } from './ui/EditorialPrimitives';
 
-export type ToolDomain = 'ai-ml' | 'frontend-3d' | 'backend-cloud' | 'systems-hardware';
-
-export interface TechTool {
-  name: string;
-  tag: string;
-  iconPath?: string;
-  svgIcon?: React.ReactNode;
-  domain: ToolDomain;
-  powersProjects: string[];
-  provenance: {
-    project: string;
-    slug: string;
-    role: string;
+export interface SkillCategory {
+  id: string;
+  number: string;
+  title: string;
+  description: string;
+  items: {
+    name: string;
+    proof: string;
+    proofLink?: string;
+    metric?: string;
   }[];
 }
 
-const CppSvg = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <path d="M14 6C12 4 8 4 6 7C4 10 4 14 6 17C8 20 12 20 14 18" stroke="#70A5FF" strokeWidth="2.2" strokeLinecap="round" />
-    <path d="M16 12H20M18 10V14M21 12H23M22 11V13" stroke="#FFB86C" strokeWidth="1.8" strokeLinecap="round" />
-  </svg>
-);
-
-const ThreeJsSvg = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <path d="M4 4L20 9L15 20L4 4Z" stroke="#70A5FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M4 4L14 13L15 20" stroke="#FFE9AE" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const FramerMotionSvg = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <path d="M4 2H20V9H12L4 2Z" fill="#FFB86C" />
-    <path d="M4 9H12L20 16H4V9Z" fill="#FF6B2B" />
-    <path d="M4 16H12L4 23V16Z" fill="#C8321E" />
-  </svg>
-);
-
-const SwiftSvg = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <path d="M20 16C16 20 8 20 3 16C7 17 11 16 14 13C10 13 6 10 4 7C7 8 10 9 13 8C8 7 5 3 5 2C9 5 14 7 19 6C17 9 14 11 12 11C15 12 18 13 20 16Z" fill="#FF8547" />
-  </svg>
-);
-
-const CanvasSvg = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <rect x="3" y="3" width="18" height="18" rx="0" stroke="#FFB86C" strokeWidth="1.8" />
-    <path d="M7 17L11 11L15 15L17 13" stroke="#FF6B2B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    <circle cx="8" cy="8" r="1.5" fill="#FFE9AE" />
-  </svg>
-);
-
-const NodeSvg = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <path d="M12 2L20.5 7V17L12 22L3.5 17V7L12 2Z" stroke="#4CC38A" strokeWidth="1.8" strokeLinejoin="round" />
-    <path d="M12 2V22M3.5 7L20.5 17M3.5 17L20.5 7" stroke="#4CC38A" strokeWidth="1.2" strokeOpacity="0.35" />
-    <circle cx="12" cy="12" r="2.2" fill="#4CC38A" />
-  </svg>
-);
-
-const LinuxSvg = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <path d="M12 2C9 2 7 5 7 9C7 11 6 13 4 14C3 15 3 17 5 18C8 19 9 20 12 20C15 20 16 19 19 18C21 17 21 15 20 14C18 13 17 11 17 9C17 5 15 2 12 2Z" stroke="#FFE9AE" strokeWidth="1.8" strokeLinejoin="round" />
-    <circle cx="10" cy="7" r="1.2" fill="#FFE9AE" />
-    <circle cx="14" cy="7" r="1.2" fill="#FFE9AE" />
-    <path d="M11 10C11.5 11 12.5 11 13 10" stroke="#FF6B2B" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-);
-
-const DaVinciSvg = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <circle cx="12" cy="12" r="9" stroke="#9BA8B8" strokeWidth="1.8" />
-    <circle cx="9" cy="10" r="2.5" fill="#C8321E" />
-    <circle cx="15" cy="10" r="2.5" fill="#4C8DFF" />
-    <circle cx="12" cy="15" r="2.5" fill="#FFB86C" />
-  </svg>
-);
-
-const PyTorchSvg = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-    <path d="M13.5 3L11.5 5L13.5 7" stroke="#EE4C2C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M12 5C7 5 4 9 4 13.5C4 18 7.5 21 12 21C16.5 21 20 18 20 13.5C20 11.5 19 9.5 17.5 8" stroke="#EE4C2C" strokeWidth="1.8" strokeLinecap="round" />
-    <circle cx="15.5" cy="5" r="1" fill="#EE4C2C" />
-  </svg>
-);
-
-interface TrackDefinition {
-  domain: ToolDomain;
-  title: string;
-  philosophy: string;
-  connectedProjects: { name: string; slug: string }[];
-}
-
-const tracks: TrackDefinition[] = [
+export const skillCategories: SkillCategory[] = [
   {
-    domain: 'ai-ml',
-    title: 'AI & Machine Learning',
-    philosophy: 'Sub-10ms explainable vision, gradient saliency, morphological HSV clustering, and statistical spatial priors over black-box outputs.',
-    connectedProjects: [
-      { name: 'Healios V2', slug: 'healios' },
-      { name: 'TamilTrove', slug: 'tamiltrove' },
-      { name: 'Careline', slug: 'routerx-careline-hub' },
+    id: 'languages-core',
+    number: '01',
+    title: 'Languages & Core Engineering',
+    description: 'Foundations in algorithmic complexity, pointer arithmetic, object-oriented contracts, and strict type-level invariants.',
+    items: [
+      { name: 'Python (Async / Scientific)', proof: 'FastAPI XAI tensor pipelines & OpenCV', proofLink: '/projects/healios', metric: '8.09ms Grad-CAM' },
+      { name: 'TypeScript / JavaScript', proof: 'Deterministic multi-car race simulation', proofLink: '/projects/apexis', metric: '60 FPS Web Workers' },
+      { name: 'C / C++ Foundations', proof: 'Memory management & CS50 computation', proofLink: '/projects/cs50-ai-projects' },
+      { name: 'Java (OOP & Invariants)', proof: 'Software 2 data structure contracts & testing', proofLink: '/projects/software-2-projects' },
+      { name: 'R Statistical Analysis', proof: 'ASA DataFest demographic regression & spatial analysis', proofLink: '/projects/routerx-careline-hub' },
     ],
   },
   {
-    domain: 'frontend-3d',
-    title: 'Frontend, 3D & Mobile',
-    philosophy: 'High-frame-rate client web systems, off-main-thread Web Workers, 60fps physics simulation, and WebGL volumetric graphics.',
-    connectedProjects: [
-      { name: 'Apexis', slug: 'apexis' },
-      { name: 'Healios', slug: 'healios' },
-      { name: 'Tempo', slug: 'tempo' },
+    id: 'ai-ml-vision',
+    number: '02',
+    title: 'AI / Machine Learning / Computer Vision',
+    description: 'Explainable AI saliency, medical image segmentation, stereoscopic point-clouds, and spatial heuristic models.',
+    items: [
+      { name: 'Grad-CAM Explainable Vision (XAI)', proof: 'NumPy vectorized saliency heatmaps', proofLink: '/projects/healios', metric: '8.09ms latency' },
+      { name: 'PyTorch & TensorFlow', proof: 'Histology tissue classification & clinical CV', proofLink: '/projects/cv-allergy-wheal' },
+      { name: 'OpenCV & Color Morphology', proof: 'HSV wound bed granulation & edge filters', proofLink: '/projects/healios', metric: '2.00ms execution' },
+      { name: 'Vector Search & pgvector RAG', proof: 'Air-gapped semantic emotional memory', proofLink: '/projects/tempo', metric: '100% offline' },
+      { name: 'Browser ML (Tesseract / TF.js)', proof: 'In-browser broadcast OCR worker', proofLink: '/projects/apexis', metric: 'Zero server lag' },
     ],
   },
   {
-    domain: 'backend-cloud',
-    title: 'Backend, Cloud & Data',
-    philosophy: 'Sub-second scientific metadata indexing, pgvector semantic cosine memory, and resilient serverless microservice pipelines.',
-    connectedProjects: [
-      { name: 'CAS Microservices', slug: 'apexis' },
-      { name: 'Tempo SQLite', slug: 'tempo' },
-      { name: 'NYC OS', slug: 'nyc-housing-market-ai' },
+    id: 'systems-performance',
+    number: '03',
+    title: 'Systems & Performance',
+    description: 'Concurrent background execution, frame-budgeted client runtimes, and resilient system boundaries.',
+    items: [
+      { name: 'Web Workers & Multithreading', proof: 'Dedicated simulator.worker.ts compute loop', proofLink: '/projects/apexis', metric: '16.6ms budget' },
+      { name: 'HTML5 Canvas & Offscreen Contexts', proof: 'Client-side Laplacian blur rejection gate', proofLink: '/projects/healios', metric: '<35ms preflight' },
+      { name: 'C4 Architecture System Modeling', proof: 'Enterprise data ingestion topologies at CAS', proofLink: '/#experience' },
+      { name: 'State Machines & Crash Journaling', proof: 'Tempo IPC queue & deterministic triage', proofLink: '/projects/tempo' },
     ],
   },
   {
-    domain: 'systems-hardware',
-    title: 'Hardware, Media & Systems',
-    philosophy: 'Strict memory management, pointer arithmetic, multi-camera color science pipelines, and verified trunk-based CI/CD testing.',
-    connectedProjects: [
-      { name: 'Syntinuum', slug: 'podcast' },
-      { name: 'Apexis Engine', slug: 'apexis' },
-      { name: 'OSU Lab Clusters', slug: 'cv-allergy-wheal' },
+    id: 'backend-cloud',
+    number: '04',
+    title: 'Backend / Cloud / Infrastructure',
+    description: 'Serverless cloud topologies, high-throughput metadata ingestion, and automated deployment pipelines.',
+    items: [
+      { name: 'Amazon Web Services (AWS)', proof: 'S3, DynamoDB, Lambda microservices at CAS', proofLink: '/#experience', metric: '12 pipelines' },
+      { name: 'FastAPI & Asynchronous Python', proof: 'High-concurrency clinical diagnostic endpoints', proofLink: '/projects/healios' },
+      { name: 'PostgreSQL & SQLite Persistence', proof: 'EHR records & encrypted local buffers', proofLink: '/projects/tempo' },
+      { name: 'CI/CD & Trunk-Based Deployment', proof: 'GitHub Actions & Next.js static site export', proofLink: '/system' },
     ],
   },
-];
-
-export const toolsRegistry: TechTool[] = [
-  // AI & ML
   {
-    name: 'Python',
-    tag: 'Python 3.11',
-    iconPath: '/icons/python.svg',
-    domain: 'ai-ml',
-    powersProjects: ['healios', 'tamiltrove', 'cv-allergy-wheal'],
-    provenance: [{ project: 'Healios V2', slug: 'healios', role: '8.09ms NumPy Grad-CAM & HSV Saliency' }],
-  },
-  {
-    name: 'PyTorch',
-    tag: 'Torch 2.x',
-    svgIcon: <PyTorchSvg />,
-    domain: 'ai-ml',
-    powersProjects: ['healios', 'cv-allergy-wheal'],
-    provenance: [{ project: 'OSU Digital Pathology', slug: 'cv-allergy-wheal', role: 'Tissue Contour Fitting' }],
-  },
-  {
-    name: 'OpenCV',
-    tag: 'OpenCV 4.x',
-    iconPath: '/icons/opencv.svg',
-    domain: 'ai-ml',
-    powersProjects: ['healios', 'cv-allergy-wheal'],
-    provenance: [{ project: 'Healios V2', slug: 'healios', role: 'HSV Color-Space Saliency' }],
-  },
-  {
-    name: 'NumPy & Pandas',
-    tag: 'Vectorized Math',
-    iconPath: '/icons/numpy.svg',
-    domain: 'ai-ml',
-    powersProjects: ['healios', 'routerx-careline-hub', 'nyc-housing-market-ai'],
-    provenance: [{ project: 'Healios V2', slug: 'healios', role: '8.09ms Vectorized Matrix Operations' }],
-  },
-  {
-    name: 'R & RStudio',
-    tag: 'CRAN / RStudio',
-    iconPath: '/icons/r.svg',
-    domain: 'ai-ml',
-    powersProjects: ['routerx-careline-hub'],
-    provenance: [{ project: 'Careline / RouteRx', slug: 'routerx-careline-hub', role: 'Transit Gap Vulnerability Index Math' }],
-  },
-  {
-    name: 'Jupyter',
-    tag: 'Interactive Math',
-    iconPath: '/icons/jupyter.svg',
-    domain: 'ai-ml',
-    powersProjects: ['nyc-housing-market-ai'],
-    provenance: [{ project: 'NYC Housing Engine', slug: 'nyc-housing-market-ai', role: 'Statistical Capital Flow Modeling' }],
-  },
-
-  // Frontend, 3D & Mobile
-  {
-    name: 'TypeScript',
-    tag: 'TS 5.9',
-    iconPath: '/icons/typescript.svg',
-    domain: 'frontend-3d',
-    powersProjects: ['apexis', 'tempo', 'philocracy'],
-    provenance: [{ project: 'Apexis Telemetry', slug: 'apexis', role: 'Worker Schemas & Physics Invariants' }],
-  },
-  {
-    name: 'React',
-    tag: 'React 18 / 19',
-    iconPath: '/icons/react.svg',
-    domain: 'frontend-3d',
-    powersProjects: ['apexis', 'tempo', 'healios'],
-    provenance: [{ project: 'Apexis', slug: 'apexis', role: 'Real-Time 60fps Telemetry HUD' }],
-  },
-  {
-    name: 'Next.js',
-    tag: 'Next.js 14 / 15',
-    iconPath: '/icons/nextjs.svg',
-    domain: 'frontend-3d',
-    powersProjects: ['healios', 'apexis', 'portfolio-website'],
-    provenance: [{ project: 'Healios V2', slug: 'healios', role: 'Static Page Routing' }],
-  },
-  {
-    name: 'Three.js / WebGL',
-    tag: 'three / r3f',
-    svgIcon: <ThreeJsSvg />,
-    domain: 'frontend-3d',
-    powersProjects: ['portfolio-website', 'nyc-housing-market-ai'],
-    provenance: [{ project: 'Portfolio 3D Hero', slug: 'portfolio-website', role: '160-Blade Lamellar Louvre Sculpture' }],
-  },
-  {
-    name: 'Tailwind CSS',
-    tag: 'Tailwind v3 / v4',
-    iconPath: '/icons/tailwind.svg',
-    domain: 'frontend-3d',
-    powersProjects: ['portfolio-website', 'healios', 'apexis'],
-    provenance: [{ project: 'Portfolio V5', slug: 'portfolio-website', role: 'Swiss 0px Blueprint System' }],
-  },
-  {
-    name: 'Framer Motion',
-    tag: 'framer-motion',
-    svgIcon: <FramerMotionSvg />,
-    domain: 'frontend-3d',
-    powersProjects: ['syntinuum-podcast-website', 'apexis'],
-    provenance: [{ project: 'Syntinuum', slug: 'syntinuum-podcast-website', role: 'Interactive Waveform Deck' }],
-  },
-  {
-    name: 'Swift & iOS',
-    tag: 'Swift 6 / ARKit',
-    svgIcon: <SwiftSvg />,
-    domain: 'frontend-3d',
-    powersProjects: ['healios'],
-    provenance: [{ project: 'Healios V2 Mobile', slug: 'healios', role: 'iOS TrueDepth LiDAR Mesh' }],
-  },
-  {
-    name: 'HTML5 Canvas',
-    tag: 'Offscreen API',
-    svgIcon: <CanvasSvg />,
-    domain: 'frontend-3d',
-    powersProjects: ['apexis', 'healios'],
-    provenance: [{ project: 'Apexis', slug: 'apexis', role: '60fps Track Rendering Worker' }],
-  },
-
-  // Backend & Cloud
-  {
-    name: 'FastAPI',
-    tag: 'FastAPI / ASGI',
-    iconPath: '/icons/fastapi.svg',
-    domain: 'backend-cloud',
-    powersProjects: ['healios', 'cas'],
-    provenance: [{ project: 'Healios V2', slug: 'healios', role: '8.09ms Clinical Vision Gateway' }],
-  },
-  {
-    name: 'AWS Architecture',
-    tag: 'Lambda / S3 / DDB',
-    iconPath: '/icons/aws.svg',
-    domain: 'backend-cloud',
-    powersProjects: ['cas', 'syntinuum-podcast-website'],
-    provenance: [{ project: 'CAS Technology Intern', slug: 'apexis', role: '12 Serverless Asynchronous Workflows' }],
-  },
-  {
-    name: 'PostgreSQL & pgvector',
-    tag: 'PostgreSQL 16',
-    iconPath: '/icons/postgresql.svg',
-    domain: 'backend-cloud',
-    powersProjects: ['tempo', 'routerx-careline-hub'],
-    provenance: [{ project: 'Tempo', slug: 'tempo', role: 'pgvector Cosine Memory' }],
-  },
-  {
-    name: 'Supabase',
-    tag: 'Supabase / RLS',
-    iconPath: '/icons/supabase.svg',
-    domain: 'backend-cloud',
-    powersProjects: ['tempo'],
-    provenance: [{ project: 'Tempo', slug: 'tempo', role: 'Row-Level Security' }],
-  },
-  {
-    name: 'Docker',
-    tag: 'Docker Compose',
-    iconPath: '/icons/docker.svg',
-    domain: 'backend-cloud',
-    powersProjects: ['cas', 'healios'],
-    provenance: [{ project: 'CAS Microservices', slug: 'apexis', role: 'Containerized CI/CD Deployment' }],
-  },
-  {
-    name: 'Node.js',
-    tag: 'Node 20+ LTS',
-    svgIcon: <NodeSvg />,
-    domain: 'backend-cloud',
-    powersProjects: ['apexis', 'portfolio-website'],
-    provenance: [{ project: 'Apexis Engine', slug: 'apexis', role: 'Multi-Threaded Worker Execution' }],
-  },
-
-  // Systems & Hardware
-  {
-    name: 'C / C++',
-    tag: 'C++17 Pointer Math',
-    svgIcon: <CppSvg />,
-    domain: 'systems-hardware',
-    powersProjects: ['software-2-projects'],
-    provenance: [{ project: 'OSU CSE Systems', slug: 'software-2-projects', role: 'Direct Memory Allocation & Trees' }],
-  },
-  {
-    name: 'Linux & Bash',
-    tag: 'Ubuntu / Shell',
-    svgIcon: <LinuxSvg />,
-    domain: 'systems-hardware',
-    powersProjects: ['cv-allergy-wheal'],
-    provenance: [{ project: 'OSU Lab Clusters', slug: 'cv-allergy-wheal', role: 'Slurm Batch Compute Scheduling' }],
-  },
-  {
-    name: 'DaVinci Resolve 20',
-    tag: 'Color Science',
-    svgIcon: <DaVinciSvg />,
-    domain: 'systems-hardware',
-    powersProjects: ['syntinuum-podcast-website'],
-    provenance: [{ project: 'Syntinuum Podcast', slug: 'syntinuum-podcast-website', role: '35mm Film Emulation' }],
-  },
-  {
-    name: 'Git & GitHub',
-    tag: 'Trunk-Based CI',
-    iconPath: '/icons/github.svg',
-    domain: 'systems-hardware',
-    powersProjects: ['all'],
-    provenance: [{ project: 'All 18 Repositories', slug: 'portfolio-website', role: 'Trunk-Based PRs' }],
+    id: 'data-engineering',
+    number: '05',
+    title: 'Data Engineering & Visualization',
+    description: 'Geospatial transit optimization, connected-vehicle telematics, and interactive 3D telemetry rendering.',
+    items: [
+      { name: 'Geospatial OSRM & GTFS Routing', proof: 'RouteRx healthcare transit desert engine', proofLink: '/projects/routerx-careline-hub', metric: '<15ms matrix' },
+      { name: 'Pandas, NumPy & Scikit-Learn', proof: 'Honda 99P Labs telematics & NYC housing AI', proofLink: '/projects/nyc-housing-market-ai', metric: '1,000+ models' },
+      { name: 'Three.js & WebGL Shaders', proof: 'LiDAR elevation mesh & volumetric aperture', proofLink: '/#hero' },
+      { name: 'Spatial Isochrone Buffering', proof: '1st Place ASA DataFest 2026 external data model', proofLink: '/projects/routerx-careline-hub' },
+    ],
   },
 ];
 
 export const NeuralSkills: React.FC = () => {
-  const [hoveredTool, setHoveredTool] = useState<TechTool | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('languages-core');
 
   return (
-    <section
+    <SectionContainer
       id="skills"
-      className="relative w-full border-b border-[#F4EFE6]/10 bg-[#07090D]"
-      aria-label="Technical Index and Capability Matrix"
+      variant="editorial"
+      bgMode="technical"
+      className="py-24 sm:py-32 lg:py-40 border-b border-[#F3EFE7]/[0.08]"
+      aria-label="Technical capabilities and systems competencies"
     >
-      <GridCrosshair className="absolute -top-[4.5px] -left-[4.5px]" active />
-      <GridCrosshair className="absolute -top-[4.5px] -right-[4.5px]" />
-
-      {/* SECTION HEADER BAR */}
-      <div className="border-b border-[#F4EFE6]/10 p-6 sm:p-8 lg:p-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-xs font-mono text-[#8A99AD] uppercase tracking-wider">
-            <span className="text-[#FFB86C] font-semibold">05 // TECHNICAL INDEX</span>
-            <span>CAPABILITY MATRIX // 06.1</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F4EFE6] leading-none tracking-tight">
-            Technical Index
-          </h2>
-          <p className="text-sm sm:text-base font-sans text-[#B0BCCB] max-w-2xl leading-relaxed">
-            4-row architectural matrix mapping verified engineering stacks directly into production systems without card wrappers.
-          </p>
-        </div>
-
-        {hoveredTool && (
-          <div className="text-xs font-mono text-[#FFB86C] flex items-center gap-2">
-            <span>ACTIVE // {hoveredTool.name.toUpperCase()}</span>
-            <span className="text-[#8A99AD]">({hoveredTool.tag})</span>
-          </div>
-        )}
+      {/* Section Intro */}
+      <div className="max-w-3xl mb-16 space-y-4">
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
+          Technical Index &amp; <span className="italic text-[#F5D998]">System Competencies.</span>
+        </h2>
+        <p className="text-base sm:text-lg font-sans text-[#A7B2C3] leading-relaxed">
+          Five structured engineering domains backed by real production deliverables, client-side benchmarks, and collegiate research.
+        </p>
       </div>
 
-      {/* 4 FLUSH HORIZONTAL MATRIX ROWS */}
-      <div className="divide-y divide-[#F4EFE6]/10">
-        {tracks.map((track) => {
-          const trackTools = toolsRegistry.filter((t) => t.domain === track.domain);
-
+      {/* 2. Category Selector Strip */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-12 border-b border-[#F3EFE7]/[0.08] scrollbar-none">
+        {skillCategories.map((cat) => {
+          const isActive = activeCategory === cat.id;
           return (
-            <div
-              key={track.domain}
-              className="p-6 sm:p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start hover:bg-[#0C1729]/30 transition-colors"
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-4 py-2.5 text-xs font-mono transition-colors whitespace-nowrap cursor-pointer select-none rounded-[2px] ${
+                isActive
+                  ? 'bg-[#FF6B35] text-[#070B12] font-semibold shadow-[0_0_12px_rgba(255,107,53,0.3)]'
+                  : 'bg-[#101B30] text-[#A7B2C3] hover:text-[#F3EFE7] hover:bg-[#17243A] border border-[#F3EFE7]/[0.08]'
+              }`}
             >
-              {/* Cols 1–3: Domain Title & Philosophy */}
-              <div className="lg:col-span-3 space-y-2">
-                <h3 className="text-2xl font-serif text-[#F4EFE6] tracking-tight">
-                  {track.title}
-                </h3>
-                <p className="text-xs font-sans text-[#8A99AD] leading-relaxed">
-                  {track.philosophy}
-                </p>
-              </div>
-
-              {/* Cols 4–9: Frameless Inline Vector Tool Nodes (ZERO BOX CARDS!) */}
-              <div className="lg:col-span-6 flex flex-wrap items-center gap-x-6 gap-y-4">
-                {trackTools.map((tool) => {
-                  const isHovered = hoveredTool?.name === tool.name;
-
-                  return (
-                    <div
-                      key={tool.name}
-                      onMouseEnter={() => setHoveredTool(tool)}
-                      onMouseLeave={() => setHoveredTool(null)}
-                      className={`inline-flex items-center gap-2.5 cursor-pointer py-1 select-none border-b transition-all ${
-                        isHovered ? 'border-[#FF6B2B] text-[#FFE9AE]' : 'border-transparent text-[#F4EFE6] hover:text-[#FFB86C]'
-                      }`}
-                    >
-                      <div className="w-5 h-5 flex items-center justify-center shrink-0">
-                        {tool.iconPath ? (
-                          <Image
-                            src={tool.iconPath}
-                            alt={tool.name}
-                            width={20}
-                            height={20}
-                            className="object-contain filter max-w-[20px] max-h-[20px]"
-                          />
-                        ) : (
-                          tool.svgIcon
-                        )}
-                      </div>
-                      <span className="text-sm font-sans font-medium">{tool.name}</span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Cols 10–12: Connected Projects Output */}
-              <div className="lg:col-span-3 space-y-1.5 lg:border-l lg:border-[#F4EFE6]/10 lg:pl-6 text-xs font-mono">
-                <span className="text-[#FFB86C] uppercase block text-[10px] tracking-wider">
-                  SYSTEM PROVENANCE //
-                </span>
-                <div className="flex flex-col gap-1 text-[#8A99AD]">
-                  {track.connectedProjects.map((proj, pIdx) => (
-                    <Link
-                      key={pIdx}
-                      href={`/projects/${proj.slug}`}
-                      className="hover:text-[#F4EFE6] transition-colors inline-flex items-center gap-1.5"
-                    >
-                      <span className="text-[#FF6B2B]">→</span>
-                      <span>{proj.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
+              <span>{cat.title}</span>
+            </button>
           );
         })}
       </div>
-    </section>
+
+      {/* 3. Active Domain Deep-Dive Table */}
+      {skillCategories
+        .filter((cat) => cat.id === activeCategory)
+        .map((cat) => (
+          <div key={cat.id} className="space-y-8">
+            <div className="max-w-2xl space-y-2">
+              <p className="text-[16px] font-sans text-[#F3EFE7] leading-relaxed">
+                {cat.description}
+              </p>
+            </div>
+
+            {/* Structured Swiss Shared-Wall Table */}
+            <div className="border border-[#F3EFE7]/[0.1] divide-y divide-[#F3EFE7]/[0.08] bg-[#070B12] rounded-[2px] overflow-hidden relative shadow-[0_4px_24px_rgba(7,11,18,0.7)]">
+              <GridCrosshair className="absolute top-2 left-2 opacity-30 text-[#82B7FF]" />
+              <GridCrosshair className="absolute top-2 right-2 opacity-30 text-[#82B7FF]" />
+
+              <div className="hidden sm:grid grid-cols-12 gap-4 py-3.5 px-6 text-[11px] font-mono text-[#82B7FF] uppercase tracking-wider bg-[#101B30]/60 border-b border-[#F3EFE7]/[0.08]">
+                <div className="col-span-5">ENGINEERING CAPABILITY</div>
+                <div className="col-span-5">VERIFIED PROOF &amp; ARTIFACT</div>
+                <div className="col-span-2 text-right">BENCHMARK</div>
+              </div>
+
+              {cat.items.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="p-5 sm:px-6 sm:py-4 flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-4 items-start sm:items-center hover:bg-[#0C1729] transition-colors duration-180"
+                >
+                  <div className="sm:col-span-5 font-serif text-[16px] text-[#F3EFE7]">
+                    {item.name}
+                  </div>
+
+                  <div className="sm:col-span-5 text-xs font-mono text-[#A7B2C3]">
+                    {item.proofLink ? (
+                      <Link
+                        href={item.proofLink}
+                        className="text-[#82B7FF] hover:text-[#F5D998] transition-colors underline underline-offset-4"
+                      >
+                        {item.proof} ↗
+                      </Link>
+                    ) : (
+                      <span>{item.proof}</span>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2 sm:text-right text-xs font-mono text-[#F5D998]">
+                    {item.metric && <span>{item.metric}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+    </SectionContainer>
   );
 };
 

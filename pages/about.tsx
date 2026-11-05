@@ -94,19 +94,19 @@ export default function AboutPage() {
   return (
     <>
       <Head>
-        <title>About Haresh Murugesan | Systems & AI Engineer</title>
+        <title>About Haresh Murugesan | Systems &amp; AI Engineer</title>
         <meta
           name="description"
-          content="Background, engineering narrative, academic research, and collegiate leadership of Haresh Murugesan (CS & AI at The Ohio State University)."
+          content="Background, engineering narrative, academic research, and collegiate leadership of Haresh Murugesan (CS &amp; AI at The Ohio State University)."
         />
         <link rel="canonical" href="https://hareshmurugesan.com/about" />
-        <meta property="og:title" content="About Haresh Murugesan | Systems & AI Engineer" />
+        <meta property="og:title" content="About Haresh Murugesan | Systems &amp; AI Engineer" />
         <meta property="og:description" content="Read Haresh's engineering journey, academic milestones, and collegiate leadership." />
         <meta property="og:url" content="https://hareshmurugesan.com/about" />
         <meta property="og:type" content="profile" />
         <meta property="og:image" content="https://hareshmurugesan.com/profile.jpeg" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="About Haresh Murugesan | Systems & AI Engineer" />
+        <meta name="twitter:title" content="About Haresh Murugesan | Systems &amp; AI Engineer" />
         <meta name="twitter:description" content="Read Haresh's engineering journey, academic milestones, and collegiate leadership." />
         <meta name="twitter:image" content="https://hareshmurugesan.com/profile.jpeg" />
         <script
@@ -115,37 +115,40 @@ export default function AboutPage() {
         />
       </Head>
 
-      <div className="w-full min-h-screen bg-[#050505] text-[#E0E0E0] overflow-x-hidden flex flex-col">
+      <div className="w-full min-h-screen bg-[#070B12] text-[#F3EFE7] overflow-x-hidden flex flex-col selection:bg-[#FF6B35] selection:text-[#070B12]">
         <SiteHeader />
 
-        <main id="main-content" className="w-full flex-grow max-w-[1280px] mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-24">
+        <main id="main-content" className="w-full flex-grow max-w-[1280px] mx-auto px-6 sm:px-8 lg:px-12 pt-32 sm:pt-40 pb-24">
           
-          {/* Header Profile Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-16 sm:mb-20">
-            <div className="lg:col-span-8">
-              <p className="text-xs font-mono uppercase tracking-widest text-[#7DD3FC] mb-2">
-                Engineer Profile & Narrative
-              </p>
-              <h1 className="text-3xl sm:text-5xl font-heading font-bold text-white tracking-tight mb-4">
+          {/* Header Profile Section (40% Portrait / 60% Narrative) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start mb-20 sm:mb-28 pb-16 sm:pb-20 border-b border-[#F3EFE7]/[0.08]">
+            <div className="lg:col-span-8 space-y-6">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-raleway font-bold text-[#F3EFE7] tracking-tight leading-tight">
                 About Haresh Murugesan
               </h1>
-              <p className="text-base sm:text-lg font-sans text-[#E0E0E0] leading-relaxed mb-4">
-                I am a Computer Science & Engineering student specializing in Artificial Intelligence at The Ohio State University (Expected May 2028). My work sits at the intersection of explainable deep learning, high-concurrency systems, and human-centered software architecture.
-              </p>
-              <p className="text-sm sm:text-base font-sans text-[#A6ADB8] leading-relaxed mb-6">
-                Rather than treating machine learning as an opaque wrapper, I focus on building transparent, reproducible pipelines—like our 8.09ms Grad-CAM explainability engine in Healios V2, client-side Web Worker simulations in Apexis, and spatial transit optimization algorithms in RouteRx (Careline).
-              </p>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <Link
-                  href="/resume"
-                  className="px-5 py-2.5 rounded-xl bg-[#7DD3FC] text-[#050505] font-sans font-semibold text-xs sm:text-sm hover:bg-white transition-colors"
+              <div className="max-w-[65ch] space-y-4 text-[16px] sm:text-[17px] font-sans text-[#A7B2C3] leading-[1.75]">
+                <p>
+                  I am a Computer Science &amp; Engineering student specializing in Artificial Intelligence at The Ohio State University (Expected May 2028). My work sits at the intersection of explainable deep learning, high-concurrency systems, and human-centered software architecture.
+                </p>
+                <p>
+                  Rather than treating machine learning as an opaque wrapper, I focus on building transparent, reproducible pipelines—like our 8.09ms Grad-CAM explainability engine in Healios V2, client-side Web Worker simulations in Apexis, and spatial transit optimization algorithms in RouteRx (Careline).
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 pt-4">
+                <a
+                  href="/Haresh_Murugesan_Resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3.5 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-mono text-xs font-semibold transition-colors select-none inline-flex items-center gap-2"
                 >
-                  View Verified Résumé →
-                </Link>
+                  <span>View Verified Résumé</span>
+                  <span>↗</span>
+                </a>
                 <Link
                   href="/projects"
-                  className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-sans font-medium text-xs sm:text-sm hover:bg-white/10 transition-colors"
+                  className="px-6 py-3.5 bg-[#101B30] hover:bg-[#17243A] border border-[#F3EFE7]/15 text-[#F3EFE7] font-mono text-xs font-medium transition-colors select-none"
                 >
                   Explore Systems Index
                 </Link>
@@ -153,12 +156,12 @@ export default function AboutPage() {
             </div>
 
             <div className="lg:col-span-4 flex justify-center">
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-3xl overflow-hidden border border-white/15 shadow-token-card">
+              <div className="relative w-full max-w-[340px] aspect-[4/5] bg-[#101B30] border border-[#F3EFE7]/[0.1] overflow-hidden">
                 <Image
                   src="/profile.jpeg"
                   alt="Haresh Murugesan"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top filter contrast-[1.03]"
                   priority
                 />
               </div>
@@ -166,58 +169,59 @@ export default function AboutPage() {
           </div>
 
           {/* Current Focus (Now Section) */}
-          <section className="mb-16 sm:mb-20 p-6 sm:p-8 rounded-3xl bg-[#0D1118] border border-white/10 shadow-token-card">
-            <div className="flex items-center gap-2 mb-4 text-xs font-mono text-[#34D399]">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] animate-pulse" />
-              <span className="uppercase tracking-widest font-semibold">Current Focus & Availability (Now)</span>
+          <section className="mb-20 sm:mb-28 p-8 sm:p-10 bg-[#101B30] border border-[#F3EFE7]/[0.1]">
+            <div className="flex items-center gap-2.5 mb-6 text-xs font-mono text-[#A7B2C3]">
+              <span className="w-2 h-2 rounded-full bg-[#4CC38A] animate-pulse" />
+              <span className="uppercase tracking-widest text-[#FF6B35] font-semibold">CURRENT FOCUS &amp; AVAILABILITY (NOW)</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm font-sans">
-              <div>
-                <p className="font-heading font-bold text-white mb-1">Internship Search</p>
-                <p className="text-[#A6ADB8] leading-relaxed">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm font-sans">
+              <div className="space-y-2">
+                <p className="font-serif text-lg text-[#F3EFE7]">Internship Search</p>
+                <p className="text-[#A7B2C3] leading-relaxed">
                   Actively interviewing for Summer 2027 Software Engineering, AI/ML, and Systems internships across top tech and research teams.
                 </p>
               </div>
-              <div>
-                <p className="font-heading font-bold text-white mb-1">Academic Research</p>
-                <p className="text-[#A6ADB8] leading-relaxed">
+              <div className="space-y-2">
+                <p className="font-serif text-lg text-[#F3EFE7]">Academic Research</p>
+                <p className="text-[#A7B2C3] leading-relaxed">
                   Investigating explainable computer vision segmentation models for digital pathology and automated allergy wheal area calibration.
                 </p>
               </div>
-              <div>
-                <p className="font-heading font-bold text-white mb-1">Technical Deep Dives</p>
-                <p className="text-[#A6ADB8] leading-relaxed">
-                  Expanding Syntinuum Podcast Season 3 while exploring on-device WebGPU machine learning and zero-copy binary serialization.
+              <div className="space-y-2">
+                <p className="font-serif text-lg text-[#F3EFE7]">Technical Deep Dives</p>
+                <p className="text-[#A7B2C3] leading-relaxed">
+                  Expanding Syntinuum Podcast Season 3 while exploring on-device Web Workers, simulation kernels, and zero-copy binary serialization.
                 </p>
               </div>
             </div>
           </section>
 
           {/* The Story So Far Timeline */}
-          <section className="mb-16 sm:mb-20">
-            <div className="mb-8 pb-4 border-b border-white/10">
-              <p className="text-xs font-mono uppercase tracking-widest text-[#7DD3FC] mb-1">
-                Milestone Retrospective
-              </p>
-              <h2 className="text-2xl sm:text-4xl font-heading font-bold text-white tracking-tight">
-                The Story So Far (2023 – Present)
-              </h2>
+          <section className="mb-20 sm:mb-28">
+            <div className="mb-10 pb-4 border-b border-[#F3EFE7]/[0.08] flex items-baseline justify-between">
+              <div>
+                <h2 className="text-2xl sm:text-4xl font-serif font-normal text-[#F3EFE7] tracking-tight">
+                  The Story So Far (2023 – Present)
+                </h2>
+              </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="border-t border-[#F3EFE7]/[0.08] divide-y divide-[#F3EFE7]/[0.08]">
               {milestones.map((m, idx) => (
                 <div
                   key={idx}
-                  className="p-5 sm:p-6 rounded-2xl bg-[#0D1118]/70 border border-white/5 hover:border-white/15 transition-all flex flex-col sm:flex-row sm:items-baseline justify-between gap-4"
+                  className="py-6 sm:py-8 flex flex-col md:flex-row md:items-baseline justify-between gap-4 hover:bg-[#101B30]/30 transition-colors"
                 >
-                  <div className="max-w-2xl">
-                    <span className="text-xs font-mono text-[#7DD3FC] block mb-1">
+                  <div className="md:w-1/3">
+                    <span className="text-xs font-mono text-[#F5D998] block">
                       {m.period}
                     </span>
-                    <h3 className="text-base sm:text-lg font-heading font-semibold text-white mb-1.5">
+                    <h3 className="text-base sm:text-lg font-serif text-[#F3EFE7] mt-1">
                       {m.title}
                     </h3>
-                    <p className="text-xs sm:text-sm font-sans text-[#A6ADB8] leading-relaxed">
+                  </div>
+                  <div className="md:w-2/3">
+                    <p className="text-sm font-sans text-[#A7B2C3] leading-relaxed">
                       {m.description}
                     </p>
                   </div>
@@ -228,12 +232,9 @@ export default function AboutPage() {
 
           {/* Collegiate Leadership */}
           <section className="mb-16">
-            <div className="mb-8 pb-4 border-b border-white/10">
-              <p className="text-xs font-mono uppercase tracking-widest text-[#D8B4FE] mb-1">
-                Community & Organization
-              </p>
-              <h2 className="text-2xl sm:text-4xl font-heading font-bold text-white tracking-tight">
-                Collegiate Leadership & Impact
+            <div className="mb-10 pb-4 border-b border-[#F3EFE7]/[0.08]">
+              <h2 className="text-2xl sm:text-4xl font-serif font-normal text-[#F3EFE7] tracking-tight">
+                Collegiate Leadership &amp; Impact
               </h2>
             </div>
 
@@ -241,17 +242,17 @@ export default function AboutPage() {
               {leadership.map((lead, idx) => (
                 <div
                   key={idx}
-                  className="p-6 rounded-2xl bg-[#0D1118]/70 border border-white/5 flex flex-col justify-between"
+                  className="p-6 bg-[#101B30] border border-[#F3EFE7]/[0.08] flex flex-col justify-between space-y-4"
                 >
-                  <div>
-                    <div className="flex items-center justify-between text-xs font-mono text-[#A6ADB8] mb-2">
-                      <span className="text-[#D8B4FE]">{lead.role}</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs font-mono text-[#A7B2C3]">
+                      <span className="text-[#FF6B35]">{lead.role}</span>
                       <span>{lead.period}</span>
                     </div>
-                    <h3 className="text-lg font-heading font-bold text-white mb-2">
+                    <h3 className="text-lg font-serif text-[#F3EFE7]">
                       {lead.title}
                     </h3>
-                    <p className="text-xs sm:text-sm font-sans text-[#A6ADB8] leading-relaxed">
+                    <p className="text-sm font-sans text-[#A7B2C3] leading-relaxed">
                       {lead.description}
                     </p>
                   </div>
@@ -267,4 +268,3 @@ export default function AboutPage() {
     </>
   );
 }
-

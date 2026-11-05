@@ -35,10 +35,10 @@ export default function ResumePage() {
   return (
     <>
       <Head>
-        <title>Résumé | Haresh Murugesan — Software & Systems Engineer</title>
+        <title>Résumé | Haresh Murugesan — Software &amp; Systems Engineer</title>
         <meta
           name="description"
-          content="Verified résumé of Haresh Murugesan — B.S. Computer Science & Engineering at The Ohio State University. Seeking Summer 2027 Software Engineering & Systems Internships."
+          content="Verified résumé of Haresh Murugesan — B.S. Computer Science &amp; Engineering at The Ohio State University. Seeking Summer 2027 Software Engineering &amp; Systems Internships."
         />
         <link rel="canonical" href="https://hareshmurugesan.com/resume" />
         <meta property="og:title" content="Résumé | Haresh Murugesan" />
@@ -56,22 +56,22 @@ export default function ResumePage() {
         />
       </Head>
 
-      <div className="w-full min-h-screen bg-[#050505] text-[#E0E0E0] overflow-x-hidden flex flex-col">
+      <div className="w-full min-h-screen bg-[#070B12] text-[#F3EFE7] overflow-x-hidden flex flex-col selection:bg-[#FF6B35] selection:text-[#070B12]">
         <SiteHeader />
 
-        <main id="main-content" className="w-full flex-grow max-w-[960px] mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-24">
+        <main id="main-content" className="w-full flex-grow max-w-[1040px] mx-auto px-6 sm:px-8 pt-32 sm:pt-40 pb-24">
           
           {/* Header Action Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-8 border-b border-white/10 gap-4">
-            <div>
-              <p className="text-xs font-mono uppercase tracking-widest text-[#7DD3FC] mb-1">
-                Verified Curriculum Vitae
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-8 mb-10 border-b border-[#F3EFE7]/[0.08] gap-6">
+            <div className="space-y-2">
+              <p className="text-xs font-mono uppercase tracking-widest text-[#FF6B35]">
+                VERIFIED CURRICULUM VITAE
               </p>
-              <h1 className="text-2xl sm:text-4xl font-heading font-bold text-white tracking-tight">
+              <h1 className="text-3xl sm:text-5xl font-raleway font-bold text-[#F3EFE7] tracking-tight">
                 Haresh Murugesan
               </h1>
-              <p className="text-xs font-mono text-[#A6ADB8] mt-1">
-                Last verified: October 29, 2026 · Columbus, OH
+              <p className="text-xs font-mono text-[#7A889B]">
+                Last verified: October 2026 · Columbus, OH
               </p>
             </div>
 
@@ -79,7 +79,7 @@ export default function ResumePage() {
               <a
                 href={profile.contacts.resumeUrl}
                 download={profile.contacts.resumeDownloadName}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#7DD3FC] text-[#050505] font-sans font-semibold text-xs sm:text-sm hover:bg-white transition-colors shadow-lg"
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-mono font-semibold text-xs transition-colors select-none"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -92,50 +92,50 @@ export default function ResumePage() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-sans font-medium text-xs sm:text-sm hover:bg-white/10 transition-colors"
+                className="hidden sm:inline-flex items-center gap-2 px-5 py-3.5 bg-[#101B30] hover:bg-[#17243A] border border-[#F3EFE7]/15 text-[#F3EFE7] font-mono text-xs transition-colors cursor-pointer select-none"
               >
                 Print / Save
               </button>
             </div>
           </div>
 
-          {/* RÉSUMÉ SHEET (Accessible HTML Sheet) */}
-          <div className="p-6 sm:p-10 rounded-3xl bg-[#0D1118] border border-white/10 shadow-token-card space-y-10">
+          {/* RÉSUMÉ SHEET (Accessible Editorial Sheet) */}
+          <div className="p-8 sm:p-12 bg-[#101B30] border border-[#F3EFE7]/[0.1] space-y-10">
             
             {/* Header info */}
-            <div className="border-b border-white/10 pb-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="border-b border-[#F3EFE7]/[0.08] pb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-heading font-bold text-white">
+                  <h2 className="text-2xl sm:text-3xl font-serif text-[#F3EFE7]">
                     {profile.name}
                   </h2>
-                  <p className="text-sm font-sans text-[#7DD3FC] mt-0.5 font-medium">
+                  <p className="text-sm font-sans text-[#F5D998] mt-1 font-medium">
                     {profile.roleLine}
                   </p>
                 </div>
-                <div className="text-xs font-mono text-[#A6ADB8] space-y-0.5 text-left sm:text-right">
-                  <p><a href={`mailto:${profile.contacts.email}`} className="hover:text-white underline">{profile.contacts.email}</a></p>
-                  <p><a href={profile.contacts.github} target="_blank" rel="noopener noreferrer" className="hover:text-white underline">github.com/haresham15</a></p>
-                  <p><a href={profile.contacts.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-white underline">linkedin.com/in/haresh-murugesan</a></p>
+                <div className="text-xs font-mono text-[#A7B2C3] space-y-1 text-left sm:text-right">
+                  <p><a href={`mailto:${profile.contacts.email}`} className="hover:text-[#F3EFE7] underline">{profile.contacts.email}</a></p>
+                  <p><a href={profile.contacts.github} target="_blank" rel="noopener noreferrer" className="hover:text-[#F3EFE7] underline">github.com/haresham15</a></p>
+                  <p><a href={profile.contacts.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-[#F3EFE7] underline">linkedin.com/in/haresh-murugesan</a></p>
                 </div>
               </div>
             </div>
 
             {/* EDUCATION */}
             <div>
-              <h3 className="text-sm font-mono uppercase tracking-widest text-[#7DD3FC] font-bold pb-2 mb-4 border-b border-white/10">
+              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF6B35] font-semibold pb-3 mb-6 border-b border-[#F3EFE7]/[0.08]">
                 Education
               </h3>
-              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
-                <div>
-                  <p className="text-base font-heading font-bold text-white">
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                <div className="space-y-1">
+                  <p className="text-lg font-serif text-[#F3EFE7]">
                     {profile.education.university}
                   </p>
-                  <p className="text-sm font-sans text-[#E0E0E0]">
+                  <p className="text-sm font-sans text-[#A7B2C3]">
                     {profile.education.degree} ({profile.education.specialization})
                   </p>
                 </div>
-                <div className="text-xs font-mono text-[#A6ADB8] text-left sm:text-right">
+                <div className="text-xs font-mono text-[#7A889B] text-left sm:text-right">
                   <p>{profile.education.location}</p>
                   <p>Expected {profile.education.expectedGraduation}</p>
                 </div>
@@ -144,30 +144,31 @@ export default function ResumePage() {
 
             {/* EXPERIENCE */}
             <div>
-              <h3 className="text-sm font-mono uppercase tracking-widest text-[#7DD3FC] font-bold pb-2 mb-4 border-b border-white/10">
-                Work & Research Experience
+              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF6B35] font-semibold pb-3 mb-6 border-b border-[#F3EFE7]/[0.08]">
+                Work &amp; Research Experience
               </h3>
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {experiences.map((exp) => (
-                  <div key={exp.id} className="space-y-2">
+                  <div key={exp.id} className="space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
                       <div>
-                        <p className="text-base font-heading font-bold text-white">
+                        <p className="text-base sm:text-lg font-serif text-[#F3EFE7]">
                           {exp.role}
                         </p>
-                        <p className="text-sm font-sans text-[#7DD3FC]">
-                          {exp.company} {exp.teamOrDivision && <span className="text-[#A6ADB8]">· {exp.teamOrDivision}</span>}
+                        <p className="text-sm font-sans text-[#F5D998]">
+                          {exp.company} {exp.teamOrDivision && <span className="text-[#A7B2C3]">· {exp.teamOrDivision}</span>}
                         </p>
                       </div>
-                      <div className="text-xs font-mono text-[#A6ADB8] text-left sm:text-right">
+                      <div className="text-xs font-mono text-[#7A889B] text-left sm:text-right">
                         <p>{exp.period}</p>
                         <p>{exp.location}</p>
                       </div>
                     </div>
-                    <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm font-sans text-[#E0E0E0]/90 leading-relaxed">
+                    <ul className="space-y-2 text-xs sm:text-sm font-sans text-[#A7B2C3] leading-relaxed">
                       {exp.bullets.map((bullet, idx) => (
-                        <li key={idx} className="pl-1">
-                          {bullet}
+                        <li key={idx} className="flex items-start gap-2.5">
+                          <span className="text-[#FF6B35] select-none font-mono text-xs">―</span>
+                          <span>{bullet}</span>
                         </li>
                       ))}
                     </ul>
@@ -178,24 +179,24 @@ export default function ResumePage() {
 
             {/* SELECTED FLAGSHIP PROJECTS */}
             <div>
-              <h3 className="text-sm font-mono uppercase tracking-widest text-[#7DD3FC] font-bold pb-2 mb-4 border-b border-white/10">
+              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF6B35] font-semibold pb-3 mb-6 border-b border-[#F3EFE7]/[0.08]">
                 Selected Engineering Projects
               </h3>
               <div className="space-y-6">
                 {flagshipProjects.map((proj) => (
-                  <div key={proj.slug} className="space-y-1.5">
+                  <div key={proj.slug} className="space-y-2">
                     <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
-                      <p className="text-base font-heading font-bold text-white">
+                      <p className="text-base sm:text-lg font-serif text-[#F3EFE7]">
                         {proj.title}
                       </p>
-                      <span className="text-xs font-mono text-[#7DD3FC]">
+                      <span className="text-xs font-mono text-[#F5D998]">
                         {proj.highlight}
                       </span>
                     </div>
-                    <p className="text-xs font-mono text-[#A6ADB8]">
+                    <p className="text-xs font-mono text-[#82B7FF]">
                       Tools: {proj.stack}
                     </p>
-                    <p className="text-xs sm:text-sm font-sans text-[#E0E0E0]/90 leading-relaxed">
+                    <p className="text-xs sm:text-sm font-sans text-[#A7B2C3] leading-relaxed">
                       {proj.description}
                     </p>
                   </div>
@@ -205,52 +206,52 @@ export default function ResumePage() {
 
             {/* TECHNICAL SKILLS */}
             <div>
-              <h3 className="text-sm font-mono uppercase tracking-widest text-[#7DD3FC] font-bold pb-2 mb-4 border-b border-white/10">
+              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF6B35] font-semibold pb-3 mb-6 border-b border-[#F3EFE7]/[0.08]">
                 Technical Skills
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
-                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                  <p className="font-mono text-[#D8B4FE] font-bold mb-1">Languages:</p>
-                  <p className="text-[#E0E0E0]">Python, TypeScript, JavaScript, Java, R, SQL, HTML5, CSS3</p>
+                <div className="p-4 bg-[#070B12] border border-[#F3EFE7]/[0.08]">
+                  <p className="font-mono text-[#F5D998] font-bold mb-1">Languages:</p>
+                  <p className="text-[#A7B2C3]">Python, TypeScript, JavaScript, Java, R, SQL, C/C++, HTML5, CSS3</p>
                 </div>
-                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                  <p className="font-mono text-[#7DD3FC] font-bold mb-1">Frameworks & Libraries:</p>
-                  <p className="text-[#E0E0E0]">Next.js, React, FastAPI, PyTorch, TensorFlow, OpenCV, Tailwind CSS, Framer Motion, Zustand</p>
+                <div className="p-4 bg-[#070B12] border border-[#F3EFE7]/[0.08]">
+                  <p className="font-mono text-[#82B7FF] font-bold mb-1">Frameworks &amp; Libraries:</p>
+                  <p className="text-[#A7B2C3]">Next.js, React, FastAPI, PyTorch, TensorFlow, OpenCV, Tailwind CSS, Framer Motion, Zustand</p>
                 </div>
-                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                  <p className="font-mono text-[#34D399] font-bold mb-1">Cloud & Infrastructure:</p>
-                  <p className="text-[#E0E0E0]">AWS (S3, DynamoDB, Lambda, Bedrock), PostgreSQL (pgvector), Supabase, Docker, Git, CI/CD</p>
+                <div className="p-4 bg-[#070B12] border border-[#F3EFE7]/[0.08]">
+                  <p className="font-mono text-[#4CC38A] font-bold mb-1">Cloud &amp; Infrastructure:</p>
+                  <p className="text-[#A7B2C3]">AWS (S3, DynamoDB, Lambda), PostgreSQL (pgvector), SQLite, Docker, Git, CI/CD</p>
                 </div>
-                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                  <p className="font-mono text-[#FBBF24] font-bold mb-1">Concepts & Systems:</p>
-                  <p className="text-[#E0E0E0]">Explainable AI (Grad-CAM), Web Workers, C4 Modeling, DBSCAN Spatial Clustering, OSRM Routing</p>
+                <div className="p-4 bg-[#070B12] border border-[#F3EFE7]/[0.08]">
+                  <p className="font-mono text-[#FF6B35] font-bold mb-1">Concepts &amp; Systems:</p>
+                  <p className="text-[#A7B2C3]">Explainable AI (Grad-CAM), Web Workers, C4 Modeling, Spatial Isochrones, OSRM Routing</p>
                 </div>
               </div>
             </div>
 
             {/* HONORS & AWARDS */}
             <div>
-              <h3 className="text-sm font-mono uppercase tracking-widest text-[#7DD3FC] font-bold pb-2 mb-4 border-b border-white/10">
-                Honors & Achievements
+              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF6B35] font-semibold pb-3 mb-6 border-b border-[#F3EFE7]/[0.08]">
+                Honors &amp; Achievements
               </h3>
-              <div className="space-y-3 text-xs sm:text-sm font-sans">
+              <div className="space-y-4 text-xs sm:text-sm font-sans">
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
-                  <p className="font-heading font-semibold text-white">
+                  <p className="font-serif text-base text-[#F3EFE7]">
                     1st Place — Best Use of External Data | ASA DataFest 2026
                   </p>
-                  <span className="font-mono text-[#A6ADB8] text-xs">Spring 2026</span>
+                  <span className="font-mono text-[#7A889B] text-xs">Spring 2026</span>
                 </div>
-                <p className="text-xs text-[#A6ADB8]">
-                  Stormont Vail Health public transit accessibility & bi-directional shuttle optimization in Topeka, KS.
+                <p className="text-xs text-[#A7B2C3]">
+                  Stormont Vail Health public transit accessibility &amp; bi-directional shuttle optimization in Topeka, KS.
                 </p>
 
-                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 pt-2">
-                  <p className="font-heading font-semibold text-white">
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 pt-3 border-t border-[#F3EFE7]/[0.06]">
+                  <p className="font-serif text-base text-[#F3EFE7]">
                     1st Place — Best Use of External Data | ASA DataFest 2025
                   </p>
-                  <span className="font-mono text-[#A6ADB8] text-xs">Spring 2025</span>
+                  <span className="font-mono text-[#7A889B] text-xs">Spring 2025</span>
                 </div>
-                <p className="text-xs text-[#A6ADB8]">
+                <p className="text-xs text-[#A7B2C3]">
                   Awarded by American Statistical Association faculty and industry data scientists.
                 </p>
               </div>
@@ -265,4 +266,3 @@ export default function ResumePage() {
     </>
   );
 }
-

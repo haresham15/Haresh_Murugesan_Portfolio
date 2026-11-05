@@ -85,14 +85,9 @@ export class SceneBoundary extends Component<Props, State> {
               {/* Offset front structural plane */}
               <rect x="80" y="60" width="160" height="90" rx="4" fill="#102C4C" fillOpacity="0.9" stroke="#4C8DFF" strokeWidth="1.5" />
               
-              {/* Distinctive Orange Path Exiting Frame */}
-              <path d="M 30 110 L 110 110 L 160 75 L 260 75" stroke="#FF7A32" strokeWidth="3" strokeLinecap="round" />
+              {/* Structural markers */}
               <circle cx="110" cy="110" r="4" fill="#FF7A32" />
               <circle cx="160" cy="75" r="4" fill="#FF7A32" />
-
-              {/* Technical annotations */}
-              <text x="88" y="80" fill="#A6B0BE" fontSize="8" fontFamily="monospace">AXIS_REF_01 // 6° TILT</text>
-              <text x="88" y="140" fill="#4C8DFF" fontSize="8" fontFamily="monospace">STATIC_POSTER_RENDER</text>
             </svg>
           </div>
           <p className="text-xs font-mono text-text-secondary mt-3">
