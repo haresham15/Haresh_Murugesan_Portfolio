@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { SectionContainer } from './ui/SectionContainer';
+import { ThemeSection } from './ThemeSection';
 import { GridCrosshair } from './ui/EditorialPrimitives';
 
 export interface SkillCategory {
@@ -58,13 +58,13 @@ export const skillCategories: SkillCategory[] = [
   {
     id: 'backend-cloud',
     number: '04',
-    title: 'Backend / Cloud / Infrastructure',
-    description: 'Serverless cloud topologies, high-throughput metadata ingestion, and automated deployment pipelines.',
+    title: 'Distributed Cloud & Microservices',
+    description: 'Trunk-based CI/CD deployment, serverless AWS architectures, and sub-millisecond retrieval.',
     items: [
-      { name: 'Amazon Web Services (AWS)', proof: 'S3, DynamoDB, Lambda microservices at CAS', proofLink: '/#experience', metric: '12 pipelines' },
-      { name: 'FastAPI & Asynchronous Python', proof: 'High-concurrency clinical diagnostic endpoints', proofLink: '/projects/healios' },
-      { name: 'PostgreSQL & SQLite Persistence', proof: 'EHR records & encrypted local buffers', proofLink: '/projects/tempo' },
-      { name: 'CI/CD & Trunk-Based Deployment', proof: 'GitHub Actions & Next.js static site export', proofLink: '/system' },
+      { name: 'AWS Lambda, DynamoDB & S3', proof: '12 serverless research ingestion pipelines at CAS', proofLink: '/#experience', metric: '<1s query speed' },
+      { name: 'FastAPI & Pydantic Contracts', proof: 'Strict type validation & Swagger schemas', proofLink: '/projects/healios' },
+      { name: 'PostgreSQL & pgvector', proof: 'IVFFlat cosine similarity vector queries', proofLink: '/projects/tamiltrove', metric: '94.2% Hit@5' },
+      { name: 'Next.js & React Server Components', proof: 'Production portfolio & client state machines', proofLink: '/' },
     ],
   },
   {
@@ -85,97 +85,101 @@ export const NeuralSkills: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('languages-core');
 
   return (
-    <SectionContainer
+    <ThemeSection
       id="skills"
-      variant="editorial"
-      bgMode="technical"
-      className="py-24 sm:py-32 lg:py-40 border-b border-[#F3EFE7]/[0.08]"
+      theme="obsidian"
       aria-label="Technical capabilities and systems competencies"
+      className="border-b border-[#F4F1EA]/10 flex flex-col justify-between"
     >
-      {/* Section Intro */}
-      <div className="max-w-3xl mb-16 space-y-4">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
-          Technical Index
-        </h2>
-        <p className="text-base sm:text-lg font-sans text-[#A7B2C3] leading-relaxed">
-          Five structured engineering domains backed by real production deliverables, client-side benchmarks, and collegiate research.
-        </p>
-      </div>
+      <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
+        {/* Section Intro */}
+        <div className="max-w-3xl space-y-4">
+          <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#E85D04]">
+            <span className="w-6 h-px bg-[#E85D04]" />
+            <span>04 // TECHNICAL INDEX &amp; COMPETENCIES</span>
+          </div>
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F1EA] leading-tight tracking-tight">
+            Technical Index
+          </h2>
+          <p className="text-base sm:text-lg font-sans text-[#8E8D94] leading-relaxed">
+            Five structured engineering domains backed by real production deliverables, client-side benchmarks, and collegiate research.
+          </p>
+        </div>
 
-      {/* 2. Category Selector Strip */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-12 border-b border-[#F3EFE7]/[0.08] scrollbar-none">
-        {skillCategories.map((cat) => {
-          const isActive = activeCategory === cat.id;
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-4 py-2.5 text-xs font-mono transition-colors whitespace-nowrap cursor-pointer select-none rounded-[2px] ${
-                isActive
-                  ? 'bg-[#FF6B35] text-[#070B12] font-semibold shadow-[0_0_12px_rgba(255,107,53,0.3)]'
-                  : 'bg-[#101B30] text-[#A7B2C3] hover:text-[#F3EFE7] hover:bg-[#17243A] border border-[#F3EFE7]/[0.08]'
-              }`}
-            >
-              <span>{cat.title}</span>
-            </button>
-          );
-        })}
-      </div>
+        {/* Category Selector Strip */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 border-b border-[#F4F1EA]/10 scrollbar-none">
+          {skillCategories.map((cat) => {
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-4 py-2.5 text-xs font-mono transition-colors whitespace-nowrap cursor-pointer select-none rounded-[2px] ${
+                  isActive
+                    ? 'bg-[#E85D04] text-[#060608] font-semibold shadow-[0_0_12px_rgba(232,93,4,0.35)]'
+                    : 'bg-[#0C0F17] text-[#8E8D94] hover:text-[#F4F1EA] hover:bg-[#151B28] border border-[#F4F1EA]/10'
+                }`}
+              >
+                <span>{cat.title}</span>
+              </button>
+            );
+          })}
+        </div>
 
-      {/* 3. Active Domain Deep-Dive Table */}
-      {skillCategories
-        .filter((cat) => cat.id === activeCategory)
-        .map((cat) => (
-          <div key={cat.id} className="space-y-8">
-            <div className="max-w-2xl space-y-2">
-              <p className="text-[16px] font-sans text-[#F3EFE7] leading-relaxed">
-                {cat.description}
-              </p>
-            </div>
-
-            {/* Structured Swiss Shared-Wall Table */}
-            <div className="border border-[#F3EFE7]/[0.1] divide-y divide-[#F3EFE7]/[0.08] bg-[#070B12] rounded-[2px] overflow-hidden relative shadow-[0_4px_24px_rgba(7,11,18,0.7)]">
-              <GridCrosshair className="absolute top-2 left-2 opacity-30 text-[#82B7FF]" />
-              <GridCrosshair className="absolute top-2 right-2 opacity-30 text-[#82B7FF]" />
-
-              <div className="hidden sm:grid grid-cols-12 gap-4 py-3.5 px-6 text-[11px] font-mono text-[#82B7FF] uppercase tracking-wider bg-[#101B30]/60 border-b border-[#F3EFE7]/[0.08]">
-                <div className="col-span-5">ENGINEERING CAPABILITY</div>
-                <div className="col-span-5">VERIFIED PROOF &amp; ARTIFACT</div>
-                <div className="col-span-2 text-right">BENCHMARK</div>
+        {/* Active Domain Deep-Dive Table */}
+        {skillCategories
+          .filter((cat) => cat.id === activeCategory)
+          .map((cat) => (
+            <div key={cat.id} className="space-y-8">
+              <div className="max-w-2xl space-y-2">
+                <p className="text-[16px] font-sans text-[#F4F1EA] leading-relaxed">
+                  {cat.description}
+                </p>
               </div>
 
-              {cat.items.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="p-5 sm:px-6 sm:py-4 flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-4 items-start sm:items-center hover:bg-[#0C1729] transition-colors duration-180"
-                >
-                  <div className="sm:col-span-5 font-serif text-[16px] text-[#F3EFE7]">
-                    {item.name}
-                  </div>
+              {/* Structured Swiss Shared-Wall Table */}
+              <div className="border border-[#F4F1EA]/10 divide-y divide-[#F4F1EA]/[0.08] bg-[#0C0F17] rounded-[2px] overflow-hidden relative shadow-2xl">
+                <GridCrosshair className="absolute top-2 left-2 opacity-30 text-[#82B7FF]" />
+                <GridCrosshair className="absolute top-2 right-2 opacity-30 text-[#82B7FF]" />
 
-                  <div className="sm:col-span-5 text-xs font-mono text-[#A7B2C3]">
-                    {item.proofLink ? (
-                      <Link
-                        href={item.proofLink}
-                        className="text-[#82B7FF] hover:text-[#F5D998] transition-colors underline underline-offset-4"
-                      >
-                        {item.proof} ↗
-                      </Link>
-                    ) : (
-                      <span>{item.proof}</span>
-                    )}
-                  </div>
-
-                  <div className="sm:col-span-2 sm:text-right text-xs font-mono text-[#F5D998]">
-                    {item.metric && <span>{item.metric}</span>}
-                  </div>
+                <div className="hidden sm:grid grid-cols-12 gap-4 py-3.5 px-6 text-[11px] font-mono text-[#F4A261] uppercase tracking-wider bg-[#10141F] border-b border-[#F4F1EA]/10">
+                  <div className="col-span-5">ENGINEERING CAPABILITY</div>
+                  <div className="col-span-5">VERIFIED PROOF &amp; ARTIFACT</div>
+                  <div className="col-span-2 text-right">BENCHMARK</div>
                 </div>
-              ))}
-            </div>
-          </div>
-        ))}
 
-    </SectionContainer>
+                {cat.items.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="p-5 sm:px-6 sm:py-4 flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-4 items-start sm:items-center hover:bg-[#151B28] transition-colors duration-180"
+                  >
+                    <div className="sm:col-span-5 font-serif text-[16px] text-[#F4F1EA]">
+                      {item.name}
+                    </div>
+
+                    <div className="sm:col-span-5 text-xs font-mono text-[#8E8D94]">
+                      {item.proofLink ? (
+                        <Link
+                          href={item.proofLink}
+                          className="text-[#82B7FF] hover:text-[#F4A261] transition-colors underline underline-offset-4"
+                        >
+                          {item.proof} ↗
+                        </Link>
+                      ) : (
+                        <span>{item.proof}</span>
+                      )}
+                    </div>
+
+                    <div className="sm:col-span-2 sm:text-right text-xs font-mono text-[#F4A261]">
+                      {item.metric && <span>{item.metric}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+      </div>
+    </ThemeSection>
   );
 };
 

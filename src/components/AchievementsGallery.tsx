@@ -1,202 +1,424 @@
-import React from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { SectionContainer } from './ui/SectionContainer';
-import { GridCrosshair } from './ui/EditorialPrimitives';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeSection } from './ThemeSection';
 
-interface SecondaryAchievement {
+const MotionDiv = motion.div as any;
+
+interface MedallionRecord {
   id: string;
   number: string;
+  shortTag: string;
   title: string;
-  organization: string;
-  date: string;
-  classification: 'Competitive Award' | 'Algorithmic Credential' | 'Infrastructure Credential';
-  description: string;
-  pdfUrl?: string;
+  year: string;
+  systemName: string;
+  scope: string;
+  collaborators?: string;
+  metrics: { label: string; value: string }[];
+  citation: string;
+  materialTheme: {
+    rimGradient: string;
+    discBg: string;
+    innerRing: string;
+    accentColor: string;
+    reliefText: string;
+    glowShadow: string;
+  };
+  linkTarget?: string;
 }
 
-const secondaryAchievements: SecondaryAchievement[] = [
+const MEDALLIONS: MedallionRecord[] = [
   {
-    id: 'hack-future-2026',
+    id: 'datafest-2026',
     number: '01',
-    title: 'Top Data Science Distinction — Hack To The Future',
-    organization: 'Hack To The Future Collegiate Hackathon',
-    date: '2026',
-    classification: 'Competitive Award',
-    description: 'Awarded for NYC OS Market Physics Engine parsing 1M+ transaction records using K-Means clustering and vector field simulation models visualized with Deck.GL.',
+    shortTag: 'ASA DATAFEST 2026 · 1ST PLACE',
+    title: '1st Place — Best Use of External Data',
+    year: '2026',
+    systemName: 'RouteRx / Careline',
+    scope: 'Bi-directional healthcare transit optimization across 141 Topeka, KS census blocks.',
+    collaborators: 'Built with Samay Patel, Harsha Kalivarapu, Sudhish Gopalakrishnan',
+    metrics: [
+      { label: 'Isochrone Latency', value: '< 15 ms' },
+      { label: 'Census Blocks', value: '141 Blocks' },
+      { label: 'Transit Gap Solved', value: '42.3%' },
+    ],
+    citation:
+      'Awarded by the American Statistical Association (ASA) for mathematical rigor in synthesizing OpenStreetMap road networks, CDC social vulnerability indexes, and bus timetables into sub-15ms multi-modal transit accessibility isochrones.',
+    materialTheme: {
+      rimGradient: 'linear-gradient(135deg, #FFE29F 0%, #FFA99F 48%, #FF719A 100%)',
+      discBg: 'radial-gradient(circle at 35% 30%, #2A1D0B 0%, #0A0805 100%)',
+      innerRing: '#F59E0B',
+      accentColor: '#D97706',
+      reliefText: 'ASA 2026',
+      glowShadow: '0 25px 60px rgba(245, 158, 11, 0.35)',
+    },
+    linkTarget: '/projects/routerx-careline-hub',
   },
   {
-    id: 'cs50-algorithms',
+    id: 'datafest-2025',
     number: '02',
-    title: 'CS50 Introduction to Computer Science & Algorithms',
-    organization: 'Harvard University',
-    date: 'July 2025',
-    classification: 'Algorithmic Credential',
-    description: 'Completed rigorous computation curriculum spanning heuristic graph search (A*), minimax adversarial game engines, probabilistic Bayesian inference, and C memory management.',
-    pdfUrl: '/cs50.pdf',
+    shortTag: 'ASA DATAFEST 2025 · 1ST PLACE',
+    title: '1st Place — Best Use of External Data',
+    year: '2025',
+    systemName: 'Hack to the Future',
+    scope: 'Macroeconomic & corporate tax spatial location modeling across multi-state commercial corridors.',
+    collaborators: 'Collegiate Competitive Team',
+    metrics: [
+      { label: 'Data Points Modeled', value: '500,000+' },
+      { label: 'Spatial Corridor', value: 'Multi-State' },
+      { label: 'Evaluation Tier', value: '1st in Region' },
+    ],
+    citation:
+      'Awarded by ASA judges for geospatial regression modeling determining how municipal corporate incentives alter distribution footprint clustering across transportation hubs.',
+    materialTheme: {
+      rimGradient: 'linear-gradient(135deg, #FFFFFF 0%, #C4D1D9 50%, #8FA3B0 100%)',
+      discBg: 'radial-gradient(circle at 35% 30%, #1A2228 0%, #0B0E11 100%)',
+      innerRing: '#94A3B8',
+      accentColor: '#64748B',
+      reliefText: 'ASA 2025',
+      glowShadow: '0 25px 60px rgba(148, 163, 184, 0.35)',
+    },
+    linkTarget: '#projects',
   },
   {
-    id: 'aws-cloud',
+    id: 'ibm-watsonx-2026',
     number: '03',
-    title: 'AWS Cloud Foundations Architecture Credential',
-    organization: 'Amazon Web Services (AWS)',
-    date: '2025',
-    classification: 'Infrastructure Credential',
-    description: 'Validated competency in serverless AWS architecture, S3/DynamoDB event topologies, IAM least-privilege security policies, and CloudWatch performance monitoring.',
-    pdfUrl: '/aws-badge.png',
+    shortTag: 'IBM SKILLSBUILD AI HACKATHON · 2026',
+    title: 'IBM SkillsBuild AI in Education Showcase',
+    year: '2026',
+    systemName: 'Vantage Platform',
+    scope: 'Architected AI educational navigation system powered by IBM watsonx and IBM Cloud.',
+    collaborators: 'IBM SkillsBuild National Showcase',
+    metrics: [
+      { label: 'Backbone', value: 'watsonx.ai' },
+      { label: 'Latency Gate', value: '< 250 ms' },
+      { label: 'Curriculum Depth', value: 'K-16 Adaptive' },
+    ],
+    citation:
+      'Recognized for developing zero-shot curriculum adaptation trees that guide non-traditional students through personalized computer science pathways without prompt drift.',
+    materialTheme: {
+      rimGradient: 'linear-gradient(135deg, #A5B4FC 0%, #38BDF8 50%, #1D4ED8 100%)',
+      discBg: 'radial-gradient(circle at 35% 30%, #0D1B36 0%, #050A14 100%)',
+      innerRing: '#38BDF8',
+      accentColor: '#2563EB',
+      reliefText: 'IBM AI',
+      glowShadow: '0 25px 60px rgba(56, 189, 248, 0.35)',
+    },
+    linkTarget: '#projects',
+  },
+  {
+    id: 'benchmarks-2026',
+    number: '04',
+    shortTag: 'DATA I/O & BENCHMARK DISTINCTIONS · 2026',
+    title: '94.2% Hit@5 Retrieval & Data I/O Geospatial Engine',
+    year: '2026',
+    systemName: 'TamilTrove & NYC OS Market Physics Engine v2.0',
+    scope: '120-query hybrid search benchmark & 6-model Deck.GL 3D urban market simulation.',
+    collaborators: 'Independent Engineering Syndicate',
+    metrics: [
+      { label: 'TamilTrove Hit@5', value: '94.2%' },
+      { label: 'Transactions Modeled', value: '1,000,000+' },
+      { label: 'Physics Visualizer', value: 'Deck.GL 3D' },
+    ],
+    citation:
+      'Benchmarked TamilTrove against 120 transliterated search queries yielding a verified 94.2% Hit@5 retrieval rate; paired with NYC OS Market Physics Engine parsing 1M+ transactions via vectorized clustering.',
+    materialTheme: {
+      rimGradient: 'linear-gradient(135deg, #FCA5A5 0%, #E11D48 50%, #881337 100%)',
+      discBg: 'radial-gradient(circle at 35% 30%, #2A0D14 0%, #0C0305 100%)',
+      innerRing: '#FB7185',
+      accentColor: '#E11D48',
+      reliefText: 'BENCH 2026',
+      glowShadow: '0 25px 60px rgba(225, 29, 72, 0.35)',
+    },
+    linkTarget: '/projects/tamiltrove',
+  },
+  {
+    id: 'leadership-2026',
+    number: '05',
+    shortTag: 'COLLEGIATE LEADERSHIP & INNOVATION · 2026',
+    title: 'NSLS Nominee & OSU Innovation Analyst',
+    year: '2026',
+    systemName: 'Philocracy & OSU Center for Innovation Strategies',
+    scope: 'Nominated to OSU NSLS Chapter; serving as Co-CEO of Philocracy and Innovation Analyst at OSU CIS.',
+    collaborators: 'The Ohio State University',
+    metrics: [
+      { label: 'Society', value: 'NSLS' },
+      { label: 'Venture Roadmap', value: 'Co-CEO' },
+      { label: 'Industry Liaison', value: 'Honda 99P Labs' },
+    ],
+    citation:
+      'Nominated to the National Society of Leadership and Success (NSLS) Ohio State Chapter for academic and executive integrity; co-leading Philocracy and directing corporate connected-mobility research at the OSU Center for Innovation Strategies.',
+    materialTheme: {
+      rimGradient: 'linear-gradient(135deg, #FDE68A 0%, #D97706 50%, #78350F 100%)',
+      discBg: 'radial-gradient(circle at 35% 30%, #291807 0%, #0A0602 100%)',
+      innerRing: '#F59E0B',
+      accentColor: '#B45309',
+      reliefText: 'LEAD 2026',
+      glowShadow: '0 25px 60px rgba(180, 83, 9, 0.35)',
+    },
+    linkTarget: '#experience',
   },
 ];
 
 export const AchievementsGallery: React.FC = () => {
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef<boolean>(false);
+  const dragStartXRef = useRef<number>(0);
+
+  const totalCount = MEDALLIONS.length;
+
+  const handlePrev = useCallback(() => {
+    setActiveIndex((prev) => (prev > 0 ? prev - 1 : totalCount - 1));
+  }, [totalCount]);
+
+  const handleNext = useCallback(() => {
+    setActiveIndex((prev) => (prev < totalCount - 1 ? prev + 1 : 0));
+  }, [totalCount]);
+
+  // Pointer drag gesture for orbital carousel
+  const handlePointerDown = (e: React.PointerEvent) => {
+    isDraggingRef.current = true;
+    dragStartXRef.current = e.clientX;
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    const diff = e.clientX - dragStartXRef.current;
+    if (diff > 50) {
+      handlePrev();
+    } else if (diff < -50) {
+      handleNext();
+    }
+  };
+
+  // Keyboard navigation when active
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') handlePrev();
+      else if (e.key === 'ArrowRight') handleNext();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handlePrev, handleNext]);
+
+  const activeRecord = MEDALLIONS[activeIndex];
+
   return (
-    <SectionContainer
+    <ThemeSection
       id="achievements"
-      variant="editorial"
-      bgMode="clean"
-      className="py-24 sm:py-32 lg:py-40 border-b border-[#F3EFE7]/[0.08]"
-      aria-label="Distinctions and certifications"
+      theme="titanium-ivory"
+      aria-label="Distinctions, competitive victories and credentials"
+      className="border-b border-[#0D0D11]/10 flex flex-col justify-between"
     >
-      {/* Section Intro */}
-      <div className="max-w-3xl mb-16 space-y-4">
-        <div className="flex items-center gap-3 text-xs font-mono text-[#A7B2C3]">
-          <span className="text-[#FF6B35] font-semibold">06</span>
-          <span className="text-[#F3EFE7]/30">/</span>
-          <span className="tracking-widest uppercase">Recognition &amp; Distinctions</span>
-        </div>
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
-          Recognition &amp; Distinctions
-        </h2>
-        <p className="text-base sm:text-lg font-sans text-[#A7B2C3] leading-relaxed">
-          Competitive hackathon victories, foundational algorithmic credentials, and cloud architecture validations.
-        </p>
-      </div>
-
-      {/* FEATURED RECOGNITION BLOCK: Consecutive DataFest Victories (40/60 Balanced Spread) */}
-      <div className="bg-[#070B12] border border-[#F3EFE7]/[0.12] rounded-[2px] p-8 sm:p-12 lg:p-16 relative overflow-hidden mb-16 sm:mb-20 shadow-[0_8px_32px_rgba(7,11,18,0.8)]">
-        {/* Precision Blueprint Corner Fiducials */}
-        <GridCrosshair className="absolute top-2 left-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
-        <GridCrosshair className="absolute top-2 right-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
-        <GridCrosshair className="absolute bottom-2 left-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
-        <GridCrosshair className="absolute bottom-2 right-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
-
-        <div className="pointer-events-none absolute top-0 inset-x-0 h-[2px] bg-[#FF6B35]" />
+      <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-          
-          {/* 40% Left: Oversized Stat Podium */}
-          <div className="lg:col-span-5 space-y-5">
-            <div className="text-[4.75rem] sm:text-[6.25rem] lg:text-[7.5rem] font-raleway font-extrabold leading-none tabular-nums tracking-tighter text-[#F3EFE7]">
-              2× 1st
+        {/* Section Headline */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-4 max-w-2xl">
+            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#B45309]">
+              <span className="w-6 h-px bg-[#B45309]" />
+              <span>04 // COMPETITIVE AWARDS &amp; DISTINCTIONS</span>
             </div>
-
-            <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="px-3 py-1 bg-[#101B30] text-[#FF6B35] border border-[#FF6B35]/30 rounded-[2px] font-semibold">
-                CHAMPION 2026
-              </span>
-              <span className="px-3 py-1 bg-[#101B30] text-[#F5D998] border border-[#F5D998]/30 rounded-[2px] font-semibold">
-                CHAMPION 2025
-              </span>
-            </div>
-
-            <div className="text-xs font-mono text-[#7A889B] pt-1">
-              American Statistical Association (ASA) · Best Use of External Data
-            </div>
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#0D0D11] leading-tight tracking-tight">
+              Recognition &amp; Distinctions
+            </h2>
+            <p className="text-base sm:text-lg font-sans text-[#575760] leading-relaxed">
+              Consecutive American Statistical Association hackathon championships, algorithmic honors, and executive research nominations.
+            </p>
           </div>
 
-          {/* 60% Right: 2026 RouteRx Breakdown + 2025 Hack to the Future */}
-          <div className="lg:col-span-7 space-y-6 lg:border-l lg:border-[#F3EFE7]/[0.08] lg:pl-12">
-            <div className="space-y-2">
-              <h3 className="text-2xl sm:text-3xl font-serif text-[#F3EFE7] leading-snug">
-                American Statistical Association DataFest Champion
-              </h3>
-              <div className="text-xs font-mono text-[#82B7FF]">
-                Consecutive 1st Place Honors · 48-Hour High-Consequence Sprints
-              </div>
-            </div>
-
-            {/* Structured Breakdown per Prompt */}
-            <div className="space-y-4 text-xs font-sans text-[#A7B2C3] leading-relaxed">
-              <div className="p-3.5 bg-[#101B30]/60 border border-[#F3EFE7]/[0.06] rounded-[2px] space-y-1">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-[#FF6B35] font-semibold">2026 · Careline / RouteRx</span>
-                  <span className="text-[#4CC38A]">1st Place Winner</span>
-                </div>
-                <p className="text-[13.5px] text-[#F3EFE7]/90 leading-relaxed font-normal">
-                  Engineered bi-directional transit routing engine resolving acute patient healthcare transit deserts in Shawnee County, KS using OSRM sub-15ms isochrone matrices.
-                </p>
-              </div>
-
-              <div className="p-3.5 bg-[#101B30]/60 border border-[#F3EFE7]/[0.06] rounded-[2px] space-y-1">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-[#F5D998] font-semibold">2025 · External Data Modeling</span>
-                  <span className="text-[#4CC38A]">1st Place Winner</span>
-                </div>
-                <p className="text-[13.5px] text-[#F3EFE7]/90 leading-relaxed font-normal">
-                  Synthesized multi-source demographic distributions and spatial predictive regressions under intense 48-hour competitive deadlines.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-1">
-              <Link
-                href="/projects/routerx-careline-hub"
-                className="bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-semibold text-xs font-mono py-3 px-5 inline-flex items-center gap-2 transition-colors select-none rounded-[2px]"
-              >
-                <span>Explore RouteRx Case Study</span>
-                <span>→</span>
-              </Link>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* SECONDARY RECOGNITION INDEX: Clean Borderless Editorial Rows */}
-      <div className="space-y-4">
-        <div className="text-xs font-mono text-[#7A889B] tracking-wider px-2">
-          COMPETITIVE AWARDS &amp; ACCREDITATIONS
-        </div>
-
-        <div className="border border-[#F3EFE7]/[0.08] divide-y divide-[#F3EFE7]/[0.08] bg-[#070B12] rounded-[2px] overflow-hidden">
-          {secondaryAchievements.map((item) => (
-            <div
-              key={item.id}
-              className="p-6 sm:p-7 flex flex-col md:flex-row md:items-baseline justify-between gap-4 hover:bg-[#101B30]/40 transition-colors group"
+          {/* Carousel Next / Prev Controls */}
+          <div className="flex items-center gap-3 text-xs font-mono shrink-0">
+            <button
+              onClick={handlePrev}
+              aria-label="Previous Medallion"
+              className="w-12 h-12 rounded-[2px] bg-[#DFD9CD] hover:bg-[#D4CCBF] border border-[#0D0D11]/20 flex items-center justify-center text-[#0D0D11] transition-colors cursor-pointer select-none"
             >
-              <div className="flex items-baseline gap-4 md:gap-6 md:w-2/5">
-                <span className="font-mono text-xs font-semibold text-[#FF6B35] tabular-nums select-none">
-                  {item.number}
-                </span>
-                <div>
-                  <h4 className="text-lg font-serif text-[#F3EFE7] group-hover:text-[#F5D998] transition-colors leading-snug">
-                    {item.title}
-                  </h4>
-                  <div className="text-xs font-mono text-[#7A889B] mt-0.5">
-                    {item.organization} · {item.date}
+              ←
+            </button>
+            <span className="px-3 text-[#575760]">
+              {activeIndex + 1} / {totalCount}
+            </span>
+            <button
+              onClick={handleNext}
+              aria-label="Next Medallion"
+              className="w-12 h-12 rounded-[2px] bg-[#DFD9CD] hover:bg-[#D4CCBF] border border-[#0D0D11]/20 flex items-center justify-center text-[#0D0D11] transition-colors cursor-pointer select-none"
+            >
+              →
+            </button>
+          </div>
+        </div>
+
+        {/* =====================================================================
+            3D PERSPECTIVE MEDALLION ORBITAL CAROUSEL
+            ===================================================================== */}
+        <div
+          ref={containerRef}
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
+          className="relative w-full h-[360px] sm:h-[420px] flex items-center justify-center overflow-visible select-none cursor-grab active:cursor-grabbing"
+          style={{ perspective: '1200px' }}
+        >
+          {MEDALLIONS.map((m, idx) => {
+            const offset = (idx - activeIndex + totalCount) % totalCount;
+            // Map offset to symmetrical visual positions: 0 is center, 1 is right, -1 is left
+            let relativePos = offset;
+            if (relativePos > totalCount / 2) relativePos -= totalCount;
+
+            const isCenter = relativePos === 0;
+            const isVisible = Math.abs(relativePos) <= 2;
+
+            if (!isVisible) return null;
+
+            const xTranslate = relativePos * 260; // horizontal spacing
+            const zTranslate = -Math.abs(relativePos) * 160; // depth recess
+            const yRotate = relativePos * -25; // face toward viewer
+            const scale = isCenter ? 1.08 : 0.85;
+            const opacity = isCenter ? 1 : Math.abs(relativePos) === 1 ? 0.6 : 0.25;
+
+            return (
+              <MotionDiv
+                key={m.id}
+                onClick={() => setActiveIndex(idx)}
+                animate={{
+                  x: xTranslate,
+                  z: zTranslate,
+                  rotateY: yRotate,
+                  scale,
+                  opacity,
+                }}
+                transition={{ type: 'spring', stiffness: 240, damping: 25 }}
+                className="absolute w-[220px] sm:w-[260px] aspect-square rounded-full flex items-center justify-center cursor-pointer transition-shadow duration-300"
+                style={{
+                  transformStyle: 'preserve-3d',
+                  boxShadow: isCenter ? m.materialTheme.glowShadow : 'none',
+                }}
+              >
+                {/* Outer Beveled Metallic Rim */}
+                <div
+                  className="absolute inset-0 rounded-full p-2.5 shadow-2xl"
+                  style={{
+                    background: m.materialTheme.rimGradient,
+                  }}
+                >
+                  {/* Subtle Bevel Shadow Step */}
+                  <div
+                    className="w-full h-full rounded-full p-2 border border-white/40 shadow-inner flex items-center justify-center relative overflow-hidden"
+                    style={{
+                      background: m.materialTheme.discBg,
+                    }}
+                  >
+                    {/* Concentric Precision Dial Rings */}
+                    <div
+                      className="absolute inset-3 rounded-full border border-dashed opacity-40 pointer-events-none"
+                      style={{ borderColor: m.materialTheme.innerRing }}
+                    />
+                    <div
+                      className="absolute inset-6 rounded-full border opacity-30 pointer-events-none"
+                      style={{ borderColor: m.materialTheme.innerRing }}
+                    />
+
+                    {/* Dynamic Specular Sheen Highlight */}
+                    <div className="absolute -top-[40%] -left-[40%] w-[180%] h-[180%] bg-gradient-to-br from-white/25 via-transparent to-transparent pointer-events-none transform -rotate-45" />
+
+                    {/* Embossed Relief Iconography & Number */}
+                    <div className="relative z-10 flex flex-col items-center justify-center text-center p-4">
+                      <span className="text-[10px] font-mono tracking-widest text-white/60 mb-1">
+                        RECORD {m.number}
+                      </span>
+                      <div
+                        className="text-lg sm:text-xl font-raleway font-black tracking-tight"
+                        style={{ color: m.materialTheme.innerRing }}
+                      >
+                        {m.materialTheme.reliefText}
+                      </div>
+                      <span className="text-[10px] font-mono text-white/70 uppercase tracking-widest mt-1">
+                        {m.year}
+                      </span>
+                    </div>
+
+                    {/* Bottom Status Ticker on Disc */}
+                    <div className="absolute bottom-3 text-[9px] font-mono text-white/50 tracking-wider">
+                      VERIFIED MEDAL
+                    </div>
                   </div>
                 </div>
+              </MotionDiv>
+            );
+          })}
+        </div>
+
+        {/* =====================================================================
+            SYNCHRONIZED EDITORIAL INSPECTION PEDESTAL PLINTH
+            ===================================================================== */}
+        <div className="w-full">
+          <AnimatePresence mode="wait">
+            <MotionDiv
+              key={activeRecord.id}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="p-8 sm:p-12 bg-[#E4DFC2]/40 border border-[#0D0D11]/15 rounded-[2px] shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+            >
+              {/* Left Column: Title & Citation (7 Cols) */}
+              <div className="lg:col-span-7 space-y-4">
+                <div className="flex items-center gap-3 text-xs font-mono">
+                  <span className="px-2.5 py-0.5 bg-[#0D0D11] text-[#ECE9E1] rounded-[2px] font-semibold">
+                    {activeRecord.shortTag}
+                  </span>
+                  <span className="text-[#575760]">{activeRecord.systemName}</span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-serif text-[#0D0D11] leading-snug">
+                  {activeRecord.title}
+                </h3>
+
+                <p className="text-sm sm:text-base font-sans text-[#2B2B30] leading-relaxed">
+                  {activeRecord.citation}
+                </p>
+
+                {activeRecord.collaborators && (
+                  <div className="text-xs font-mono text-[#575760] pt-1">
+                    COLLABORATION: {activeRecord.collaborators}
+                  </div>
+                )}
+
+                <div className="pt-3">
+                  <Link
+                    href={activeRecord.linkTarget || '#projects'}
+                    className="inline-flex items-center gap-2 text-xs font-mono font-semibold text-[#B45309] hover:text-[#0D0D11] border-b border-[#B45309] pb-0.5 transition-colors uppercase"
+                  >
+                    <span>View Winning Architecture in System Field</span>
+                    <span>→</span>
+                  </Link>
+                </div>
               </div>
 
-              <div className="md:w-3/5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
-                <p className="text-sm font-sans text-[#A7B2C3] leading-relaxed max-w-[55ch]">
-                  {item.description}
-                </p>
-                {item.pdfUrl && (
-                  <a
-                    href={item.pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-mono text-[#82B7FF] hover:text-[#FF6B35] transition-colors inline-flex items-center gap-1 shrink-0"
-                  >
-                    <span>Credential</span>
-                    <span>↗</span>
-                  </a>
-                )}
+              {/* Right Column: Quantitative Impact Metrics (5 Cols) */}
+              <div className="lg:col-span-5 bg-[#ECE9E1] p-6 rounded-[2px] border border-[#0D0D11]/15 space-y-4">
+                <div className="text-xs font-mono text-[#B45309] uppercase tracking-wider pb-2 border-b border-[#0D0D11]/10">
+                  VERIFIED IMPACT METRICS
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {activeRecord.metrics.map((met, i) => (
+                    <div key={i} className="space-y-0.5">
+                      <div className="text-[11px] font-mono text-[#575760]">{met.label}</div>
+                      <div className="text-base sm:text-lg font-mono font-bold text-[#0D0D11]">
+                        {met.value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            </MotionDiv>
+          </AnimatePresence>
         </div>
+
       </div>
-    </SectionContainer>
+    </ThemeSection>
   );
 };
 

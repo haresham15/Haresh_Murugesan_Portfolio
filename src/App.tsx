@@ -13,37 +13,40 @@ import ContactFooter from './components/ContactFooter';
 import SignalTraceBackground from './components/SignalTraceBackground';
 import AntigravityParticles from './components/AntigravityParticles';
 import { MotionPreferenceProvider } from './components/MotionPreference';
+import { ChromaticThemeProvider } from './components/ThemeSection';
 
 function App() {
   return (
     <MotionPreferenceProvider>
-      <div className="w-full min-h-screen bg-[#070B12] text-[#F3EFE7] overflow-x-clip relative selection:bg-[#FF6B35] selection:text-[#070B12]">
-        {/* Subtle Background Signal Grid */}
-        <SignalTraceBackground />
+      <ChromaticThemeProvider>
+        <div className="w-full min-h-screen bg-[#060608] text-[#F5F3EF] overflow-x-clip relative selection:bg-[#E85D04] selection:text-[#060608] transition-colors duration-500">
+          {/* Subtle Background Signal Grid */}
+          <SignalTraceBackground />
 
-        {/* Tactile Antigravity Cursor Particles with Adaptive Throttle */}
-        <AntigravityParticles />
+          {/* Tactile Antigravity Cursor Particles with Adaptive Throttle */}
+          <AntigravityParticles />
 
-        {/* 35mm Analog Film Grain Overlay */}
-        <div className="film-grain-overlay" aria-hidden="true" />
+          {/* 35mm Analog Film Grain Overlay */}
+          <div className="film-grain-overlay" aria-hidden="true" />
 
-        {/* Global Navigation Header (Floating Decoupled Icons) */}
-        <Header />
+          {/* Global Navigation Header (Floating Decoupled Controls + Top Portal) */}
+          <Header />
 
-        {/* EDITORIAL HOMEPAGE SEQUENCE (Prominent: Hero → About → Experience → Works → Syntinuum → Skills → Recognition → Milestones → Now → Contact) */}
-        <main id="main-content" className="relative z-10 w-full overflow-x-clip bg-transparent">
-          <BentoHero />
-          <AboutSection />
-          <ScrollyExperience />
-          <ProjectLab />
-          <PodcastSection />
-          <NeuralSkills />
-          <AchievementsGallery />
-          <HistorySection />
-          <NowSection />
-          <ContactFooter />
-        </main>
-      </div>
+          {/* EDITORIAL HOMEPAGE SEQUENCE (Prominent: Hero → About → Experience → Works → Syntinuum → Skills → Recognition → Milestones → Now → Contact) */}
+          <main id="main-content" className="relative z-10 w-full overflow-x-clip bg-transparent">
+            <BentoHero />
+            <AboutSection />
+            <ScrollyExperience />
+            <ProjectLab />
+            <PodcastSection />
+            <NeuralSkills />
+            <AchievementsGallery />
+            <HistorySection />
+            <NowSection />
+            <ContactFooter />
+          </main>
+        </div>
+      </ChromaticThemeProvider>
     </MotionPreferenceProvider>
   );
 }

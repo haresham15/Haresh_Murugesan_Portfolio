@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SectionContainer } from './ui/SectionContainer';
+import { ThemeSection } from './ThemeSection';
 
 export const ContactFooter: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
@@ -22,120 +22,128 @@ export const ContactFooter: React.FC = () => {
   };
 
   return (
-    <footer id="contact" className="relative w-full bg-transparent text-[#F3EFE7]" aria-label="Contact and colophon">
-      <SectionContainer
-        variant="editorial"
-        bgMode="clean"
-        className="pt-24 sm:pt-36 pb-20 sm:pb-28"
+    <footer id="contact" className="relative w-screen max-w-none text-[#F4F1EA]" aria-label="Contact and colophon">
+      <ThemeSection
+        id="contact-section"
+        theme="obsidian"
+        className="flex flex-col justify-between"
       >
-        {/* 7.20 EXPANSIVE STATEMENT COMPOSITION: Generous Negative Space & Expressive Typography */}
-        <div className="max-w-4xl space-y-8 mb-16 sm:mb-24">
-          <h2 className="text-4xl sm:text-6xl lg:text-7xl text-[#F3EFE7] leading-[1.05] tracking-tight">
-            <span className="font-raleway font-bold block sm:inline">Have an interesting problem? </span>
-            <span className="font-serif italic font-normal text-[#F5D998] block sm:inline">
-              Let’s talk about how I could help
-            </span>
-          </h2>
-
-          <p className="text-lg sm:text-xl font-sans text-[#A7B2C3] max-w-2xl leading-relaxed">
-            Based in Columbus, OH — actively interviewing for Summer 2027 Software Engineering, AI/ML, and Systems roles. Open to hybrid or relocation opportunities.
-          </p>
-        </div>
-
-        {/* 7.21 STRICT 3-TIER ACTION HIERARCHY WITH MACHINED 2PX BEVELS */}
-        <div className="space-y-10 border-t border-[#F3EFE7]/[0.08] pt-12 sm:pt-16">
+        <div className="w-full flex flex-col my-auto space-y-16 sm:space-y-24">
           
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 max-w-2xl">
-            {/* Primary Action: Direct Email */}
-            <a
-              href={`mailto:${email}`}
-              className="bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-mono text-xs font-semibold px-8 py-5 rounded-[2px] flex items-center justify-between sm:justify-center gap-3 transition-colors select-none group shadow-[0_0_20px_rgba(255,107,53,0.3)]"
-            >
-              <span>Send Direct Email</span>
-              <span className="text-base group-hover:translate-x-1.5 transition-transform duration-200">→</span>
-            </a>
+          {/* Expansive Statement Composition */}
+          <div className="max-w-4xl space-y-8">
+            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#E85D04]">
+              <span className="w-6 h-px bg-[#E85D04]" />
+              <span>07 // DIRECT DISPATCH &amp; CORRESPONDENCE</span>
+            </div>
 
-            {/* Secondary Action: Copy Email */}
-            <button
-              onClick={handleCopyEmail}
-              type="button"
-              className="bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] font-mono text-xs px-6 py-5 flex items-center justify-between sm:justify-center gap-3 transition-colors cursor-pointer select-none"
-            >
-              <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${copied ? 'bg-[#4CC38A]' : 'bg-[#FF6B35]'}`} />
-                <span>{copied ? 'Copied to Clipboard' : 'Copy Email Address'}</span>
-              </div>
-              <span className="text-[#A7B2C3]">{copied ? '✓' : '⧉'}</span>
-            </button>
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl text-[#F4F1EA] leading-[1.05] tracking-tight">
+              <span className="font-raleway font-bold block sm:inline">Have an interesting problem? </span>
+              <span className="font-serif italic font-normal text-[#F4A261] block sm:inline">
+                Let’s talk about how I can help.
+              </span>
+            </h2>
 
-            {/* Tertiary Action: Résumé */}
-            <a
-              href="/Haresh_Murugesan_Resume.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] font-mono text-xs px-6 py-5 flex items-center justify-between sm:justify-center gap-2 transition-colors select-none font-medium"
-            >
-              <span>Download Résumé</span>
-              <span className="text-[#F5D998]">↗</span>
-            </a>
+            <p className="text-lg sm:text-xl font-sans text-[#8E8D94] max-w-2xl leading-relaxed">
+              Based in Columbus, OH — actively interviewing for Summer 2027 Software Engineering, AI/ML, and High-Performance Systems roles. Open to hybrid or relocation opportunities.
+            </p>
           </div>
 
-          {/* Social Links & Back to Top */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-6 text-xs font-mono text-[#A7B2C3]">
-            <div className="flex items-center gap-6">
+          {/* 3-Tier Action Hierarchy */}
+          <div className="space-y-10 border-t border-[#F4F1EA]/10 pt-12 sm:pt-16">
+            
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 max-w-3xl">
+              {/* Primary Action: Direct Email */}
               <a
-                href="https://github.com/haresham15"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#F3EFE7] transition-colors"
+                href={`mailto:${email}`}
+                className="bg-[#E85D04] hover:bg-[#F4A261] text-[#060608] font-mono text-xs font-semibold px-8 py-5 rounded-[2px] flex items-center justify-between sm:justify-center gap-3 transition-colors select-none group shadow-[0_0_24px_rgba(232,93,4,0.35)]"
               >
-                GitHub ↗
+                <span>Send Direct Email</span>
+                <span className="text-base group-hover:translate-x-1.5 transition-transform duration-200">→</span>
               </a>
+
+              {/* Secondary Action: Copy Email */}
+              <button
+                onClick={handleCopyEmail}
+                type="button"
+                className="bg-[#0C0F17] hover:bg-[#151B28] text-[#F4F1EA] border border-[#F4F1EA]/15 rounded-[2px] font-mono text-xs px-6 py-5 flex items-center justify-between sm:justify-center gap-3 transition-colors cursor-pointer select-none"
+              >
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${copied ? 'bg-[#10B981]' : 'bg-[#E85D04]'}`} />
+                  <span>{copied ? 'Copied to Clipboard' : 'Copy Email Address'}</span>
+                </div>
+                <span className="text-[#8E8D94]">{copied ? '✓' : '⧉'}</span>
+              </button>
+
+              {/* Tertiary Action: Résumé */}
               <a
-                href="https://linkedin.com/in/haresh-murugesan"
+                href="/Haresh_Murugesan_Resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-[#F3EFE7] transition-colors"
+                className="bg-[#0C0F17] hover:bg-[#151B28] text-[#F4F1EA] border border-[#F4F1EA]/15 rounded-[2px] font-mono text-xs px-6 py-5 flex items-center justify-between sm:justify-center gap-2 transition-colors select-none font-medium"
               >
-                LinkedIn ↗
-              </a>
-              <a
-                href="https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#F3EFE7] transition-colors"
-              >
-                Spotify ↗
-              </a>
-              <a
-                href="https://www.youtube.com/@syntinuum"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#F3EFE7] transition-colors"
-              >
-                YouTube ↗
+                <span>Download Résumé</span>
+                <span className="text-[#F4A261]">↗</span>
               </a>
             </div>
 
-            <button
-              onClick={scrollToTop}
-              type="button"
-              className="hover:text-[#F5D998] transition-colors cursor-pointer select-none inline-flex items-center gap-1.5 self-start sm:self-auto"
-            >
-              <span>Back to Top</span>
-              <span>↑</span>
-            </button>
+            {/* Social Links & Back to Top */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-6 text-xs font-mono text-[#8E8D94] border-t border-[#F4F1EA]/[0.06]">
+              <div className="flex items-center gap-6">
+                <a
+                  href="https://github.com/haresham15"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#F4F1EA] transition-colors"
+                >
+                  GitHub ↗
+                </a>
+                <a
+                  href="https://linkedin.com/in/haresh-murugesan"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#F4F1EA] transition-colors"
+                >
+                  LinkedIn ↗
+                </a>
+                <a
+                  href="https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#F4F1EA] transition-colors"
+                >
+                  Spotify ↗
+                </a>
+                <a
+                  href="https://www.youtube.com/@syntinuum"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#F4F1EA] transition-colors"
+                >
+                  YouTube ↗
+                </a>
+              </div>
+
+              <button
+                onClick={scrollToTop}
+                type="button"
+                className="hover:text-[#E85D04] transition-colors flex items-center gap-2 text-left sm:text-right cursor-pointer"
+              >
+                <span>Return to Summit [TOP]</span>
+                <span>↑</span>
+              </button>
+            </div>
+
+            {/* Minimalist Colophon */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-[#64748B] pt-4">
+              <span>© {new Date().getFullYear()} HARESH MURUGESAN · ALL RIGHTS RESERVED</span>
+              <span>DESIGNED &amp; BUILT IN COLUMBUS, OH · NEXT.JS &amp; THREE.JS</span>
+            </div>
+
           </div>
 
         </div>
-
-      </SectionContainer>
-
-      {/* 7.22 Restrained Minimal Colophon Footer */}
-      <div className="w-full border-t border-[#F3EFE7]/[0.08] py-6 px-6 sm:px-10 lg:px-16 max-w-[1520px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono text-[#7A889B]">
-        <span>© 2026 HARESH MURUGESAN · ALL RIGHTS RESERVED</span>
-        <span>THE OHIO STATE UNIVERSITY · B.S. CSE (ARTIFICIAL INTELLIGENCE)</span>
-      </div>
+      </ThemeSection>
     </footer>
   );
 };

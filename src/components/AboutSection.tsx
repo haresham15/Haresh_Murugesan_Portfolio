@@ -1,111 +1,245 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { SectionContainer } from './ui/SectionContainer';
-import { ResearchArtifact, GridCrosshair } from './ui/EditorialPrimitives';
-import { ScrollReveal } from './ui/ReactBitsControls';
+import { motion, useSpring, useMotionValue } from 'framer-motion';
+import { ThemeSection } from './ThemeSection';
+
+const MotionDiv = motion.div as any;
 
 export const AboutSection: React.FC = () => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Spring physics for subtle ±4deg 3D tilt response
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useSpring(mouseY, { stiffness: 220, damping: 22 });
+  const rotateY = useSpring(mouseX, { stiffness: 220, damping: 22 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const offsetX = (e.clientX - centerX) / (rect.width / 2);
+    const offsetY = (e.clientY - centerY) / (rect.height / 2);
+
+    // Map to ±4deg max tilt
+    mouseX.set(offsetX * 4);
+    mouseY.set(-offsetY * 4);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const scrollToAnchor = (anchorId: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = document.getElementById(anchorId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <SectionContainer
+    <ThemeSection
       id="about"
-      variant="editorial"
-      bgMode="clean"
-      className="py-24 sm:py-32 lg:py-40 border-b border-[#F3EFE7]/[0.08]"
+      theme="alabaster"
       aria-label="About and engineering thesis"
+      className="border-b border-[#0B0B0E]/10"
     >
-      {/* Primary Composition: 40% Portrait / 60% Narrative Spread */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-        
-        {/* Left 40% Column: Architectural Blueprint Framed Portrait */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="relative w-full aspect-[4/5] bg-[#070B12] border border-[#F3EFE7]/[0.12] rounded-[2px] overflow-hidden group shadow-[0_4px_24px_rgba(7,11,18,0.7)]">
-            {/* Precision Blueprint Corner Fiducials */}
-            <GridCrosshair className="absolute top-2 left-2 z-20 opacity-40 text-[#82B7FF]" />
-            <GridCrosshair className="absolute top-2 right-2 z-20 opacity-40 text-[#82B7FF]" />
-            <GridCrosshair className="absolute bottom-2 left-2 z-20 opacity-40 text-[#82B7FF]" />
-            <GridCrosshair className="absolute bottom-2 right-2 z-20 opacity-40 text-[#82B7FF]" />
+      <div className="w-full flex flex-col justify-center my-auto">
+        {/* Editorial Section Index / Marginalia Header */}
+        <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#C83E2B] mb-12 sm:mb-16">
+          <span className="w-6 h-px bg-[#C83E2B]" />
+          <span>01 // THESIS &amp; ARCHITECTURAL DIRECTIVE</span>
+        </div>
 
-            {/* Corner CAD Ticks */}
-            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#82B7FF]/40 z-20 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#82B7FF]/40 z-20 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#82B7FF]/40 z-20 pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#82B7FF]/40 z-20 pointer-events-none" />
+        {/* 12-Column Fluid Grid: 5 Cols Portrait Monolith / 7 Cols Concise Narrative Spread */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 xl:gap-20 items-center">
+          
+          {/* Left 5 Columns: Asymmetric Editorial Monolith & Parallax Lens Frame */}
+          <div className="lg:col-span-5 relative">
+            <MotionDiv
+              ref={cardRef}
+              onMouseMove={handleMouseMove}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              style={{
+                rotateX,
+                rotateY,
+                transformPerspective: 1000,
+              }}
+              className="relative w-full aspect-[4/5] max-w-[480px] mx-auto lg:mx-0 select-none cursor-pointer group"
+            >
+              {/* Offset Double-Frame Shadow Contours */}
+              <div
+                className="absolute inset-0 translate-x-3 translate-y-3 bg-[#0B0B0E]/10 rounded-[2px] pointer-events-none transition-transform duration-500 group-hover:translate-x-5 group-hover:translate-y-5"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%)',
+                }}
+              />
+              <div
+                className="absolute inset-0 translate-x-1.5 translate-y-1.5 border border-[#C83E2B]/40 rounded-[2px] pointer-events-none transition-transform duration-500 group-hover:translate-x-2.5 group-hover:translate-y-2.5"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%)',
+                }}
+              />
 
-            <Image
-              src="/profile.jpeg"
-              alt="Haresh Murugesan in Columbus, OH"
-              fill
-              sizes="(max-width: 1024px) 100vw, 480px"
-              priority
-              className="object-cover object-top filter contrast-[1.04] grayscale group-hover:grayscale-0 transition-all duration-700"
-            />
+              {/* Main Chamfered Architectural Image Container */}
+              <div
+                className="relative w-full h-full bg-[#0B0B0E] border border-[#0B0B0E]/20 overflow-hidden shadow-[0_20px_50px_rgba(11,11,14,0.18)]"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%)',
+                }}
+              >
+                <Image
+                  src="/profile.jpeg"
+                  alt="Haresh Murugesan — Software & Systems Engineer"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 480px"
+                  priority
+                  className="object-cover object-top filter grayscale contrast-[1.08] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                />
+
+                {/* Interactive True-Color Reveal Wave Overlay */}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-tr from-[#C83E2B]/15 via-transparent to-transparent pointer-events-none transition-opacity duration-500 ${
+                    isHovered ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+
+                {/* Bottom Internal Optical Chamfer Rule */}
+                <div className="absolute bottom-2 right-2 text-[9px] font-mono text-white/50 tracking-widest pointer-events-none">
+                  SEC // 40.00°N
+                </div>
+              </div>
+
+              {/* Clean Floating Marginalia Tag (Outside Bottom-Left Edge) */}
+              <div className="absolute -bottom-8 left-0 text-[11px] font-mono text-[#525156] tracking-wider whitespace-nowrap hidden sm:block">
+                <span className="text-[#0B0B0E] font-semibold">HARESH MURUGESAN</span>
+                <span className="mx-2 text-[#C83E2B]">·</span>
+                <span>COLUMBUS, OH [40.0067° N, 83.0305° W]</span>
+                <span className="mx-2 text-[#C83E2B]">·</span>
+                <span>B.S. CSE (AI), OHIO STATE</span>
+              </div>
+            </MotionDiv>
+          </div>
+
+          {/* Right 7 Columns: Display Headline + Concise 32-Word Statement + 3 Metric Anchors */}
+          <div className="lg:col-span-7 space-y-8 lg:space-y-10">
             
-            {/* Ambient vignette */}
-            <div className="pointer-events-none absolute inset-0 opacity-30 bg-gradient-to-t from-[#070B12] via-transparent to-transparent z-10" />
-          </div>
-
-          <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-[#A7B2C3] border-t border-[#F3EFE7]/[0.06] pt-4">
-            <span className="text-[#F3EFE7] font-medium tracking-wide">HARESH MURUGESAN</span>
-            <span className="text-[#F5D998]">B.S. CSE · THE OHIO STATE UNIVERSITY</span>
-          </div>
-        </div>
-
-        {/* Right 60% Column: Statement + Single Readable Prose Column (55–70ch) */}
-        <div className="lg:col-span-7 space-y-8 lg:pl-4">
-          {/* Focal Lead Statement with Hero-style Raleway + Serif Italic Accent */}
-          <ScrollReveal>
-            <h2 className="text-[2.25rem] sm:text-[2.85rem] lg:text-[3.35rem] text-[#F3EFE7] leading-[1.08] tracking-[-0.025em]">
-              <span className="font-raleway font-bold">I build software where computational speed meets real-world </span>
-              <span className="font-serif font-normal text-[#F5D998]">physical and human systems</span>
+            {/* Monumental Editorial Headline */}
+            <h2 className="text-[2.35rem] sm:text-[3.25rem] lg:text-[3.85rem] text-[#0B0B0E] leading-[1.08] tracking-[-0.03em]">
+              <span className="font-raleway font-bold block">I build software where</span>
+              <span className="font-serif italic font-normal text-[#C83E2B] block">
+                computational speed meets real-world
+              </span>
+              <span className="font-raleway font-bold block">physical and human systems.</span>
             </h2>
-          </ScrollReveal>
 
-          {/* Single Readable Prose Column (Never split into narrow text) */}
-          <div className="max-w-[65ch] space-y-6 text-[16px] sm:text-[17px] font-sans text-[#A7B2C3] leading-[1.75]">
-            <p>
-              I focus on the engineering seam between complex data pipelines and high-reliability systems. Too much modern software relies on bloated cloud abstractions and unverified assumptions. My approach centers on performance, deterministic verification, and client-side architectures that keep latency low and operators in control.
-            </p>
-            <p>
-              When I tackle an unfamiliar problem, I start by isolating where the feedback loop breaks. In post-operative surgical monitoring (<Link href="/projects/healios" className="text-[#FF6B35] hover:text-[#F5D998] underline underline-offset-4 transition-colors font-medium">Healios V2</Link>), clinicians needed transparent diagnostics rather than opaque scores. I vectorized a NumPy image-processing pipeline to compute visual gradient saliency maps in 8.09ms, and built an in-browser HTML5 Canvas Laplacian filter to catch blurred photographs in under 35ms before upload.
-            </p>
+            {/* Radical Copy Condensation: Exact Concise 32-Word Punchy Statement */}
+            <div className="max-w-[58ch]">
+              <p className="text-[18px] sm:text-[20px] font-sans text-[#2B2B30] leading-[1.65] font-normal">
+                Focused on the seam between deterministic data pipelines, explainable deep learning, and low-latency client architectures—eliminating bloated cloud abstractions so clinicians, analysts, and operators stay in control.
+              </p>
+            </div>
+
+            {/* Clean Horizontal Strip of 3 Interactive Metric Anchors */}
+            <div className="pt-2">
+              <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#525156] mb-4">
+                VERIFIED ARCHITECTURAL BENCHMARKS // CLICK TO JUMP
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                
+                {/* Metric 01 */}
+                <a
+                  href="#projects"
+                  onClick={scrollToAnchor('projects')}
+                  className="group p-4 bg-[#EDE8DE] hover:bg-[#E3DDCF] border border-[#0B0B0E]/10 rounded-[2px] transition-all duration-200 flex flex-col justify-between select-none"
+                >
+                  <span className="text-[11px] font-mono text-[#525156] group-hover:text-[#C83E2B] transition-colors flex items-center justify-between">
+                    <span>PLATE 01</span>
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </span>
+                  <div className="mt-2 text-sm sm:text-base font-mono font-bold text-[#0B0B0E] tracking-tight">
+                    8.09ms Vectorized Grad-CAM
+                  </div>
+                  <span className="mt-1 text-[11px] font-sans text-[#525156]">
+                    Healios V2 Saliency Pipeline
+                  </span>
+                </a>
+
+                {/* Metric 02 */}
+                <a
+                  href="#experience"
+                  onClick={scrollToAnchor('experience')}
+                  className="group p-4 bg-[#EDE8DE] hover:bg-[#E3DDCF] border border-[#0B0B0E]/10 rounded-[2px] transition-all duration-200 flex flex-col justify-between select-none"
+                >
+                  <span className="text-[11px] font-mono text-[#525156] group-hover:text-[#C83E2B] transition-colors flex items-center justify-between">
+                    <span>APEX 01</span>
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </span>
+                  <div className="mt-2 text-sm sm:text-base font-mono font-bold text-[#0B0B0E] tracking-tight">
+                    12 AWS Agentic Workflows
+                  </div>
+                  <span className="mt-1 text-[11px] font-sans text-[#525156]">
+                    Chemical Abstracts Service (CAS)
+                  </span>
+                </a>
+
+                {/* Metric 03 */}
+                <a
+                  href="#projects"
+                  onClick={scrollToAnchor('projects')}
+                  className="group p-4 bg-[#EDE8DE] hover:bg-[#E3DDCF] border border-[#0B0B0E]/10 rounded-[2px] transition-all duration-200 flex flex-col justify-between select-none"
+                >
+                  <span className="text-[11px] font-mono text-[#525156] group-hover:text-[#C83E2B] transition-colors flex items-center justify-between">
+                    <span>PLATE 02</span>
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </span>
+                  <div className="mt-2 text-sm sm:text-base font-mono font-bold text-[#0B0B0E] tracking-tight">
+                    60 FPS Web Worker Telemetry
+                  </div>
+                  <span className="mt-1 text-[11px] font-sans text-[#525156]">
+                    Apexis Motorsports Engine
+                  </span>
+                </a>
+
+              </div>
+            </div>
+
+            {/* Direct Action Links */}
+            <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono">
+              <a
+                href="#experience"
+                onClick={scrollToAnchor('experience')}
+                className="px-6 py-3.5 bg-[#0B0B0E] hover:bg-[#C83E2B] text-[#F5F3EF] font-semibold rounded-[2px] transition-colors inline-flex items-center gap-2 select-none shadow-[0_4px_16px_rgba(11,11,14,0.18)]"
+              >
+                <span>Follow the Experience S-Curve</span>
+                <span>↓</span>
+              </a>
+              <Link
+                href="/about"
+                className="px-6 py-3.5 bg-transparent hover:bg-[#0B0B0E]/5 text-[#0B0B0E] border border-[#0B0B0E]/20 rounded-[2px] transition-colors inline-flex items-center gap-2 select-none font-medium"
+              >
+                <span>Full Leadership Profile</span>
+                <span>→</span>
+              </Link>
+            </div>
+
           </div>
 
-          <div className="pt-4 flex flex-wrap items-center gap-4 text-xs font-mono">
-            <Link
-              href="#experience"
-              className="px-5 py-3 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-semibold rounded-[2px] transition-colors inline-flex items-center gap-2 select-none shadow-[0_0_15px_rgba(255,107,53,0.25)]"
-            >
-              <span>Explore Verified Experience</span>
-              <span>↓</span>
-            </Link>
-            <Link
-              href="/about"
-              className="px-5 py-3 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] transition-colors inline-flex items-center gap-2 select-none"
-            >
-              <span>Full Leadership Profile</span>
-              <span>→</span>
-            </Link>
-          </div>
         </div>
-
       </div>
-
-      {/* 3. Separate Dedicated Research Artifact Module (96px–144px Below) */}
-      <div className="mt-24 sm:mt-32 lg:mt-36">
-        <ResearchArtifact
-          title="Clinical Saliency &amp; LiDAR Mesh Calibration"
-          figureNumber="RESEARCH FIG 01.1"
-          metricLabel="Saliency Latency"
-          metricValue="8.09ms"
-          caption="Healios V2 clinical computer vision plate"
-          explanation="Stereoscopic point-cloud filtered with bilateral mesh smoothing and NumPy vectorized Grad-CAM heatmaps, delivering ±0.08mm verified elevation margin."
-          imageSrc="/healios.png"
-          imageAlt="Healios V2 3D mesh calibration and Grad-CAM saliency map"
-          projectHref="/projects/healios"
-        />
-      </div>
-    </SectionContainer>
+    </ThemeSection>
   );
 };
 

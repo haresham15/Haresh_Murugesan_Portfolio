@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { SectionContainer } from './ui/SectionContainer';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
+import { useScroll } from 'framer-motion';
+import { ThemeSection } from './ThemeSection';
 import { ChicaneCircuitTrack } from './experience/ChicaneCircuitTrack';
 import { ExperienceDossierStage, DetailedExperienceRecord } from './experience/ExperienceDossierStage';
 
@@ -124,7 +126,7 @@ export const experiences: ExperienceItem[] = [
     year: '2023–2025',
     period: 'Dec 2025 – Present',
     role: 'Host & Producer (Season 3)',
-    company: 'Syntinuum Podcast',
+    company: 'Syntinuum Podcast & VECTOR Syndicate',
     teamOrDivision: 'Engineering Conversations Series (Formerly Adapt)',
     location: 'Columbus, OH',
     classification: 'TECHNICAL JOURNALISM & SYSTEMS DIALOGUES',
@@ -148,6 +150,7 @@ export const experiences: ExperienceItem[] = [
 ];
 
 export const ScrollyExperience: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const totalCount = experiences.length;
 
@@ -163,7 +166,7 @@ export const ScrollyExperience: React.FC = () => {
     setActiveIndex((prev) => (prev < totalCount - 1 ? prev + 1 : 0));
   }, [totalCount]);
 
-  // Keyboard navigation when user is on the section
+  // Keyboard navigation when user is focused on the section
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
@@ -186,68 +189,101 @@ export const ScrollyExperience: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handlePrev, handleNext]);
 
+  // Scroll tracking to guide car across chicanes as user scrolls through section
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start 0.7', 'end 0.3'],
+  });
+
+  useEffect(() => {
+    return scrollYProgress.on('change', (latest) => {
+      const targetIndex = Math.min(
+        totalCount - 1,
+        Math.max(0, Math.floor(latest * totalCount))
+      );
+      setActiveIndex(targetIndex);
+    });
+  }, [scrollYProgress, totalCount]);
+
   const activeRecord = experiences[activeIndex] || experiences[0];
 
   return (
-    <SectionContainer
+    <ThemeSection
       id="experience"
-      variant="full"
-      bgMode="clean"
-      className="py-16 sm:py-20 lg:py-24 border-b border-[#F3EFE7]/[0.08]"
-      aria-label="Experience & Proven Systems"
+      theme="telemetry-slate"
+      carbonType="woven"
+      carbonOpacity={0.25}
+      aria-label="Experience & Proven Systems Horizontal Grand Prix Chicane"
+      className="border-b border-[#F1F5F9]/10 flex flex-col justify-between"
     >
-      {/* 1. SECTION INTRO (Editorial Headline & Subtext) */}
-      <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6 mb-8 sm:mb-10">
-        <div className="max-w-2xl space-y-2.5">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
-            Experience
-          </h2>
-          <p className="text-sm sm:text-base font-sans text-[#A7B2C3] leading-relaxed">
-            Autonomous software engineering, deep learning research, and mobility telematics delivered across enterprise workflows, collegiate diagnostics, and venture roadmaps.
-          </p>
+      <div ref={containerRef} className="w-full flex flex-col my-auto space-y-8 sm:space-y-12">
+        
+        {/* 1. SECTION INTRO (Editorial Headline & Subtext) */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#10B981]">
+              <span className="w-6 h-px bg-[#10B981]" />
+              <span>02 // EXPERIENCE &amp; AUTONOMOUS SYSTEMS</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F1F5F9] leading-tight tracking-tight">
+              Horizontal Chicane Circuit
+            </h2>
+            <p className="text-base sm:text-lg font-sans text-[#64748B] leading-relaxed">
+              Steer through 5 engineering sectors across enterprise serverless, digital pathology AI, and connected-vehicle mobility telematics.
+            </p>
+          </div>
+
+          {/* Pit-Wall Status Tag */}
+          <div className="flex items-center gap-3 text-xs font-mono text-[#A7B2C3] shrink-0">
+            <span className="px-3 py-1.5 bg-[#0C121E] border border-[#10B981]/30 rounded-[2px] text-[#10B981] flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+              <span>LIVE TELEMETRY TRACK [5 SECTORS]</span>
+            </span>
+          </div>
         </div>
-      </div>
 
-      {/* 2. HORIZONTAL CHICANE RACE TRACK (100vw Full-Bleed Spline & Top-Down DNA Aero Prototype) */}
-      <div className="w-screen relative left-1/2 -translate-x-1/2 mb-6 sm:mb-8">
-        <ChicaneCircuitTrack
-          items={experiences.map((exp) => ({
-            id: exp.id,
-            role: exp.role,
-            company: exp.company,
-            period: exp.period,
-            year: exp.year,
-          }))}
-          activeIndex={activeIndex}
-          onSelectIndex={handleSelectIndex}
-        />
-      </div>
-
-      {/* 3. SYNCHRONIZED EXPERIENCE DOSSIER STAGE (Compact Swiss Architectural Stage) */}
-      <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6">
-        <ExperienceDossierStage
-          record={activeRecord}
-          currentIndex={activeIndex}
-          totalCount={totalCount}
-          onPrev={handlePrev}
-          onNext={handleNext}
-        />
-      </div>
-
-      {/* 4. EDITORIAL TRANSITION INTO SELECTED WORKS */}
-      <div className="w-full max-w-[1140px] mx-auto px-4 sm:px-6 pt-10 sm:pt-12 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-[#F3EFE7]/[0.08] mt-12">
-        <div className="text-xs font-mono text-[#7A889B] uppercase tracking-wider">
-          Verified Systems &amp; Benchmark Evidence
+        {/* 2. FULL-BLEED HORIZONTAL CHICANE RACE TRACK WITH AERO PROTOTYPE CAR */}
+        <div className="w-screen -ml-[4vw] md:-ml-[6vw] xl:-ml-[7vw] relative border-y border-[#F1F5F9]/10 bg-[#060A10]/95 shadow-2xl overflow-hidden">
+          <ChicaneCircuitTrack
+            items={experiences.map((exp) => ({
+              id: exp.id,
+              role: exp.role,
+              company: exp.company,
+              period: exp.period,
+              year: exp.year,
+            }))}
+            activeIndex={activeIndex}
+            onSelectIndex={handleSelectIndex}
+          />
         </div>
-        <a
-          href="#projects"
-          className="text-[#FF6B35] hover:text-[#F5D998] transition-colors inline-flex items-center gap-2 text-xs font-mono uppercase font-semibold"
-        >
-          <span>Explore Selected Engineering Case Studies</span>
-          <span>↓</span>
-        </a>
+
+        {/* 3. SYNCHRONIZED PIT-WALL EXPERIENCE DOSSIER STAGE */}
+        <div className="w-full">
+          <ExperienceDossierStage
+            record={activeRecord}
+            currentIndex={activeIndex}
+            totalCount={totalCount}
+            onPrev={handlePrev}
+            onNext={handleNext}
+          />
+        </div>
+
+        {/* 4. EDITORIAL TRANSITION INTO SELECTED WORKS */}
+        <div className="w-full pt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-[#F1F5F9]/10 text-xs font-mono">
+          <div className="text-[#64748B] uppercase tracking-wider">
+            Verified Systems &amp; Benchmark Evidence
+          </div>
+          <Link
+            href="#projects"
+            className="text-[#10B981] hover:text-[#38BDF8] transition-colors inline-flex items-center gap-2 uppercase font-semibold"
+          >
+            <span>Explore 18-System Engineering Field</span>
+            <span>↓</span>
+          </Link>
+        </div>
+
       </div>
-    </SectionContainer>
+    </ThemeSection>
   );
 };
 

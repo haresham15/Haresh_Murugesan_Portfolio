@@ -1,422 +1,545 @@
-import React, { useState, useEffect } from 'react';
-import { SectionContainer } from './ui/SectionContainer';
-import { GridCrosshair } from './ui/EditorialPrimitives';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeSection } from './ThemeSection';
 
 const MotionDiv = motion.div as any;
 
-export interface PodcastItem {
+type PodcastZone = 'signal' | 'dialogues' | 'architecture';
+
+interface FeaturedDialogue {
   id: string;
-  indexTag: string;
-  chapterTitle: string;
-  title: string;
   guest: string;
   role: string;
-  organization: string;
-  duration: string;
-  description: string;
-  insight: string;
-  metrics: { label: string; value: string }[];
-  spotifyUrl: string;
-  youtubeUrl: string;
-  tags: string[];
+  org: string;
+  focus: string;
+  runtime: string;
+  url: string;
 }
 
-export const podcastItems: PodcastItem[] = [
+const FEATURED_DIALOGUES: FeaturedDialogue[] = [
   {
-    id: 'ep01-kaicker',
-    indexTag: '01',
-    chapterTitle: 'Episode 01 · Computational Geometry',
-    title: 'Parametric Topology & Algorithm-Assisted Spatial Design',
-    guest: 'Mr. Arjun Kaicker',
-    role: 'Head of Analytics',
-    organization: 'Zaha Hadid Architects',
-    duration: '48 min',
-    description:
-      'Arjun Kaicker breaks down the computational mathematics powering Zaha Hadid Architects. We dissect how generative algorithms, finite-element pedestrian simulations, and ergonomic topology optimization turn architectural design from an aesthetic hunch into a mathematically verifiable spatial discipline.',
-    insight: 'Generative algorithms turn architectural form into a verifiable simulation loop rather than a stylistic hunch.',
-    metrics: [
-      { label: 'Algorithmic Domain', value: 'Parametric CFD' },
-      { label: 'Runtime', value: '48 min' },
-    ],
-    spotifyUrl: 'https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98',
-    youtubeUrl: 'https://www.youtube.com/@syntinuum',
-    tags: ['Zaha Hadid', 'Parametric Architecture', 'Generative Algorithms'],
+    id: 'dhaval-patel',
+    guest: 'Dhaval Patel',
+    role: 'Founder & CEO',
+    org: 'Lotus (ex-Apple Senior Engineering Manager)',
+    focus: 'Zero-touch wearable rings, firmware memory constraints, and high-volume hardware scaling.',
+    runtime: '58 min',
+    url: 'https://syntinuumpodcast.com',
   },
   {
-    id: 'ep02-wszalek',
-    indexTag: '02',
-    chapterTitle: 'Episode 02 · Neuromorphic Systems',
-    title: 'Cognitive Neurobiology & Machine Decision Boundaries',
-    guest: 'Dr. Joseph Wszalek',
-    role: 'Cognitive Neuroscientist & Legal Scholar',
-    organization: 'University of Wisconsin–Madison',
-    duration: '54 min',
-    description:
-      'Dr. Joseph Wszalek unpacks the cognitive mechanisms of human judgment under acute physiological stress and where modern transformer architectures fail to replicate neurobiological heuristic safety. We explore neuromorphic computing, legal responsibility in autonomous agents, and biological feedback circuits.',
-    insight: 'Transformer architectures lack the biological feedback circuits that enforce heuristic safety under acute stress.',
-    metrics: [
-      { label: 'Research Focus', value: 'Neurobiology' },
-      { label: 'Runtime', value: '54 min' },
-    ],
-    spotifyUrl: 'https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98',
-    youtubeUrl: 'https://www.youtube.com/@syntinuum',
-    tags: ['Neuroscience', 'Machine Perception', 'Cognitive Heuristics'],
+    id: 'andrea-jacobs',
+    guest: 'Andrea Jacobs',
+    role: 'Director of AI & ML',
+    org: 'Chemical Abstracts Service (CAS)',
+    focus: 'CAS Newton, agentic scientific graph architectures, and fine-tuning biomedical LLMs.',
+    runtime: '52 min',
+    url: 'https://syntinuumpodcast.com',
   },
   {
-    id: 'ep03-mcfetridge',
-    indexTag: '03',
-    chapterTitle: 'Episode 03 · Distributed Telemetry',
-    title: 'Smart Stormwater Grids & Real-Time Meteorological IoT',
-    guest: 'Mrs. Alisha McFetridge',
-    role: 'Co-Founder & CEO',
-    organization: 'RainGrid Inc.',
-    duration: '42 min',
-    description:
-      'Alisha McFetridge details the engineering challenges of managing decentralized stormwater infrastructure across municipal geographies. We dissect edge microcontrollers, predictive radar precipitation modeling, and the firmware fail-safes required when civil infrastructure IoT operates through extreme weather volatility.',
-    insight: 'Decentralized municipal IoT requires zero-cloud local failover valve controllers to survive infrastructure grid failures.',
-    metrics: [
-      { label: 'System Topology', value: 'Decentralized IoT' },
-      { label: 'Runtime', value: '42 min' },
-    ],
-    spotifyUrl: 'https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98',
-    youtubeUrl: 'https://www.youtube.com/@syntinuum',
-    tags: ['IoT Telemetry', 'Municipal Grids', 'Edge Computing'],
+    id: 'paul-shapiro',
+    guest: 'Paul Shapiro',
+    role: 'CEO & Author',
+    org: 'The Better Meat Co. (Author of Clean Meat)',
+    focus: 'Bioreactor fermentation economics, food-tech scaling dilemmas, and industrial microbiology.',
+    runtime: '46 min',
+    url: 'https://syntinuumpodcast.com',
   },
   {
-    id: 'ep04-hykes',
-    indexTag: '04',
-    chapterTitle: 'Episode 04 · Clinical Commercialization',
-    title: 'Navigating FDA Software Gates & Clinical Hardware Systems',
-    guest: 'Mr. Kevin Hykes',
-    role: 'President & CEO',
-    organization: 'Medical Device Ventures',
-    duration: '50 min',
-    description:
-      'Kevin Hykes shares a playbook honed over decades leading medical technology enterprises. We explore Class II and III FDA clearance pathways for software-as-a-medical-device (SaMD), hardware-in-the-loop surgical validation, and the technical discipline required to take life-saving diagnostic systems from lab bench to hospital OR.',
-    insight: 'Class III medical software clearance requires absolute deterministic traceability in hardware-in-the-loop validation.',
-    metrics: [
-      { label: 'Regulatory Scope', value: 'Class II / III FDA' },
-      { label: 'Runtime', value: '50 min' },
-    ],
-    spotifyUrl: 'https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98',
-    youtubeUrl: 'https://www.youtube.com/@syntinuum',
-    tags: ['FDA Clearance', 'Medical Devices', 'SaMD Verification'],
+    id: 'adam-geller',
+    guest: 'Adam Geller',
+    role: 'Founder & CEO',
+    org: 'Edthena',
+    focus: 'Video-based AI coaching pipelines, classroom NLP analysis, and educational venture engineering.',
+    runtime: '44 min',
+    url: 'https://syntinuumpodcast.com',
+  },
+  {
+    id: 'steve-wang',
+    guest: 'Steve Wang',
+    role: 'Founder & CEO',
+    org: 'Colorpik AI',
+    focus: 'Sub-millimeter color sensor hardware, pump micro-dispensing, and embedded C firmware.',
+    runtime: '49 min',
+    url: 'https://syntinuumpodcast.com',
   },
 ];
 
 export const PodcastSection: React.FC = () => {
-  const [selectedEpisodeIdx, setSelectedEpisodeIdx] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [scrubPosition, setScrubPosition] = useState(38); // 0-100%
-  const [waveSeed, setWaveSeed] = useState(0);
+  const [activeZone, setActiveZone] = useState<PodcastZone>('dialogues');
+  const [hoveredZone, setHoveredZone] = useState<PodcastZone | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animFrameRef = useRef<number | null>(null);
 
-  const featuredEp = podcastItems[selectedEpisodeIdx];
-  const totalCount = podcastItems.length;
+  const currentZone = hoveredZone || activeZone;
 
-  const handlePrev = () => {
-    setSelectedEpisodeIdx((prev) => (prev > 0 ? prev - 1 : totalCount - 1));
+  // Horizontal position of the DNA-Lightbulb selector corresponding to each zone
+  const selectorPositions: Record<PodcastZone, string> = {
+    signal: '18%',
+    dialogues: '50%',
+    architecture: '82%',
   };
 
-  const handleNext = () => {
-    setSelectedEpisodeIdx((prev) => (prev < totalCount - 1 ? prev + 1 : 0));
-  };
-
-  // Subtle wave motion animation
+  // 100vw Canvas Waveform Loop with 3 Harmonic Frequency Zones
   useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(() => {
-      setWaveSeed((s) => (s + 1) % 100);
-      setScrubPosition((p) => (p >= 99 ? 0 : p + 0.3));
-    }, 150);
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let width = (canvas.width = canvas.parentElement?.clientWidth || window.innerWidth);
+    let height = (canvas.height = canvas.parentElement?.clientHeight || 240);
+
+    const handleResize = () => {
+      if (!canvas || !canvas.parentElement) return;
+      width = canvas.width = canvas.parentElement.clientWidth;
+      height = canvas.height = canvas.parentElement.clientHeight;
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    let phase = 0;
+
+    const render = () => {
+      phase += 0.024;
+      ctx.clearRect(0, 0, width, height);
+
+      const zone1End = width * 0.33;
+      const zone2End = width * 0.67;
+
+      // Draw Multi-Harmonic Sine Waves across 100vw
+      const drawHarmonic = (
+        ampMultiplier: number,
+        freq: number,
+        color: string,
+        lineWidth: number,
+        activeZoneWeight: number
+      ) => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+
+        for (let x = 0; x < width; x += 4) {
+          // Identify zone
+          let zoneAmp = 1.0;
+          if (x < zone1End) {
+            zoneAmp = currentZone === 'signal' ? activeZoneWeight : 0.45;
+          } else if (x < zone2End) {
+            zoneAmp = currentZone === 'dialogues' ? activeZoneWeight : 0.45;
+          } else {
+            zoneAmp = currentZone === 'architecture' ? activeZoneWeight : 0.45;
+          }
+
+          const baseSine = Math.sin(x * freq + phase) * 32;
+          const secondHarmonic = Math.sin(x * freq * 2.2 - phase * 1.5) * 16;
+          const noiseRipple = Math.cos(x * 0.05 + phase * 2) * 6;
+          const y = height / 2 + (baseSine + secondHarmonic + noiseRipple) * ampMultiplier * zoneAmp;
+
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+
+        ctx.stroke();
+        ctx.restore();
+      };
+
+      // Primary Gold Filament wave
+      drawHarmonic(1.2, 0.008, '#F59E0B', 2.2, 1.8);
+      // Secondary Bio-Luminescent Cyan wave
+      drawHarmonic(0.85, 0.012, '#38BDF8', 1.6, 1.6);
+      // Ambient Muted Navy/Silver wave
+      drawHarmonic(0.5, 0.016, 'rgba(115, 138, 156, 0.35)', 1.0, 1.2);
+
+      // Draw Frequency Histogram Bars in Background
+      const barCount = 48;
+      const barWidth = width / barCount;
+      ctx.save();
+      for (let i = 0; i < barCount; i++) {
+        const barX = i * barWidth + barWidth * 0.25;
+        let barZone: PodcastZone = 'signal';
+        if (barX >= zone2End) barZone = 'architecture';
+        else if (barX >= zone1End) barZone = 'dialogues';
+
+        const isBarActive = barZone === currentZone;
+        const barHeight = Math.abs(Math.sin(i * 0.4 + phase * 1.8) * 45) + (isBarActive ? 25 : 8);
+
+        ctx.fillStyle = isBarActive
+          ? barZone === 'signal'
+            ? 'rgba(245, 158, 11, 0.35)'
+            : barZone === 'dialogues'
+            ? 'rgba(56, 189, 248, 0.35)'
+            : 'rgba(245, 158, 11, 0.35)'
+          : 'rgba(115, 138, 156, 0.08)';
+
+        ctx.fillRect(barX, height / 2 - barHeight / 2, barWidth * 0.5, barHeight);
+      }
+      ctx.restore();
+
+      // Vertical hairline zone dividers
+      ctx.save();
+      ctx.strokeStyle = 'rgba(248, 250, 252, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 6]);
+      ctx.beginPath();
+      ctx.moveTo(zone1End, 0);
+      ctx.lineTo(zone1End, height);
+      ctx.moveTo(zone2End, 0);
+      ctx.lineTo(zone2End, height);
+      ctx.stroke();
+      ctx.restore();
+
+      animFrameRef.current = requestAnimationFrame(render);
+    };
+
+    animFrameRef.current = requestAnimationFrame(render);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, [currentZone]);
 
   return (
-    <SectionContainer
+    <ThemeSection
       id="podcast"
-      variant="editorial"
-      bgMode="clean"
-      className="py-24 sm:py-32 lg:py-40 border-b border-[#F3EFE7]/[0.08]"
-      aria-label="Syntinuum technical journalism podcast"
+      theme="studio-midnight"
+      aria-label="Syntinuum technical journalism podcast and audio architecture"
+      className="border-b border-[#F8FAFC]/10 flex flex-col justify-between"
     >
-      {/* Publication-Inspired Magazine Header */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16 sm:mb-20">
-        <div className="space-y-4 max-w-2xl">
-          <div className="flex items-center gap-3 text-xs font-mono text-[#A7B2C3]">
-            <span className="text-[#FF6B35] font-semibold">04</span>
-            <span className="text-[#F3EFE7]/30">/</span>
-            <span className="tracking-widest uppercase">Publication &amp; Audio Archive</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#F3EFE7] leading-tight tracking-tight">
-            Syntinuum
-          </h2>
-          <p className="text-base sm:text-lg font-sans text-[#A7B2C3] leading-relaxed">
-            Long-form dialogues with engineering founders, research scientists, and technology executives exploring the seam between textbook algorithms and live production fires.
-          </p>
-        </div>
-
-        {/* Global Platform Links */}
-        <div className="flex items-center gap-3 shrink-0 text-xs font-mono">
-          <a
-            href="https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2.5 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors font-medium cursor-pointer"
-          >
-            <span>Spotify Show</span>
-            <span className="text-[#4CC38A]">↗</span>
-          </a>
-          <a
-            href="https://www.youtube.com/@syntinuum"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2.5 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors font-medium cursor-pointer"
-          >
-            <span>YouTube Channel</span>
-            <span className="text-[#FF6B35]">↗</span>
-          </a>
-        </div>
-      </div>
-
-      {/* =====================================================================
-          INTERACTIVE AUDIO WAVEFORM & DNA-LIGHTBULB EPISODE CYCLER STAGE
-          ===================================================================== */}
-      <div className="bg-[#070B12] border border-[#F3EFE7]/[0.12] rounded-[2px] p-6 sm:p-10 lg:p-14 mb-14 relative overflow-hidden shadow-[0_12px_44px_rgba(7,11,18,0.85)]">
-        {/* Precision Blueprint Corner Fiducials */}
-        <GridCrosshair className="absolute top-2 left-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
-        <GridCrosshair className="absolute top-2 right-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
-        <GridCrosshair className="absolute bottom-2 left-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
-        <GridCrosshair className="absolute bottom-2 right-2 z-20 opacity-40 text-[#82B7FF] pointer-events-none" />
-
-        <div className="pointer-events-none absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#F5D998] via-[#FF6B35] to-[#82B7FF]" />
-
-        {/* Top Cycler & Telemetry Bar */}
-        <div className="pb-6 mb-8 border-b border-[#F3EFE7]/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          {/* DNA Lightbulb Visual Motif + Cycler Controls */}
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-[#101B30] border border-[#FF6B35]/40 rounded-[2px] flex items-center justify-center text-[#FF6B35] shrink-0">
-              {/* Stylized DNA-Bulb vector mark */}
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z" />
-                <path d="M9 21h6" />
-                <path d="M10 9l4 4M14 9l-4 4" stroke="#F5D998" strokeWidth="1.4" />
-              </svg>
+      <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
+        
+        {/* Section Headline & Top Platforms Strip */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+          <div className="space-y-4 max-w-2xl">
+            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#38BDF8]">
+              <span className="w-6 h-px bg-[#38BDF8]" />
+              <span>03 // FRONTIER INTELLIGENCE &amp; PRODUCTION REALITY</span>
             </div>
-
-            <div>
-              <div className="text-[11px] font-mono text-[#FF6B35] uppercase tracking-wider font-semibold">
-                SYNTINUUM WAVEFORM CYCLER
-              </div>
-              <div className="text-xs font-mono text-[#A7B2C3]">
-                Episode {featuredEp.indexTag} / 0{totalCount} · 48kHz Master Audio
-              </div>
-            </div>
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F8FAFC] leading-tight tracking-tight">
+              Syntinuum
+            </h2>
+            <p className="text-base sm:text-lg font-sans text-[#738A9C] leading-relaxed">
+              Where frontier machine intelligence meets human implementation. Long-form technical dialogues dissecting how theoretical research moves into production systems.
+            </p>
           </div>
 
-          {/* Episode Cycler Controls */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handlePrev}
-              className="px-3 py-1.5 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] hover:text-[#FF6B35] border border-[#F3EFE7]/15 rounded-[2px] text-xs font-mono transition-colors flex items-center gap-1 cursor-pointer"
-              aria-label="Previous Episode"
+          <div className="flex items-center gap-3 shrink-0 text-xs font-mono">
+            <a
+              href="https://syntinuumpodcast.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-3 bg-[#F59E0B] hover:bg-[#D97706] text-[#05070E] font-semibold rounded-[2px] inline-flex items-center gap-2 transition-colors shadow-[0_0_20px_rgba(245,158,11,0.3)]"
             >
-              <span>←</span>
-              <span>Prev Episode</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleNext}
-              className="px-3 py-1.5 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] hover:text-[#FF6B35] border border-[#F3EFE7]/15 rounded-[2px] text-xs font-mono transition-colors flex items-center gap-1 cursor-pointer"
-              aria-label="Next Episode"
+              <span>Explore SyntinuumPodcast.com</span>
+              <span>↗</span>
+            </a>
+            <a
+              href="https://www.youtube.com/@syntinuum"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-3 bg-[#0E1526] hover:bg-[#16213B] text-[#F8FAFC] border border-[#F8FAFC]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors"
             >
-              <span>Next Episode</span>
-              <span>→</span>
-            </button>
+              <span>YouTube [8k+ Views]</span>
+              <span className="text-[#38BDF8]">↗</span>
+            </a>
           </div>
         </div>
 
-        {/* Interactive Audio Waveform Spectrum Bar */}
-        <div className="mb-10 bg-[#0A101C] border border-[#F3EFE7]/[0.08] p-4 sm:p-5 rounded-[2px]">
-          <div className="flex items-center justify-between text-[11px] font-mono text-[#7A889B] mb-2.5">
-            <div className="flex items-center gap-2">
+        {/* =====================================================================
+            EDGE-TO-EDGE 100VW LIVING AUDIO WAVEFORM & GLIDING DNA-LIGHTBULB
+            ===================================================================== */}
+        <div className="w-screen -ml-[4vw] md:-ml-[6vw] xl:-ml-[7vw] relative border-y border-[#F8FAFC]/10 bg-[#04060C] select-none">
+          
+          {/* Canvas Waveform Container */}
+          <div className="relative w-full h-[220px] sm:h-[260px] overflow-hidden">
+            <canvas ref={canvasRef} className="w-full h-full block" />
+
+            {/* Gliding DNA-Lightbulb Floating Selector */}
+            <MotionDiv
+              animate={{ left: selectorPositions[currentZone] }}
+              transition={{ type: 'spring', stiffness: 160, damping: 20 }}
+              className="absolute top-6 -translate-x-1/2 pointer-events-none z-20 flex flex-col items-center"
+            >
+              {/* Stylized DNA-Lightbulb Vector Icon */}
+              <div className="w-12 h-12 rounded-full bg-[#05070E] border-2 border-[#F59E0B] flex items-center justify-center text-[#F59E0B] shadow-[0_0_24px_rgba(245,158,11,0.6)]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M9 18h6" />
+                  <path d="M10 22h4" />
+                  <path d="M12 2v2" />
+                  <path d="M12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V18H9v-.8C7.21 16.16 6 14.22 6 12a6 6 0 0 1 6-6z" />
+                  {/* Internal DNA Double Helix Filament */}
+                  <path d="M10 10c1 1 3-1 4 0" stroke="#38BDF8" strokeWidth="1.5" />
+                  <path d="M10 13c1-1 3 1 4 0" stroke="#38BDF8" strokeWidth="1.5" />
+                </svg>
+              </div>
+
+              {/* Status Indicator Label */}
+              <span className="mt-2 px-2.5 py-0.5 bg-[#05070E]/90 text-[10px] font-mono text-[#F59E0B] border border-[#F59E0B]/30 rounded-[2px] tracking-widest whitespace-nowrap uppercase shadow-lg">
+                ACTIVE ZONE
+              </span>
+            </MotionDiv>
+
+            {/* 3 Interactive Clickable Zone Trigger Overlays */}
+            <div className="absolute inset-0 grid grid-cols-3 z-30">
+              
+              {/* Zone 01: Signal */}
               <button
                 type="button"
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="px-2.5 py-0.5 bg-[#FF6B35] text-[#070B12] font-semibold rounded-[2px] cursor-pointer hover:bg-[#FF8547] transition-colors"
-              >
-                {isPlaying ? 'PAUSE ❚❚' : 'SIMULATE PLAY ▶'}
-              </button>
-              <span className="text-[#A7B2C3]">OPUS 128kbps</span>
-            </div>
-            <div className="tabular-nums text-[#F5D998]">
-              {Math.floor((scrubPosition / 100) * 48)}:
-              {String(Math.floor(((scrubPosition / 100) * 48 * 60) % 60)).padStart(2, '0')} / {featuredEp.duration}
-            </div>
-          </div>
-
-          {/* 36 Waveform Frequency Bars (Clickable Scrub Bar) */}
-          <div
-            className="w-full h-12 flex items-end gap-1 cursor-ew-resize py-1 select-none"
-            onClick={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-              setScrubPosition(pct);
-            }}
-            title="Click or drag to scrub episode waveform"
-          >
-            {Array.from({ length: 48 }).map((_, i) => {
-              const pct = (i / 47) * 100;
-              const isPast = pct <= scrubPosition;
-              // Generate organic frequency height based on index and seed
-              const baseHeight = 12 + Math.abs(Math.sin((i + waveSeed * 0.1) * 0.45) * 28) + Math.cos(i * 0.8) * 8;
-              const clampedHeight = Math.round(Math.max(8, Math.min(44, baseHeight)));
-
-              return (
-                <div
-                  key={i}
-                  className="flex-1 rounded-[1px] transition-all duration-150"
-                  style={{
-                    height: `${clampedHeight}px`,
-                    backgroundColor: isPast ? '#FF6B35' : 'rgba(167, 178, 195, 0.22)',
-                    boxShadow: isPast && i === Math.floor((scrubPosition / 100) * 47) ? '0 0 8px #FF6B35' : 'none',
-                  }}
-                />
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Episode Content Spread */}
-        <AnimatePresence mode="wait">
-          <MotionDiv
-            key={featuredEp.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start"
-          >
-            {/* Left Column (Cols 1–5): Episode Meta, Speaker & Editorial Insight */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="space-y-2">
-                <span className="text-xs font-mono text-[#FF6B35] uppercase tracking-wider block font-semibold">
-                  {featuredEp.chapterTitle}
-                </span>
-                <div className="text-2xl sm:text-3xl font-serif text-[#F3EFE7] font-normal leading-snug">
-                  {featuredEp.guest}
-                </div>
-                <div className="text-sm font-sans text-[#F5D998] font-medium">
-                  {featuredEp.role} · {featuredEp.organization}
-                </div>
-              </div>
-
-              {/* Editorial Key Perspective */}
-              <div className="pt-4 border-t border-[#F3EFE7]/[0.08] space-y-2">
-                <span className="text-[11px] font-mono text-[#82B7FF] tracking-wider block">
-                  Core Engineering Perspective:
-                </span>
-                <p className="text-[15px] font-serif italic text-[#F3EFE7] leading-relaxed">
-                  "{featuredEp.insight}"
-                </p>
-              </div>
-
-              {/* Metrics Chips */}
-              <div className="flex items-center gap-3 text-xs font-mono text-[#A7B2C3] pt-1">
-                {featuredEp.metrics.map((m) => (
-                  <div key={m.label} className="px-3 py-1.5 bg-[#101B30] border border-[#F3EFE7]/[0.1] rounded-[2px]">
-                    <span className="text-[#7A889B]">{m.label}: </span>
-                    <span className="text-[#F3EFE7] font-semibold">{m.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Column (Cols 6–12): Title, Deep Narrative & Action CTAs */}
-            <div className="lg:col-span-7 space-y-6 lg:border-l lg:border-[#F3EFE7]/[0.08] lg:pl-12">
-              <h3 className="text-2xl sm:text-3xl lg:text-[32px] font-serif text-[#F3EFE7] leading-tight font-normal">
-                {featuredEp.title}
-              </h3>
-
-              <p className="text-[15px] sm:text-[16px] font-sans text-[#A7B2C3] leading-[1.74]">
-                {featuredEp.description}
-              </p>
-
-              <div className="text-xs font-mono text-[#7A889B]">
-                <span className="text-[#F5D998]">Explored Topics: </span>
-                <span>{featuredEp.tags.join(' · ')}</span>
-              </div>
-
-              <div className="pt-4 flex flex-wrap items-center gap-3.5">
-                <a
-                  href={featuredEp.spotifyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-semibold px-6 py-3.5 text-xs font-mono inline-flex items-center gap-2 transition-colors select-none rounded-[2px] shadow-[0_0_15px_rgba(255,107,53,0.25)]"
-                >
-                  <span>Play Conversation on Spotify</span>
-                  <span>↗</span>
-                </a>
-                <a
-                  href={featuredEp.youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 px-5 py-3.5 text-xs font-mono inline-flex items-center gap-2 transition-colors select-none font-medium rounded-[2px]"
-                >
-                  <span>Watch on YouTube</span>
-                  <span>↗</span>
-                </a>
-              </div>
-            </div>
-          </MotionDiv>
-        </AnimatePresence>
-      </div>
-
-      {/* Supporting Episode Archive Browser */}
-      <div className="space-y-3">
-        <div className="text-xs font-mono text-[#7A889B] uppercase tracking-wider px-2">
-          SELECT FROM CONVERSATION ARCHIVE
-        </div>
-
-        <div className="border border-[#F3EFE7]/[0.08] divide-y divide-[#F3EFE7]/[0.08] bg-[#070B12] rounded-[2px] overflow-hidden">
-          {podcastItems.map((ep, idx) => {
-            const isSelected = selectedEpisodeIdx === idx;
-            return (
-              <button
-                key={ep.id}
-                onClick={() => setSelectedEpisodeIdx(idx)}
-                type="button"
-                className={`w-full p-5 sm:p-6 text-left flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors cursor-pointer ${
-                  isSelected ? 'bg-[#101B30]' : 'hover:bg-[#101B30]/40'
+                onClick={() => setActiveZone('signal')}
+                onMouseEnter={() => setHoveredZone('signal')}
+                onMouseLeave={() => setHoveredZone(null)}
+                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer group ${
+                  currentZone === 'signal' ? 'bg-[#F59E0B]/[0.04]' : 'hover:bg-white/[0.02]'
                 }`}
               >
-                <div className="flex items-center gap-4 sm:gap-6">
-                  <span className={`font-mono text-xs font-semibold tabular-nums ${isSelected ? 'text-[#FF6B35]' : 'text-[#7A889B]'}`}>
-                    {ep.indexTag}
+                <div className="space-y-1">
+                  <span className="text-xs font-mono text-[#F59E0B] font-semibold tracking-wider">
+                    01 // THE SIGNAL
                   </span>
-                  <div>
-                    <span className={`text-base font-serif block transition-colors ${isSelected ? 'text-[#F5D998]' : 'text-[#F3EFE7]'}`}>
-                      {ep.guest} — <span className="font-sans font-normal text-sm text-[#A7B2C3]">{ep.title}</span>
-                    </span>
-                    <span className="text-xs font-mono text-[#7A889B] block mt-0.5">
-                      {ep.organization}
-                    </span>
+                  <div className="text-sm sm:text-base font-raleway font-bold text-[#F8FAFC]">
+                    The Thesis &amp; Editorial Mission
+                  </div>
+                </div>
+              </button>
+
+              {/* Zone 02: Dialogues */}
+              <button
+                type="button"
+                onClick={() => setActiveZone('dialogues')}
+                onMouseEnter={() => setHoveredZone('dialogues')}
+                onMouseLeave={() => setHoveredZone(null)}
+                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer border-x border-[#F8FAFC]/10 group ${
+                  currentZone === 'dialogues' ? 'bg-[#38BDF8]/[0.04]' : 'hover:bg-white/[0.02]'
+                }`}
+              >
+                <div className="space-y-1">
+                  <span className="text-xs font-mono text-[#38BDF8] font-semibold tracking-wider">
+                    02 // THE DIALOGUES
+                  </span>
+                  <div className="text-sm sm:text-base font-raleway font-bold text-[#F8FAFC]">
+                    Founder &amp; Executive Sessions
+                  </div>
+                </div>
+              </button>
+
+              {/* Zone 03: Architecture */}
+              <button
+                type="button"
+                onClick={() => setActiveZone('architecture')}
+                onMouseEnter={() => setHoveredZone('architecture')}
+                onMouseLeave={() => setHoveredZone(null)}
+                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer group ${
+                  currentZone === 'architecture' ? 'bg-[#F59E0B]/[0.04]' : 'hover:bg-white/[0.02]'
+                }`}
+              >
+                <div className="space-y-1">
+                  <span className="text-xs font-mono text-[#F59E0B] font-semibold tracking-wider">
+                    03 // THE ARCHITECTURE
+                  </span>
+                  <div className="text-sm sm:text-base font-raleway font-bold text-[#F8FAFC]">
+                    Automated Discovery Pipeline
+                  </div>
+                </div>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* =====================================================================
+            THREE INTERACTIVE NARRATIVE STAGES (Cross-Faded below Waveform)
+            ===================================================================== */}
+        <div className="w-full min-h-[360px]">
+          <AnimatePresence mode="wait">
+            
+            {/* STAGE 01: THE THESIS & SIGNAL */}
+            {activeZone === 'signal' && (
+              <MotionDiv
+                key="stage-signal"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[#090D18] border border-[#F8FAFC]/10 rounded-[2px]"
+              >
+                <div className="lg:col-span-7 space-y-6">
+                  <div className="text-xs font-mono text-[#F59E0B] uppercase tracking-widest">
+                    FOUNDED &amp; HOSTED BY HARESH MURUGESAN · 8,000+ YOUTUBE VIEWS
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F8FAFC] leading-snug">
+                    Syntinuum: Where Frontier Intelligence Meets Human Implementation.
+                  </h3>
+                  <p className="text-base text-[#738A9C] leading-relaxed">
+                    Formerly <em>Adapt: Implementing Innovations</em>, Syntinuum was founded to interrogate the critical seam between theoretical computation and live operational fires. We dissect how artificial intelligence, cellular biology, and complex systems engineering translate from whitepapers into robust products that scale.
+                  </p>
+                  <div className="pt-2">
+                    <a
+                      href="https://syntinuumpodcast.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-3 text-xs font-mono text-[#F59E0B] hover:text-[#F8FAFC] border-b border-[#F59E0B] pb-1 transition-colors uppercase font-semibold"
+                    >
+                      <span>Explore Full Show Archive On SyntinuumPodcast.com</span>
+                      <span>↗</span>
+                    </a>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs font-mono text-[#7A889B] shrink-0">
-                  <span>{ep.duration}</span>
-                  <span className={isSelected ? 'text-[#FF6B35] font-semibold' : 'text-[#7A889B]'}>
-                    {isSelected ? '● ACTIVE' : 'LOAD EPISODE →'}
-                  </span>
+                <div className="lg:col-span-5 bg-[#05070E] p-6 rounded-[2px] border border-[#F8FAFC]/10 space-y-4">
+                  <div className="text-xs font-mono text-[#38BDF8] uppercase tracking-wider pb-2 border-b border-[#F8FAFC]/10">
+                    PUBLICATION METRICS
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-xs font-mono">
+                    <div>
+                      <div className="text-[#738A9C]">YouTube Views:</div>
+                      <div className="text-lg font-bold text-[#F8FAFC]">8,000+</div>
+                    </div>
+                    <div>
+                      <div className="text-[#738A9C]">Combined Impressions:</div>
+                      <div className="text-lg font-bold text-[#F59E0B]">100K+</div>
+                    </div>
+                    <div>
+                      <div className="text-[#738A9C]">Platforms:</div>
+                      <div className="text-[#F8FAFC]">Spotify, Apple, YT</div>
+                    </div>
+                    <div>
+                      <div className="text-[#738A9C]">Editorial Focus:</div>
+                      <div className="text-[#38BDF8]">Systems Tradeoffs</div>
+                    </div>
+                  </div>
                 </div>
-              </button>
-            );
-          })}
+              </MotionDiv>
+            )}
+
+            {/* STAGE 02: EXECUTIVE & FOUNDER DIALOGUES */}
+            {activeZone === 'dialogues' && (
+              <MotionDiv
+                key="stage-dialogues"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="space-y-6"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-serif text-[#F8FAFC]">
+                      Unfiltered Conversations with Builders, Researchers &amp; Executives
+                    </h3>
+                    <p className="text-xs font-mono text-[#738A9C]">
+                      CLICK ANY RECORD TO LISTEN ON SYNTINUUMPODCAST.COM OR YOUTUBE
+                    </p>
+                  </div>
+                  <a
+                    href="https://syntinuumpodcast.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-mono text-[#38BDF8] hover:underline shrink-0"
+                  >
+                    ALL EPISODES (10+) ↗
+                  </a>
+                </div>
+
+                {/* 5 Featured Dialogue Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {FEATURED_DIALOGUES.map((d) => (
+                    <a
+                      key={d.id}
+                      href={d.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-5 bg-[#090D18] hover:bg-[#10172A] border border-[#F8FAFC]/10 hover:border-[#38BDF8]/40 rounded-[2px] transition-all duration-200 group flex flex-col justify-between select-none"
+                    >
+                      <div className="space-y-2.5">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-[#38BDF8] font-semibold">{d.runtime}</span>
+                          <span className="text-[#738A9C] group-hover:text-[#F8FAFC] transition-colors">↗</span>
+                        </div>
+                        <h4 className="text-base font-raleway font-bold text-[#F8FAFC] group-hover:text-[#F59E0B] transition-colors">
+                          {d.guest}
+                        </h4>
+                        <div className="text-xs font-mono text-[#F59E0B]">
+                          {d.role} · {d.org}
+                        </div>
+                        <p className="text-xs font-sans text-[#738A9C] leading-relaxed line-clamp-3">
+                          {d.focus}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-[#F8FAFC]/[0.08] text-[10px] font-mono text-[#738A9C] flex items-center justify-between">
+                        <span>LISTEN EPISODE</span>
+                        <span className="text-[#38BDF8]">syntinuumpodcast.com</span>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </MotionDiv>
+            )}
+
+            {/* STAGE 03: AUTOMATED DISCOVERY & STUDIO PIPELINE */}
+            {activeZone === 'architecture' && (
+              <MotionDiv
+                key="stage-architecture"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[#090D18] border border-[#F8FAFC]/10 rounded-[2px]"
+              >
+                <div className="lg:col-span-7 space-y-6">
+                  <div className="text-xs font-mono text-[#F59E0B] uppercase tracking-widest">
+                    SYSTEMS-ENGINEERED PRODUCTION WORKFLOW
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F8FAFC] leading-snug">
+                    Engineered Like a Software Product.
+                  </h3>
+                  <p className="text-base text-[#738A9C] leading-relaxed">
+                    Behind each episode runs a rigorous technical automation pipeline: a bespoke Python web-scraping and SMTP outreach engine for discoverability, coupled with custom audio-reactive transcription parsing and DaVinci Resolve 20 color-space managed post-production for crisp cinematic fidelity.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-4 pt-2">
+                    <a
+                      href="https://syntinuumpodcast.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-5 py-3 bg-[#F59E0B] hover:bg-[#D97706] text-[#05070E] font-mono text-xs font-semibold rounded-[2px] transition-colors"
+                    >
+                      <span>Listen on SyntinuumPodcast.com ↗</span>
+                    </a>
+                    <a
+                      href="https://www.youtube.com/@syntinuum"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-5 py-3 bg-[#05070E] hover:bg-[#10172A] text-[#F8FAFC] border border-[#F8FAFC]/20 font-mono text-xs rounded-[2px] transition-colors"
+                    >
+                      <span>Watch on YouTube ↗</span>
+                    </a>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-5 space-y-3 font-mono text-xs">
+                  <div className="p-4 bg-[#05070E] rounded-[2px] border border-[#F8FAFC]/10">
+                    <span className="text-[#38BDF8] block font-semibold mb-1">01. DISCOVERY ENGINE</span>
+                    <p className="text-[#738A9C] font-sans">
+                      Python BeautifulSoup &amp; SMTP scraper identifying top arXiv authors, serial founders, and executive architects.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-[#05070E] rounded-[2px] border border-[#F8FAFC]/10">
+                    <span className="text-[#F59E0B] block font-semibold mb-1">02. AUDIO DSP &amp; DAVINCI 20</span>
+                    <p className="text-[#738A9C] font-sans">
+                      Phase-coherent multiband gating, ITU-R BS.1770-4 loudness normalization, and DaVinci YRGB Color-Managed pipeline.
+                    </p>
+                  </div>
+                </div>
+              </MotionDiv>
+            )}
+
+          </AnimatePresence>
         </div>
+
       </div>
-    </SectionContainer>
+    </ThemeSection>
   );
 };
 
