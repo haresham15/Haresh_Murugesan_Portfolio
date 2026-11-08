@@ -264,30 +264,33 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
               </filter>
             </defs>
 
-            {/* LAYER 1: TRACK BED & RUN-OFF APRON (44px wide dark tarmac ribbon #0B1220 with 1px outer barrier walls) */}
+            {/* 4-PASS LAYERED SVG TRACK SPLINE */}
+            {/* PASS 1: 48px Structural Outer Barrier Walls */}
             <path
               d={trackPathD}
               stroke="rgba(167, 178, 195, 0.28)"
-              strokeWidth="44"
+              strokeWidth="48"
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
               filter="url(#track-shadow)"
             />
+
+            {/* PASS 2: 40px High-Grip Tarmac Runway */}
             <path
               d={trackPathD}
-              stroke="#0B1220"
-              strokeWidth="42"
+              stroke="#0B101B"
+              strokeWidth="40"
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
             />
 
-            {/* LAYER 2: INNER ASPHALT SURFACE (30px wide deep obsidian asphalt #070B12 with longitudinal track grain) */}
+            {/* PASS 3: 32px Inner Asphalt Surface with Micro-Grain */}
             <path
               d={trackPathD}
               stroke="#070B12"
-              strokeWidth="30"
+              strokeWidth="32"
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
@@ -471,7 +474,7 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
                   {/* Sector Badge Pill */}
                   <div className="inline-block mb-1.5">
                     <span
-                      className={`text-[10px] font-mono tracking-widest px-2.5 py-0.5 rounded-full uppercase font-bold transition-colors ${
+                      className={`text-[10px] font-mono tracking-widest px-2 py-0.5 rounded-[2px] uppercase font-bold transition-colors ${
                         isActive
                           ? 'bg-[#FF6B35] text-[#070B12]'
                           : isHovered
@@ -485,7 +488,7 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
 
                   {/* Organization Title (Bold 17px–19px Serif) */}
                   <h3
-                    className={`font-serif text-[16px] sm:text-[18px] leading-snug tracking-tight transition-colors duration-200 ${
+                    className={`font-serif text-[18px] leading-snug tracking-tight transition-colors duration-200 ${
                       isActive
                         ? 'text-[#F3EFE7] font-medium'
                         : isHovered
@@ -498,7 +501,7 @@ export const ChicaneCircuitTrack: React.FC<ChicaneCircuitTrackProps> = ({
 
                   {/* Role Title & Timeframe (12px Monospace) */}
                   <div
-                    className={`text-[11px] sm:text-[12px] font-mono mt-0.5 tracking-tight transition-colors duration-200 truncate ${
+                    className={`text-[11px] font-mono mt-0.5 tracking-tight transition-colors duration-200 truncate ${
                       isActive
                         ? 'text-[#FF6B35] font-semibold'
                         : isHovered

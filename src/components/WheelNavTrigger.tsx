@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useMotionPreference } from './MotionPreference';
 
 interface WheelNavTriggerProps {
@@ -6,92 +6,160 @@ interface WheelNavTriggerProps {
   onToggle: () => void;
 }
 
-interface SmokePuff {
-  id: number;
+interface SmokeParticle {
   x: number;
   y: number;
-  scale: number;
-  opacity: number;
-  blur: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  maxRadius: number;
+  alpha: number;
+  life: number;
+  maxLife: number;
+  curlFreq: number;
+  curlAmp: number;
 }
 
 export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onToggle }) => {
   const { isReduced } = useMotionPreference();
   const [isHovered, setIsHovered] = useState(false);
-  const [smokePuffs, setSmokePuffs] = useState<SmokePuff[]>([]);
+  const [rotationDeg, setRotationDeg] = useState(0);
+  const smokeCanvasRef = useRef<HTMLCanvasElement>(null);
+  const smokeParticlesRef = useRef<SmokeParticle[]>([]);
+  const smokeAnimRef = useRef<number | null>(null);
 
-  // 6 Primary Twin Y-Spoke Angles
-  const spokeAngles = [0, 60, 120, 180, 240, 300];
-
-  // 12 Outer Perimeter Tick Mark Angles (every 30°)
-  const tickAngles = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
-
-  // Emit volumetric burnout smoke burst on click
-  const triggerBurnoutSmoke = () => {
+  // Spawn and animate 28 turbulent canvas smoke particles at bottom-left contact patch
+  const triggerBurnoutSmoke = useCallback(() => {
     if (isReduced) return;
-    const count = 10;
-    const newPuffs: SmokePuff[] = [];
-    for (let i = 0; i < count; i++) {
-      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
-      const dist = 24 + Math.random() * 22;
-      newPuffs.push({
-        id: Date.now() + i,
-        x: Math.cos(angle) * dist,
-        y: Math.sin(angle) * dist + (Math.random() * 6),
-        scale: 1.2 + Math.random() * 1.5,
-        opacity: 0.75 + Math.random() * 0.2,
-        blur: 10 + Math.random() * 8,
+    const canvas = smokeCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Contact patch origin relative to canvas
+    const originX = 55;
+    const originY = 65;
+
+    const newParticles: SmokeParticle[] = [];
+    for (let i = 0; i < 28; i++) {
+      const angle = Math.PI * 0.75 + (Math.random() - 0.5) * 1.1; // down-left drift
+      const speed = 1.0 + Math.random() * 2.8;
+      newParticles.push({
+        x: originX + (Math.random() - 0.5) * 14,
+        y: originY + (Math.random() - 0.5) * 10,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        radius: 8 + Math.random() * 4,
+        maxRadius: 45 + Math.random() * 15,
+        alpha: 0.35 + Math.random() * 0.15,
+        life: 0,
+        maxLife: 40 + Math.floor(Math.random() * 15), // ~750ms
+        curlFreq: 0.08 + Math.random() * 0.12,
+        curlAmp: 0.5 + Math.random() * 0.6,
       });
     }
-    setSmokePuffs(newPuffs);
 
-    setTimeout(() => {
-      setSmokePuffs([]);
-    }, 700);
-  };
+    smokeParticlesRef.current = newParticles;
+
+    if (smokeAnimRef.current) {
+      cancelAnimationFrame(smokeAnimRef.current);
+    }
+
+    const renderSmoke = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const particles = smokeParticlesRef.current;
+      let activeCount = 0;
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.life++;
+        if (p.life >= p.maxLife) continue;
+        activeCount++;
+
+        const progress = p.life / p.maxLife;
+        // Turbulent curl velocity
+        p.vx += Math.sin(p.life * p.curlFreq) * p.curlAmp;
+        p.vy += Math.cos(p.life * p.curlFreq) * (p.curlAmp * 0.5) - 0.08; // subtle buoyancy
+        p.x += p.vx;
+        p.y += p.vy;
+
+        const currentR = p.radius + (p.maxRadius - p.radius) * Math.pow(progress, 0.65);
+        const currentAlpha = p.alpha * (1 - progress);
+
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, currentR);
+        grad.addColorStop(0, `rgba(243, 239, 231, ${(0.35 * currentAlpha).toFixed(3)})`);
+        grad.addColorStop(0.45, `rgba(148, 163, 184, ${(0.18 * currentAlpha).toFixed(3)})`);
+        grad.addColorStop(1, 'rgba(148, 163, 184, 0)');
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, currentR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (activeCount > 0) {
+        smokeAnimRef.current = requestAnimationFrame(renderSmoke);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        smokeAnimRef.current = null;
+      }
+    };
+
+    smokeAnimRef.current = requestAnimationFrame(renderSmoke);
+  }, [isReduced]);
+
+  // Clean up animation on unmount
+  useEffect(() => {
+    return () => {
+      if (smokeAnimRef.current) cancelAnimationFrame(smokeAnimRef.current);
+    };
+  }, []);
 
   const handleClick = () => {
-    triggerBurnoutSmoke();
+    if (!isReduced) {
+      setRotationDeg((prev) => prev + 1080);
+      triggerBurnoutSmoke();
+    }
     onToggle();
   };
 
-  // Smooth rotation: 25deg on hover, 90deg when open
+  // Rotation style for wheel assembly (Layer 3-7)
   const getRotationStyle = () => {
     if (isReduced) return {};
-    const angle = isOpen ? 90 : isHovered ? 25 : 0;
+    const hoverAngle = !isOpen && isHovered ? 25 : 0;
+    const totalAngle = rotationDeg + (isOpen ? 90 : 0) + hoverAngle;
     return {
-      transform: `rotate(${angle}deg)`,
-      transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)',
+      transform: `rotate(${totalAngle}deg)`,
+      transformOrigin: '50px 50px',
+      transition: 'transform 650ms cubic-bezier(0.16, 1, 0.3, 1)',
       willChange: 'transform',
     };
   };
 
   return (
     <div className="relative flex items-center justify-center">
-      {/* Volumetric Burnout Smoke Burst (Expanding organic smoke clouds on click) */}
-      {smokePuffs.map((puff) => (
-        <div
-          key={puff.id}
-          className="absolute rounded-full pointer-events-none transition-all duration-700 ease-out z-0"
-          style={{
-            width: '48px',
-            height: '48px',
-            transform: `translate(${puff.x}px, ${puff.y}px) scale(${puff.scale})`,
-            opacity: 0,
-            filter: `blur(${puff.blur}px)`,
-            background:
-              'radial-gradient(circle, rgba(255, 107, 53, 0.45) 0%, rgba(245, 217, 152, 0.25) 45%, rgba(167, 178, 195, 0.15) 70%, transparent 100%)',
-          }}
-        />
-      ))}
+      {/* High-Resolution HTML5 Canvas for Burnout Smoke Burst */}
+      <canvas
+        ref={smokeCanvasRef}
+        width={140}
+        height={140}
+        className="absolute pointer-events-none z-0"
+        style={{
+          width: '140px',
+          height: '140px',
+          left: '-48px',
+          top: '-12px',
+        }}
+        aria-hidden="true"
+      />
 
-      {/* Precision Engineered Wheel Rim Trigger Button */}
+      {/* 60px x 60px Precision Engineered Wheel Rim Trigger Button */}
       <button
         type="button"
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="group relative z-10 w-[48px] h-[48px] sm:w-[56px] sm:h-[56px] rounded-full p-0 flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-[#FF6B35] focus-visible:outline-offset-4 select-none"
+        className="group relative z-10 w-[54px] h-[54px] sm:w-[60px] sm:h-[60px] rounded-full p-0 flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-[#FF6B35] focus-visible:outline-offset-4 select-none"
         aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
         aria-expanded={isOpen}
       >
@@ -106,168 +174,140 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
           }}
         />
 
-        {/* Scalable High-Precision SVG Turbofan Alloy Wheel */}
+        {/* 7-LAYER PARAMETRIC MOTORSPORT WHEEL SVG (viewBox 0 0 100 100) */}
         <svg
-          viewBox="-100 -100 200 200"
-          className="w-full h-full shadow-[0_4px_16px_rgba(7,11,18,0.8)] group-hover:shadow-[0_0_24px_rgba(255,107,53,0.35)] rounded-full"
-          style={getRotationStyle()}
+          viewBox="0 0 100 100"
+          className="w-full h-full shadow-[0_4px_16px_rgba(7,11,18,0.85)] group-hover:shadow-[0_0_24px_rgba(255,107,53,0.35)] rounded-full"
           aria-hidden="true"
         >
           <defs>
-            {/* Outer Rim Bezel Gradient */}
-            <linearGradient id="wheelRimBezel" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#253243" />
-              <stop offset="50%" stopColor="#101724" />
-              <stop offset="100%" stopColor="#080C14" />
+            {/* Outer Rim Chrome Gradient */}
+            <linearGradient id="wheelChromeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="25%" stopColor="#CBD5E1" />
+              <stop offset="60%" stopColor="#64748B" />
+              <stop offset="100%" stopColor="#1E293B" />
             </linearGradient>
 
             {/* Brushed Silver Face Gradient */}
-            <linearGradient id="wheelSilverFace" x1="20%" y1="0%" x2="80%" y2="100%">
+            <linearGradient id="wheelSilverFace" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#FFFFFF" />
-              <stop offset="35%" stopColor="#E2E8F0" />
-              <stop offset="70%" stopColor="#CBD5E1" />
-              <stop offset="100%" stopColor="#94A3B8" />
+              <stop offset="45%" stopColor="#E2E8F0" />
+              <stop offset="80%" stopColor="#94A3B8" />
+              <stop offset="100%" stopColor="#64748B" />
             </linearGradient>
 
-            {/* Chamfer Depth Gradient */}
-            <linearGradient id="wheelChamferDepth" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#334155" />
-              <stop offset="60%" stopColor="#1E293B" />
-              <stop offset="100%" stopColor="#0F172A" />
+            {/* Orange Brembo Caliper Gradient */}
+            <linearGradient id="wheelBremboGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FF8547" />
+              <stop offset="55%" stopColor="#FF6B35" />
+              <stop offset="100%" stopColor="#D94814" />
             </linearGradient>
 
-            {/* Hub Cavity Gradient */}
-            <radialGradient id="wheelHubRotor" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#070B12" />
-              <stop offset="65%" stopColor="#101927" />
-              <stop offset="100%" stopColor="#1A2638" />
-            </radialGradient>
+            <filter id="rotorShadow">
+              <feDropShadow dx="0" dy="1" stdDeviation="2" floodColor="#000000" floodOpacity="0.8" />
+            </filter>
           </defs>
 
-          {/* 1. Low-Profile Tire Sidewall & Outer Bezel */}
-          <circle r="98" fill="url(#wheelRimBezel)" stroke="#1A2536" strokeWidth="1" />
-          <circle r="93" fill="none" stroke="#2D3B4E" strokeWidth="0.8" />
-          <circle r="90" fill="#070B12" />
+          {/* LAYER 1: Performance Tire Ring */}
+          <circle cx="50" cy="50" r="48" fill="none" stroke="#0F141D" strokeWidth="4" />
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#1E293B" strokeWidth="0.8" opacity="0.6" />
 
-          {/* 2. 12 Precision Perimeter Datum Ticks */}
-          {tickAngles.map((deg) => {
-            const isCardinal = deg % 90 === 0;
-            return (
-              <g key={deg} transform={`rotate(${deg})`}>
-                <line
-                  x1="0"
-                  y1={isCardinal ? '82' : '85'}
-                  x2="0"
-                  y2="89"
-                  stroke={isCardinal ? '#FF6B35' : 'rgba(243, 239, 231, 0.22)'}
-                  strokeWidth={isCardinal ? '1.2' : '0.8'}
+          {/* LAYER 2: Stationary Brake Rotor & Orange Brembo Caliper (Does NOT Rotate With Wheel) */}
+          <g id="stationary-brake-rotor">
+            {/* Steel brake rotor disc */}
+            <circle cx="50" cy="50" r="32" fill="#1E293B" stroke="#334155" strokeWidth="1" filter="url(#rotorShadow)" />
+            {/* Concentric friction grooves */}
+            <circle cx="50" cy="50" r="29" fill="none" stroke="#2D3B4E" strokeWidth="0.6" strokeDasharray="3 2" />
+            <circle cx="50" cy="50" r="26" fill="none" stroke="#2D3B4E" strokeWidth="0.6" strokeDasharray="4 3" />
+
+            {/* Orange Brembo Caliper positioned between 135° and 195° (top-left/left side) */}
+            <path
+              d="M 27.37 72.63 A 32 32 0 0 1 19.09 41.72 L 24.87 43.26 A 26 26 0 0 0 31.61 68.39 Z"
+              fill="url(#wheelBremboGrad)"
+              stroke="#FF9565"
+              strokeWidth="0.75"
+            />
+            {/* Caliper machined pistons & detail */}
+            <circle cx="23" cy="54" r="2.2" fill="#1E293B" stroke="#FFD8BE" strokeWidth="0.6" />
+            <circle cx="27" cy="63" r="2.2" fill="#1E293B" stroke="#FFD8BE" strokeWidth="0.6" />
+            <line x1="21" y1="46" x2="25" y2="47" stroke="#FFFFFF" strokeWidth="0.8" strokeLinecap="round" />
+          </g>
+
+          {/* ROTATING WHEEL ASSEMBLY (Layers 3 through 7) */}
+          <g style={getRotationStyle()}>
+            {/* LAYER 3: Outer Brushed Barrel */}
+            <circle cx="50" cy="50" r="44" fill="none" stroke="url(#wheelChromeGrad)" strokeWidth="2.5" />
+
+            {/* LAYER 4: The 36-Pocket Slotted Aero Fenestration Ring */}
+            {/* Dark recessed pocket ring */}
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#090D14" strokeWidth="5.5" />
+            {/* 36 machined silver aero ribs: strokeDasharray 2.2 4.78 (36 * 6.98 = 251.3 ~ 2*PI*40) */}
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              fill="none"
+              stroke="url(#wheelSilverFace)"
+              strokeWidth="5.5"
+              strokeDasharray="2.2 4.78"
+            />
+            {/* Inner aero boundary ring */}
+            <circle cx="50" cy="50" r="37" fill="none" stroke="#CBD5E1" strokeWidth="1.2" />
+
+            {/* LAYER 5: 12 Interlaced Split-Y & Mesh Spokes (6 Primary Spokes) */}
+            {[0, 60, 120, 180, 240, 300].map((deg) => (
+              <g key={deg} transform={`rotate(${deg} 50 50)`}>
+                {/* Gunmetal depth shadow pass */}
+                <path
+                  d="M 50 36 L 46 27 L 40 14 L 43.5 13.5 L 47.8 25 L 49.2 25 L 50 28 L 50.8 25 L 52.2 25 L 56.5 13.5 L 60 14 L 54 27 L 50 36 Z"
+                  fill="#475569"
+                  opacity="0.95"
                 />
+                {/* Machined silver face pass */}
+                <path
+                  d="M 50 35 L 46.8 27 L 41.5 14 L 44 13.5 L 48.2 25.2 L 50 28.5 L 51.8 25.2 L 56 13.5 L 58.5 14 L 53.2 27 L 50 35 Z"
+                  fill="url(#wheelSilverFace)"
+                  stroke="#FFFFFF"
+                  strokeWidth="0.3"
+                />
+                {/* Center spoke fluting line */}
+                <line x1="50" y1="36" x2="50" y2="28.5" stroke="#1E293B" strokeWidth="0.6" />
               </g>
-            );
-          })}
+            ))}
 
-          {/* 3. Deep Rotor Disk Cavity */}
-          <circle r="81" fill="#090D15" stroke="rgba(243, 239, 231, 0.12)" strokeWidth="0.8" />
-          <circle r="60" fill="none" stroke="#131D2C" strokeWidth="14" opacity="0.8" />
+            {/* LAYER 6: 6 Recessed Lug Nut Wells (angle = i*60 + 30 deg at r = 11.5) */}
+            {[0, 60, 120, 180, 240, 300].map((deg) => {
+              const rad = ((deg + 30) * Math.PI) / 180;
+              const lx = 50 + 11.5 * Math.cos(rad);
+              const ly = 50 + 11.5 * Math.sin(rad);
+              return (
+                <circle
+                  key={deg}
+                  cx={lx}
+                  cy={ly}
+                  r="2.2"
+                  fill="#070B12"
+                  stroke="#94A3B8"
+                  strokeWidth="0.8"
+                />
+              );
+            })}
 
-          {/* 4. 6 Aerodynamic Slotted Spoke Vanes */}
-          {spokeAngles.map((deg) => (
-            <g key={deg} transform={`rotate(${deg})`}>
-              {/* Spoke Chamfered Relief */}
-              <path
-                d="M -7 26 L -9 45 L -16 66 L -9 80 L -6 80 L -11 65 L -3 45 L 0 45 L 3 45 L 11 65 L 6 80 L 9 80 L 16 66 L 9 45 L 7 26 Z"
-                fill="url(#wheelChamferDepth)"
-              />
-              <path
-                d="M -16 66 L -26 66 L -21 80 L -17 80 Z"
-                fill="url(#wheelChamferDepth)"
-              />
-              <path
-                d="M 16 66 L 26 66 L 21 80 L 17 80 Z"
-                fill="url(#wheelChamferDepth)"
-              />
-
-              {/* Brushed Metallic Spoke Face */}
-              <path
-                d="M -5.5 26 L -7 44 L -14 65 L -8 79.5 L -5.5 79.5 L -10 64 L -2.5 44 L 0 44 L 2.5 44 L 10 64 L 5.5 79.5 L 8 79.5 L 14 65 L 7 44 L 5.5 26 Z"
-                fill="url(#wheelSilverFace)"
-                stroke="#FFFFFF"
-                strokeWidth="0.4"
-                strokeOpacity="0.85"
-              />
-              <path
-                d="M -14 65 L -23.5 65 L -19.5 79.5 L -17 79.5 Z"
-                fill="url(#wheelSilverFace)"
-                stroke="#FFFFFF"
-                strokeWidth="0.3"
-                strokeOpacity="0.75"
-              />
-              <path
-                d="M 14 65 L 23.5 65 L 19.5 79.5 L 17 79.5 Z"
-                fill="url(#wheelSilverFace)"
-                stroke="#FFFFFF"
-                strokeWidth="0.3"
-                strokeOpacity="0.75"
-              />
-
-              {/* Recessed Milling Line */}
-              <line x1="0" y1="28" x2="0" y2="44" stroke="#475569" strokeWidth="0.9" strokeLinecap="round" />
-            </g>
-          ))}
-
-          {/* 5. Center Hub Collar Assembly */}
-          <circle r="27" fill="url(#wheelHubRotor)" stroke="#475569" strokeWidth="1" />
-          <circle r="25" fill="none" stroke="rgba(243, 239, 231, 0.15)" strokeWidth="0.6" />
-
-          {/* 6 Lug Bolts */}
-          {[0, 60, 120, 180, 240, 300].map((deg) => (
-            <g key={deg} transform={`rotate(${deg + 30})`}>
-              <circle cx="18" cy="0" r="3.2" fill="#0C131D" stroke="#64748B" strokeWidth="0.5" />
-              <circle cx="18" cy="0" r="1.5" fill="#CBD5E1" />
-            </g>
-          ))}
-
-          {/* 6. Center Cap Dynamic Status Morph (HM <-> Close Cross) */}
-          <circle
-            r="12.5"
-            fill={isOpen ? '#0B0F17' : '#141D2B'}
-            stroke={isOpen ? '#FF6B35' : 'rgba(243, 239, 231, 0.35)'}
-            strokeWidth={isOpen ? '1.5' : '1'}
-            className="transition-colors duration-200"
-          />
-
-          {isOpen ? (
-            /* Razor-Sharp Close Crosshair (✕) */
-            <g className="text-[#FF6B35]">
-              <line x1="-4.5" y1="-4.5" x2="4.5" y2="4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-              <line x1="4.5" y1="-4.5" x2="-4.5" y2="4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </g>
-          ) : (
-            /* Precision Monospace Monogram */
-            <text
-              x="0"
-              y="2.3"
-              textAnchor="middle"
-              fill="#F3EFE7"
-              fontSize="4.2"
-              fontFamily="'Geist Mono', monospace"
-              fontWeight="600"
-              letterSpacing="0.06em"
-              className="group-hover:fill-[#F5D998] transition-colors"
-            >
-              HM
-            </text>
-          )}
+            {/* LAYER 7: Center Cap & Monogram Bar */}
+            <circle cx="50" cy="50" r="7.5" fill="url(#wheelChromeGrad)" stroke="#475569" strokeWidth="1" />
+            {/* Crisp horizontal dark emblem slot */}
+            <rect x="44.5" y="48.8" width="11" height="2.4" rx="1" fill="#070B12" />
+            <rect
+              x="45.5"
+              y="49.5"
+              width="9"
+              height="1"
+              rx="0.5"
+              fill={isOpen ? '#FF6B35' : '#F5D998'}
+            />
+          </g>
         </svg>
-
-        {/* Monospace MENU / CLOSE Sub-Label */}
-        <span
-          className={`absolute -bottom-5 text-[9.5px] font-mono tracking-[0.2em] uppercase transition-colors duration-200 pointer-events-none select-none ${
-            isOpen ? 'text-[#FF6B35] font-semibold' : 'text-[#A7B2C3] group-hover:text-[#F3EFE7]'
-          }`}
-        >
-          {isOpen ? 'CLOSE' : 'MENU'}
-        </span>
       </button>
     </div>
   );

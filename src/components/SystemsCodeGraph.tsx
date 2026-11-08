@@ -193,7 +193,35 @@ export const SystemsCodeGraph: React.FC = () => {
   const [isVisible, setIsVisible] = useState<boolean>(true);
 
   // Dynamic layout dimension tracking
-  const [canvasDim, setCanvasDim] = useState({ width: 720, height: 640 });
+  const [canvasDim, setCanvasDim] = useState({ width: 720, height: 680 });
+
+  // Camera Pan/Zoom Matrix
+  const [camera, setCamera] = useState({ x: 0, y: 0, zoom: 1.0 });
+  const targetCamRef = useRef({ x: 0, y: 0, zoom: 1.0 });
+
+  // Smooth camera lerp loop
+  useEffect(() => {
+    let animId: number;
+    const lerpCamera = () => {
+      setCamera((prev) => {
+        const target = targetCamRef.current;
+        const dx = target.x - prev.x;
+        const dy = target.y - prev.y;
+        const dz = target.zoom - prev.zoom;
+        if (Math.abs(dx) < 0.08 && Math.abs(dy) < 0.08 && Math.abs(dz) < 0.001) {
+          return prev;
+        }
+        return {
+          x: prev.x + dx * 0.12,
+          y: prev.y + dy * 0.12,
+          zoom: prev.zoom + dz * 0.12,
+        };
+      });
+      animId = requestAnimationFrame(lerpCamera);
+    };
+    animId = requestAnimationFrame(lerpCamera);
+    return () => cancelAnimationFrame(animId);
+  }, []);
 
   // Elastic pointer dragging state
   const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
@@ -269,8 +297,8 @@ export const SystemsCodeGraph: React.FC = () => {
         list.push({
           id: 'root',
           type: 'root',
-          label: 'CORE // 18 SYSTEMS',
-          sublabel: 'Full Architecture',
+          label: 'Systems Core',
+          sublabel: '18 Systems',
           x: centerX,
           y: centerY,
           targetX: centerX,
@@ -607,6 +635,52 @@ export const SystemsCodeGraph: React.FC = () => {
     return list;
   }, [canvasDim, viewMode, selectedSuperCluster, selectedSubCluster, projectMap]);
 
+
+  // Update camera target based on active focus node
+  useEffect(() => {
+    const { width, height } = canvasDim;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    if (selectedProjectSlug) {
+      const pNode = nodes.find((n) => n.id === selectedProjectSlug);
+      if (pNode) {
+        targetCamRef.current = {
+          x: (centerX - pNode.targetX) * 0.55,
+          y: (centerY - pNode.targetY) * 0.55,
+          zoom: 1.35,
+        };
+        return;
+      }
+    }
+
+    if (selectedSubCluster) {
+      const sNode = nodes.find((n) => n.id === selectedSubCluster);
+      if (sNode) {
+        targetCamRef.current = {
+          x: (centerX - sNode.targetX) * 0.45,
+          y: (centerY - sNode.targetY) * 0.45,
+          zoom: 1.2,
+        };
+        return;
+      }
+    }
+
+    if (selectedSuperCluster) {
+      const scNode = nodes.find((n) => n.id === selectedSuperCluster);
+      if (scNode) {
+        targetCamRef.current = {
+          x: (centerX - scNode.targetX) * 0.35,
+          y: (centerY - scNode.targetY) * 0.35,
+          zoom: 1.12,
+        };
+        return;
+      }
+    }
+
+    targetCamRef.current = { x: 0, y: 0, zoom: 1.0 };
+  }, [selectedProjectSlug, selectedSubCluster, selectedSuperCluster, nodes, canvasDim]);
+
   // Pointer drag logic
   const handlePointerDown = (id: string, e: React.PointerEvent) => {
     e.stopPropagation();
@@ -887,7 +961,7 @@ export const SystemsCodeGraph: React.FC = () => {
       {/* =====================================================================
           SPLIT-SCREEN "VECTOR DATABASE STUDIO" LAYOUT (68% Canvas / 32% Inspector)
           ===================================================================== */}
-      <div className="relative w-full flex flex-col lg:flex-row items-stretch lg:h-[640px]">
+      <div className="relative w-full flex flex-col lg:flex-row items-stretch lg:h-[680px]">
         
         {/* LEFT 68% (Desktop): Interactive Orbital Vector Canvas */}
         <div
@@ -921,6 +995,11 @@ export const SystemsCodeGraph: React.FC = () => {
             <line x1="0" y1={canvasDim.height / 2} x2={canvasDim.width} y2={canvasDim.height / 2} stroke="rgba(167, 178, 195, 0.04)" strokeWidth="1" />
             <line x1={canvasDim.width / 2} y1="0" x2={canvasDim.width / 2} y2={canvasDim.height} stroke="rgba(167, 178, 195, 0.04)" strokeWidth="1" />
 
+            {/* Camera Pan/Zoom Transform Matrix Group */}
+            <g
+              transform={`translate(${camera.x.toFixed(2)}, ${camera.y.toFixed(2)}) scale(${camera.zoom.toFixed(3)})`}
+              style={{ transformOrigin: `${canvasDim.width / 2}px ${canvasDim.height / 2}px`, transition: 'transform 0.08s ease-out' }}
+            >
             {/* 1. Hierarchy Parent-to-Child Edges & Streaming Data Packets */}
             {nodes.map((child) => {
               if (!child.parentId) return null;
@@ -1124,6 +1203,7 @@ export const SystemsCodeGraph: React.FC = () => {
                 </g>
               );
             })}
+            </g>
           </svg>
 
           {/* Interactive Hint Banner at Bottom-Left of Canvas */}
@@ -1162,14 +1242,19 @@ export const SystemsCodeGraph: React.FC = () => {
                     <span className="text-[#4CC38A]">Verified System</span>
                   </div>
 
-                  <h4 className="text-xl sm:text-2xl font-serif text-[#F3EFE7] leading-snug tracking-tight">
+                  <h4 className="text-2xl sm:text-[26px] font-serif text-[#F3EFE7] leading-tight tracking-tight">
                     {activeProject.title}
                   </h4>
 
-                  {/* Highlight Distinction Badge */}
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#101B30] border border-[#F5D998]/30 rounded-[2px] text-xs font-mono text-[#F5D998] font-medium mt-1">
-                    <span className="text-[#FF6B35]">★</span>
-                    <span>{activeProject.highlight}</span>
+                  {/* Verified Benchmark Telemetry Box */}
+                  <div className="p-3 bg-[#FF6B35]/10 border border-[#FF6B35]/30 rounded-[2px] space-y-1 mt-2">
+                    <div className="text-[10px] font-mono text-[#FF6B35] uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
+                      <span>Verified Benchmark Telemetry</span>
+                    </div>
+                    <div className="text-xs font-mono text-[#F5D998] font-medium">
+                      {activeProject.highlight}
+                    </div>
                   </div>
                 </div>
 
@@ -1222,9 +1307,9 @@ export const SystemsCodeGraph: React.FC = () => {
               <div className="pt-5 border-t border-[#F3EFE7]/[0.08] space-y-2">
                 <Link
                   href={`/projects/${activeProject.slug}`}
-                  className="w-full py-3 px-4 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] text-xs font-mono font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 select-none cursor-pointer rounded-[2px] shadow-[0_0_15px_rgba(255,107,53,0.25)]"
+                  className="w-full py-3 px-4 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] text-xs font-mono font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 select-none cursor-pointer rounded-[2px] shadow-[0_0_20px_rgba(255,107,53,0.3)]"
                 >
-                  <span>Launch Full Case Study</span>
+                  <span>Open Project Case Study</span>
                   <span>→</span>
                 </Link>
 
@@ -1249,10 +1334,10 @@ export const SystemsCodeGraph: React.FC = () => {
                 <div className="space-y-1 pb-3 border-b border-[#F3EFE7]/[0.08]">
                   <div className="text-[10px] font-mono text-[#7A889B] uppercase tracking-wider">
                     {selectedSubCluster
-                      ? 'ACTIVE SUB-DOMAIN DIRECTORY'
+                      ? 'Sub-Domain Directory'
                       : selectedSuperCluster
-                      ? 'ACTIVE SUPER-CLUSTER DIRECTORY'
-                      : 'SYSTEMS ARCHITECTURE INDEX'}
+                      ? 'Super-Cluster Directory'
+                      : 'Systems Architecture Index'}
                   </div>
                   <h4 className="text-lg font-serif text-[#F3EFE7]">
                     {selectedSubCluster

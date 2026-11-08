@@ -22,7 +22,7 @@ const CURVY_MILESTONES: CurvyMilestone[] = [
   {
     id: 'm-2023',
     year: '2023',
-    phase: '01 // ORIGIN & TECHNICAL INQUIRY',
+    phase: '01  Origin & Technical Inquiry',
     title: 'Syntinuum Launch & Systems Journalism',
     reflection:
       'Founded an engineering podcast to investigate the gap between textbook algorithms and live production fires. Interviewed founders across healthcare, aerospace, and software, generating 100K+ impressions and building a discipline of technical inquiry.',
@@ -35,7 +35,7 @@ const CURVY_MILESTONES: CurvyMilestone[] = [
   {
     id: 'm-2024',
     year: '2024',
-    phase: '02 // COMPUTATIONAL MODELING',
+    phase: '02  Computational Modeling',
     title: 'Recursive Graph Schemas & Philocracy',
     reflection:
       'Directed engineering architecture for the Philocracy deliberation platform. Designed cycle-free recursive graph schemas in TypeScript to model complex philosophical premises with mathematical rigor, guaranteeing zero dependency deadlock in debate trees.',
@@ -48,7 +48,7 @@ const CURVY_MILESTONES: CurvyMilestone[] = [
   {
     id: 'm-2025',
     year: '2025',
-    phase: '03 // COMPETITIVE PRESSURE & TELEMATICS',
+    phase: '03  Competitive Pressure & Telematics',
     title: 'DataFest Champion & Connected Mobility',
     reflection:
       'Won 1st Place at ASA DataFest for predictive external data modeling under an intense 48-hour competitive deadline. Joined Honda 99P Labs as an Innovation Analyst, analyzing 1,000+ vehicle telemetry models to evaluate urban route efficiency and EV battery depletion.',
@@ -61,7 +61,7 @@ const CURVY_MILESTONES: CurvyMilestone[] = [
   {
     id: 'm-2026',
     year: '2026',
-    phase: '04 // DETERMINISTIC HARDWARE & VISION',
+    phase: '04  Deterministic Hardware & Vision',
     title: 'Clinical Computer Vision & Deterministic Physics',
     reflection:
       'Shipped Healios V2 uniting 3D LiDAR point-clouds with an 8.09ms vectorized Grad-CAM tensor pipeline. Built Apexis locking 60 FPS deterministic multi-car simulation in dedicated Web Workers with zero main-thread lag. Defended 1st Place at ASA DataFest 2026 with RouteRx.',
@@ -74,7 +74,7 @@ const CURVY_MILESTONES: CurvyMilestone[] = [
   {
     id: 'm-2027',
     year: '2027+',
-    phase: '05 // THE TRAJECTORY VECTOR',
+    phase: '05  The Trajectory Vector',
     title: 'High-Concurrency Systems & Spatial Intelligence',
     reflection:
       'Scaling distributed autonomous agent workflows, low-latency spatial indexing, and hardware-accelerated simulation runtimes. Seeking high-impact software engineering and machine learning roles where computational speed directly impacts human operators.',
@@ -134,7 +134,7 @@ export const HistorySection: React.FC = () => {
       carbonType="forged"
       carbonOpacity={0.28}
       aria-label="Trajectory and formative curvy milestones"
-      className="border-b border-[#F4F1EA]/10 flex flex-col justify-between"
+      className="border-b border-[#F4F1EA]/10 flex flex-col justify-between py-24 lg:py-36"
     >
       <div ref={containerRef} className="w-full relative my-auto space-y-12 sm:space-y-16">
         
@@ -143,7 +143,7 @@ export const HistorySection: React.FC = () => {
           <div className="space-y-4 max-w-2xl">
             <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#E85D04]">
               <span className="w-6 h-px bg-[#E85D04]" />
-              <span>05 // CURVILINEAR TRAJECTORY &amp; MILESTONES</span>
+              <span>05  Trajectory &amp; Curvilinear Milestones</span>
             </div>
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F1EA] leading-tight tracking-tight">
               Trajectory &amp; Curvy Milestones
@@ -267,9 +267,9 @@ export const HistorySection: React.FC = () => {
                   >
                     {/* Header */}
                     <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#F4F1EA]/10 text-xs font-mono">
-                      <div className="flex items-center gap-2.5">
-                        <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-[#E85D04] animate-pulse' : 'bg-[#8E8D94]'}`} />
-                        <span className="text-[#E85D04] font-bold text-base tracking-wide">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-[#FF6B35] animate-pulse' : 'bg-[#8E8D94]'}`} />
+                        <span className="font-serif text-3xl sm:text-4xl text-[#FF6B35] font-normal leading-none">
                           {m.year}
                         </span>
                       </div>
@@ -279,7 +279,7 @@ export const HistorySection: React.FC = () => {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F4F1EA] mb-3">
+                    <h3 className="text-xl sm:text-2xl font-sans font-bold text-[#F4F1EA] mb-3">
                       {m.title}
                     </h3>
 

@@ -34,7 +34,7 @@ export const ContactFooter: React.FC = () => {
           <div className="max-w-4xl space-y-8">
             <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#E85D04]">
               <span className="w-6 h-px bg-[#E85D04]" />
-              <span>07 // DIRECT DISPATCH &amp; CORRESPONDENCE</span>
+              <span>07  Direct Dispatch &amp; Correspondence</span>
             </div>
 
             <h2 className="text-4xl sm:text-6xl lg:text-7xl text-[#F4F1EA] leading-[1.05] tracking-tight">

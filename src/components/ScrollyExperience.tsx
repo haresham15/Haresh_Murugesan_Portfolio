@@ -223,7 +223,7 @@ export const ScrollyExperience: React.FC = () => {
           <div className="space-y-3 max-w-2xl">
             <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#10B981]">
               <span className="w-6 h-px bg-[#10B981]" />
-              <span>02 // EXPERIENCE &amp; AUTONOMOUS SYSTEMS</span>
+              <span>02  Experience &amp; Autonomous Systems</span>
             </div>
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F1F5F9] leading-tight tracking-tight">
               Horizontal Chicane Circuit

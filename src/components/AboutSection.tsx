@@ -53,13 +53,13 @@ export const AboutSection: React.FC = () => {
       id="about"
       theme="alabaster"
       aria-label="About and engineering thesis"
-      className="border-b border-[#0B0B0E]/10"
+      className="border-b border-[#0B0B0E]/10 py-24 lg:py-36"
     >
       <div className="w-full flex flex-col justify-center my-auto">
         {/* Editorial Section Index / Marginalia Header */}
         <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#C83E2B] mb-12 sm:mb-16">
           <span className="w-6 h-px bg-[#C83E2B]" />
-          <span>01 // THESIS &amp; ARCHITECTURAL DIRECTIVE</span>
+          <span>01  Thesis &amp; Architectural Directive</span>
         </div>
 
         {/* 12-Column Fluid Grid: 5 Cols Portrait Monolith / 7 Cols Concise Narrative Spread */}
@@ -118,7 +118,7 @@ export const AboutSection: React.FC = () => {
 
                 {/* Bottom Internal Optical Chamfer Rule */}
                 <div className="absolute bottom-2 right-2 text-[9px] font-mono text-white/50 tracking-widest pointer-events-none">
-                  SEC // 40.00°N
+                  40.00°N · 83.03°W
                 </div>
               </div>
 
@@ -138,11 +138,11 @@ export const AboutSection: React.FC = () => {
             
             {/* Monumental Editorial Headline */}
             <h2 className="text-[2.35rem] sm:text-[3.25rem] lg:text-[3.85rem] text-[#0B0B0E] leading-[1.08] tracking-[-0.03em]">
-              <span className="font-raleway font-bold block">I build software where</span>
+              <span className="font-sans font-bold block">I build software where</span>
               <span className="font-serif italic font-normal text-[#C83E2B] block">
                 computational speed meets real-world
               </span>
-              <span className="font-raleway font-bold block">physical and human systems.</span>
+              <span className="font-sans font-bold block">physical and human systems.</span>
             </h2>
 
             {/* Radical Copy Condensation: Exact Concise 32-Word Punchy Statement */}
@@ -155,7 +155,7 @@ export const AboutSection: React.FC = () => {
             {/* Clean Horizontal Strip of 3 Interactive Metric Anchors */}
             <div className="pt-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#525156] mb-4">
-                VERIFIED ARCHITECTURAL BENCHMARKS // CLICK TO JUMP
+                VERIFIED ARCHITECTURAL BENCHMARKS · SELECT TO NAVIGATE
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 

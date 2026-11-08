@@ -15,7 +15,7 @@ export const NowSection: React.FC = () => {
           <div className="space-y-4 max-w-xl">
             <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#E85D04]">
               <span className="w-6 h-px bg-[#E85D04]" />
-              <span>06 // ACTIVE RESEARCH &amp; CURRENT VECTOR</span>
+              <span>06  Active Research &amp; Current Vector</span>
             </div>
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F1EA] leading-tight tracking-tight">
               Field Notes

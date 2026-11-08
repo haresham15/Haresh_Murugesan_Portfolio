@@ -126,55 +126,12 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
     };
 
     // -------------------------------------------------------------------------
-    // True Anatomical Pear-Shaped Bulb Profile Function R(v)
+    // True Anatomical Smooth-Min Pear-Shaped Signed Distance Field (SDF)
     // -------------------------------------------------------------------------
-    // Returns normalized radius R_norm in [0, 1] relative to base dome radius R_bulb
-    // v_norm is normalized longitudinal position along 45° launch axis:
-    //   v_norm = +1.0  => glass crown tip
-    //   v_norm =  0.0  => dome equator
-    //   v_norm = -0.1  => dome lower boundary
-    //   v_norm = -0.75 => smooth concave inflection neck
-    //   v_norm = -1.10 => metallic screw base
-    //   v_norm = -1.22 => ceramic insulator & ignition tip
-    const getPearProfile = (vNorm: number): { rNorm: number; zone: 'dome' | 'neck' | 'screw' | 'nozzle' | 'none' } => {
-      if (vNorm > 1.0 || vNorm < -1.22) {
-        return { rNorm: 0, zone: 'none' };
-      }
-
-      // 1. Upper Hemisphere Dome (vNorm from -0.1 to +1.0)
-      if (vNorm >= -0.1) {
-        const radSqr = 1.0 - vNorm * vNorm;
-        return { rNorm: radSqr > 0 ? Math.sqrt(radSqr) : 0, zone: 'dome' };
-      }
-
-      // 2. Smooth Concave Inflection Neck (vNorm from -0.75 to -0.1)
-      if (vNorm >= -0.75) {
-        const t = (vNorm - (-0.75)) / (-0.1 - (-0.75)); // 0 at neck, 1 at dome base
-        const neckRadius = 0.42;
-        const domeBaseRadius = Math.sqrt(1.0 - 0.01); // ~0.995
-        // Smooth cosine S-curve transition
-        const smoothT = (1.0 - Math.cos(t * Math.PI)) * 0.5;
-        const rNorm = neckRadius + (domeBaseRadius - neckRadius) * smoothT;
-        return { rNorm, zone: 'neck' };
-      }
-
-      // 3. Machined Edison Screw Threads (5 distinct sinusoidal ridges)
-      if (vNorm >= -1.10) {
-        const threadFreq = 5.0 * Math.PI * 2.0; // 5 full ridges
-        const threadT = (vNorm - (-1.10)) / (-0.75 - (-1.10));
-        const threadMod = Math.sin(threadT * threadFreq) * 0.040;
-        const screwRadius = 0.38 + threadMod;
-        return { rNorm: screwRadius, zone: 'screw' };
-      }
-
-      // 4. Ceramic Insulator Collar & White-Hot Ignition Contact Tip
-      if (vNorm >= -1.22) {
-        const collarT = (vNorm - (-1.22)) / (-1.10 - (-1.22));
-        const nozzleRadius = 0.22 + (0.36 - 0.22) * collarT;
-        return { rNorm: nozzleRadius, zone: 'nozzle' };
-      }
-
-      return { rNorm: 0, zone: 'none' };
+    // Polynomial smooth-minimum for blending dome with neck seamlessly
+    const smin = (a: number, b: number, k: number): number => {
+      const h = Math.max(k - Math.abs(a - b), 0.0) / k;
+      return Math.min(a, b) - h * h * k * 0.25;
     };
 
     // Pre-calculate continuous streamline ribbon offsets (20 streamline ribbons)
@@ -1013,11 +970,11 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
             continue;
           }
 
-          // Transform (px, py) to bulb local coordinates (u, v)
+          // Transform (px, py) to bulb local coordinates (rawU, rawV)
           const dx = px - bulbCenterX;
           const dy = py - bulbCenterY;
-          const u = dx * dirX + dy * dirY;
-          const v = dx * perpX + dy * perpY;
+          const rawU = dx * dirX + dy * dirY;
+          const rawV = dx * perpX + dy * perpY;
 
           // Mouse perturbation factor
           let perturbation = 0;
@@ -1029,19 +986,19 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
           }
 
           // -------------------------------------------------------------------
-          // A. FOCUSED SUPERSONIC EXHAUST PLUME (u < -1.22 * bulbRadius)
+          // A. FOCUSED SUPERSONIC EXHAUST PLUME (rawU < -1.22 * bulbRadius)
           // Tightly collimated near base: clears left text by >175px!
           // -------------------------------------------------------------------
           const nozzleU = -1.22 * bulbRadius;
-          if (u < nozzleU) {
-            const exhaustDist = nozzleU - u;
+          if (rawU < nozzleU) {
+            const exhaustDist = nozzleU - rawU;
             const maxExhaust = isMobile ? 240 : 360; // Focused, tight exhaust plume
 
             if (exhaustDist < maxExhaust) {
               // Collimated Plume Cone
               const plumeWidth = (22 + 0.15 * exhaustDist + Math.sqrt(exhaustDist) * 2.6) * scale;
 
-              if (Math.abs(v) < plumeWidth) {
+              if (Math.abs(rawV) < plumeWidth) {
                 // Standing Mach Shock Diamonds (4 Periodic Compression Nodes)
                 const shockNodeDist = exhaustDist / (40 * scale);
                 const isMachDiamond = Math.abs(Math.sin(shockNodeDist * Math.PI)) < 0.26 && exhaustDist < 200 * scale;
@@ -1049,10 +1006,10 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
                 // High-velocity advecting exhaust flow
                 const flowOffset = exhaustDist - animTime * 380;
                 const turbulence =
-                  Math.sin(flowOffset * 0.06 + v * 0.10) *
-                  Math.cos(flowOffset * 0.04 - v * 0.08);
+                  Math.sin(flowOffset * 0.06 + rawV * 0.10) *
+                  Math.cos(flowOffset * 0.04 - rawV * 0.08);
 
-                const radialFactor = 1.0 - Math.abs(v) / plumeWidth;
+                const radialFactor = 1.0 - Math.abs(rawV) / plumeWidth;
                 const distDecay = Math.exp(-exhaustDist / (isMobile ? 150 : 230));
                 const intensity = Math.max(0, radialFactor * distDecay + turbulence * 0.15 * distDecay);
 
@@ -1063,7 +1020,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
                   if (perturbation > 0.08) {
                     char = RAMP_DNA_BASES[safeMod(animTime * 15 + px + py, 4)];
                     color = '#F5D998';
-                  } else if (isMachDiamond && Math.abs(v) < 16 * scale) {
+                  } else if (isMachDiamond && Math.abs(rawV) < 16 * scale) {
                     // Standing Mach Shock Diamond (Blazing White-Gold)
                     char = '@';
                     color = '#FFFFFF';
@@ -1093,264 +1050,175 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
           }
 
           // -------------------------------------------------------------------
-          // B. ANATOMICALLY ACCURATE PEAR-SHAPED BULB & CONTINUOUS 3D DNA HELIX
+          // B. EXACT SMOOTH-MIN PEAR-BULB SDF & CONTINUOUS 3D BRAIDED DNA DOUBLE-HELIX
           // -------------------------------------------------------------------
-          const vNorm = u / bulbRadius;
-          const { rNorm, zone } = getPearProfile(vNorm);
+          // Transform screen coordinates (px, py) relative to bulb center into local 45°-rotated coordinates
+          // Normalized by bulb radius R = bulbRadius
+          const R = bulbRadius;
+          const normDx = dx / R;
+          const normDy = dy / R;
+          // v runs along the 45° thrust axis (+v is top-right dome, -v is bottom-left nozzle)
+          // u runs perpendicular to the 45° axis (u < 0 is upper-left lit side, u >= 0 is lower-right shadow side)
+          const v = (normDx - normDy) * invSqrt2;
+          const u = (normDx + normDy) * invSqrt2;
 
-          if (rNorm > 0) {
-            const actualHalfW = rNorm * bulbRadius;
-            const rCellNorm = Math.abs(v) / actualHalfW;
-
-            // 1. Machined Edison Screw Base & Ceramic Nozzle Collar
-            if (zone === 'screw' || zone === 'nozzle') {
-              if (rCellNorm <= 1.05) {
-                const isBaseEdge = rCellNorm >= 0.88;
-                let char = '=';
-                let color = '#94A3B8';
-
-                if (perturbation > 0.1) {
-                  char = RAMP_DNA_BASES[safeMod(animTime * 12 + px, 4)];
-                  color = '#F5D998';
-                } else if (zone === 'nozzle') {
-                  char = '@';
-                  color = '#FFFFFF';
-                } else if (isBaseEdge) {
-                  char = v < 0 ? '@' : '#';
-                  color = v < 0 ? '#CBD5E1' : '#64748B'; // Specular highlight on left lit side
-                } else {
-                  // Corrugated thread ridge fluting (5 distinct thread ridges)
-                  const threadPhase = Math.sin(((vNorm + 1.10) / 0.35) * 10.0 * Math.PI);
-                  char = threadPhase > 0 ? '%' : '=';
-                  color = threadPhase > 0 ? '#E2E8F0' : '#475569';
-                }
-
-                ctx.fillStyle = color;
-                ctx.fillText(char, px, py);
-                continue;
-              }
+          // 1. Ceramic Nozzle Collar & Blazing Core (v from -1.08 to -0.92)
+          if (v >= -1.08 && v < -0.92) {
+            if (Math.abs(u) <= 0.28) {
+              const isCollar = v > -1.00;
+              const char = isCollar ? '#' : '@';
+              const color = isCollar ? '#1E293B' : (u < 0 ? '#FFFFFF' : '#FF6B35');
+              ctx.fillStyle = color;
+              ctx.fillText(char, px, py);
+              continue;
             }
+          }
 
-            // 2. Continuous 3D Braided DNA Double-Helix Filament (Inside Glass Dome/Neck)
+          // 2. Machined Edison Screw Threads (v from -0.92 to -0.55)
+          if (v >= -0.92 && v < -0.55) {
+            const threadWidth = 0.34 + 0.04 * Math.sin(v * 38);
+            if (Math.abs(u) <= threadWidth) {
+              const isRidge = Math.sin(v * 38) > 0;
+              const char = isRidge ? (u < 0 ? '@' : '#') : (u < 0 ? '=' : '-');
+              const color = u < 0 ? '#CBD5E1' : '#475569';
+              ctx.fillStyle = color;
+              ctx.fillText(char, px, py);
+              continue;
+            }
+          }
+
+          // 3. Smooth-Min Glass Envelope (Dome + Tapered Neck)
+          // Dome centered at v = 0.18, radius = 0.88
+          const dDome = Math.hypot(u, v - 0.18) - 0.88;
+          // Tapered Neck from v = -0.55 to v = 0.05
+          const neckT = Math.max(0, Math.min(1, (v + 0.55) / 0.60));
+          const neckHalfWidth = 0.36 + 0.38 * neckT;
+          const dNeck = Math.max(Math.abs(u) - neckHalfWidth, Math.abs(v + 0.25) - 0.32);
+          // Seamless blend eliminating jagged step gap
+          const dGlass = smin(dDome, dNeck, 0.35);
+
+          if (dGlass <= 0) {
+            const edge = Math.abs(dGlass);
+
+            // A. CONTINUOUS 3D BRAIDED DNA DOUBLE-HELIX (Inside Envelope: v from -0.50 to +0.82)
             let drewFilament = false;
-            if ((zone === 'dome' || zone === 'neck') && vNorm >= -0.74 && vNorm <= 0.84 && rCellNorm < 0.90) {
-              // Lead-In Nickel/Molybdenum Support Wires rising from Edison stem
-              if (vNorm < -0.52) {
-                const wireV = 22 * scale;
-                if (Math.abs(v - wireV) < 3.6 || Math.abs(v + wireV) < 3.6) {
-                  const isHook = vNorm >= -0.55 && vNorm <= -0.52;
-                  ctx.fillStyle = isHook ? '#F5D998' : '#94A3B8';
-                  ctx.fillText(isHook ? 'o' : '│', px, py);
-                  continue;
-                }
-              }
+            if (v >= -0.50 && v <= 0.82) {
+              const helixFreq = 7.5;
+              const helixAmp = 0.34 * (1 - 0.25 * Math.pow(Math.max(0, (-0.1 - v) / 0.45), 2));
+              const phase1 = v * helixFreq - animTime * 2.8;
+              const phase2 = phase1 + Math.PI;
 
-              // Responsive amplitude tailored to bulb envelope (slight taper in neck)
-              const localAmp = baseHelixAmp * (zone === 'dome' ? 1.05 : 0.85);
+              const u1 = helixAmp * Math.sin(phase1);
+              const z1 = Math.cos(phase1); // Depth of Strand 1 (-1 to +1)
+              const u2 = helixAmp * Math.sin(phase2);
+              const z2 = Math.cos(phase2); // Depth of Strand 2 (-1 to +1)
 
-              // Two Continuous, Unbroken Helical Strands with Biological B-DNA Asymmetry
-              const thetaStrand1 = (u + 0.65 * bulbRadius) * strandK - helixCycle;
-              const vStrand1 = Math.sin(thetaStrand1) * localAmp;
-              const zStrand1 = Math.cos(thetaStrand1); // +z = front, -z = rear
+              const dist1 = Math.abs(u - u1);
+              const dist2 = Math.abs(u - u2);
 
-              // Biological B-DNA major/minor groove phase shift (major groove ~240°, minor groove ~120°)
-              const thetaStrand2 = thetaStrand1 + Math.PI + 0.32 * Math.sin(thetaStrand1);
-              const vStrand2 = Math.sin(thetaStrand2) * localAmp;
-              const zStrand2 = Math.cos(thetaStrand2);
-
-              const dist1 = Math.abs(v - vStrand1);
-              const dist2 = Math.abs(v - vStrand2);
-
-              // Continuous 3-layer glowing backbone ribbon (up to 7.8px half-width)
-              const strandThreshold = 7.8 * scale;
-              if (dist1 < strandThreshold || dist2 < strandThreshold) {
+              // Render Unbroken Helical Backbone Ribbons First
+              if (dist1 < 0.085 || dist2 < 0.085) {
                 const isStrand1 = dist1 < dist2;
-                const zDepth = isStrand1 ? zStrand1 : zStrand2;
+                const z = isStrand1 ? z1 : z2;
                 const distToBackbone = isStrand1 ? dist1 : dist2;
 
-                let char = '@';
-                let color = '#FFFFFF';
-
-                if (perturbation > 0.05) {
-                  char = RAMP_DNA_BASES[safeMod(animTime * 18 + px, 4)];
-                  color = '#F5D998';
-                } else if (zDepth > 0.10) {
-                  // FRONT-FACING STRAND: 3-Layer Incandescent White-Gold Core
-                  if (distToBackbone < 2.6 * scale) {
-                    char = zDepth > 0.6 ? '@' : '8';
-                    color = '#FFFFFF';
-                  } else if (distToBackbone < 5.2 * scale) {
-                    char = '#';
-                    color = '#FFF2B2';
-                  } else {
-                    char = '%';
-                    color = '#F5D998';
-                  }
+                if (z > 0) {
+                  // Foreground Backbone (z > 0): Blazing white-gold (#FFFFFF / #F5D998, alpha 0.98)
+                  const char = distToBackbone < 0.035 ? '@' : (distToBackbone < 0.065 ? '#' : '$');
+                  const color = z > 0.5 ? '#FFFFFF' : '#F5D998';
+                  ctx.fillStyle = color;
+                  ctx.fillText(char, px, py);
                 } else {
-                  // REAR-FACING STRAND: 3-Layer Saturated Flame Orange & Tangerine
-                  if (distToBackbone < 2.6 * scale) {
-                    char = zDepth < -0.5 ? '$' : 'S';
-                    color = '#FF6B35';
-                  } else if (distToBackbone < 5.2 * scale) {
-                    char = '&';
-                    color = '#FF8547';
-                  } else {
-                    char = '+';
-                    color = 'rgba(255, 107, 53, 0.85)';
-                  }
+                  // Background Backbone (z <= 0): Deep incandescent orange (#FF6B35, alpha 0.82)
+                  const char = distToBackbone < 0.035 ? '%' : (distToBackbone < 0.065 ? '*' : '+');
+                  ctx.fillStyle = '#FF6B35';
+                  ctx.fillText(char, px, py);
                 }
-
-                ctx.fillStyle = color;
-                ctx.fillText(char, px, py);
                 drewFilament = true;
                 continue;
               }
 
-              // Base-Pair Rungs with Hydrogen Bonds (A═T, C≡G, T═A, G≡C)
-              // Analytical spacing ensures EVERY rung across the height is rendered continuously (~20-22 rungs!)
-              const nearestRungIdx = Math.round(u / rungSpacing);
-              const rungU = nearestRungIdx * rungSpacing;
-              const distToRungAxial = Math.abs(u - rungU);
+              // Render Base-Pair Rungs (A-T, C-G) Between u1 and u2
+              if (
+                Math.abs(Math.sin(v * helixFreq * 2)) < 0.28 &&
+                u > Math.min(u1, u2) &&
+                u < Math.max(u1, u2)
+              ) {
+                const minU = Math.min(u1, u2);
+                const maxU = Math.max(u1, u2);
+                const span = Math.max(0.001, maxU - minU);
+                const rungT = (u - minU) / span;
+                const rungIdx = Math.round((v * helixFreq * 2) / Math.PI);
+                const pairType = safeMod(rungIdx, 4);
 
-              // Active range for rungs along the double helix
-              if (distToRungAxial < 5.4 * scale && u > -0.54 * bulbRadius && u < 0.82 * bulbRadius) {
-                const minV = Math.min(vStrand1, vStrand2);
-                const maxV = Math.max(vStrand1, vStrand2);
-                const rungSpan = maxV - minV;
+                let rungChar = '═';
+                let rungColor = '#82B7FF';
 
-                // Only render rung if between the two helical backbones
-                if (v >= minV - 1.2 && v <= maxV + 1.2 && rungSpan > 10.0 * scale) {
-                  const rungFrac = (v - minV) / rungSpan;
-                  const pairIdx = safeMod(nearestRungIdx, 4);
-
-                  let rungChar = '═';
-                  let rungColor = '#82B7FF';
-
-                  // Base assignment based on pair index:
-                  // 0: A ═ T
-                  // 1: C ≡ G
-                  // 2: T ═ A
-                  // 3: G ≡ C
-                  if (rungFrac < 0.28) {
-                    // Left base
-                    if (pairIdx === 0) { rungChar = 'A'; rungColor = '#F5D998'; }
-                    else if (pairIdx === 1) { rungChar = 'C'; rungColor = '#FF8547'; }
-                    else if (pairIdx === 2) { rungChar = 'T'; rungColor = '#82B7FF'; }
-                    else { rungChar = 'G'; rungColor = '#34D399'; }
-                  } else if (rungFrac >= 0.28 && rungFrac < 0.40) {
-                    // Left connector
-                    rungChar = '-';
-                    rungColor = pairIdx % 2 === 0 ? '#F5D998' : '#FF8547';
-                  } else if (rungFrac > 0.72) {
-                    // Right complementary base
-                    if (pairIdx === 0) { rungChar = 'T'; rungColor = '#82B7FF'; }
-                    else if (pairIdx === 1) { rungChar = 'G'; rungColor = '#34D399'; }
-                    else if (pairIdx === 2) { rungChar = 'A'; rungColor = '#F5D998'; }
-                    else { rungChar = 'C'; rungColor = '#FF8547'; }
-                  } else if (rungFrac > 0.60 && rungFrac <= 0.72) {
-                    // Right connector
-                    rungChar = '-';
-                    rungColor = pairIdx % 2 === 0 ? '#82B7FF' : '#34D399';
-                  } else {
-                    // Central Hydrogen Bond (double bond for A-T, triple bond for C-G)
-                    // Animated electron resonance pulse
-                    const bondPulse = Math.sin(animTime * 8.0 + nearestRungIdx * 1.5);
-                    if (bondPulse > 0.75) {
-                      rungChar = '•';
-                      rungColor = '#FFFFFF';
-                    } else if (pairIdx === 0 || pairIdx === 2) {
-                      rungChar = '═';
-                      rungColor = '#F5D998';
-                    } else {
-                      rungChar = '≡';
-                      rungColor = '#82B7FF';
-                    }
-                  }
-
-                  ctx.fillStyle = rungColor;
-                  ctx.fillText(rungChar, px, py);
-                  drewFilament = true;
-                  continue;
-                }
-              }
-
-              if (drewFilament) continue;
-
-              // Quantum Energy Spark Field & Vacuum Radiance around the helix
-              const distToHelixCenter = Math.hypot(v, (u - 0.1 * bulbRadius) * 0.32);
-              if (distToHelixCenter < 80 * scale) {
-                const radianceT = 1.0 - distToHelixCenter / (80 * scale);
-                // Quantum photon spark
-                const sparkSeed = Math.sin(px * 12.9898 + py * 78.233 + animTime * 4.0);
-                if (sparkSeed > 0.88) {
-                  const sparkChar = sparkSeed > 0.96 ? '*' : (sparkSeed > 0.92 ? '+' : '·');
-                  const sparkColor = sparkSeed > 0.94 ? '#F5D998' : 'rgba(130, 183, 255, 0.75)';
-                  ctx.fillStyle = sparkColor;
-                  ctx.fillText(sparkChar, px, py);
-                  continue;
+                if (rungT > 0.36 && rungT < 0.64) {
+                  // Electric cyan central hydrogen bond
+                  rungChar = pairType % 2 === 0 ? '═' : '≡';
+                  rungColor = '#82B7FF';
+                } else if (rungT <= 0.36) {
+                  // Left nucleotide base (warm gold near strand)
+                  if (pairType === 0) { rungChar = 'A'; rungColor = '#F5D998'; }
+                  else if (pairType === 1) { rungChar = 'C'; rungColor = '#F5D998'; }
+                  else if (pairType === 2) { rungChar = 'T'; rungColor = '#82B7FF'; }
+                  else { rungChar = 'G'; rungColor = '#82B7FF'; }
+                } else {
+                  // Right nucleotide base
+                  if (pairType === 0) { rungChar = 'T'; rungColor = '#82B7FF'; }
+                  else if (pairType === 1) { rungChar = 'G'; rungColor = '#82B7FF'; }
+                  else if (pairType === 2) { rungChar = 'A'; rungColor = '#F5D998'; }
+                  else { rungChar = 'C'; rungColor = '#F5D998'; }
                 }
 
-                if (Math.random() > 0.82) {
-                  const glowColor = Math.random() > 0.40
-                    ? `rgba(255, 107, 53, ${(0.22 * radianceT).toFixed(3)})`
-                    : `rgba(130, 183, 255, ${(0.18 * radianceT).toFixed(3)})`;
-                  ctx.fillStyle = glowColor;
-                  ctx.fillText('·', px, py);
-                  continue;
-                }
+                ctx.fillStyle = rungColor;
+                ctx.fillText(rungChar, px, py);
+                drewFilament = true;
+                continue;
               }
             }
 
-            // 3. Delicate Multi-Graded Glass Envelope Shading
-            if (rCellNorm <= 1.02) {
-              // Outer 1-cell crisp specular rim (rCellNorm 0.93 - 1.02)
-              if (rCellNorm >= 0.93) {
-                let char = '#';
-                let color = '#F3EFE7';
+            if (drewFilament) continue;
 
-                if (perturbation > 0.1) {
-                  char = RAMP_DENSITY[safeMod(perturbation * 8, RAMP_DENSITY.length)];
-                  color = '#F5D998';
-                } else if (v < 0) {
-                  // Upper-left lit side: high contrast specular ivory
-                  char = rCellNorm > 0.97 ? '@' : '%';
-                  color = '#F3EFE7';
-                } else {
-                  // Lower-right shadow side: technical blue / silver
-                  char = rCellNorm > 0.97 ? '*' : '+';
-                  color = '#82B7FF';
-                }
+            // B. GLASS ENVELOPE SURFACE SHADING
+            // Outer Fresnel Rim (edge < 0.11)
+            if (edge < 0.11) {
+              const char = edge < 0.05 ? '@' : (edge < 0.08 ? '#' : '%');
+              // Upper-left lit side (u < 0): #F3EFE7 at 0.95 alpha
+              // Lower-right shadow side (u >= 0): #82B7FF / #94A3B8 at 0.75 alpha
+              const color = u < 0 ? 'rgba(243, 239, 231, 0.95)' : 'rgba(130, 183, 255, 0.75)';
+              ctx.fillStyle = color;
+              ctx.fillText(char, px, py);
+              continue;
+            }
 
-                ctx.fillStyle = color;
-                ctx.fillText(char, px, py);
-                continue;
-              }
+            // Inner Bevel (0.11 <= edge < 0.22): :, ., + at 0.35 alpha (#CBD5E1)
+            if (edge < 0.22) {
+              const char = edge < 0.16 ? ':' : (edge < 0.19 ? '.' : '+');
+              ctx.fillStyle = 'rgba(203, 213, 225, 0.35)';
+              ctx.fillText(char, px, py);
+              continue;
+            }
 
-              // Inner bevel transition (rCellNorm 0.85 - 0.93)
-              if (rCellNorm >= 0.85) {
-                ctx.fillStyle = 'rgba(243, 239, 231, 0.25)';
-                ctx.fillText(rCellNorm > 0.90 ? ':' : '.', px, py);
-                continue;
-              }
+            // Curved Specular Ribbon (u in [-0.65, -0.35], v in [0.15, 0.75])
+            if (
+              u >= -0.65 &&
+              u <= -0.35 &&
+              v >= 0.15 &&
+              v <= 0.75 &&
+              Math.hypot(u + 0.45, v - 0.45) < 0.22
+            ) {
+              const char = Math.hypot(u + 0.45, v - 0.45) < 0.12 ? '#' : '*';
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+              ctx.fillText(char, px, py);
+              continue;
+            }
 
-              // Delicate Crescent Specular Highlight Ribbon along upper-left perimeter curve
-              // Refined to NOT collide with internal DNA filament!
-              const isCrescentSpecular =
-                vNorm >= 0.35 && vNorm <= 0.85 && (v / actualHalfW) >= -0.85 && (v / actualHalfW) <= -0.74;
-
-              if (isCrescentSpecular) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
-                ctx.fillText('"', px, py);
-                continue;
-              }
-
-              // Interior Glass Sheen (rCellNorm < 0.85)
-              // Subtle curved glass feel without obstructing internal DNA filament
-              const glassSheen = Math.sin(px * 0.25 + py * 0.25 + animTime * 0.3);
-              if (glassSheen > 0.90) {
-                ctx.fillStyle = 'rgba(167, 178, 195, 0.08)';
-                ctx.fillText('·', px, py);
-              }
+            // Interior Volume (edge >= 0.22): subtle . at 0.08 alpha so DNA helix is 100% visible
+            if (Math.sin(px * 0.35 + py * 0.35 + animTime) > 0.75) {
+              ctx.fillStyle = 'rgba(167, 178, 195, 0.08)';
+              ctx.fillText('·', px, py);
             }
           }
         }
