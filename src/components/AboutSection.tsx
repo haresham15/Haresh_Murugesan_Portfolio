@@ -53,12 +53,12 @@ export const AboutSection: React.FC = () => {
       id="about"
       theme="alabaster"
       aria-label="About and engineering thesis"
-      className="border-b border-[#0B0B0E]/10 py-24 lg:py-36"
+      className="border-b border-[#060A12]/10 py-24 lg:py-36"
     >
       <div className="w-full flex flex-col justify-center my-auto">
         {/* Editorial Section Index / Marginalia Header */}
-        <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#C83E2B] mb-12 sm:mb-16">
-          <span className="w-6 h-px bg-[#C83E2B]" />
+        <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800] mb-12 sm:mb-16">
+          <span className="w-6 h-px bg-[#FF2800]" />
           <span>01  Thesis &amp; Architectural Directive</span>
         </div>
 
@@ -81,13 +81,13 @@ export const AboutSection: React.FC = () => {
             >
               {/* Offset Double-Frame Shadow Contours */}
               <div
-                className="absolute inset-0 translate-x-3 translate-y-3 bg-[#0B0B0E]/10 rounded-[2px] pointer-events-none transition-transform duration-500 group-hover:translate-x-5 group-hover:translate-y-5"
+                className="absolute inset-0 translate-x-3 translate-y-3 bg-[#060A12]/10 rounded-[2px] pointer-events-none transition-transform duration-500 group-hover:translate-x-5 group-hover:translate-y-5"
                 style={{
                   clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%)',
                 }}
               />
               <div
-                className="absolute inset-0 translate-x-1.5 translate-y-1.5 border border-[#C83E2B]/40 rounded-[2px] pointer-events-none transition-transform duration-500 group-hover:translate-x-2.5 group-hover:translate-y-2.5"
+                className="absolute inset-0 translate-x-1.5 translate-y-1.5 border border-[#FF2800]/40 rounded-[2px] pointer-events-none transition-transform duration-500 group-hover:translate-x-2.5 group-hover:translate-y-2.5"
                 style={{
                   clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%)',
                 }}
@@ -95,7 +95,7 @@ export const AboutSection: React.FC = () => {
 
               {/* Main Chamfered Architectural Image Container */}
               <div
-                className="relative w-full h-full bg-[#0B0B0E] border border-[#0B0B0E]/20 overflow-hidden shadow-[0_20px_50px_rgba(11,11,14,0.18)]"
+                className="relative w-full h-full bg-[#060A12] border border-[#060A12]/20 overflow-hidden shadow-[0_20px_50px_rgba(11,11,14,0.18)]"
                 style={{
                   clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%)',
                 }}
@@ -111,7 +111,7 @@ export const AboutSection: React.FC = () => {
 
                 {/* Interactive True-Color Reveal Wave Overlay */}
                 <div
-                  className={`absolute inset-0 bg-gradient-to-tr from-[#C83E2B]/15 via-transparent to-transparent pointer-events-none transition-opacity duration-500 ${
+                  className={`absolute inset-0 bg-gradient-to-tr from-[#FF2800]/15 via-transparent to-transparent pointer-events-none transition-opacity duration-500 ${
                     isHovered ? 'opacity-100' : 'opacity-0'
                   }`}
                 />
@@ -123,11 +123,11 @@ export const AboutSection: React.FC = () => {
               </div>
 
               {/* Clean Floating Marginalia Tag (Outside Bottom-Left Edge) */}
-              <div className="absolute -bottom-8 left-0 text-[11px] font-mono text-[#525156] tracking-wider whitespace-nowrap hidden sm:block">
-                <span className="text-[#0B0B0E] font-semibold">HARESH MURUGESAN</span>
-                <span className="mx-2 text-[#C83E2B]">·</span>
+              <div className="absolute -bottom-8 left-0 text-[11px] font-mono text-[#7E8B9B] tracking-wider whitespace-nowrap hidden sm:block">
+                <span className="text-[#060A12] font-semibold">HARESH MURUGESAN</span>
+                <span className="mx-2 text-[#FF2800]">·</span>
                 <span>COLUMBUS, OH [40.0067° N, 83.0305° W]</span>
-                <span className="mx-2 text-[#C83E2B]">·</span>
+                <span className="mx-2 text-[#FF2800]">·</span>
                 <span>B.S. CSE (AI), OHIO STATE</span>
               </div>
             </MotionDiv>
@@ -137,9 +137,9 @@ export const AboutSection: React.FC = () => {
           <div className="lg:col-span-7 space-y-8 lg:space-y-10">
             
             {/* Monumental Editorial Headline */}
-            <h2 className="text-[2.35rem] sm:text-[3.25rem] lg:text-[3.85rem] text-[#0B0B0E] leading-[1.08] tracking-[-0.03em]">
+            <h2 className="text-[2.35rem] sm:text-[3.25rem] lg:text-[3.85rem] text-[#060A12] leading-[1.08] tracking-[-0.03em]">
               <span className="font-sans font-bold block">I build software where</span>
-              <span className="font-serif italic font-normal text-[#C83E2B] block">
+              <span className="font-serif italic font-normal text-[#FF2800] block">
                 computational speed meets real-world
               </span>
               <span className="font-sans font-bold block">physical and human systems.</span>
@@ -147,14 +147,14 @@ export const AboutSection: React.FC = () => {
 
             {/* Radical Copy Condensation: Exact Concise 32-Word Punchy Statement */}
             <div className="max-w-[58ch]">
-              <p className="text-[18px] sm:text-[20px] font-sans text-[#2B2B30] leading-[1.65] font-normal">
+              <p className="text-[18px] sm:text-[20px] font-sans text-[#C8D2E0] leading-[1.65] font-normal">
                 Focused on the seam between deterministic data pipelines, explainable deep learning, and low-latency client architectures—eliminating bloated cloud abstractions so clinicians, analysts, and operators stay in control.
               </p>
             </div>
 
             {/* Clean Horizontal Strip of 3 Interactive Metric Anchors */}
             <div className="pt-2">
-              <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#525156] mb-4">
+              <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#7E8B9B] mb-4">
                 VERIFIED ARCHITECTURAL BENCHMARKS · SELECT TO NAVIGATE
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -163,16 +163,16 @@ export const AboutSection: React.FC = () => {
                 <a
                   href="#projects"
                   onClick={scrollToAnchor('projects')}
-                  className="group p-4 bg-[#EDE8DE] hover:bg-[#E3DDCF] border border-[#0B0B0E]/10 rounded-[2px] transition-all duration-200 flex flex-col justify-between select-none"
+                  className="group p-4 bg-[#060A12] border border-[#18458B]/30 hover:border-[#FF2800]/50 border border-[#060A12]/10 rounded-[2px] transition-all duration-200 flex flex-col justify-between select-none"
                 >
-                  <span className="text-[11px] font-mono text-[#525156] group-hover:text-[#C83E2B] transition-colors flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-[#7E8B9B] group-hover:text-[#FF2800] transition-colors flex items-center justify-between">
                     <span>PLATE 01</span>
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                   </span>
-                  <div className="mt-2 text-sm sm:text-base font-mono font-bold text-[#0B0B0E] tracking-tight">
+                  <div className="mt-2 text-sm sm:text-base font-mono font-bold text-[#060A12] tracking-tight">
                     8.09ms Vectorized Grad-CAM
                   </div>
-                  <span className="mt-1 text-[11px] font-sans text-[#525156]">
+                  <span className="mt-1 text-[11px] font-sans text-[#7E8B9B]">
                     Healios V2 Saliency Pipeline
                   </span>
                 </a>
@@ -181,16 +181,16 @@ export const AboutSection: React.FC = () => {
                 <a
                   href="#experience"
                   onClick={scrollToAnchor('experience')}
-                  className="group p-4 bg-[#EDE8DE] hover:bg-[#E3DDCF] border border-[#0B0B0E]/10 rounded-[2px] transition-all duration-200 flex flex-col justify-between select-none"
+                  className="group p-4 bg-[#060A12] border border-[#18458B]/30 hover:border-[#FF2800]/50 border border-[#060A12]/10 rounded-[2px] transition-all duration-200 flex flex-col justify-between select-none"
                 >
-                  <span className="text-[11px] font-mono text-[#525156] group-hover:text-[#C83E2B] transition-colors flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-[#7E8B9B] group-hover:text-[#FF2800] transition-colors flex items-center justify-between">
                     <span>APEX 01</span>
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                   </span>
-                  <div className="mt-2 text-sm sm:text-base font-mono font-bold text-[#0B0B0E] tracking-tight">
+                  <div className="mt-2 text-sm sm:text-base font-mono font-bold text-[#060A12] tracking-tight">
                     12 AWS Agentic Workflows
                   </div>
-                  <span className="mt-1 text-[11px] font-sans text-[#525156]">
+                  <span className="mt-1 text-[11px] font-sans text-[#7E8B9B]">
                     Chemical Abstracts Service (CAS)
                   </span>
                 </a>
@@ -199,16 +199,16 @@ export const AboutSection: React.FC = () => {
                 <a
                   href="#projects"
                   onClick={scrollToAnchor('projects')}
-                  className="group p-4 bg-[#EDE8DE] hover:bg-[#E3DDCF] border border-[#0B0B0E]/10 rounded-[2px] transition-all duration-200 flex flex-col justify-between select-none"
+                  className="group p-4 bg-[#060A12] border border-[#18458B]/30 hover:border-[#FF2800]/50 border border-[#060A12]/10 rounded-[2px] transition-all duration-200 flex flex-col justify-between select-none"
                 >
-                  <span className="text-[11px] font-mono text-[#525156] group-hover:text-[#C83E2B] transition-colors flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-[#7E8B9B] group-hover:text-[#FF2800] transition-colors flex items-center justify-between">
                     <span>PLATE 02</span>
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
                   </span>
-                  <div className="mt-2 text-sm sm:text-base font-mono font-bold text-[#0B0B0E] tracking-tight">
+                  <div className="mt-2 text-sm sm:text-base font-mono font-bold text-[#060A12] tracking-tight">
                     60 FPS Web Worker Telemetry
                   </div>
-                  <span className="mt-1 text-[11px] font-sans text-[#525156]">
+                  <span className="mt-1 text-[11px] font-sans text-[#7E8B9B]">
                     Apexis Motorsports Engine
                   </span>
                 </a>
@@ -221,14 +221,14 @@ export const AboutSection: React.FC = () => {
               <a
                 href="#experience"
                 onClick={scrollToAnchor('experience')}
-                className="px-6 py-3.5 bg-[#0B0B0E] hover:bg-[#C83E2B] text-[#F5F3EF] font-semibold rounded-[2px] transition-colors inline-flex items-center gap-2 select-none shadow-[0_4px_16px_rgba(11,11,14,0.18)]"
+                className="px-6 py-3.5 bg-[#060A12] hover:bg-[#FF2800] text-[#03050A] font-semibold rounded-[2px] transition-colors inline-flex items-center gap-2 select-none shadow-[0_4px_16px_rgba(11,11,14,0.18)]"
               >
                 <span>Follow the Experience S-Curve</span>
                 <span>↓</span>
               </a>
               <Link
                 href="/about"
-                className="px-6 py-3.5 bg-transparent hover:bg-[#0B0B0E]/5 text-[#0B0B0E] border border-[#0B0B0E]/20 rounded-[2px] transition-colors inline-flex items-center gap-2 select-none font-medium"
+                className="px-6 py-3.5 bg-transparent hover:bg-[#060A12]/5 text-[#060A12] border border-[#060A12]/20 rounded-[2px] transition-colors inline-flex items-center gap-2 select-none font-medium"
               >
                 <span>Full Leadership Profile</span>
                 <span>→</span>

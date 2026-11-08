@@ -1,19 +1,19 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { BlurText } from './ui/ReactBitsControls';
-import { ThemeSection } from './ThemeSection';
+import { BlurText } from './reactbits/BlurText';
 
+// Dynamic import with SSR disabled to safely mount WebGL/Canvas on the client
 const AsciiDnaLightbulbCanvas = dynamic(
-  () => import('./AsciiDnaLightbulbCanvas').then((mod) => mod.AsciiDnaLightbulbCanvas),
+  () => import('./AsciiDnaLightbulbCanvas'),
   {
     ssr: false,
     loading: () => (
       <div
-        className="absolute inset-0 w-full h-full bg-[#060608] pointer-events-none"
+        className="absolute inset-0 w-full h-full bg-[#03050A] pointer-events-none"
         style={{
           backgroundImage:
-            'radial-gradient(ellipse at 25% 42%, rgba(232, 93, 4, 0.20) 0%, transparent 60%), radial-gradient(ellipse at 74% 35%, rgba(244, 162, 97, 0.12) 0%, transparent 65%)',
+            'radial-gradient(ellipse at 25% 42%, rgba(255, 40, 0, 0.18) 0%, transparent 60%), radial-gradient(ellipse at 74% 35%, rgba(11, 30, 64, 0.25) 0%, transparent 65%)',
         }}
       />
     ),
@@ -22,11 +22,9 @@ const AsciiDnaLightbulbCanvas = dynamic(
 
 export const BentoHero: React.FC = () => {
   return (
-    <ThemeSection
+    <section
       id="hero"
-      theme="obsidian"
-      minHeight="min-h-[115dvh]"
-      className="p-0 overflow-hidden flex flex-col justify-between"
+      className="relative w-screen h-dvh min-h-[100svh] max-w-none overflow-hidden flex items-center p-0 select-none"
       aria-label="Ballistic ASCII DNA-Lightbulb Stage and Introduction"
     >
       {/* Ambient Architectural Atmospheric Gradient: Left Radiant Filament Glow */}
@@ -35,14 +33,14 @@ export const BentoHero: React.FC = () => {
           className="absolute -top-[12%] -left-[10%] w-[70vw] h-[105vh] sm:w-[58vw] sm:h-[115vh] opacity-90"
           style={{
             background:
-              'radial-gradient(ellipse 65% 55% at 28% 42%, rgba(232, 93, 4, 0.22) 0%, rgba(244, 162, 97, 0.13) 32%, rgba(254, 217, 152, 0.05) 58%, transparent 80%)',
+              'radial-gradient(ellipse 65% 55% at 28% 42%, rgba(255, 40, 0, 0.16) 0%, rgba(24, 69, 139, 0.12) 35%, transparent 75%)',
           }}
         />
         <div
           className="absolute bottom-[2%] left-[8%] w-[48vw] h-[48vh] opacity-80"
           style={{
             background:
-              'radial-gradient(circle at 35% 65%, rgba(232, 93, 4, 0.18) 0%, rgba(254, 217, 152, 0.05) 45%, transparent 75%)',
+              'radial-gradient(circle at 35% 65%, rgba(255, 40, 0, 0.14) 0%, rgba(11, 30, 64, 0.12) 45%, transparent 75%)',
           }}
         />
       </div>
@@ -50,7 +48,7 @@ export const BentoHero: React.FC = () => {
       {/* 1. Interactive 45° Ballistic ASCII DNA-Lightbulb Canvas */}
       <div className="absolute inset-0 z-0">
         <AsciiDnaLightbulbCanvas />
-        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#060608] via-[#060608]/80 to-transparent pointer-events-none z-10" />
+        <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#03050A] via-[#03050A]/80 to-transparent pointer-events-none z-10" />
       </div>
 
       {/* 2. Top Spacer to accommodate floating clean Header */}
@@ -61,11 +59,11 @@ export const BentoHero: React.FC = () => {
         
         {/* Primary Statement */}
         <div id="hero-headline-block" className="max-w-4xl pointer-events-auto">
-          <h1 className="text-[#F5F3EF] text-[2.75rem] sm:text-[4.25rem] md:text-[5.25rem] lg:text-[6.5rem] leading-[1.02] tracking-[-0.035em]">
-            <span className="block font-raleway font-bold text-[#F5F3EF] drop-shadow-[0_8px_24px_rgba(6,6,8,0.9)]">
+          <h1 className="text-[#F4F6F9] text-[clamp(3.75rem,6.8vw,7.25rem)] leading-[0.96] tracking-[-0.035em]">
+            <span className="block font-sans font-bold text-[#F4F6F9] drop-shadow-[0_8px_32px_rgba(3,5,10,0.95)]">
               <BlurText text="Curious about intelligence." />
             </span>
-            <span className="block font-serif italic font-normal text-[#F4A261] mt-2.5 sm:mt-5 pl-0 sm:pl-8 md:pl-12 drop-shadow-[0_12px_32px_rgba(6,6,8,0.95)]">
+            <span className="block font-serif italic font-normal text-[#C8D2E0] mt-2 sm:mt-4 pl-0 sm:pl-6 md:pl-10 drop-shadow-[0_12px_40px_rgba(3,5,10,0.98)]">
               <BlurText text="Obsessed with making it work." delay={0.06} />
             </span>
           </h1>
@@ -74,19 +72,19 @@ export const BentoHero: React.FC = () => {
         {/* Concise Sub-Module */}
         <div id="hero-subcopy-block" className="w-full max-w-[560px] mt-10 sm:mt-14 lg:mt-16 pointer-events-auto">
           <div className="space-y-4">
-            <p className="text-[16.5px] sm:text-[18.5px] text-[#8E8D94] font-sans leading-[1.65] font-normal max-w-[48ch]">
+            <p className="text-[16.5px] sm:text-[18.5px] text-[#7E8B9B] font-sans leading-[1.65] font-normal max-w-[48ch]">
               Building high-speed computational systems where machine intelligence meets physical reality.
             </p>
 
             <div className="pt-2">
               <Link
                 href="/#projects"
-                className="group inline-flex items-center gap-3 text-sm font-mono text-[#F5F3EF] hover:text-[#F4A261] transition-colors py-1 select-none"
+                className="group inline-flex items-center gap-3 text-sm font-mono text-[#F4F6F9] hover:text-[#FF4419] transition-colors py-1 select-none"
               >
-                <span className="border-b border-[#E85D04] pb-0.5 font-medium tracking-wide">
+                <span className="border-b border-[#FF2800] pb-0.5 font-medium tracking-wide">
                   Explore Work
                 </span>
-                <span className="text-base text-[#E85D04] group-hover:translate-x-1.5 transition-transform duration-300">
+                <span className="text-base text-[#FF2800] group-hover:translate-x-1.5 transition-transform duration-300">
                   →
                 </span>
               </Link>
@@ -97,15 +95,15 @@ export const BentoHero: React.FC = () => {
       </div>
 
       {/* 4. Restrained Exit Transition */}
-      <div className="relative z-20 w-full px-[4vw] md:px-[6vw] xl:px-[7vw] pb-8 pt-2 flex items-center justify-end text-xs font-mono text-[#8E8D94] pointer-events-none">
-        <div className="flex items-center gap-2 text-[#8E8D94] pointer-events-auto">
-          <Link href="#about" className="hover:text-[#F5F3EF] transition-colors inline-flex items-center gap-2">
+      <div className="relative z-20 w-full px-[4vw] md:px-[6vw] xl:px-[7vw] pb-8 pt-2 flex items-center justify-end text-xs font-mono text-[#7E8B9B] pointer-events-none">
+        <div className="flex items-center gap-2 text-[#7E8B9B] pointer-events-auto">
+          <Link href="#about" className="hover:text-[#F4F6F9] transition-colors inline-flex items-center gap-2">
             <span>SCROLL TO EXPLORE</span>
-            <span className="text-[#E85D04] animate-bounce">↓</span>
+            <span className="text-[#FF2800] animate-bounce">↓</span>
           </Link>
         </div>
       </div>
-    </ThemeSection>
+    </section>
   );
 };
 

@@ -204,7 +204,7 @@ export const PodcastSection: React.FC = () => {
       id="podcast"
       theme="studio-midnight"
       aria-label="Syntinuum technical journalism podcast and audio architecture"
-      className="border-b border-[#F8FAFC]/10 flex flex-col justify-between py-24 lg:py-36"
+      className="border-b border-[#F4F6F9]/10 flex flex-col justify-between py-24 lg:py-36"
     >
       <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
         
@@ -215,10 +215,10 @@ export const PodcastSection: React.FC = () => {
               <span className="w-6 h-px bg-[#82B7FF]" />
               <span>03  Frontier Intelligence &amp; Production Reality</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F8FAFC] leading-tight tracking-tight">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
               Syntinuum
             </h2>
-            <p className="text-base sm:text-lg font-sans text-[#738A9C] leading-relaxed">
+            <p className="text-base sm:text-lg font-sans text-[#7E8B9B] leading-relaxed">
               Where frontier machine intelligence meets human implementation. Long-form technical dialogues dissecting how theoretical research moves into production systems.
             </p>
           </div>
@@ -228,7 +228,7 @@ export const PodcastSection: React.FC = () => {
               href="https://syntinuumpodcast.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-3 bg-[#FF6B35] hover:bg-[#FF8547] text-[#05070E] font-semibold rounded-[2px] inline-flex items-center gap-2 transition-colors shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+              className="px-5 py-3 bg-[#FF6B35] hover:bg-[#FF8547] text-[#060A12] font-semibold rounded-[2px] inline-flex items-center gap-2 transition-colors shadow-[0_0_20px_rgba(245,158,11,0.3)]"
             >
               <span>Explore SyntinuumPodcast.com</span>
               <span>↗</span>
@@ -237,7 +237,7 @@ export const PodcastSection: React.FC = () => {
               href="https://www.youtube.com/@syntinuum"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-3 bg-[#0E1526] hover:bg-[#16213B] text-[#F8FAFC] border border-[#F8FAFC]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors"
+              className="px-4 py-3 bg-[#0E1526] hover:bg-[#16213B] text-[#F4F6F9] border border-[#F4F6F9]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors"
             >
               <span>YouTube [8k+ Views]</span>
               <span className="text-[#82B7FF]">↗</span>
@@ -248,7 +248,7 @@ export const PodcastSection: React.FC = () => {
         {/* =====================================================================
             EDGE-TO-EDGE 100VW LIVING AUDIO WAVEFORM & GLIDING DNA-LIGHTBULB
             ===================================================================== */}
-        <div className="w-screen -ml-[4vw] md:-ml-[6vw] xl:-ml-[7vw] relative border-y border-[#F8FAFC]/10 bg-[#04060C] select-none">
+        <div className="w-screen -ml-[4vw] md:-ml-[6vw] xl:-ml-[7vw] relative border-y border-[#F4F6F9]/10 bg-[bg-transparent] select-none">
           
           {/* Canvas Waveform Container */}
           <div className="relative w-full h-[220px] sm:h-[260px] overflow-hidden">
@@ -261,7 +261,7 @@ export const PodcastSection: React.FC = () => {
               className="absolute top-6 -translate-x-1/2 pointer-events-none z-20 flex flex-col items-center"
             >
               {/* Stylized DNA-Lightbulb Vector Icon */}
-              <div className="w-12 h-12 rounded-full bg-[#05070E] border-2 border-[#FF6B35] flex items-center justify-center text-[#FF6B35] shadow-[0_0_24px_rgba(245,158,11,0.6)]">
+              <div className="w-12 h-12 rounded-full bg-[#060A12] border-2 border-[#FF6B35] flex items-center justify-center text-[#FF6B35] shadow-[0_0_24px_rgba(245,158,11,0.6)]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M9 18h6" />
                   <path d="M10 22h4" />
@@ -274,7 +274,7 @@ export const PodcastSection: React.FC = () => {
               </div>
 
               {/* Status Indicator Label */}
-              <span className="mt-2 px-2.5 py-0.5 bg-[#05070E]/90 text-[10px] font-mono text-[#FF6B35] border border-[#FF6B35]/30 rounded-[2px] tracking-widest whitespace-nowrap uppercase shadow-lg">
+              <span className="mt-2 px-2.5 py-0.5 bg-[#060A12]/90 text-[10px] font-mono text-[#FF6B35] border border-[#FF6B35]/30 rounded-[2px] tracking-widest whitespace-nowrap uppercase shadow-lg">
                 ACTIVE ZONE
               </span>
             </MotionDiv>
@@ -296,7 +296,7 @@ export const PodcastSection: React.FC = () => {
                   <span className="text-xs font-mono text-[#FF6B35] font-semibold tracking-wider">
                     01  The Signal
                   </span>
-                  <div className="text-sm sm:text-base font-sans font-semibold text-[#F8FAFC]">
+                  <div className="text-sm sm:text-base font-sans font-semibold text-[#F4F6F9]">
                     The Thesis &amp; Editorial Mission
                   </div>
                 </div>
@@ -308,7 +308,7 @@ export const PodcastSection: React.FC = () => {
                 onClick={() => setActiveZone('dialogues')}
                 onMouseEnter={() => setHoveredZone('dialogues')}
                 onMouseLeave={() => setHoveredZone(null)}
-                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer border-x border-[#F8FAFC]/10 group ${
+                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer border-x border-[#F4F6F9]/10 group ${
                   currentZone === 'dialogues' ? 'bg-[#82B7FF]/[0.04]' : 'hover:bg-white/[0.02]'
                 }`}
               >
@@ -316,7 +316,7 @@ export const PodcastSection: React.FC = () => {
                   <span className="text-xs font-mono text-[#82B7FF] font-semibold tracking-wider">
                     02  The Dialogues
                   </span>
-                  <div className="text-sm sm:text-base font-sans font-semibold text-[#F8FAFC]">
+                  <div className="text-sm sm:text-base font-sans font-semibold text-[#F4F6F9]">
                     Founder &amp; Executive Sessions
                   </div>
                 </div>
@@ -336,7 +336,7 @@ export const PodcastSection: React.FC = () => {
                   <span className="text-xs font-mono text-[#FF6B35] font-semibold tracking-wider">
                     03  The Architecture
                   </span>
-                  <div className="text-sm sm:text-base font-sans font-semibold text-[#F8FAFC]">
+                  <div className="text-sm sm:text-base font-sans font-semibold text-[#F4F6F9]">
                     Automated Discovery Pipeline
                   </div>
                 </div>
@@ -362,16 +362,16 @@ export const PodcastSection: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[#090D18] border border-[#F8FAFC]/10 rounded-[2px]"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[bg-transparent] border border-[#F4F6F9]/10 rounded-[2px]"
               >
                 <div className="lg:col-span-7 space-y-6">
                   <div className="text-xs font-mono text-[#FF6B35] uppercase tracking-widest">
                     FOUNDED &amp; HOSTED BY HARESH MURUGESAN · 8,000+ YOUTUBE VIEWS
                   </div>
-                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F8FAFC] leading-snug">
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F4F6F9] leading-snug">
                     Syntinuum: Where Frontier Intelligence Meets Human Implementation.
                   </h3>
-                  <p className="text-base text-[#738A9C] leading-relaxed">
+                  <p className="text-base text-[#7E8B9B] leading-relaxed">
                     Formerly <em>Adapt: Implementing Innovations</em>, Syntinuum was founded to interrogate the critical seam between theoretical computation and live operational fires. We dissect how artificial intelligence, cellular biology, and complex systems engineering translate from whitepapers into robust products that scale.
                   </p>
                   <div className="pt-2">
@@ -379,7 +379,7 @@ export const PodcastSection: React.FC = () => {
                       href="https://syntinuumpodcast.com"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 text-xs font-mono text-[#FF6B35] hover:text-[#F8FAFC] border-b border-[#FF6B35] pb-1 transition-colors uppercase font-semibold"
+                      className="inline-flex items-center gap-3 text-xs font-mono text-[#FF6B35] hover:text-[#F4F6F9] border-b border-[#FF6B35] pb-1 transition-colors uppercase font-semibold"
                     >
                       <span>Explore Full Show Archive On SyntinuumPodcast.com</span>
                       <span>↗</span>
@@ -387,25 +387,25 @@ export const PodcastSection: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="lg:col-span-5 bg-[#05070E] p-6 rounded-[2px] border border-[#F8FAFC]/10 space-y-4">
-                  <div className="text-xs font-mono text-[#82B7FF] uppercase tracking-wider pb-2 border-b border-[#F8FAFC]/10">
+                <div className="lg:col-span-5 bg-[#060A12] p-6 rounded-[2px] border border-[#F4F6F9]/10 space-y-4">
+                  <div className="text-xs font-mono text-[#82B7FF] uppercase tracking-wider pb-2 border-b border-[#F4F6F9]/10">
                     PUBLICATION METRICS
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-xs font-mono">
                     <div>
-                      <div className="text-[#738A9C]">YouTube Views:</div>
-                      <div className="text-lg font-bold text-[#F8FAFC]">8,000+</div>
+                      <div className="text-[#7E8B9B]">YouTube Views:</div>
+                      <div className="text-lg font-bold text-[#F4F6F9]">8,000+</div>
                     </div>
                     <div>
-                      <div className="text-[#738A9C]">Combined Impressions:</div>
+                      <div className="text-[#7E8B9B]">Combined Impressions:</div>
                       <div className="text-lg font-bold text-[#FF6B35]">100K+</div>
                     </div>
                     <div>
-                      <div className="text-[#738A9C]">Platforms:</div>
-                      <div className="text-[#F8FAFC]">Spotify, Apple, YT</div>
+                      <div className="text-[#7E8B9B]">Platforms:</div>
+                      <div className="text-[#F4F6F9]">Spotify, Apple, YT</div>
                     </div>
                     <div>
-                      <div className="text-[#738A9C]">Editorial Focus:</div>
+                      <div className="text-[#7E8B9B]">Editorial Focus:</div>
                       <div className="text-[#82B7FF]">Systems Tradeoffs</div>
                     </div>
                   </div>
@@ -425,10 +425,10 @@ export const PodcastSection: React.FC = () => {
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-serif text-[#F8FAFC]">
+                    <h3 className="text-xl sm:text-2xl font-serif text-[#F4F6F9]">
                       Unfiltered Conversations with Builders, Researchers &amp; Executives
                     </h3>
-                    <p className="text-xs font-mono text-[#738A9C]">
+                    <p className="text-xs font-mono text-[#7E8B9B]">
                       CLICK ANY RECORD TO LISTEN ON SYNTINUUMPODCAST.COM OR YOUTUBE
                     </p>
                   </div>
@@ -450,25 +450,25 @@ export const PodcastSection: React.FC = () => {
                       href={d.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-5 bg-[#090D18] hover:bg-[#10172A] border border-[#F8FAFC]/10 hover:border-[#82B7FF]/40 rounded-[2px] transition-all duration-200 group flex flex-col justify-between select-none"
+                      className="p-5 bg-[bg-transparent] hover:bg-[#10172A] border border-[#F4F6F9]/10 hover:border-[#82B7FF]/40 rounded-[2px] transition-all duration-200 group flex flex-col justify-between select-none"
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between text-xs font-mono">
                           <span className="text-[#82B7FF] font-semibold">{d.runtime}</span>
-                          <span className="text-[#738A9C] group-hover:text-[#F8FAFC] transition-colors">↗</span>
+                          <span className="text-[#7E8B9B] group-hover:text-[#F4F6F9] transition-colors">↗</span>
                         </div>
-                        <h4 className="text-base font-sans font-semibold text-[#F8FAFC] group-hover:text-[#FF6B35] transition-colors">
+                        <h4 className="text-base font-sans font-semibold text-[#F4F6F9] group-hover:text-[#FF6B35] transition-colors">
                           {d.guest}
                         </h4>
                         <div className="text-xs font-mono text-[#FF6B35]">
                           {d.role} · {d.org}
                         </div>
-                        <p className="text-xs font-sans text-[#738A9C] leading-relaxed line-clamp-3">
+                        <p className="text-xs font-sans text-[#7E8B9B] leading-relaxed line-clamp-3">
                           {d.focus}
                         </p>
                       </div>
 
-                      <div className="mt-4 pt-3 border-t border-[#F8FAFC]/[0.08] text-[10px] font-mono text-[#738A9C] flex items-center justify-between">
+                      <div className="mt-4 pt-3 border-t border-[#F4F6F9]/[0.08] text-[10px] font-mono text-[#7E8B9B] flex items-center justify-between">
                         <span>LISTEN EPISODE</span>
                         <span className="text-[#82B7FF]">syntinuumpodcast.com</span>
                       </div>
@@ -486,16 +486,16 @@ export const PodcastSection: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[#090D18] border border-[#F8FAFC]/10 rounded-[2px]"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[bg-transparent] border border-[#F4F6F9]/10 rounded-[2px]"
               >
                 <div className="lg:col-span-7 space-y-6">
                   <div className="text-xs font-mono text-[#FF6B35] uppercase tracking-widest">
                     SYSTEMS-ENGINEERED PRODUCTION WORKFLOW
                   </div>
-                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F8FAFC] leading-snug">
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F4F6F9] leading-snug">
                     Engineered Like a Software Product.
                   </h3>
-                  <p className="text-base text-[#738A9C] leading-relaxed">
+                  <p className="text-base text-[#7E8B9B] leading-relaxed">
                     Behind each episode runs a rigorous technical automation pipeline: a bespoke Python web-scraping and SMTP outreach engine for discoverability, coupled with custom audio-reactive transcription parsing and DaVinci Resolve 20 color-space managed post-production for crisp cinematic fidelity.
                   </p>
                   <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -503,7 +503,7 @@ export const PodcastSection: React.FC = () => {
                       href="https://syntinuumpodcast.com"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-3 bg-[#FF6B35] hover:bg-[#FF8547] text-[#05070E] font-mono text-xs font-semibold rounded-[2px] transition-colors"
+                      className="px-5 py-3 bg-[#FF6B35] hover:bg-[#FF8547] text-[#060A12] font-mono text-xs font-semibold rounded-[2px] transition-colors"
                     >
                       <span>Listen on SyntinuumPodcast.com ↗</span>
                     </a>
@@ -511,7 +511,7 @@ export const PodcastSection: React.FC = () => {
                       href="https://www.youtube.com/@syntinuum"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-3 bg-[#05070E] hover:bg-[#10172A] text-[#F8FAFC] border border-[#F8FAFC]/20 font-mono text-xs rounded-[2px] transition-colors"
+                      className="px-5 py-3 bg-[#060A12] hover:bg-[#10172A] text-[#F4F6F9] border border-[#F4F6F9]/20 font-mono text-xs rounded-[2px] transition-colors"
                     >
                       <span>Watch on YouTube ↗</span>
                     </a>
@@ -519,15 +519,15 @@ export const PodcastSection: React.FC = () => {
                 </div>
 
                 <div className="lg:col-span-5 space-y-3 font-mono text-xs">
-                  <div className="p-4 bg-[#05070E] rounded-[2px] border border-[#F8FAFC]/10">
+                  <div className="p-4 bg-[#060A12] rounded-[2px] border border-[#F4F6F9]/10">
                     <span className="text-[#82B7FF] block font-semibold mb-1">01. DISCOVERY ENGINE</span>
-                    <p className="text-[#738A9C] font-sans">
+                    <p className="text-[#7E8B9B] font-sans">
                       Python BeautifulSoup &amp; SMTP scraper identifying top arXiv authors, serial founders, and executive architects.
                     </p>
                   </div>
-                  <div className="p-4 bg-[#05070E] rounded-[2px] border border-[#F8FAFC]/10">
+                  <div className="p-4 bg-[#060A12] rounded-[2px] border border-[#F4F6F9]/10">
                     <span className="text-[#FF6B35] block font-semibold mb-1">02. AUDIO DSP &amp; DAVINCI 20</span>
-                    <p className="text-[#738A9C] font-sans">
+                    <p className="text-[#7E8B9B] font-sans">
                       Phase-coherent multiband gating, ITU-R BS.1770-4 loudness normalization, and DaVinci YRGB Color-Managed pipeline.
                     </p>
                   </div>

@@ -252,12 +252,13 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
       // High-Density Micro-Cell Monospace Grid: 6px x 8px on desktop, 8px x 10px on mobile
       const cellW = isMobile ? 8 : 6;
       const cellH = isMobile ? 10 : 8;
-      const scale = isMobile ? 0.58 : 1.0;
-      const bulbRadius = 175 * scale; // Macro scale: 350px diameter on desktop, ~203px on mobile
+      const scale = isMobile ? 0.62 : 1.0;
+      // 70% of viewport height diameter -> radius = h * 0.35
+      const bulbRadius = isMobile ? Math.min(w, h) * 0.28 : h * 0.35;
 
-      // Shifted Safe Focal Coordinate (x = 73% vw, y = 38% vh on desktop; 82%, 15% on mobile)
-      const targetX = isMobile ? w * 0.82 : w * 0.73;
-      const targetY = isMobile ? h * 0.15 : h * 0.38;
+      // Positioned at cx = 71% vw, cy = 38% vh on desktop
+      const targetX = isMobile ? w * 0.80 : w * 0.71;
+      const targetY = isMobile ? h * 0.18 : h * 0.38;
 
       // Ballistic Launch Progress
       const elapsed = (now - launchStartTimeRef.current) * 0.001;
@@ -725,7 +726,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
 
         // Diamond marker (6px total size, r = 3px)
         const dSize = 3;
-        ctx.fillStyle = mouse.active ? '#FF6B35' : 'rgba(130, 183, 255, 0.6)';
+        ctx.fillStyle = mouse.active ? '#FF2800' : 'rgba(130, 183, 255, 0.6)';
         ctx.beginPath();
         ctx.moveTo(rulerX, currentRulerY - dSize);
         ctx.lineTo(rulerX + dSize, currentRulerY);
@@ -1019,7 +1020,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
 
                   if (perturbation > 0.08) {
                     char = RAMP_DNA_BASES[safeMod(animTime * 15 + px + py, 4)];
-                    color = '#F5D998';
+                    color = '#E2E8F0';
                   } else if (isMachDiamond && Math.abs(rawV) < 16 * scale) {
                     // Standing Mach Shock Diamond (Blazing White-Gold)
                     char = '@';
@@ -1028,7 +1029,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
                     // Near-Nozzle Core
                     const coreIdx = Math.floor((1 - intensity) * (RAMP_EXHAUST.length - 1));
                     char = RAMP_EXHAUST[Math.max(0, Math.min(RAMP_EXHAUST.length - 1, coreIdx))];
-                    color = intensity > 0.65 ? '#F5D998' : '#FF6B35';
+                    color = intensity > 0.65 ? '#E2E8F0' : '#FF2800';
                   } else if (exhaustDist < 210 * scale) {
                     // Mid Stream
                     const midIdx = Math.floor((1 - intensity) * (RAMP_EXHAUST.length - 1));
@@ -1067,7 +1068,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
             if (Math.abs(u) <= 0.28) {
               const isCollar = v > -1.00;
               const char = isCollar ? '#' : '@';
-              const color = isCollar ? '#1E293B' : (u < 0 ? '#FFFFFF' : '#FF6B35');
+              const color = isCollar ? '#1E293B' : (u < 0 ? '#FFFFFF' : '#FF2800');
               ctx.fillStyle = color;
               ctx.fillText(char, px, py);
               continue;
@@ -1125,13 +1126,13 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
                 if (z > 0) {
                   // Foreground Backbone (z > 0): Blazing white-gold (#FFFFFF / #F5D998, alpha 0.98)
                   const char = distToBackbone < 0.035 ? '@' : (distToBackbone < 0.065 ? '#' : '$');
-                  const color = z > 0.5 ? '#FFFFFF' : '#F5D998';
+                  const color = z > 0.5 ? '#FFFFFF' : '#E2E8F0';
                   ctx.fillStyle = color;
                   ctx.fillText(char, px, py);
                 } else {
                   // Background Backbone (z <= 0): Deep incandescent orange (#FF6B35, alpha 0.82)
                   const char = distToBackbone < 0.035 ? '%' : (distToBackbone < 0.065 ? '*' : '+');
-                  ctx.fillStyle = '#FF6B35';
+                  ctx.fillStyle = '#FF2800';
                   ctx.fillText(char, px, py);
                 }
                 drewFilament = true;
@@ -1152,24 +1153,24 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
                 const pairType = safeMod(rungIdx, 4);
 
                 let rungChar = '═';
-                let rungColor = '#82B7FF';
+                let rungColor = '#2563EB';
 
                 if (rungT > 0.36 && rungT < 0.64) {
                   // Electric cyan central hydrogen bond
                   rungChar = pairType % 2 === 0 ? '═' : '≡';
-                  rungColor = '#82B7FF';
+                  rungColor = '#2563EB';
                 } else if (rungT <= 0.36) {
                   // Left nucleotide base (warm gold near strand)
-                  if (pairType === 0) { rungChar = 'A'; rungColor = '#F5D998'; }
-                  else if (pairType === 1) { rungChar = 'C'; rungColor = '#F5D998'; }
-                  else if (pairType === 2) { rungChar = 'T'; rungColor = '#82B7FF'; }
-                  else { rungChar = 'G'; rungColor = '#82B7FF'; }
+                  if (pairType === 0) { rungChar = 'A'; rungColor = '#E2E8F0'; }
+                  else if (pairType === 1) { rungChar = 'C'; rungColor = '#E2E8F0'; }
+                  else if (pairType === 2) { rungChar = 'T'; rungColor = '#2563EB'; }
+                  else { rungChar = 'G'; rungColor = '#2563EB'; }
                 } else {
                   // Right nucleotide base
-                  if (pairType === 0) { rungChar = 'T'; rungColor = '#82B7FF'; }
-                  else if (pairType === 1) { rungChar = 'G'; rungColor = '#82B7FF'; }
-                  else if (pairType === 2) { rungChar = 'A'; rungColor = '#F5D998'; }
-                  else { rungChar = 'C'; rungColor = '#F5D998'; }
+                  if (pairType === 0) { rungChar = 'T'; rungColor = '#2563EB'; }
+                  else if (pairType === 1) { rungChar = 'G'; rungColor = '#2563EB'; }
+                  else if (pairType === 2) { rungChar = 'A'; rungColor = '#E2E8F0'; }
+                  else { rungChar = 'C'; rungColor = '#E2E8F0'; }
                 }
 
                 ctx.fillStyle = rungColor;

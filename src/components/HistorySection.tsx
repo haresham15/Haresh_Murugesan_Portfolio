@@ -134,27 +134,27 @@ export const HistorySection: React.FC = () => {
       carbonType="forged"
       carbonOpacity={0.28}
       aria-label="Trajectory and formative curvy milestones"
-      className="border-b border-[#F4F1EA]/10 flex flex-col justify-between py-24 lg:py-36"
+      className="border-b border-[#F4F6F9]/10 flex flex-col justify-between py-24 lg:py-36"
     >
       <div ref={containerRef} className="w-full relative my-auto space-y-12 sm:space-y-16">
         
         {/* Section Intro */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4 max-w-2xl">
-            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#E85D04]">
-              <span className="w-6 h-px bg-[#E85D04]" />
+            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800]">
+              <span className="w-6 h-px bg-[#FF2800]" />
               <span>05  Trajectory &amp; Curvilinear Milestones</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F1EA] leading-tight tracking-tight">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
               Trajectory &amp; Curvy Milestones
             </h2>
-            <p className="text-base sm:text-lg font-sans text-[#8E8D94] leading-relaxed">
+            <p className="text-base sm:text-lg font-sans text-[#7E8B9B] leading-relaxed">
               A winding, non-linear progression of technical breakthroughs, collegiate leadership, and competitive hackathon victories.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-mono text-[#8E8D94] shrink-0">
-            <span className="px-3 py-1.5 bg-[#0C0F17] border border-[#E85D04]/30 rounded-[2px] text-[#F4A261]">
+          <div className="flex items-center gap-3 text-xs font-mono text-[#7E8B9B] shrink-0">
+            <span className="px-3 py-1.5 bg-[#060A12] border border-[#FF2800]/30 rounded-[2px] text-[#C8D2E0]">
               ● 5-YEAR CHRONOLOGICAL EXPANSION
             </span>
           </div>
@@ -173,8 +173,8 @@ export const HistorySection: React.FC = () => {
           >
             <defs>
               <linearGradient id="curvySpineGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#E85D04" stopOpacity="0.85" />
-                <stop offset="30%" stopColor="#F4A261" stopOpacity="0.95" />
+                <stop offset="0%" stopColor="#FF2800" stopOpacity="0.85" />
+                <stop offset="30%" stopColor="#C8D2E0" stopOpacity="0.95" />
                 <stop offset="60%" stopColor="#38BDF8" stopOpacity="0.85" />
                 <stop offset="85%" stopColor="#10B981" stopOpacity="0.95" />
                 <stop offset="100%" stopColor="#FFB86C" stopOpacity="1" />
@@ -204,9 +204,9 @@ export const HistorySection: React.FC = () => {
               { x: 1120, y: 1740, angle: 25 },
             ].map((rib, idx) => (
               <g key={idx} transform={`translate(${rib.x}, ${rib.y}) rotate(${rib.angle})`}>
-                <line x1="-35" y1="0" x2="35" y2="0" stroke="#E85D04" strokeWidth="2" strokeDasharray="3 3" opacity="0.6" />
-                <circle cx="0" cy="0" r="14" fill="#060608" stroke="#F4A261" strokeWidth="1.5" />
-                <circle cx="0" cy="0" r="4" fill="#E85D04" />
+                <line x1="-35" y1="0" x2="35" y2="0" stroke="#FF2800" strokeWidth="2" strokeDasharray="3 3" opacity="0.6" />
+                <circle cx="0" cy="0" r="14" fill="#03050A" stroke="#C8D2E0" strokeWidth="1.5" />
+                <circle cx="0" cy="0" r="4" fill="#FF2800" />
               </g>
             ))}
 
@@ -225,7 +225,7 @@ export const HistorySection: React.FC = () => {
               cx={beadPos.x}
               cy={beadPos.y}
               r="12"
-              fill="#E85D04"
+              fill="#FF2800"
               className="animate-ping"
               opacity="0.65"
             />
@@ -233,8 +233,8 @@ export const HistorySection: React.FC = () => {
               cx={beadPos.x}
               cy={beadPos.y}
               r="7"
-              fill="#F4F1EA"
-              stroke="#E85D04"
+              fill="#F4F6F9"
+              stroke="#FF2800"
               strokeWidth="3"
             />
           </svg>
@@ -261,40 +261,40 @@ export const HistorySection: React.FC = () => {
                     transition={{ duration: 0.45 }}
                     className={`w-full max-w-xl p-6 sm:p-8 lg:p-10 rounded-[2px] border transition-all duration-300 shadow-2xl cursor-pointer select-none ${
                       isSelected
-                        ? 'bg-[#0E131F] border-[#E85D04] shadow-[0_12px_45px_rgba(232,93,4,0.22)]'
-                        : 'bg-[#0C0F17]/95 border-[#F4F1EA]/10 hover:border-[#E85D04]/40'
+                        ? 'bg-[#060A12] border-[#FF2800] shadow-[0_12px_45px_rgba(232,93,4,0.22)]'
+                        : 'bg-[#060A12]/95 border-[#F4F6F9]/10 hover:border-[#FF2800]/40'
                     }`}
                   >
                     {/* Header */}
-                    <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#F4F1EA]/10 text-xs font-mono">
+                    <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#F4F6F9]/10 text-xs font-mono">
                       <div className="flex items-center gap-3">
-                        <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-[#FF6B35] animate-pulse' : 'bg-[#8E8D94]'}`} />
+                        <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-[#FF6B35] animate-pulse' : 'bg-[#7E8B9B]'}`} />
                         <span className="font-serif text-3xl sm:text-4xl text-[#FF6B35] font-normal leading-none">
                           {m.year}
                         </span>
                       </div>
-                      <span className="text-[#F4A261] font-medium tracking-wider">
+                      <span className="text-[#C8D2E0] font-medium tracking-wider">
                         {m.phase}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl sm:text-2xl font-sans font-bold text-[#F4F1EA] mb-3">
+                    <h3 className="text-xl sm:text-2xl font-sans font-bold text-[#F4F6F9] mb-3">
                       {m.title}
                     </h3>
 
                     {/* Reflection */}
-                    <p className="text-sm sm:text-base font-sans text-[#8E8D94] leading-relaxed mb-6">
+                    <p className="text-sm sm:text-base font-sans text-[#7E8B9B] leading-relaxed mb-6">
                       {m.reflection}
                     </p>
 
                     {/* Bottom Specs */}
-                    <div className="pt-4 border-t border-[#F4F1EA]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+                    <div className="pt-4 border-t border-[#F4F6F9]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
                       <span className="text-[#64748B]">{m.detail}</span>
                       {m.link && (
                         <Link
                           href={m.link}
-                          className="text-[#E85D04] hover:text-[#F4A261] transition-colors inline-flex items-center gap-1 font-semibold uppercase"
+                          className="text-[#FF2800] hover:text-[#C8D2E0] transition-colors inline-flex items-center gap-1 font-semibold uppercase"
                         >
                           <span>Explore System Link</span>
                           <span>→</span>

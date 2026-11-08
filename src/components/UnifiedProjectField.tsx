@@ -109,24 +109,24 @@ export const UnifiedProjectField: React.FC = () => {
       id="projects"
       theme="obsidian"
       aria-label="Selected Works & Architectural Systems Exhibition"
-      className="border-b border-[#A7B2C3]/10"
+      className="border-b border-[#7E8B9B]/10"
     >
       <div className="w-full max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 space-y-24">
         {/* Section Gutter Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-[#A7B2C3]/10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-[#7E8B9B]/10">
           <div className="space-y-3">
-            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF6B35]">
-              <span className="w-6 h-px bg-[#FF6B35]" />
+            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800]">
+              <span className="w-6 h-px bg-[#FF2800]" />
               <span>02  Selected Works &amp; Systems Architecture</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif text-[#F3EFE7] leading-tight">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif text-[#F4F6F9] leading-tight">
               Selected Works
             </h2>
           </div>
-          <div className="flex items-center gap-4 text-xs font-mono text-[#A7B2C3]">
+          <div className="flex items-center gap-4 text-xs font-mono text-[#7E8B9B]">
             <Link
               href="/archive"
-              className="px-4 py-2.5 bg-[#101B30] hover:bg-[#FF6B35] hover:text-[#070B12] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] transition-colors flex items-center gap-2"
+              className="px-4 py-2.5 bg-[#101B30] hover:bg-[#FF2800] hover:text-[#070B12] text-[#F4F6F9] border border-[#F4F6F9]/15 rounded-[2px] transition-colors flex items-center gap-2"
             >
               <span>Explore All 18 Systems [Archive Graph]</span>
               <span>→</span>
@@ -135,7 +135,7 @@ export const UnifiedProjectField: React.FC = () => {
         </div>
 
         {/* 12-Column Architectural Exhibition Stages (01–04) */}
-        <div className="space-y-24 divide-y divide-[#A7B2C3]/10">
+        <div className="space-y-24 divide-y divide-[#7E8B9B]/10">
           {EXHIBITION_PROJECTS.map((project, idx) => (
             <section
               key={project.index}
@@ -149,37 +149,37 @@ export const UnifiedProjectField: React.FC = () => {
                 {/* Header Row: 44px Serif Index Numeral + Monospace Domain */}
                 <div className="space-y-3">
                   <div className="flex items-baseline gap-4">
-                    <span className="font-serif text-[44px] leading-none text-[#FF6B35] font-normal">
+                    <span className="font-serif text-[44px] leading-none text-[#FF2800] font-normal">
                       {project.index}
                     </span>
-                    <span className="text-[11px] font-mono tracking-widest text-[#F5D998] uppercase font-semibold">
+                    <span className="text-[11px] font-mono tracking-widest text-[#C8D2E0] uppercase font-semibold">
                       {project.domain}
                     </span>
                   </div>
 
                   {/* Title & Italic Thesis */}
                   <div className="space-y-2">
-                    <h3 className="text-3xl sm:text-[40px] font-serif text-[#F3EFE7] leading-tight tracking-tight">
+                    <h3 className="text-3xl sm:text-[40px] font-serif text-[#F4F6F9] leading-tight tracking-tight">
                       {project.title}
                     </h3>
-                    <p className="text-[19px] font-serif italic text-[#F5D998] leading-snug">
+                    <p className="text-[19px] font-serif italic text-[#C8D2E0] leading-snug">
                       {project.thesis}
                     </p>
                   </div>
                 </div>
 
                 {/* Single Concise Prose Paragraph */}
-                <p className="text-[16px] font-sans text-[#A7B2C3] leading-[1.7]">
+                <p className="text-[16px] font-sans text-[#7E8B9B] leading-[1.7]">
                   {project.paragraph}
                 </p>
 
                 {/* 2-Column Architectural Metric Grid */}
-                <div className="grid grid-cols-2 gap-4 py-4 border-y border-[#A7B2C3]/15">
+                <div className="grid grid-cols-2 gap-4 py-4 border-y border-[#7E8B9B]/15">
                   <div className="space-y-1">
-                    <div className="font-mono text-xl sm:text-2xl font-bold text-[#F3EFE7]">
+                    <div className="font-mono text-xl sm:text-2xl font-bold text-[#F4F6F9]">
                       {project.metric1.value}
                     </div>
-                    <div className="text-[11px] font-mono text-[#A7B2C3] uppercase tracking-wider">
+                    <div className="text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider">
                       {project.metric1.label}
                     </div>
                   </div>
@@ -187,7 +187,7 @@ export const UnifiedProjectField: React.FC = () => {
                     <div className="font-mono text-xl sm:text-2xl font-bold text-[#4CC38A]">
                       {project.metric2.value}
                     </div>
-                    <div className="text-[11px] font-mono text-[#A7B2C3] uppercase tracking-wider">
+                    <div className="text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider">
                       {project.metric2.label}
                     </div>
                   </div>
@@ -195,14 +195,14 @@ export const UnifiedProjectField: React.FC = () => {
 
                 {/* Tech Stack & Identical CTA Buttons */}
                 <div className="space-y-4 pt-2">
-                  <div className="text-xs font-mono text-[#82B7FF] tracking-wide">
+                  <div className="text-xs font-mono text-[#2563EB] tracking-wide">
                     {project.stack}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
                     <Link
                       href={`/projects/${project.slug}`}
-                      className="px-6 py-3.5 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-semibold rounded-[2px] transition-colors inline-flex items-center gap-2 select-none"
+                      className="px-6 py-3.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#070B12] font-semibold rounded-[2px] transition-colors inline-flex items-center gap-2 select-none"
                     >
                       <span>Read Case Study</span>
                       <span>→</span>
@@ -211,7 +211,7 @@ export const UnifiedProjectField: React.FC = () => {
                       href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-3.5 bg-[#101B30] hover:bg-[#17243A] text-[#F3EFE7] border border-[#F3EFE7]/15 rounded-[2px] transition-colors inline-flex items-center gap-2 select-none"
+                      className="px-5 py-3.5 bg-[#101B30] hover:bg-[#17243A] text-[#F4F6F9] border border-[#F4F6F9]/15 rounded-[2px] transition-colors inline-flex items-center gap-2 select-none"
                     >
                       <span>Source Code</span>
                       <span>↗</span>
@@ -221,7 +221,7 @@ export const UnifiedProjectField: React.FC = () => {
               </div>
 
               {/* 3.2 RIGHT 7 COLUMNS: High-Craft Open Blueprint Stage */}
-              <div className="lg:col-span-7 relative flex flex-col min-h-[460px] bg-[#070B12] border border-[#82B7FF]/20 p-5 sm:p-7 shadow-2xl">
+              <div className="lg:col-span-7 relative flex flex-col min-h-[460px] p-2 sm:p-4 bg-transparent">
                 {/* 32px Technical Blueprint Grid Background */}
                 <div
                   className="absolute inset-0 pointer-events-none"
@@ -233,15 +233,15 @@ export const UnifiedProjectField: React.FC = () => {
                   aria-hidden="true"
                 />
 
-                {/* 4 Corner L-Shaped Registration Brackets (12px x 12px, 1px solid #82B7FF) */}
+                {/* 4 Corner L-Shaped Registration Brackets (12px x 12px, 1px solid #2563EB) */}
                 {/* Top-Left Bracket */}
-                <div className="absolute top-0 left-0 w-3 h-3 pointer-events-none border-t border-l border-[#82B7FF]" />
+                <div className="absolute top-0 left-0 w-3 h-3 pointer-events-none border-t border-l border-[#2563EB]" />
                 {/* Top-Right Bracket */}
-                <div className="absolute top-0 right-0 w-3 h-3 pointer-events-none border-t border-r border-[#82B7FF]" />
+                <div className="absolute top-0 right-0 w-3 h-3 pointer-events-none border-t border-r border-[#2563EB]" />
                 {/* Bottom-Left Bracket */}
-                <div className="absolute bottom-0 left-0 w-3 h-3 pointer-events-none border-b border-l border-[#82B7FF]" />
+                <div className="absolute bottom-0 left-0 w-3 h-3 pointer-events-none border-b border-l border-[#2563EB]" />
                 {/* Bottom-Right Bracket */}
-                <div className="absolute bottom-0 right-0 w-3 h-3 pointer-events-none border-b border-r border-[#82B7FF]" />
+                <div className="absolute bottom-0 right-0 w-3 h-3 pointer-events-none border-b border-r border-[#2563EB]" />
 
                 {/* Interactive Blueprint Stage Content */}
                 <div className="relative z-10 flex-1 flex flex-col">
@@ -253,18 +253,18 @@ export const UnifiedProjectField: React.FC = () => {
         </div>
 
         {/* Closing Architecture Prompt to Full Archive */}
-        <div className="p-8 bg-[#090D18] border border-[#A7B2C3]/15 rounded-[2px] flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="pt-12 pb-6 border-t border-[#18458B]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1.5">
-            <h4 className="text-xl font-serif text-[#F3EFE7]">
+            <h4 className="text-xl font-serif text-[#F4F6F9]">
               18 Engineered Systems in Archive
             </h4>
-            <p className="text-xs font-mono text-[#A7B2C3]">
+            <p className="text-xs font-mono text-[#7E8B9B]">
               Deterministic polar constellation, call graphs, benchmarks, and architectural dossiers.
             </p>
           </div>
           <Link
             href="/archive"
-            className="px-6 py-3 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-mono text-xs font-semibold rounded-[2px] transition-colors shrink-0 inline-flex items-center gap-2"
+            className="px-6 py-3 bg-[#FF2800] hover:bg-[#FF4419] text-[#070B12] font-mono text-xs font-semibold rounded-[2px] transition-colors shrink-0 inline-flex items-center gap-2"
           >
             <span>Open Systems Graph Studio</span>
             <span>→</span>

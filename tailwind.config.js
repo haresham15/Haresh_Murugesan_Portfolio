@@ -16,61 +16,73 @@ module.exports = {
         mono: ['"Geist Mono"', '"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       colors: {
+        // V3.0 Computational & Motorsport Color Palette
+        'bg-midnight': '#03050A',
+        'bg-obsidian': '#060A12',
+        'cobalt-deep': '#0B1E40',
+        'cobalt-bright': '#18458B',
+        'cobalt-electric': '#2563EB',
+        'accent-red-orange': '#FF2800',
+        'accent-crimson-glow': '#FF4419',
+        'metal-silver': '#C8D2E0',
+        'metal-titanium': '#7E8B9B',
+        'text-alabaster': '#F4F6F9',
+
         // Master Editorial V2 Color Palette
-        'deep-bg': '#070B12',
-        'navy-surface': '#101B30',
-        'elevated-surface': '#17243A',
-        'editorial-ivory': '#F3EFE7',
-        'editorial-muted': '#A7B2C3',
-        'accent-orange': '#FF6B35',
-        'warm-highlight': '#F5D998',
-        'technical-blue': '#82B7FF',
+        'deep-bg': '#03050A',
+        'navy-surface': '#060A12',
+        'elevated-surface': '#0B1E40',
+        'editorial-ivory': '#F4F6F9',
+        'editorial-muted': '#C8D2E0',
+        'accent-orange': '#FF2800',
+        'warm-highlight': '#C8D2E0',
+        'technical-blue': '#18458B',
 
         // Master 85 / 12 / 3 Color Palette & Backward Compatibility
-        canvas: '#070B12', // Deep Obsidian
-        surface: '#101B30', // Midnight Chassis Blue
-        raised: '#17243A', // Prussian Slate
-        prussian: '#132440',
-        'cobalt-slate': '#162B4C',
-        'deep-blue': '#101B30',
-        'chassis-blue': '#101B30',
-        'prussian-slate': '#17243A',
+        canvas: '#03050A',
+        surface: '#060A12',
+        raised: '#0B1E40',
+        prussian: '#0B1E40',
+        'cobalt-slate': '#0B1E40',
+        'deep-blue': '#060A12',
+        'chassis-blue': '#060A12',
+        'prussian-slate': '#0B1E40',
         'indigo-crimson': '#1E1633',
         'crimson-trough': '#5C191B',
         
-        // 3-Stop Self-Illuminated Orange
-        'thermal-halo': '#C8321E', // Outer Thermal Halo
-        'slipstream-orange': '#FF6B35', // Core Body
-        'specular-crest': '#FFB86C', // Hot Crest
-        'hot-core': '#FFE9AE', // Hot Specular Pinpoint
-        accent: '#FF6B35',
-        amber: '#FF6B35',
-        gold: '#F5D998',
+        // 3-Stop Self-Illuminated Red-Orange
+        'thermal-halo': '#FF4419',
+        'slipstream-orange': '#FF2800',
+        'specular-crest': '#FFB86C',
+        'hot-core': '#FFE9AE',
+        accent: '#FF2800',
+        amber: '#FF2800',
+        gold: '#C8D2E0',
         
         // Atmospheric blues & ivories
-        prism: '#82B7FF',
-        'prism-light': '#82B7FF',
-        ivory: '#F3EFE7',
-        'text-primary': '#F3EFE7',
-        'text-secondary': '#A7B2C3',
-        'text-muted': '#7A889B',
+        prism: '#2563EB',
+        'prism-light': '#18458B',
+        ivory: '#F4F6F9',
+        'text-primary': '#F4F6F9',
+        'text-secondary': '#C8D2E0',
+        'text-muted': '#7E8B9B',
 
         // Token mappings & backward compatibility
-        'brand-blue': '#82B7FF',
-        'link-blue': '#82B7FF',
-        'brand-orange': '#FF6B35',
-        'page-base': '#070B12',
-        'charcoal': '#070B12',
-        'surface-raised': '#17243A',
-        'surface-subtle': '#101B30',
-        'primary-ink': '#F3EFE7',
-        'muted-ink': '#A7B2C3',
-        'light-gray': '#F3EFE7',
-        'glass-border': 'rgba(243, 239, 231, 0.08)',
-        'glass-bg': 'rgba(16, 27, 48, 0.85)',
+        'brand-blue': '#18458B',
+        'link-blue': '#2563EB',
+        'brand-orange': '#FF2800',
+        'page-base': '#03050A',
+        'charcoal': '#03050A',
+        'surface-raised': '#0B1E40',
+        'surface-subtle': '#060A12',
+        'primary-ink': '#F4F6F9',
+        'muted-ink': '#C8D2E0',
+        'light-gray': '#F4F6F9',
+        'glass-border': 'rgba(200, 210, 224, 0.08)',
+        'glass-bg': 'rgba(6, 10, 18, 0.85)',
 
         'signal-emerald': '#4CC38A',
-        'signal-rose': '#E5484D',
+        'signal-rose': '#FF2800',
       },
       spacing: {
         'space-1': '8px',
