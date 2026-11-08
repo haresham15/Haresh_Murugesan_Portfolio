@@ -33,10 +33,10 @@ export default function Header() {
 
   // Primary destinations
   const primaryLinks = [
-    { label: 'Work', href: '/#projects', note: 'Interactive Rupin-inspired Force Graph & Project Field' },
-    { label: 'Experience', href: '/#experience', note: 'Winding S-Curve Chicane Timeline' },
-    { label: 'About', href: '/#about', note: 'Asymmetric Portrait Stage & Engineering Thesis' },
-    { label: 'Syntinuum', href: '/#podcast', note: 'Full-Bleed Waveform & DNA Selector' },
+    { label: 'Work', href: '/#projects', note: 'Deterministic Systems CodeGraph & Architecture' },
+    { label: 'Experience', href: '/#experience', note: 'Top-to-Bottom Grand Prix Circuit' },
+    { label: 'About', href: '/#about', note: 'Engineering Thesis & Academic Research' },
+    { label: 'Syntinuum', href: '/#podcast', note: 'Waveform Studio & Research Synthesis' },
     { label: 'Recognition', href: '/#achievements', note: '3D Medallion Awards Carousel' },
   ];
 
@@ -79,14 +79,14 @@ export default function Header() {
           <Link
             href="/"
             aria-label="Haresh Murugesan — Home"
-            className="pointer-events-auto flex items-center gap-3 group focus-visible:outline-2 focus-visible:outline-[#FF6B35] select-none transition-transform duration-150 active:scale-95"
+            className="pointer-events-auto flex items-center gap-3 group focus-visible:outline-2 focus-visible:outline-[#FF2800] select-none transition-transform duration-150 active:scale-95"
           >
             {/* Initials Logo Badge */}
             <span
               className={`w-8 h-8 sm:w-9 sm:h-9 border rounded-[2px] flex items-center justify-center font-raleway text-xs sm:text-sm font-bold transition-all duration-300 shrink-0 shadow-[0_2px_12px_rgba(0,0,0,0.35)] ${
                 isLight
-                  ? 'bg-[#0B0B0E] text-[#F5F3EF] border-[#0B0B0E]/30 group-hover:border-[#C83E2B]'
-                  : 'bg-[#101B30] text-[#F3EFE7] border-[#F3EFE7]/20 group-hover:border-[#FF6B35] group-hover:text-[#FF6B35]'
+                  ? 'bg-[#0B0B0E] text-[#F4F6F9] border-[#0B0B0E]/30 group-hover:border-[#FF2800]'
+                  : 'bg-[#060A12] text-[#F4F6F9] border-[#18458B]/30 group-hover:border-[#FF2800] group-hover:text-[#FF2800]'
               }`}
             >
               HM
@@ -96,8 +96,8 @@ export default function Header() {
             <span
               className={`font-raleway font-semibold text-[15px] sm:text-[16px] tracking-tight transition-colors duration-300 whitespace-nowrap drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] ${
                 isLight
-                  ? 'text-[#0B0B0E] group-hover:text-[#C83E2B]'
-                  : 'text-[#F3EFE7] group-hover:text-[#FF6B35]'
+                  ? 'text-[#0B0B0E] group-hover:text-[#FF2800]'
+                  : 'text-[#F4F6F9] group-hover:text-[#FF2800]'
               }`}
             >
               Haresh Murugesan
@@ -112,7 +112,7 @@ export default function Header() {
             />
 
             {/* Precision Architectural Tooltip */}
-            <span className="absolute right-0 top-full mt-2.5 px-2 py-1 bg-[#070B12]/95 border border-[#F3EFE7]/15 text-[10px] font-mono uppercase tracking-widest text-[#F3EFE7] opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap shadow-xl rounded-[2px] translate-y-1 group-hover:translate-y-0">
+            <span className="absolute right-0 top-full mt-2.5 px-2 py-1 bg-[#060A12]/95 border border-[#18458B]/30 text-[10px] font-mono uppercase tracking-widest text-[#F4F6F9] opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap shadow-xl rounded-[2px] translate-y-1 group-hover:translate-y-0">
               {navOpen ? 'CLOSE' : 'INDEX'}
             </span>
           </div>
@@ -137,13 +137,13 @@ export default function Header() {
           {/* Backdrop Tint & Blur */}
           <div
             onClick={() => setNavOpen(false)}
-            className="absolute inset-0 bg-[#070B12]/96 backdrop-blur-xl transition-opacity duration-300 cursor-pointer"
+            className="absolute inset-0 bg-[#03050A]/96 backdrop-blur-xl transition-opacity duration-300 cursor-pointer"
           />
 
           {/* Diagonal Subtle Hairline Background Elements */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20">
-            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-[#F3EFE7]/40 to-transparent top-1/4 -rotate-12 transform origin-left" />
-            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-[#FF6B35]/40 to-transparent bottom-1/3 -rotate-12 transform origin-right" />
+            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-[#C8D2E0]/40 to-transparent top-1/4 -rotate-12 transform origin-left" />
+            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-[#FF2800]/40 to-transparent bottom-1/3 -rotate-12 transform origin-right" />
           </div>
 
           {/* Content Container */}
@@ -154,8 +154,8 @@ export default function Header() {
               
               {/* Left Column: Primary Monumental Links (Span 7) */}
               <div className="lg:col-span-7 space-y-4 sm:space-y-5">
-                <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF6B35] mb-3">
-                  <span className="w-2.5 h-px bg-[#FF6B35]" />
+                <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF2800] mb-3">
+                  <span className="w-2.5 h-px bg-[#FF2800]" />
                   <span>PRIMARY DESTINATIONS</span>
                 </div>
 
@@ -167,10 +167,10 @@ export default function Header() {
                         onClick={() => handleLinkClick(item.href)}
                         className="inline-flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 transition-transform duration-300 group-hover:translate-x-2"
                       >
-                        <span className="font-raleway font-bold text-[2rem] sm:text-[3rem] md:text-[3.5rem] text-[#F3EFE7] group-hover:text-[#F5D998] leading-none transition-colors tracking-tight">
+                        <span className="font-raleway font-bold text-[2rem] sm:text-[3rem] md:text-[3.5rem] text-[#F4F6F9] group-hover:text-[#C8D2E0] leading-none transition-colors tracking-tight">
                           {item.label}
                         </span>
-                        <span className="text-xs sm:text-sm font-mono text-[#7A889B] group-hover:text-[#A7B2C3] transition-colors">
+                        <span className="text-xs sm:text-sm font-mono text-[#7E8B9B] group-hover:text-[#C8D2E0] transition-colors">
                           / {item.note}
                         </span>
                       </Link>
@@ -180,9 +180,9 @@ export default function Header() {
               </div>
 
               {/* Right Column: Architectural Secondary Index (Span 5) */}
-              <div className="lg:col-span-5 bg-[#101B30]/50 border border-[#F3EFE7]/[0.08] p-6 sm:p-7 space-y-5 rounded-[2px] backdrop-blur-md">
-                <div className="flex items-center justify-between text-xs font-mono tracking-wider text-[#A7B2C3] uppercase pb-2.5 border-b border-[#F3EFE7]/[0.08]">
-                  <span className="text-[#F5D998]">SECTIONS &amp; ARCHITECTURAL INDEX</span>
+              <div className="lg:col-span-5 bg-[#060A12]/80 border border-[#18458B]/25 p-6 sm:p-7 space-y-5 rounded-[2px] backdrop-blur-md">
+                <div className="flex items-center justify-between text-xs font-mono tracking-wider text-[#7E8B9B] uppercase pb-2.5 border-b border-[#18458B]/20">
+                  <span className="text-[#C8D2E0]">SECTIONS &amp; ARCHITECTURAL INDEX</span>
                   <span>(08 RECORDS)</span>
                 </div>
 
@@ -196,13 +196,13 @@ export default function Header() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={() => setNavOpen(false)}
-                          className="flex items-center justify-between py-2 px-3 text-xs font-mono text-[#A7B2C3] hover:text-[#F3EFE7] hover:bg-[#101B30] border-b border-[#F3EFE7]/[0.04] transition-colors group rounded-[2px]"
+                          className="flex items-center justify-between py-2 px-3 text-xs font-mono text-[#7E8B9B] hover:text-[#F4F6F9] hover:bg-[#0B1E40]/30 border-b border-[#18458B]/10 transition-colors group rounded-[2px]"
                         >
                           <span className="flex items-center gap-3">
-                            <span className="text-[#FF6B35]">{item.num}</span>
-                            <span className="font-medium text-[#F3EFE7]">{item.label}</span>
+                            <span className="text-[#FF2800]">{item.num}</span>
+                            <span className="font-medium text-[#F4F6F9]">{item.label}</span>
                           </span>
-                          <span className="text-xs text-[#F5D998] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                          <span className="text-xs text-[#C8D2E0] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
                             ↗
                           </span>
                         </a>
@@ -214,13 +214,13 @@ export default function Header() {
                         key={item.label}
                         href={item.href}
                         onClick={() => handleLinkClick(item.href)}
-                        className="flex items-center justify-between py-2 px-3 text-xs font-mono text-[#A7B2C3] hover:text-[#F3EFE7] hover:bg-[#101B30] border-b border-[#F3EFE7]/[0.04] transition-colors group rounded-[2px]"
+                        className="flex items-center justify-between py-2 px-3 text-xs font-mono text-[#7E8B9B] hover:text-[#F4F6F9] hover:bg-[#0B1E40]/30 border-b border-[#18458B]/10 transition-colors group rounded-[2px]"
                       >
                         <span className="flex items-center gap-3">
-                          <span className="text-[#FF6B35]">{item.num}</span>
-                          <span className="font-medium text-[#F3EFE7]">{item.label}</span>
+                          <span className="text-[#FF2800]">{item.num}</span>
+                          <span className="font-medium text-[#F4F6F9]">{item.label}</span>
                         </span>
-                        <span className="text-[#7A889B] group-hover:text-[#FF6B35] transition-colors">
+                        <span className="text-[#7E8B9B] group-hover:text-[#FF2800] transition-colors">
                           →
                         </span>
                       </Link>
@@ -229,11 +229,11 @@ export default function Header() {
                 </div>
 
                 {/* Direct Quick Contact Dispatch */}
-                <div className="pt-3 border-t border-[#F3EFE7]/[0.08] flex items-center justify-between text-xs font-mono text-[#7A889B]">
+                <div className="pt-3 border-t border-[#18458B]/20 flex items-center justify-between text-xs font-mono text-[#7E8B9B]">
                   <span>DIRECT DISPATCH:</span>
                   <a
                     href="mailto:haresh.murugesan@gmail.com"
-                    className="text-[#FF6B35] hover:text-[#F5D998] transition-colors"
+                    className="text-[#FF2800] hover:text-[#C8D2E0] transition-colors"
                   >
                     haresh.murugesan@gmail.com ↗
                   </a>
@@ -243,9 +243,9 @@ export default function Header() {
             </div>
 
             {/* Bottom Colophon / Status Bar */}
-            <div className="pt-6 border-t border-[#F3EFE7]/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-[#7A889B]">
+            <div className="pt-6 border-t border-[#18458B]/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-[#7E8B9B]">
               <div className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-[#FF6B35] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
                 <span>COLUMBUS, OH · THE OHIO STATE UNIVERSITY</span>
               </div>
               <div className="flex items-center gap-6">

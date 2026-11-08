@@ -87,9 +87,9 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
         const currentAlpha = p.alpha * (1 - progress);
 
         const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, currentR);
-        grad.addColorStop(0, `rgba(243, 239, 231, ${(0.35 * currentAlpha).toFixed(3)})`);
-        grad.addColorStop(0.45, `rgba(148, 163, 184, ${(0.18 * currentAlpha).toFixed(3)})`);
-        grad.addColorStop(1, 'rgba(148, 163, 184, 0)');
+        grad.addColorStop(0, `rgba(244, 246, 249, ${(0.35 * currentAlpha).toFixed(3)})`);
+        grad.addColorStop(0.45, `rgba(200, 210, 224, ${(0.18 * currentAlpha).toFixed(3)})`);
+        grad.addColorStop(1, 'rgba(200, 210, 224, 0)');
 
         ctx.fillStyle = grad;
         ctx.beginPath();
@@ -159,7 +159,7 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="group relative z-10 w-[54px] h-[54px] sm:w-[60px] sm:h-[60px] rounded-full p-0 flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-[#FF6B35] focus-visible:outline-offset-4 select-none"
+        className="group relative z-10 w-[54px] h-[54px] sm:w-[60px] sm:h-[60px] rounded-full p-0 flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-[#FF2800] focus-visible:outline-offset-4 select-none"
         aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
         aria-expanded={isOpen}
       >
@@ -170,14 +170,14 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
           }`}
           style={{
             background:
-              'radial-gradient(circle, rgba(255, 107, 53, 0.28) 0%, rgba(245, 217, 152, 0.1) 50%, transparent 72%)',
+              'radial-gradient(circle, rgba(255, 40, 0, 0.22) 0%, rgba(11, 30, 64, 0.15) 50%, transparent 72%)',
           }}
         />
 
         {/* 7-LAYER PARAMETRIC MOTORSPORT WHEEL SVG (viewBox 0 0 100 100) */}
         <svg
           viewBox="0 0 100 100"
-          className="w-full h-full shadow-[0_4px_16px_rgba(7,11,18,0.85)] group-hover:shadow-[0_0_24px_rgba(255,107,53,0.35)] rounded-full"
+          className="w-full h-full shadow-[0_4px_16px_rgba(3,5,10,0.85)] group-hover:shadow-[0_0_24px_rgba(255,40,0,0.35)] rounded-full"
           aria-hidden="true"
         >
           <defs>
@@ -197,11 +197,11 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
               <stop offset="100%" stopColor="#64748B" />
             </linearGradient>
 
-            {/* Orange Brembo Caliper Gradient */}
+            {/* Reddish-Orange Brembo Caliper Gradient */}
             <linearGradient id="wheelBremboGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FF8547" />
-              <stop offset="55%" stopColor="#FF6B35" />
-              <stop offset="100%" stopColor="#D94814" />
+              <stop offset="0%" stopColor="#FF4419" />
+              <stop offset="55%" stopColor="#FF2800" />
+              <stop offset="100%" stopColor="#D92000" />
             </linearGradient>
 
             <filter id="rotorShadow">
@@ -210,27 +210,27 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
           </defs>
 
           {/* LAYER 1: Performance Tire Ring */}
-          <circle cx="50" cy="50" r="48" fill="none" stroke="#0F141D" strokeWidth="4" />
-          <circle cx="50" cy="50" r="46" fill="none" stroke="#1E293B" strokeWidth="0.8" opacity="0.6" />
+          <circle cx="50" cy="50" r="48" fill="none" stroke="#04070E" strokeWidth="4" />
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#0B1E40" strokeWidth="0.8" opacity="0.6" />
 
           {/* LAYER 2: Stationary Brake Rotor & Orange Brembo Caliper (Does NOT Rotate With Wheel) */}
           <g id="stationary-brake-rotor">
             {/* Steel brake rotor disc */}
-            <circle cx="50" cy="50" r="32" fill="#1E293B" stroke="#334155" strokeWidth="1" filter="url(#rotorShadow)" />
+            <circle cx="50" cy="50" r="32" fill="#0B1E40" stroke="#18458B" strokeWidth="1" filter="url(#rotorShadow)" />
             {/* Concentric friction grooves */}
-            <circle cx="50" cy="50" r="29" fill="none" stroke="#2D3B4E" strokeWidth="0.6" strokeDasharray="3 2" />
-            <circle cx="50" cy="50" r="26" fill="none" stroke="#2D3B4E" strokeWidth="0.6" strokeDasharray="4 3" />
+            <circle cx="50" cy="50" r="29" fill="none" stroke="#2563EB" strokeWidth="0.6" strokeDasharray="3 2" opacity="0.4" />
+            <circle cx="50" cy="50" r="26" fill="none" stroke="#2563EB" strokeWidth="0.6" strokeDasharray="4 3" opacity="0.4" />
 
-            {/* Orange Brembo Caliper positioned between 135° and 195° (top-left/left side) */}
+            {/* Reddish-Orange Brembo Caliper positioned between 135° and 195° (top-left/left side) */}
             <path
               d="M 27.37 72.63 A 32 32 0 0 1 19.09 41.72 L 24.87 43.26 A 26 26 0 0 0 31.61 68.39 Z"
               fill="url(#wheelBremboGrad)"
-              stroke="#FF9565"
+              stroke="#FF4419"
               strokeWidth="0.75"
             />
             {/* Caliper machined pistons & detail */}
-            <circle cx="23" cy="54" r="2.2" fill="#1E293B" stroke="#FFD8BE" strokeWidth="0.6" />
-            <circle cx="27" cy="63" r="2.2" fill="#1E293B" stroke="#FFD8BE" strokeWidth="0.6" />
+            <circle cx="23" cy="54" r="2.2" fill="#03050A" stroke="#C8D2E0" strokeWidth="0.6" />
+            <circle cx="27" cy="63" r="2.2" fill="#03050A" stroke="#C8D2E0" strokeWidth="0.6" />
             <line x1="21" y1="46" x2="25" y2="47" stroke="#FFFFFF" strokeWidth="0.8" strokeLinecap="round" />
           </g>
 
@@ -287,7 +287,7 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
                   cx={lx}
                   cy={ly}
                   r="2.2"
-                  fill="#070B12"
+                  fill="#03050A"
                   stroke="#94A3B8"
                   strokeWidth="0.8"
                 />
@@ -297,14 +297,14 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
             {/* LAYER 7: Center Cap & Monogram Bar */}
             <circle cx="50" cy="50" r="7.5" fill="url(#wheelChromeGrad)" stroke="#475569" strokeWidth="1" />
             {/* Crisp horizontal dark emblem slot */}
-            <rect x="44.5" y="48.8" width="11" height="2.4" rx="1" fill="#070B12" />
+            <rect x="44.5" y="48.8" width="11" height="2.4" rx="1" fill="#03050A" />
             <rect
               x="45.5"
               y="49.5"
               width="9"
               height="1"
               rx="0.5"
-              fill={isOpen ? '#FF6B35' : '#F5D998'}
+              fill={isOpen ? '#FF2800' : '#C8D2E0'}
             />
           </g>
         </svg>

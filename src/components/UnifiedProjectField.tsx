@@ -126,7 +126,7 @@ export const UnifiedProjectField: React.FC = () => {
           <div className="flex items-center gap-4 text-xs font-mono text-[#7E8B9B]">
             <Link
               href="/archive"
-              className="px-4 py-2.5 bg-[#101B30] hover:bg-[#FF2800] hover:text-[#070B12] text-[#F4F6F9] border border-[#F4F6F9]/15 rounded-[2px] transition-colors flex items-center gap-2"
+              className="px-4 py-2.5 bg-[#060A12] hover:bg-[#FF2800] hover:text-[#03050A] text-[#F4F6F9] border border-[#18458B]/30 rounded-[2px] transition-colors flex items-center gap-2"
             >
               <span>Explore All 18 Systems [Archive Graph]</span>
               <span>→</span>
@@ -202,7 +202,7 @@ export const UnifiedProjectField: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
                     <Link
                       href={`/projects/${project.slug}`}
-                      className="px-6 py-3.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#070B12] font-semibold rounded-[2px] transition-colors inline-flex items-center gap-2 select-none"
+                      className="px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-semibold rounded-[2px] transition-colors inline-flex items-center gap-2 select-none"
                     >
                       <span>Read Case Study</span>
                       <span>→</span>
@@ -211,7 +211,7 @@ export const UnifiedProjectField: React.FC = () => {
                       href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-3.5 bg-[#101B30] hover:bg-[#17243A] text-[#F4F6F9] border border-[#F4F6F9]/15 rounded-[2px] transition-colors inline-flex items-center gap-2 select-none"
+                      className="px-5 py-3.5 bg-[#060A12] hover:bg-[#0B1E40]/40 text-[#F4F6F9] border border-[#18458B]/30 rounded-[2px] transition-colors inline-flex items-center gap-2 select-none"
                     >
                       <span>Source Code</span>
                       <span>↗</span>
@@ -264,7 +264,7 @@ export const UnifiedProjectField: React.FC = () => {
           </div>
           <Link
             href="/archive"
-            className="px-6 py-3 bg-[#FF2800] hover:bg-[#FF4419] text-[#070B12] font-mono text-xs font-semibold rounded-[2px] transition-colors shrink-0 inline-flex items-center gap-2"
+            className="px-6 py-3 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono text-xs font-semibold rounded-[2px] transition-colors shrink-0 inline-flex items-center gap-2"
           >
             <span>Open Systems Graph Studio</span>
             <span>→</span>

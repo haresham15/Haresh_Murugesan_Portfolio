@@ -144,7 +144,7 @@ export const PodcastSection: React.FC = () => {
       };
 
       // Primary Gold Filament wave
-      drawHarmonic(1.2, 0.008, '#FF6B35', 2.2, 1.8);
+      drawHarmonic(1.2, 0.008, '#FF2800', 2.2, 1.8);
       // Secondary Bio-Luminescent Cyan wave
       drawHarmonic(0.85, 0.012, '#82B7FF', 1.6, 1.6);
       // Ambient Muted Navy/Silver wave
@@ -228,7 +228,7 @@ export const PodcastSection: React.FC = () => {
               href="https://syntinuumpodcast.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-3 bg-[#FF6B35] hover:bg-[#FF8547] text-[#060A12] font-semibold rounded-[2px] inline-flex items-center gap-2 transition-colors shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+              className="px-5 py-3 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#060A12] font-semibold rounded-[2px] inline-flex items-center gap-2 transition-colors shadow-[0_0_20px_rgba(245,158,11,0.3)]"
             >
               <span>Explore SyntinuumPodcast.com</span>
               <span>↗</span>
@@ -261,7 +261,7 @@ export const PodcastSection: React.FC = () => {
               className="absolute top-6 -translate-x-1/2 pointer-events-none z-20 flex flex-col items-center"
             >
               {/* Stylized DNA-Lightbulb Vector Icon */}
-              <div className="w-12 h-12 rounded-full bg-[#060A12] border-2 border-[#FF6B35] flex items-center justify-center text-[#FF6B35] shadow-[0_0_24px_rgba(245,158,11,0.6)]">
+              <div className="w-12 h-12 rounded-full bg-[#060A12] border-2 border-[#FF2800] flex items-center justify-center text-[#FF2800] shadow-[0_0_24px_rgba(245,158,11,0.6)]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M9 18h6" />
                   <path d="M10 22h4" />
@@ -274,7 +274,7 @@ export const PodcastSection: React.FC = () => {
               </div>
 
               {/* Status Indicator Label */}
-              <span className="mt-2 px-2.5 py-0.5 bg-[#060A12]/90 text-[10px] font-mono text-[#FF6B35] border border-[#FF6B35]/30 rounded-[2px] tracking-widest whitespace-nowrap uppercase shadow-lg">
+              <span className="mt-2 px-2.5 py-0.5 bg-[#060A12]/90 text-[10px] font-mono text-[#FF2800] border border-[#FF2800]/30 rounded-[2px] tracking-widest whitespace-nowrap uppercase shadow-lg">
                 ACTIVE ZONE
               </span>
             </MotionDiv>
@@ -289,11 +289,11 @@ export const PodcastSection: React.FC = () => {
                 onMouseEnter={() => setHoveredZone('signal')}
                 onMouseLeave={() => setHoveredZone(null)}
                 className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer group ${
-                  currentZone === 'signal' ? 'bg-[#FF6B35]/[0.04]' : 'hover:bg-white/[0.02]'
+                  currentZone === 'signal' ? 'bg-[#FF2800]/[0.04]' : 'hover:bg-white/[0.02]'
                 }`}
               >
                 <div className="space-y-1">
-                  <span className="text-xs font-mono text-[#FF6B35] font-semibold tracking-wider">
+                  <span className="text-xs font-mono text-[#FF2800] font-semibold tracking-wider">
                     01  The Signal
                   </span>
                   <div className="text-sm sm:text-base font-sans font-semibold text-[#F4F6F9]">
@@ -329,11 +329,11 @@ export const PodcastSection: React.FC = () => {
                 onMouseEnter={() => setHoveredZone('architecture')}
                 onMouseLeave={() => setHoveredZone(null)}
                 className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer group ${
-                  currentZone === 'architecture' ? 'bg-[#FF6B35]/[0.04]' : 'hover:bg-white/[0.02]'
+                  currentZone === 'architecture' ? 'bg-[#FF2800]/[0.04]' : 'hover:bg-white/[0.02]'
                 }`}
               >
                 <div className="space-y-1">
-                  <span className="text-xs font-mono text-[#FF6B35] font-semibold tracking-wider">
+                  <span className="text-xs font-mono text-[#FF2800] font-semibold tracking-wider">
                     03  The Architecture
                   </span>
                   <div className="text-sm sm:text-base font-sans font-semibold text-[#F4F6F9]">
@@ -365,7 +365,7 @@ export const PodcastSection: React.FC = () => {
                 className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[bg-transparent] border border-[#F4F6F9]/10 rounded-[2px]"
               >
                 <div className="lg:col-span-7 space-y-6">
-                  <div className="text-xs font-mono text-[#FF6B35] uppercase tracking-widest">
+                  <div className="text-xs font-mono text-[#FF2800] uppercase tracking-widest">
                     FOUNDED &amp; HOSTED BY HARESH MURUGESAN · 8,000+ YOUTUBE VIEWS
                   </div>
                   <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F4F6F9] leading-snug">
@@ -379,7 +379,7 @@ export const PodcastSection: React.FC = () => {
                       href="https://syntinuumpodcast.com"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 text-xs font-mono text-[#FF6B35] hover:text-[#F4F6F9] border-b border-[#FF6B35] pb-1 transition-colors uppercase font-semibold"
+                      className="inline-flex items-center gap-3 text-xs font-mono text-[#FF2800] hover:text-[#F4F6F9] border-b border-[#FF2800] pb-1 transition-colors uppercase font-semibold"
                     >
                       <span>Explore Full Show Archive On SyntinuumPodcast.com</span>
                       <span>↗</span>
@@ -398,7 +398,7 @@ export const PodcastSection: React.FC = () => {
                     </div>
                     <div>
                       <div className="text-[#7E8B9B]">Combined Impressions:</div>
-                      <div className="text-lg font-bold text-[#FF6B35]">100K+</div>
+                      <div className="text-lg font-bold text-[#FF2800]">100K+</div>
                     </div>
                     <div>
                       <div className="text-[#7E8B9B]">Platforms:</div>
@@ -457,10 +457,10 @@ export const PodcastSection: React.FC = () => {
                           <span className="text-[#82B7FF] font-semibold">{d.runtime}</span>
                           <span className="text-[#7E8B9B] group-hover:text-[#F4F6F9] transition-colors">↗</span>
                         </div>
-                        <h4 className="text-base font-sans font-semibold text-[#F4F6F9] group-hover:text-[#FF6B35] transition-colors">
+                        <h4 className="text-base font-sans font-semibold text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors">
                           {d.guest}
                         </h4>
-                        <div className="text-xs font-mono text-[#FF6B35]">
+                        <div className="text-xs font-mono text-[#FF2800]">
                           {d.role} · {d.org}
                         </div>
                         <p className="text-xs font-sans text-[#7E8B9B] leading-relaxed line-clamp-3">
@@ -489,7 +489,7 @@ export const PodcastSection: React.FC = () => {
                 className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[bg-transparent] border border-[#F4F6F9]/10 rounded-[2px]"
               >
                 <div className="lg:col-span-7 space-y-6">
-                  <div className="text-xs font-mono text-[#FF6B35] uppercase tracking-widest">
+                  <div className="text-xs font-mono text-[#FF2800] uppercase tracking-widest">
                     SYSTEMS-ENGINEERED PRODUCTION WORKFLOW
                   </div>
                   <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F4F6F9] leading-snug">
@@ -503,7 +503,7 @@ export const PodcastSection: React.FC = () => {
                       href="https://syntinuumpodcast.com"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-3 bg-[#FF6B35] hover:bg-[#FF8547] text-[#060A12] font-mono text-xs font-semibold rounded-[2px] transition-colors"
+                      className="px-5 py-3 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#060A12] font-mono text-xs font-semibold rounded-[2px] transition-colors"
                     >
                       <span>Listen on SyntinuumPodcast.com ↗</span>
                     </a>
@@ -526,7 +526,7 @@ export const PodcastSection: React.FC = () => {
                     </p>
                   </div>
                   <div className="p-4 bg-[#060A12] rounded-[2px] border border-[#F4F6F9]/10">
-                    <span className="text-[#FF6B35] block font-semibold mb-1">02. AUDIO DSP &amp; DAVINCI 20</span>
+                    <span className="text-[#FF2800] block font-semibold mb-1">02. AUDIO DSP &amp; DAVINCI 20</span>
                     <p className="text-[#7E8B9B] font-sans">
                       Phase-coherent multiband gating, ITU-R BS.1770-4 loudness normalization, and DaVinci YRGB Color-Managed pipeline.
                     </p>

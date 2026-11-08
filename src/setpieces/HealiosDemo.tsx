@@ -45,24 +45,24 @@ export const HealiosDemo: React.FC = () => {
   };
 
   return (
-    <div className="w-full rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 p-5 sm:p-7 shadow-[0_4px_24px_rgba(7,11,18,0.7)] flex flex-col justify-between">
+    <div className="w-full rounded-[2px] bg-[#060A12] border border-[#F4F6F9]/10 p-5 sm:p-7 shadow-[0_4px_24px_rgba(7,11,18,0.7)] flex flex-col justify-between">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#F3EFE7]/10 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#F4F6F9]/10 gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#F5D998]" />
-            <span className="text-xs font-mono uppercase tracking-widest text-[#FF6B35] font-semibold">
+            <span className="w-2 h-2 rounded-full bg-[#C8D2E0]" />
+            <span className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold">
               Explainable AI (XAI) Architecture
             </span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F3EFE7] tracking-tight">
+          <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F4F6F9] tracking-tight">
             Healios V2: 8.09ms Grad-CAM Saliency Lens
           </h3>
         </div>
 
         {/* Verified Pipeline Latency Tag */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-[2px] bg-[#101B30] border border-[#F3EFE7]/10 text-xs font-mono text-[#A7B2C3]">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-[2px] bg-[#0B1E40] border border-[#F4F6F9]/10 text-xs font-mono text-[#7E8B9B]">
           <span>Pipeline Latency:</span>
           <strong className="text-[#4CC38A]">8.09 ms Saliency</strong>
         </div>
@@ -72,7 +72,7 @@ export const HealiosDemo: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center mb-6">
         
         {/* LEFT: Interactive Comparison Lens (7 cols) */}
-        <div className="xl:col-span-7 relative w-full aspect-[4/3] rounded-[2px] overflow-hidden bg-[#070B12] border border-[#F3EFE7]/10 select-none group">
+        <div className="xl:col-span-7 relative w-full aspect-[4/3] rounded-[2px] overflow-hidden bg-[#060A12] border border-[#F4F6F9]/10 select-none group">
           
           {/* Base Layer: Synthetic Surface Simulation (Simulated Granulation/Slough) */}
           <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#2D1B1B] via-[#4A2020] to-[#1E1414] flex items-center justify-center">
@@ -133,7 +133,7 @@ export const HealiosDemo: React.FC = () => {
             </div>
 
             {/* Stage-specific diagnostic HUD tags */}
-            <div className="absolute top-3 left-3 bg-[#070B12]/90 border border-[#82B7FF]/40 px-2.5 py-1.5 rounded-[2px] text-[10px] font-mono text-[#82B7FF]">
+            <div className="absolute top-3 left-3 bg-[#060A12]/90 border border-[#82B7FF]/40 px-2.5 py-1.5 rounded-[2px] text-[10px] font-mono text-[#82B7FF]">
               Grad-CAM Piecewise Jet (Active)
             </div>
           </div>
@@ -143,17 +143,17 @@ export const HealiosDemo: React.FC = () => {
             className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] pointer-events-none"
             style={{ left: `${lensPosition}%` }}
           >
-            <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white text-[#070B12] flex items-center justify-center text-[10px] font-bold shadow-lg">
+            <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white text-[#060A12] flex items-center justify-center text-[10px] font-bold shadow-lg">
               ↔
             </div>
           </div>
 
           {/* Bottom Labels */}
           <div className="absolute bottom-3 inset-x-3 flex items-center justify-between text-[10px] font-mono pointer-events-none">
-            <span className="bg-[#070B12]/80 px-2 py-1 rounded-[2px] text-[#82B7FF] border border-[#F3EFE7]/10">
+            <span className="bg-[#060A12]/80 px-2 py-1 rounded-[2px] text-[#82B7FF] border border-[#F4F6F9]/10">
               ← Saliency Heatmap ({lensPosition}%)
             </span>
-            <span className="bg-[#070B12]/80 px-2 py-1 rounded-[2px] text-[#F3EFE7] border border-[#F3EFE7]/10">
+            <span className="bg-[#060A12]/80 px-2 py-1 rounded-[2px] text-[#F4F6F9] border border-[#F4F6F9]/10">
               Raw Image Overlay →
             </span>
           </div>
@@ -176,7 +176,7 @@ export const HealiosDemo: React.FC = () => {
         <div className="xl:col-span-5 flex flex-col justify-between space-y-4">
           
           <div className="space-y-2.5">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#A7B2C3]">
+            <p className="text-xs font-mono uppercase tracking-widest text-[#7E8B9B]">
               Vectorized Pipeline Inspection
             </p>
 
@@ -189,19 +189,19 @@ export const HealiosDemo: React.FC = () => {
                   onClick={() => handleStageSelect(stage.id)}
                   className={`w-full text-left p-3 rounded-[2px] border transition-all ${
                     isSelected
-                      ? 'bg-[#101B30] border-[#FF6B35] shadow-sm'
+                      ? 'bg-[#0B1E40] border-[#FF2800] shadow-sm'
                       : 'bg-white/[0.02] border-white/5 hover:border-white/15'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className={`text-xs font-sans font-bold ${isSelected ? 'text-[#F3EFE7]' : 'text-[#A7B2C3]'}`}>
+                    <span className={`text-xs font-sans font-bold ${isSelected ? 'text-[#F4F6F9]' : 'text-[#7E8B9B]'}`}>
                       {stage.label}
                     </span>
                     <span className="text-[11px] font-mono text-[#4CC38A] font-semibold">
                       {stage.latency}
                     </span>
                   </div>
-                  <p className="text-[11px] font-sans text-[#A7B2C3] leading-relaxed">
+                  <p className="text-[11px] font-sans text-[#7E8B9B] leading-relaxed">
                     {stage.description}
                   </p>
                 </button>
@@ -210,13 +210,13 @@ export const HealiosDemo: React.FC = () => {
           </div>
 
           {/* Live Timing Ledger */}
-          <div className="p-3.5 rounded-[2px] bg-[#070B12] border border-[#F3EFE7]/10 text-xs font-mono">
-            <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#F3EFE7]/10 text-[11px]">
-              <span className="text-[#A7B2C3]">Grad-CAM Saliency Compute</span>
+          <div className="p-3.5 rounded-[2px] bg-[#060A12] border border-[#F4F6F9]/10 text-xs font-mono">
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#F4F6F9]/10 text-[11px]">
+              <span className="text-[#7E8B9B]">Grad-CAM Saliency Compute</span>
               <span className="text-[#82B7FF] font-bold">8.09 ms</span>
             </div>
             <div className="flex items-center justify-between text-[11px]">
-              <span className="text-[#A7B2C3]">Memory Footprint Reduction</span>
+              <span className="text-[#7E8B9B]">Memory Footprint Reduction</span>
               <span className="text-[#4CC38A] font-bold">120 MB+ Saved</span>
             </div>
             <div className="flex items-center justify-between text-[10px] text-[#A6ADB8]/70 pt-2 mt-2 border-t border-white/5">

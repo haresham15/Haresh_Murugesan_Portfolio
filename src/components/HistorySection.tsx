@@ -177,7 +177,7 @@ export const HistorySection: React.FC = () => {
                 <stop offset="30%" stopColor="#C8D2E0" stopOpacity="0.95" />
                 <stop offset="60%" stopColor="#38BDF8" stopOpacity="0.85" />
                 <stop offset="85%" stopColor="#10B981" stopOpacity="0.95" />
-                <stop offset="100%" stopColor="#FFB86C" stopOpacity="1" />
+                <stop offset="100%" stopColor="#FF2800" stopOpacity="1" />
               </linearGradient>
 
               {/* Anisotropic Carbon Fiber Texture Filter for Spine Backplate */}
@@ -268,8 +268,8 @@ export const HistorySection: React.FC = () => {
                     {/* Header */}
                     <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#F4F6F9]/10 text-xs font-mono">
                       <div className="flex items-center gap-3">
-                        <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-[#FF6B35] animate-pulse' : 'bg-[#7E8B9B]'}`} />
-                        <span className="font-serif text-3xl sm:text-4xl text-[#FF6B35] font-normal leading-none">
+                        <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-[#FF2800] animate-pulse' : 'bg-[#7E8B9B]'}`} />
+                        <span className="font-serif text-3xl sm:text-4xl text-[#FF2800] font-normal leading-none">
                           {m.year}
                         </span>
                       </div>

@@ -16,7 +16,7 @@ export default function Document() {
         <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </Head>
-      <body className="bg-[#070B12] text-[#F3EFE7] antialiased selection:bg-[#FF6B35] selection:text-[#070B12]">
+      <body className="bg-[#03050A] text-[#F4F6F9] antialiased selection:bg-[#FF2800] selection:text-[#03050A]">
         <Main />
         <NextScript />
       </body>

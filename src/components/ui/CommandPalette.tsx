@@ -169,15 +169,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       role="dialog"
       aria-modal="true"
       aria-label="System Command Palette"
-      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-[#07090D]/85 backdrop-blur-md"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-[#03050A]/85 backdrop-blur-md"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-2xl bg-[#0E1623] border border-brand-blue/30 rounded-md shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+      <div className="w-full max-w-2xl bg-[#060A12]/95 border border-[#18458B]/35 rounded-[2px] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
         {/* Search Input Bar */}
-        <div className="flex items-center px-4 py-3.5 border-b border-brand-blue/20 gap-3">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-brand-orange shrink-0">
+        <div className="flex items-center px-4 py-3.5 border-b border-[#18458B]/25 gap-3">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-[#FF2800] shrink-0">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
@@ -191,11 +191,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             }}
             onKeyDown={handleInputKeyDown}
             placeholder="Search projects, skills, roles, or actions..."
-            className="w-full bg-transparent text-sm sm:text-base text-text-primary placeholder:text-text-secondary focus:outline-none font-sans"
+            className="w-full bg-transparent text-sm sm:text-base text-[#F4F6F9] placeholder:text-[#7E8B9B] focus:outline-none font-sans"
             autoComplete="off"
             spellCheck={false}
           />
-          <kbd className="hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-text-secondary bg-[#07090D] border border-brand-blue/20 rounded">
+          <kbd className="hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] font-mono text-[#7E8B9B] bg-[#03050A] border border-[#18458B]/25 rounded-[2px]">
             ESC
           </kbd>
         </div>
@@ -204,11 +204,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         <ul
           ref={listRef}
           role="listbox"
-          className="overflow-y-auto p-2 divide-y divide-brand-blue/10 max-h-[60vh] no-scrollbar"
+          className="overflow-y-auto p-2 divide-y divide-[#18458B]/15 max-h-[60vh] no-scrollbar"
         >
           {filteredItems.length === 0 ? (
-            <li className="p-8 text-center text-sm font-sans text-text-secondary">
-              No results found matching &ldquo;<span className="text-text-primary font-mono">{query}</span>&rdquo;.
+            <li className="p-8 text-center text-sm font-sans text-[#7E8B9B]">
+              No results found matching &ldquo;<span className="text-[#F4F6F9] font-mono">{query}</span>&rdquo;.
             </li>
           ) : (
             filteredItems.map((item, idx) => {
@@ -220,21 +220,21 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                   aria-selected={isSelected}
                   onClick={() => executeItem(item)}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`p-3 rounded-sm cursor-pointer transition-colors flex items-center justify-between gap-3 ${
-                    isSelected ? 'bg-deep-blue text-text-primary border-l-2 border-brand-orange' : 'text-text-secondary hover:bg-surface'
+                  className={`p-3 rounded-[2px] cursor-pointer transition-colors flex items-center justify-between gap-3 ${
+                    isSelected ? 'bg-[#0B1E40]/60 text-[#F4F6F9]' : 'text-[#7E8B9B] hover:bg-[#060A12]'
                   }`}
                 >
                   <div className="flex flex-col min-w-0">
-                    <span className={`text-sm font-heading font-semibold truncate ${isSelected ? 'text-brand-orange' : 'text-text-primary'}`}>
+                    <span className={`text-sm font-sans font-medium truncate ${isSelected ? 'text-[#FF2800]' : 'text-[#F4F6F9]'}`}>
                       {item.title}
                     </span>
-                    <span className="text-xs font-sans text-text-secondary truncate mt-0.5">
+                    <span className="text-xs font-sans text-[#7E8B9B] truncate mt-0.5">
                       {item.subtitle}
                     </span>
                   </div>
 
                   {item.badge && (
-                    <span className="shrink-0 text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#07090D] border border-brand-blue/20 text-link-blue">
+                    <span className="shrink-0 text-[10px] font-mono uppercase px-2 py-0.5 rounded-[2px] bg-[#03050A] border border-[#18458B]/30 text-[#2563EB]">
                       {item.badge}
                     </span>
                   )}
@@ -245,7 +245,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         </ul>
 
         {/* Footer Navigation Hints */}
-        <div className="px-4 py-2 border-t border-brand-blue/20 bg-[#07090D] flex items-center justify-between text-[11px] font-mono text-text-secondary">
+        <div className="px-4 py-2 border-t border-[#18458B]/25 bg-[#03050A] flex items-center justify-between text-[11px] font-mono text-[#7E8B9B]">
           <div className="flex items-center gap-3">
             <span>↑↓ to navigate</span>
             <span>↵ to select</span>

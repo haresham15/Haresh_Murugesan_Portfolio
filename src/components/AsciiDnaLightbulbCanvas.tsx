@@ -505,7 +505,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
 
       // 1. 45.0° Ballistic Trajectory Centerline (Dashed-dot line in amber #FF6B35)
       const datumDiagLen = Math.hypot(w, h) * 1.5;
-      ctx.strokeStyle = 'rgba(255, 107, 53, 0.38)';
+      ctx.strokeStyle = 'rgba(255, 40, 0, 0.38)';
       ctx.setLineDash([12, 4, 3, 4]);
       ctx.beginPath();
       ctx.moveTo(bulbCenterX - datumDiagLen * dirX, bulbCenterY - datumDiagLen * dirY);

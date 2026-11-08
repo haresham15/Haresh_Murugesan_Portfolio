@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
+import ForgedCarbonCanvas from '@/components/ForgedCarbonCanvas';
 import { profile } from '@/content/profile';
 
 export default function AboutPage() {
@@ -115,19 +116,25 @@ export default function AboutPage() {
         />
       </Head>
 
-      <div className="w-full min-h-screen bg-[#070B12] text-[#F3EFE7] overflow-x-hidden flex flex-col selection:bg-[#FF6B35] selection:text-[#070B12]">
+      <div className="w-full min-h-screen bg-[#03050A] text-[#F4F6F9] overflow-x-hidden flex flex-col selection:bg-[#FF2800] selection:text-[#03050A] relative">
+        <ForgedCarbonCanvas />
         <SiteHeader />
 
-        <main id="main-content" className="w-full flex-grow max-w-[1280px] mx-auto px-6 sm:px-8 lg:px-12 pt-32 sm:pt-40 pb-24">
+        <main id="main-content" className="w-full flex-grow max-w-[1280px] mx-auto px-6 sm:px-8 lg:px-12 pt-32 sm:pt-40 pb-24 relative z-10">
           
           {/* Header Profile Section (40% Portrait / 60% Narrative) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start mb-20 sm:mb-28 pb-16 sm:pb-20 border-b border-[#F3EFE7]/[0.08]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start mb-20 sm:mb-28 pb-16 sm:pb-20 border-b border-[#18458B]/20">
             <div className="lg:col-span-8 space-y-6">
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-raleway font-bold text-[#F3EFE7] tracking-tight leading-tight">
+              <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800]">
+                <span className="w-6 h-px bg-[#FF2800]" />
+                <span>ENGINEERING NARRATIVE</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-raleway font-bold text-[#F4F6F9] tracking-tight leading-tight">
                 About Haresh Murugesan
               </h1>
 
-              <div className="max-w-[65ch] space-y-4 text-[16px] sm:text-[17px] font-sans text-[#A7B2C3] leading-[1.75]">
+              <div className="max-w-[65ch] space-y-4 text-[16px] sm:text-[17px] font-sans text-[#7E8B9B] leading-[1.75]">
                 <p>
                   I am a Computer Science &amp; Engineering student specializing in Artificial Intelligence at The Ohio State University (Expected May 2028). My work sits at the intersection of explainable deep learning, high-concurrency systems, and human-centered software architecture.
                 </p>
@@ -141,14 +148,14 @@ export default function AboutPage() {
                   href="/Haresh_Murugesan_Resume.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-6 py-3.5 bg-[#FF6B35] hover:bg-[#FF8547] text-[#070B12] font-mono text-xs font-semibold transition-colors select-none inline-flex items-center gap-2"
+                  className="px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono text-xs font-semibold rounded-[2px] transition-colors select-none inline-flex items-center gap-2 shadow-[0_0_16px_rgba(255,40,0,0.3)]"
                 >
                   <span>View Verified Résumé</span>
                   <span>↗</span>
                 </a>
                 <Link
                   href="/projects"
-                  className="px-6 py-3.5 bg-[#101B30] hover:bg-[#17243A] border border-[#F3EFE7]/15 text-[#F3EFE7] font-mono text-xs font-medium transition-colors select-none"
+                  className="px-6 py-3.5 bg-[#060A12] hover:bg-[#0B1E40]/40 border border-[#18458B]/25 text-[#F4F6F9] font-mono text-xs font-medium rounded-[2px] transition-colors select-none"
                 >
                   Explore Systems Index
                 </Link>
@@ -156,7 +163,7 @@ export default function AboutPage() {
             </div>
 
             <div className="lg:col-span-4 flex justify-center">
-              <div className="relative w-full max-w-[340px] aspect-[4/5] bg-[#101B30] border border-[#F3EFE7]/[0.1] overflow-hidden">
+              <div className="relative w-full max-w-[340px] aspect-[4/5] bg-[#060A12] border border-[#18458B]/30 rounded-[2px] overflow-hidden shadow-2xl">
                 <Image
                   src="/profile.jpeg"
                   alt="Haresh Murugesan"
@@ -169,27 +176,27 @@ export default function AboutPage() {
           </div>
 
           {/* Current Focus (Now Section) */}
-          <section className="mb-20 sm:mb-28 p-8 sm:p-10 bg-[#101B30] border border-[#F3EFE7]/[0.1]">
-            <div className="flex items-center gap-2.5 mb-6 text-xs font-mono text-[#A7B2C3]">
-              <span className="w-2 h-2 rounded-full bg-[#4CC38A] animate-pulse" />
-              <span className="uppercase tracking-widest text-[#FF6B35] font-semibold">CURRENT FOCUS &amp; AVAILABILITY (NOW)</span>
+          <section className="mb-20 sm:mb-28 p-8 sm:p-10 bg-[#060A12]/85 border border-[#18458B]/25 rounded-[2px] backdrop-blur-sm shadow-xl">
+            <div className="flex items-center gap-2.5 mb-6 text-xs font-mono text-[#7E8B9B]">
+              <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
+              <span className="uppercase tracking-widest text-[#FF2800] font-semibold">CURRENT FOCUS &amp; AVAILABILITY (NOW)</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm font-sans">
               <div className="space-y-2">
-                <p className="font-serif text-lg text-[#F3EFE7]">Internship Search</p>
-                <p className="text-[#A7B2C3] leading-relaxed">
+                <p className="font-serif text-lg text-[#F4F6F9]">Internship Search</p>
+                <p className="text-[#7E8B9B] leading-relaxed">
                   Actively interviewing for Summer 2027 Software Engineering, AI/ML, and Systems internships across top tech and research teams.
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="font-serif text-lg text-[#F3EFE7]">Academic Research</p>
-                <p className="text-[#A7B2C3] leading-relaxed">
+                <p className="font-serif text-lg text-[#F4F6F9]">Academic Research</p>
+                <p className="text-[#7E8B9B] leading-relaxed">
                   Investigating explainable computer vision segmentation models for digital pathology and automated allergy wheal area calibration.
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="font-serif text-lg text-[#F3EFE7]">Technical Deep Dives</p>
-                <p className="text-[#A7B2C3] leading-relaxed">
+                <p className="font-serif text-lg text-[#F4F6F9]">Technical Deep Dives</p>
+                <p className="text-[#7E8B9B] leading-relaxed">
                   Expanding Syntinuum Podcast Season 3 while exploring on-device Web Workers, simulation kernels, and zero-copy binary serialization.
                 </p>
               </div>
@@ -198,30 +205,30 @@ export default function AboutPage() {
 
           {/* The Story So Far Timeline */}
           <section className="mb-20 sm:mb-28">
-            <div className="mb-10 pb-4 border-b border-[#F3EFE7]/[0.08] flex items-baseline justify-between">
+            <div className="mb-10 pb-4 border-b border-[#18458B]/20 flex items-baseline justify-between">
               <div>
-                <h2 className="text-2xl sm:text-4xl font-serif font-normal text-[#F3EFE7] tracking-tight">
+                <h2 className="text-2xl sm:text-4xl font-serif font-normal text-[#F4F6F9] tracking-tight">
                   The Story So Far (2023 – Present)
                 </h2>
               </div>
             </div>
 
-            <div className="border-t border-[#F3EFE7]/[0.08] divide-y divide-[#F3EFE7]/[0.08]">
+            <div className="border-t border-[#18458B]/20 divide-y divide-[#18458B]/15">
               {milestones.map((m, idx) => (
                 <div
                   key={idx}
-                  className="py-6 sm:py-8 flex flex-col md:flex-row md:items-baseline justify-between gap-4 hover:bg-[#101B30]/30 transition-colors"
+                  className="py-6 sm:py-8 flex flex-col md:flex-row md:items-baseline justify-between gap-4 hover:bg-[#0B1E40]/20 transition-colors"
                 >
                   <div className="md:w-1/3">
-                    <span className="text-xs font-mono text-[#F5D998] block">
+                    <span className="text-xs font-mono text-[#C8D2E0] block">
                       {m.period}
                     </span>
-                    <h3 className="text-base sm:text-lg font-serif text-[#F3EFE7] mt-1">
+                    <h3 className="text-base sm:text-lg font-serif text-[#F4F6F9] mt-1">
                       {m.title}
                     </h3>
                   </div>
                   <div className="md:w-2/3">
-                    <p className="text-sm font-sans text-[#A7B2C3] leading-relaxed">
+                    <p className="text-sm font-sans text-[#7E8B9B] leading-relaxed">
                       {m.description}
                     </p>
                   </div>
@@ -232,8 +239,8 @@ export default function AboutPage() {
 
           {/* Collegiate Leadership */}
           <section className="mb-16">
-            <div className="mb-10 pb-4 border-b border-[#F3EFE7]/[0.08]">
-              <h2 className="text-2xl sm:text-4xl font-serif font-normal text-[#F3EFE7] tracking-tight">
+            <div className="mb-10 pb-4 border-b border-[#18458B]/20">
+              <h2 className="text-2xl sm:text-4xl font-serif font-normal text-[#F4F6F9] tracking-tight">
                 Collegiate Leadership &amp; Impact
               </h2>
             </div>
@@ -242,17 +249,17 @@ export default function AboutPage() {
               {leadership.map((lead, idx) => (
                 <div
                   key={idx}
-                  className="p-6 bg-[#101B30] border border-[#F3EFE7]/[0.08] flex flex-col justify-between space-y-4"
+                  className="p-6 bg-[#060A12]/85 border border-[#18458B]/20 rounded-[2px] flex flex-col justify-between space-y-4 hover:bg-[#0B1E40]/20 transition-colors"
                 >
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs font-mono text-[#A7B2C3]">
-                      <span className="text-[#FF6B35]">{lead.role}</span>
+                    <div className="flex items-center justify-between text-xs font-mono text-[#7E8B9B]">
+                      <span className="text-[#FF2800]">{lead.role}</span>
                       <span>{lead.period}</span>
                     </div>
-                    <h3 className="text-lg font-serif text-[#F3EFE7]">
+                    <h3 className="text-lg font-serif text-[#F4F6F9]">
                       {lead.title}
                     </h3>
-                    <p className="text-sm font-sans text-[#A7B2C3] leading-relaxed">
+                    <p className="text-sm font-sans text-[#7E8B9B] leading-relaxed">
                       {lead.description}
                     </p>
                   </div>
