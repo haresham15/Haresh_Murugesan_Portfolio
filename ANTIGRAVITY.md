@@ -93,14 +93,14 @@ All colors MUST reference these exact DTCG 3-tier tokens defined in [`design/tok
 - **Linear Systems CodeGraph ([`SystemsCodeGraph.tsx`](file:///src/components/SystemsCodeGraph.tsx))**:
   - Full-page camera translation across depths on `/projects`: Depth 0 (Core) $\to$ Depth 1 (Domain Modules) $\to$ Depth 2 (Projects) $\to$ Depth 3 (Case Study).
   - World translation along X axis ($\text{camX} = 0 \to -420 \to -880 \to -1240$) with 1-click step-back reverse translation.
-- **Home Systems Constellation ([`HomeCodeGraph.tsx`](file:///src/components/HomeCodeGraph.tsx))**:
-  - Background-integrated dot-module constellation suspended directly above the forged carbon canvas (`#archive`). Zero boxes or outer card containers.
-  - Tier 0 central origin reticle (6px machined silver, 32px dashed reticle).
-  - Tier 1 primary super-dots: `Backend, AI/ML & Compute [8]` in `#FF2800` and `Frontend, Spatial UI & Interactive [10]` in `#2563EB`.
-  - Tier 2 domain dots (6.5px core + 16px hairline ring + uppercase monospace labels).
-  - Tier 3 all 18 project dots (4.5px vector dots with non-colliding polar angle micro-labels).
-  - Hovering any project dot illuminates parent synaptic threads and displays a floating Whisper Callout HUD with title, metric, synopsis, stack, and direct CTA.
-  - Clicking any project dot executes an expanding 180ms shockwave ripple and routes directly to `/projects/${project.slug}`.
+- **Awwwards-Caliber Vector Systems Constellation ([`HomeCodeGraph.tsx`](file:///src/components/HomeCodeGraph.tsx) V6.0)**:
+  - Background-integrated interactive vector embedding space suspended directly above the forged carbon canvas (`#archive`). Zero boxes or outer card containers.
+  - **2.5D Perspective Projection ($F=900$)**: Multi-pass optical bloom (`globalCompositeOperation = 'lighter'`) on active `#FF2800` and `#2563EB` nodes with mouse parallax tilt ($\pm 6^\circ$), rotating segmented silver reticles, and incandescent alabaster pinpoint cores.
+  - **Elastic Verlet String Physics**: Connecting Bézier splines simulate damped harmonic springs that physically deflect around the cursor when swept and emit drifting spark particles upon vibration.
+  - **UMAP Topographical Density Contours**: Deformable trigonometric contour rings with elevation callouts ($\nabla 0.85, \nabla 0.60$) wrap active clusters like gravitational potential wells.
+  - **Live Semantic Vector Query Bar & Cosine Gravity**: Real-time cosine similarity search pulls matching systems inward into the center focal ring with live `cos θ = 0.94` badges and quick-prompt chips (`[Low-Latency 60FPS]`, `[Clinical CV & LiDAR]`, `[Spatial ML]`).
+  - **k-NN Vector Cross-Links on Hover**: Hovering a project dot renders animated dashed vector bridges to its top 3 nearest-neighbor systems with exact similarity pills (`0.94 SIM · CLINICAL CV / HISTOLOGY`).
+  - **Holographic Spec Lens & Singularity Dive Warp**: Hovering opens an obsidian-cobalt lens with live vector signature and 3D cosine coordinates; clicking triggers an exponential 420ms warp zoom dive ($1\times \to 16\times$) with radial starfield streaks before resolving into the case study.
 
 ### 4.5 Compacted Flagship Telemetry Deck ([`UnifiedProjectField.tsx`](file:///src/components/UnifiedProjectField.tsx))
 - Single-viewport 740px (~85dvh) console consolidating the 4 flagship systems (01 Healios V2, 02 Apexis Telemetry Engine, 03 RouteRx / Careline, 04 Tempo Task Suite).
