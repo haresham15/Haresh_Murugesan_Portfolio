@@ -11,7 +11,7 @@ export const NowSection: React.FC = () => {
     >
       <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
         {/* Section Intro (Unboxed & De-Vibecoded) */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#18458B]/20">
+        <div className="pb-8 border-b border-[#18458B]/20">
           <div className="space-y-3 max-w-3xl">
             <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
               Field Notes.
@@ -20,23 +20,16 @@ export const NowSection: React.FC = () => {
               Active engineering focus, research investigations, and personal inquiry in Columbus, OH.
             </p>
           </div>
-
-          <div className="flex items-center gap-2.5 text-xs font-mono text-[#C8D2E0] shrink-0">
-            <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
-            <span className="text-[#FF2800] font-semibold">ACTIVE INQUIRIES</span>
-            <span className="text-[#7E8B9B]">· Columbus, OH</span>
-          </div>
         </div>
 
         {/* 12-Col Asymmetric Spread: 7 Cols Primary Build / 5 Cols Research & Inquiry (Unboxed) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
           
           {/* Primary Build (7 Cols, Unboxed) */}
-          <div className="lg:col-span-7 p-6 sm:p-10 border-b lg:border-b-0 lg:border-r border-[#18458B]/20 flex flex-col justify-between space-y-8 relative">
+          <div className="lg:col-span-7 p-4 sm:p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-[#18458B]/20 flex flex-col justify-between space-y-6 sm:space-y-8 relative">
             <div className="space-y-6">
-              <div className="flex items-center gap-2 text-xs font-mono text-[#FF2800] font-semibold uppercase tracking-wider">
-                <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
-                <span>Active Production Build</span>
+              <div className="text-xs font-mono text-[#FF2800] font-semibold uppercase tracking-wider">
+                Active Production Build
               </div>
 
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F4F6F9] leading-snug">

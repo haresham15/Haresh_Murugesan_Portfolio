@@ -154,10 +154,10 @@ export default function ProjectsPage() {
         {/* Global Navigation Header */}
         <Header />
 
-        <main id="main-content" className="relative z-10 w-full max-w-[1320px] mx-auto border-x border-[#18458B]/20 bg-[#03050A]/90 backdrop-blur-md shadow-2xl pt-24 sm:pt-28 pb-16 sm:pb-24">
+        <main id="main-content" className="relative z-10 w-full max-w-[1320px] mx-auto border-x-0 sm:border-x border-[#18458B]/20 bg-[#03050A]/90 backdrop-blur-md shadow-2xl pt-24 sm:pt-28 pb-16 sm:pb-24">
           
           {/* 1. TOP ARCHITECTURAL DATUM STRIP */}
-          <div className="w-full border-b border-[#18458B]/20 px-6 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#7E8B9B] bg-[#060A12]/95">
+          <div className="w-full border-b border-[#18458B]/20 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#7E8B9B] bg-[#060A12]/95">
             <div className="flex items-center gap-3">
               <Link href="/" className="hover:text-[#FF2800] transition-colors">HOME</Link>
               <span className="text-[#C8D2E0]/25">/</span>
@@ -170,7 +170,7 @@ export default function ProjectsPage() {
           </div>
 
           {/* 2. PAGE HERO & TELEMETRY SUMMARY */}
-          <section className="relative p-6 sm:p-10 lg:p-14 border-b border-[#18458B]/20 bg-[#060A12]/40">
+          <section className="relative p-4 sm:p-8 lg:p-14 border-b border-[#18458B]/20 bg-[#060A12]/40">
             <GridCrosshair className="absolute -top-[4.5px] -left-[4.5px]" active />
             <GridCrosshair className="absolute -top-[4.5px] -right-[4.5px]" />
 
@@ -307,7 +307,7 @@ export default function ProjectsPage() {
                 </div>
 
                 {/* Category Filter Tabs (Zero-Radius 0px Hairline Group) */}
-                <div className="flex flex-wrap items-center border border-[#18458B]/25 divide-x divide-[#18458B]/25 rounded-[2px] overflow-hidden text-xs font-mono" role="tablist">
+                <div className="flex items-center overflow-x-auto scrollbar-none border border-[#18458B]/25 divide-x divide-[#18458B]/25 rounded-[2px] text-xs font-mono -mx-2 px-2 sm:mx-0 sm:px-0" role="tablist">
                   {categories.map((cat) => {
                     const isActive = selectedCategory === cat.name;
                     return (
@@ -315,7 +315,7 @@ export default function ProjectsPage() {
                         key={cat.name}
                         type="button"
                         onClick={() => handleCategoryChange(cat.name)}
-                        className={`px-4 py-2.5 transition-colors cursor-pointer select-none ${
+                        className={`min-h-[40px] px-3.5 sm:px-4 py-2 transition-colors cursor-pointer select-none whitespace-nowrap flex items-center shrink-0 ${
                           isActive
                             ? 'bg-[#FF2800] text-[#03050A] font-semibold'
                             : 'bg-[#060A12] text-[#7E8B9B] hover:text-[#F4F6F9] hover:bg-[#0B1E40]/30'

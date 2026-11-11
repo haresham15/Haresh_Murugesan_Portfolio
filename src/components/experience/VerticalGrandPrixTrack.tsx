@@ -1,5 +1,6 @@
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { gsap } from 'gsap';
+import { buildTrackPath, unwrapTrackAngle, progressAtY, type TrackPoint } from './verticalTrackGeometry';
 import { useMotionPreference } from '../MotionPreference';
 
 export interface ExperienceRole {
@@ -17,7 +18,7 @@ export interface ExperienceRole {
   side: 'left' | 'right';
   apexX: number;
   apexY: number;
-  t: number; // approximate normalized t along spline
+  t: number;
 }
 
 export const EXPERIENCE_ROLES: ExperienceRole[] = [
@@ -49,7 +50,7 @@ export const EXPERIENCE_ROLES: ExperienceRole[] = [
     year: '2026',
     period: 'Aug 2026 – Present',
     role: 'Undergraduate AI & Machine Learning Researcher',
-    company: 'The Ohio State University',
+    company: 'The Ohio State University (Digital Pathology)',
     teamOrDivision: 'Digital Pathology & Clinical Diagnostics Lab',
     leadSummary:
       'Developing deep learning computer vision architectures applied to gigapixel Whole Slide Images (WSI) for automated histological tissue segmentation and explainable boundary analysis.',
@@ -71,7 +72,7 @@ export const EXPERIENCE_ROLES: ExperienceRole[] = [
     year: '2026',
     period: 'Feb 2026 – Present',
     role: 'Innovation Analyst',
-    company: 'Center for Innovation Strategies at OSU',
+    company: 'Center for Innovation Strategies / Honda 99P Labs',
     teamOrDivision: 'Honda 99P Labs Connected Mobility Data Accelerator',
     leadSummary:
       'Synthesized mobility telemetry and spatial datasets across 1,000+ vehicle trip models to uncover urban driving energy efficiency patterns and battery degradation trends.',
@@ -134,487 +135,483 @@ export const EXPERIENCE_ROLES: ExperienceRole[] = [
 ];
 
 export const VerticalGrandPrixTrack: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const pathRef = useRef<SVGPathElement | null>(null);
-  const carRef = useRef<SVGGElement | null>(null);
-  const racingLineRef = useRef<SVGPathElement | null>(null);
-
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [pathLength, setPathLength] = useState<number>(0);
-
-  const { isReduced } = useMotionPreference();
-  const progressRef = useRef<{ t: number }>({ t: 0.12 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const apexRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const pathRef = useRef<SVGPathElement>(null);
+  const carRef = useRef<SVGGElement>(null);
+  const progressRef = useRef({ t: 0 });
+  const angleRef = useRef(90);
+  const activeRef = useRef(0);
+  const stopsRef = useRef<number[]>([]);
+  const lengthRef = useRef(0);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
-  const prevIndexRef = useRef<number>(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [geometry, setGeometry] = useState<{ width: number; height: number; points: TrackPoint[]; d: string } | null>(null);
+  const { isReduced } = useMotionPreference();
 
-  // SVG Spline geometry: 1440 x 1750 coordinate system
-  const trackPathD = useMemo(() => {
-    return 'M 720 0 C 730 70, 850 130, 880 220 C 920 330, 640 440, 460 540 C 310 650, 830 760, 920 880 C 1010 1010, 560 1100, 440 1220 C 330 1340, 780 1430, 860 1540 C 910 1620, 810 1680, 720 1750';
+  const applyCarTransform = useCallback(() => {
+    const path = pathRef.current;
+    const car = carRef.current;
+    const total = lengthRef.current;
+    if (!path || !car || !total) return;
+
+    const t = progressRef.current.t;
+    const clampedT = Math.max(0, Math.min(1, t));
+    const distance = clampedT * total;
+    const point = path.getPointAtLength(distance);
+
+    let rawAngle: number;
+    if (t < 0 || t > 1) {
+      // Off track bounds (top entry or bottom exit): car travels vertically downwards
+      rawAngle = 90;
+    } else {
+      const behind = path.getPointAtLength(Math.max(0, distance - 2));
+      const ahead = path.getPointAtLength(Math.min(total, distance + 2));
+      const dx = ahead.x - behind.x;
+      const dy = ahead.y - behind.y;
+      rawAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+    }
+
+    angleRef.current = unwrapTrackAngle(angleRef.current, rawAngle);
+    const y = point.y + (t < 0 ? t * total : t > 1 ? (t - 1) * total : 0);
+    const x = point.x;
+
+    car.setAttribute('transform', `translate(${x}, ${y}) rotate(${angleRef.current})`);
+    car.dataset.progress = String(t);
   }, []);
 
-  // Compute transform (x, y, angle) along the spline
-  const computeCarTransform = useCallback(
-    (t: number) => {
-      const path = pathRef.current;
-      if (!path) return { x: 880, y: 190, angle: 45 };
-
-      const total = pathLength || path.getTotalLength() || 2000;
-      if (total <= 0) return { x: 880, y: 190, angle: 45 };
-
-      // Off bottom
-      if (t > 1) {
-        const pt = path.getPointAtLength(total);
-        const excess = (t - 1) * total;
-        return { x: pt.x, y: pt.y + excess, angle: 90 };
-      }
-      // Off top
-      if (t < 0) {
-        const pt = path.getPointAtLength(0);
-        const deficit = t * total;
-        return { x: pt.x, y: pt.y + deficit, angle: 90 };
-      }
-
-      const s = Math.max(0, Math.min(total, t * total));
-      const pt = path.getPointAtLength(s);
-
-      // Tangent angle
-      const delta = 4.0;
-      const s1 = Math.max(0, s - delta);
-      const s2 = Math.min(total, s + delta);
-      const p1 = path.getPointAtLength(s1);
-      const p2 = path.getPointAtLength(s2);
-
-      const dx = p2.x - p1.x;
-      const dy = p2.y - p1.y;
-      const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
-
-      return { x: pt.x, y: pt.y, angle };
-    },
-    [pathLength]
-  );
-
-  const applyCarTransform = useCallback(
-    (t: number) => {
-      if (!carRef.current) return;
-      const tf = computeCarTransform(t);
-      carRef.current.setAttribute(
-        'transform',
-        `translate(${tf.x.toFixed(2)}, ${tf.y.toFixed(2)}) rotate(${tf.angle.toFixed(2)})`
-      );
-
-      // Racing line glow trailing wake
-      if (racingLineRef.current && pathLength > 0) {
-        racingLineRef.current.setAttribute('stroke-dashoffset', `${(-t * 2200).toFixed(1)}`);
-      }
-    },
-    [computeCarTransform, pathLength]
-  );
-
-  // Measure path length on mount
   useEffect(() => {
-    if (pathRef.current) {
-      const len = pathRef.current.getTotalLength();
-      setPathLength(len);
-      applyCarTransform(EXPERIENCE_ROLES[0].t);
+    const container = containerRef.current;
+    if (!container) return;
+
+    const measure = () => {
+      const rect = container.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const validAnchors = apexRefs.current.filter((a): a is HTMLButtonElement => a !== null);
+      if (validAnchors.length !== EXPERIENCE_ROLES.length) return;
+
+      const points = validAnchors.map((anchor) => {
+        const box = anchor.getBoundingClientRect();
+        return {
+          x: box.left + box.width / 2 - rect.left,
+          y: box.top + box.height / 2 - rect.top,
+        };
+      });
+
+      const entryX = rect.width >= 900 ? rect.width / 2 : points[0].x;
+      const d = buildTrackPath(points, entryX, rect.height);
+
+      setGeometry((previous) =>
+        previous?.d === d && previous.width === rect.width && previous.height === rect.height
+          ? previous
+          : { width: rect.width, height: rect.height, points, d }
+      );
+    };
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    Array.from(container.querySelectorAll('[data-experience-row]')).forEach((row) => observer.observe(row));
+
+    window.addEventListener('resize', measure);
+    const rafId = requestAnimationFrame(measure);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', measure);
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const path = pathRef.current;
+    if (!path || !geometry) return;
+
+    timelineRef.current?.kill();
+    timelineRef.current = null;
+    lengthRef.current = path.getTotalLength();
+    stopsRef.current = geometry.points.map((point) => progressAtY(path, lengthRef.current, point.y));
+    progressRef.current.t = stopsRef.current[activeRef.current] ?? 0;
+    applyCarTransform();
+  }, [geometry, applyCarTransform]);
+
+  useEffect(() => {
+    if (isReduced && stopsRef.current.length) {
+      timelineRef.current?.kill();
+      timelineRef.current = null;
+      progressRef.current.t = stopsRef.current[activeRef.current] ?? 0;
+      applyCarTransform();
     }
-  }, [applyCarTransform]);
+    return () => {
+      timelineRef.current?.kill();
+    };
+  }, [isReduced, applyCarTransform]);
 
-  // Forward-Only Kinematics Controller
-  const navigateToRole = useCallback(
-    (targetIndex: number) => {
-      setActiveIndex(targetIndex);
+  const navigateToRole = (index: number) => {
+    if (index === activeRef.current && timelineRef.current?.isActive()) return;
+    const target = stopsRef.current[index];
+    if (target === undefined) return;
 
-      if (isReduced) {
-        const targetT = EXPERIENCE_ROLES[targetIndex].t;
-        progressRef.current.t = targetT;
-        applyCarTransform(targetT);
-        prevIndexRef.current = targetIndex;
-        return;
-      }
+    // Rapid clicks: cancel stale timeline immediately to target latest selection cleanly
+    timelineRef.current?.kill();
+    timelineRef.current = null;
 
-      if (timelineRef.current) {
-        timelineRef.current.kill();
+    const fromIndex = activeRef.current;
+    activeRef.current = index;
+    setActiveIndex(index);
+
+    // Reduced motion: select immediately without continuous animation
+    if (isReduced) {
+      progressRef.current.t = target;
+      applyCarTransform();
+      return;
+    }
+
+    // Forward-only rule:
+    // Moving upward (targetIndex < fromIndex): never reverse.
+    // Also if target < current t, moving directly would reverse backward, so wrap forward!
+    const wrap = index < fromIndex || target < progressRef.current.t;
+
+    const timeline = gsap.timeline({
+      onUpdate: applyCarTransform,
+      onComplete: () => {
         timelineRef.current = null;
-      }
+      },
+    });
+    timelineRef.current = timeline;
 
-      const fromIndex = prevIndexRef.current;
-      prevIndexRef.current = targetIndex;
-      const targetT = EXPERIENCE_ROLES[targetIndex].t;
-
-      // 1. FORWARD PROGRESSION (Moving Downwards)
-      if (targetIndex >= fromIndex) {
-        const duration = 0.65 + (targetIndex - fromIndex) * 0.12;
-        const tl = gsap.timeline({
-          onComplete: () => {
-            progressRef.current.t = targetT;
-            applyCarTransform(targetT);
-            timelineRef.current = null;
-          },
-        });
-
-        tl.to(progressRef.current, {
-          t: targetT,
-          duration,
-          ease: 'power2.inOut',
-          onUpdate: () => {
-            applyCarTransform(progressRef.current.t);
-          },
-        });
-
-        timelineRef.current = tl;
-        return;
-      }
-
-      // 2. NON-REVERSING WRAP-AROUND FORWARD LOOP (Moving Upwards)
-      // Never drive in reverse!
-      // Phase A: Blast downward off bottom exit (t -> 1.06) in 420ms
-      // Phase B: Instant wrap to top entry straight (t = -0.06)
-      // Phase C: Dive down into selected upper apex (-0.06 -> targetT) in 520ms
-      const tl = gsap.timeline({
-        onComplete: () => {
-          progressRef.current.t = targetT;
-          applyCarTransform(targetT);
-          timelineRef.current = null;
-        },
-      });
-
-      tl.to(progressRef.current, {
+    if (wrap) {
+      // Accelerate downward off bottom exit (t -> 1.06 in ~400ms)
+      timeline.to(progressRef.current, {
         t: 1.06,
-        duration: 0.42,
+        duration: 0.4,
         ease: 'power2.in',
-        onUpdate: () => {
-          applyCarTransform(progressRef.current.t);
-        },
       });
-
-      tl.set(progressRef.current, {
-        t: -0.06,
-        onComplete: () => {
-          applyCarTransform(-0.06);
-        },
+      // Wrap to top (t = -0.06)
+      timeline.set(progressRef.current, { t: -0.06 });
+      // Dive into target apex in ~500ms
+      timeline.to(progressRef.current, {
+        t: target,
+        duration: 0.5,
+        ease: 'power2.out',
       });
-
-      tl.to(progressRef.current, {
-        t: targetT,
-        duration: 0.52,
-        ease: 'power3.out',
-        onUpdate: () => {
-          applyCarTransform(progressRef.current.t);
-        },
+    } else {
+      // Moving downward (targetIndex > fromIndex): move forward over ~700ms
+      timeline.to(progressRef.current, {
+        t: target,
+        duration: 0.7,
+        ease: 'power2.inOut',
       });
-
-      timelineRef.current = tl;
-    },
-    [isReduced, applyCarTransform]
-  );
+    }
+  };
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-[1440px] mx-auto select-none py-12"
-      style={{ minHeight: '1750px' }}
+      data-experience-track
+      className="experience-track relative w-full max-w-[1380px] mx-auto py-16"
     >
-      {/* =====================================================================
-          GRAND 4-PASS OPEN-CANVAS SVG MOTORSPORT CIRCUIT
-          ===================================================================== */}
       <svg
-        viewBox="0 0 1440 1750"
-        className="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10"
-        preserveAspectRatio="xMidYMid meet"
+        viewBox={geometry ? `0 0 ${geometry.width} ${geometry.height}` : undefined}
+        className="absolute inset-0 w-full h-full pointer-events-none z-10"
         aria-hidden="true"
+        style={{ visibility: geometry ? 'visible' : 'hidden', overflow: 'hidden' }}
       >
         <defs>
-          {/* Active racing line gradient */}
-          <linearGradient id="v-racing-line-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#2563EB" stopOpacity="0.1" />
-            <stop offset="40%" stopColor="#FF2800" stopOpacity="1" />
-            <stop offset="70%" stopColor="#FF4419" stopOpacity="1" />
-            <stop offset="100%" stopColor="#C8D2E0" stopOpacity="0.4" />
+          {/* High-intensity forward headlight projection gradient */}
+          <linearGradient id="car-headlight-glow" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#F4F6F9" stopOpacity="0.85" />
+            <stop offset="35%" stopColor="#2563EB" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
           </linearGradient>
-
-          {/* Headlight beam radial gradient */}
-          <radialGradient id="headlight-beam" cx="50%" cy="0%" r="90%">
-            <stop offset="0%" stopColor="rgba(200, 210, 224, 0.45)" />
-            <stop offset="50%" stopColor="rgba(37, 99, 235, 0.2)" />
-            <stop offset="100%" stopColor="transparent" />
-          </radialGradient>
         </defs>
 
-        {/* 1. Track Bed Outer Barrier Walls (74px wide dark cobalt) */}
+        {/* Track Layer 1: 64px Glow */}
         <path
-          d={trackPathD}
+          d={geometry?.d}
           fill="none"
-          stroke="rgba(11, 30, 64, 0.75)"
-          strokeWidth="74"
+          stroke="rgba(11, 30, 64, 0.6)"
+          strokeWidth="64"
           strokeLinecap="round"
-          strokeLinejoin="round"
         />
-
-        {/* 2. Main 68px Dark Obsidian Asphalt Track Surface (#050912) */}
+        {/* Track Layer 2: 52px Barrier */}
         <path
-          d={trackPathD}
+          d={geometry?.d}
           fill="none"
-          stroke="#050912"
-          strokeWidth="68"
+          stroke="rgba(200, 210, 224, 0.22)"
+          strokeWidth="52"
           strokeLinecap="round"
-          strokeLinejoin="round"
         />
-
-        {/* 3. Metallic Silver Track Boundary Edge Lines (#7E8B9B, 1.5px) */}
+        {/* Track Layer 3: 46px Asphalt */}
         <path
-          d={trackPathD}
+          d={geometry?.d}
           fill="none"
-          stroke="rgba(126, 139, 155, 0.35)"
-          strokeWidth="66"
-          strokeDasharray="2 0"
+          stroke="#04070E"
+          strokeWidth="46"
           strokeLinecap="round"
-          strokeLinejoin="round"
         />
-        <path
-          d={trackPathD}
-          fill="none"
-          stroke="#050912"
-          strokeWidth="63"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* 4. Alternating Reddish-Orange (#FF2800) & Metallic Silver (#E2E8F0) FIA Apex Curbs */}
-        {EXPERIENCE_ROLES.map((role) => {
-          const isRoleActive = activeIndex === role.index;
-          const isRoleHovered = hoveredIndex === role.index;
-          const isHigh = isRoleActive || isRoleHovered;
-
-          // Curbs hugging the inside of each apex
-          const offsetDist = role.side === 'left' ? 34 : -34;
-          const curbD = `M ${role.apexX + offsetDist - 25} ${role.apexY - 35} Q ${role.apexX + offsetDist} ${role.apexY} ${role.apexX + offsetDist - 25} ${role.apexY + 35}`;
-
-          return (
-            <g key={`curb-${role.id}`}>
-              <path
-                d={curbD}
-                fill="none"
-                stroke={isHigh ? '#FF2800' : '#18458B'}
-                strokeWidth="10"
-                strokeLinecap="round"
-                className="transition-colors duration-300"
-              />
-              <path
-                d={curbD}
-                fill="none"
-                stroke={isHigh ? '#F4F6F9' : '#7E8B9B'}
-                strokeWidth="10"
-                strokeDasharray="10 8"
-                strokeLinecap="round"
-              />
-            </g>
-          );
-        })}
-
-        {/* 5. 3px Continuous Ideal Racing Line + Trailing Telemetry Wake */}
+        {/* Track Layer 4: 3px Cobalt Racing Line */}
         <path
           ref={pathRef}
-          d={trackPathD}
+          data-experience-path
+          d={geometry?.d}
           fill="none"
-          stroke="rgba(37, 99, 235, 0.25)"
+          stroke="#2563EB"
           strokeWidth="3"
-          strokeDasharray="10 6"
-        />
-        <path
-          ref={racingLineRef}
-          d={trackPathD}
-          fill="none"
-          stroke="url(#v-racing-line-grad)"
-          strokeWidth="3.5"
-          strokeDasharray="320 1800"
-          strokeDashoffset="0"
-          opacity="0.95"
+          strokeLinecap="round"
         />
 
-        {/* 6. Precision Apex Ring Reticles */}
-        {EXPERIENCE_ROLES.map((role) => {
-          const isRoleActive = activeIndex === role.index;
+        {/* FIA Curbs: Red-Orange and High-Luster Silver alternating rumble strips */}
+        {geometry?.points.map((point, index) => {
+          const isDesktop = geometry.width >= 900;
+          const offset = isDesktop ? (index % 2 === 0 ? 24 : -24) : (index % 2 === 0 ? 20 : -20);
+          const curbX = point.x + offset;
+          const curb = `M ${curbX} ${point.y - 28} L ${curbX} ${point.y + 28}`;
           return (
-            <g key={`reticle-${role.id}`}>
-              {isRoleActive && (
-                <circle
-                  cx={role.apexX}
-                  cy={role.apexY}
-                  r="26"
-                  fill="none"
-                  stroke="#FF2800"
-                  strokeWidth="1.5"
-                  strokeDasharray="4 4"
-                  className="animate-spin-slow origin-center"
-                  style={{ transformOrigin: `${role.apexX}px ${role.apexY}px` }}
-                />
-              )}
-              <circle
-                cx={role.apexX}
-                cy={role.apexY}
-                r="10"
-                fill="#03050A"
-                stroke={isRoleActive ? '#FF2800' : '#2563EB'}
-                strokeWidth="2"
-              />
-              <circle
-                cx={role.apexX}
-                cy={role.apexY}
-                r="4.5"
-                fill={isRoleActive ? '#FF2800' : '#C8D2E0'}
-              />
+            <g key={EXPERIENCE_ROLES[index].id}>
+              <path d={curb} stroke="#FF2800" strokeWidth="5" strokeLinecap="round" />
+              <path d={curb} stroke="#E6ECF5" strokeWidth="5" strokeDasharray="6 6" strokeLinecap="round" />
             </g>
           );
         })}
 
-        {/* =====================================================================
-            GRAND-SCALE DNA-AERO PROTOTYPE CAR (76px x 36px)
-            ===================================================================== */}
-        <g ref={carRef} style={{ willChange: 'transform' }}>
-          {/* Forward Headlight Cones */}
-          <polygon
-            points="0,-16 -120,-90 -80,-110 0,-18"
-            fill="url(#headlight-beam)"
-            opacity="0.75"
-          />
-          <polygon
-            points="0,16 -120,90 -80,110 0,18"
-            fill="url(#headlight-beam)"
-            opacity="0.75"
-          />
-
+        {/* High-Performance 76x36px Prototype Car with Double-Helix Canopy, Headlights, & Twin Slipstream Trails */}
+        <g ref={carRef} data-experience-car style={{ willChange: 'transform' }}>
           {/* Twin Rear Red-Orange Exhaust Slipstream Trails */}
-          <line x1="-36" y1="-9" x2="-80" y2="-9" stroke="#FF2800" strokeWidth="2.5" opacity="0.85" />
-          <line x1="-36" y1="9" x2="-80" y2="9" stroke="#FF2800" strokeWidth="2.5" opacity="0.85" />
+          <line x1="-38" y1="-10" x2="-82" y2="-10" stroke="#FF2800" strokeWidth="2.5" opacity="0.85" strokeLinecap="round" />
+          <line x1="-38" y1="10" x2="-82" y2="10" stroke="#FF2800" strokeWidth="2.5" opacity="0.85" strokeLinecap="round" />
+          <line x1="-38" y1="-10" x2="-62" y2="-10" stroke="#FF4419" strokeWidth="1" opacity="0.9" />
+          <line x1="-38" y1="10" x2="-62" y2="10" stroke="#FF4419" strokeWidth="1" opacity="0.9" />
 
-          {/* Machined Metallic Silver Carbon Chassis (76px x 36px) */}
+          {/* Machined Metallic Carbon Chassis (76px x 36px) */}
           <rect
             x="-38"
             y="-18"
             width="76"
             height="36"
-            rx="8"
+            rx="6"
             fill="#060A12"
             stroke="#C8D2E0"
             strokeWidth="1.5"
           />
-          {/* Front Aero Wing Splitter */}
-          <polygon points="34,-18 42,-14 42,14 34,18" fill="#18458B" stroke="#C8D2E0" strokeWidth="1" />
-          {/* Rear Wing Endplates */}
-          <rect x="-38" y="-20" width="8" height="40" rx="1.5" fill="#FF2800" />
 
-          {/* Glowing Reddish-Orange DNA-Helix Cockpit Canopy */}
-          <ellipse cx="6" cy="0" rx="18" ry="8" fill="#03050A" stroke="#FF2800" strokeWidth="1.5" />
-          {/* DNA Helix Rungs inside Canopy */}
-          <line x1="-4" y1="-5" x2="-4" y2="5" stroke="#FF2800" strokeWidth="1.2" />
-          <line x1="2" y1="-6" x2="2" y2="6" stroke="#C8D2E0" strokeWidth="1.2" />
-          <line x1="8" y1="-5" x2="8" y2="5" stroke="#2563EB" strokeWidth="1.2" />
-          <line x1="14" y1="-4" x2="14" y2="4" stroke="#FF4419" strokeWidth="1.2" />
+          {/* Aerodynamic Sidepods & Venturi Diffusers */}
+          <path d="M -22 -18 L 14 -18 L 10 -14 L -22 -14 Z" fill="#0B1E40" opacity="0.8" />
+          <path d="M -22 18 L 14 18 L 10 14 L -22 14 Z" fill="#0B1E40" opacity="0.8" />
+
+          {/* Front Aero Splitter */}
+          <polygon points="34,-18 42,-14 42,14 34,18" fill="#153875" stroke="#C8D2E0" strokeWidth="1" />
+
+          {/* Rear Wing Endplates */}
+          <rect x="-38" y="-20" width="6" height="40" rx="1.5" fill="#FF2800" stroke="#FF4419" strokeWidth="0.5" />
+
+          {/* Twin High-Intensity Projector Headlights */}
+          <circle cx="36" cy="-11" r="2.5" fill="#F4F6F9" stroke="#2563EB" strokeWidth="1" />
+          <circle cx="36" cy="11" r="2.5" fill="#F4F6F9" stroke="#2563EB" strokeWidth="1" />
+          {/* Forward Light Cones */}
+          <polygon points="38,-12 62,-18 62,-4 38,-10" fill="url(#car-headlight-glow)" opacity="0.45" />
+          <polygon points="38,10 62,4 62,18 38,12" fill="url(#car-headlight-glow)" opacity="0.45" />
+
+          {/* Exposed #FF2800 Double-Helix Cockpit Canopy */}
+          <ellipse cx="4" cy="0" rx="20" ry="9" fill="#03050A" stroke="#FF2800" strokeWidth="1.5" />
+          {/* Strand A (Red-Orange) */}
+          <path
+            d="M -14 0 Q -9 -6 -4 0 T 6 0 T 16 0"
+            fill="none"
+            stroke="#FF2800"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+          {/* Strand B (Metallic Silver) */}
+          <path
+            d="M -14 0 Q -9 6 -4 0 T 6 0 T 16 0"
+            fill="none"
+            stroke="#C8D2E0"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+          {/* Base-Pair Rungs */}
+          <line x1="-11" y1="-4" x2="-11" y2="4" stroke="#FF4419" strokeWidth="1.2" />
+          <line x1="-6" y1="-3" x2="-6" y2="3" stroke="#2563EB" strokeWidth="1.2" />
+          <line x1="-1" y1="-5" x2="-1" y2="5" stroke="#FF2800" strokeWidth="1.2" />
+          <line x1="4" y1="-3" x2="4" y2="3" stroke="#C8D2E0" strokeWidth="1.2" />
+          <line x1="9" y1="-5" x2="9" y2="5" stroke="#FF4419" strokeWidth="1.2" />
+          <line x1="14" y1="-3" x2="14" y2="3" stroke="#2563EB" strokeWidth="1.2" />
         </g>
       </svg>
 
-      {/* =====================================================================
-          UNBOXED EDITORIAL TYPOGRAPHY AT EACH APEX (Alternating Left / Right)
-          ===================================================================== */}
-      <div className="relative z-20 space-y-44 sm:space-y-48 pt-6">
-        {EXPERIENCE_ROLES.map((role) => {
-          const isRoleActive = activeIndex === role.index;
-          const isRoleHovered = hoveredIndex === role.index;
-          const isHighlighted = isRoleActive || isRoleHovered;
-
-          // Position matching the apex y coordinate
+      <div className="relative z-20">
+        {EXPERIENCE_ROLES.map((role, index) => {
+          const active = activeIndex === index;
           return (
             <div
               key={role.id}
-              className={`w-full flex ${role.side === 'left' ? 'justify-start' : 'justify-end'} px-4 sm:px-8 lg:px-12`}
-              style={{ minHeight: '220px' }}
+              data-experience-row
+              className={`experience-row ${index % 2 === 0 ? 'role-left' : 'role-right'}`}
             >
-              <div
-                className={`max-w-xl transition-all duration-300 cursor-pointer ${
-                  role.side === 'left' ? 'text-left' : 'text-right'
-                }`}
-                onClick={() => navigateToRole(role.index)}
-                onMouseEnter={() => setHoveredIndex(role.index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                role="button"
-                tabIndex={0}
-                aria-label={`Inspect Role: ${role.company}`}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigateToRole(role.index);
-                  }
+              <button
+                ref={(node) => {
+                  apexRefs.current[index] = node;
                 }}
+                type="button"
+                data-experience-apex
+                aria-label={`Navigate to ${role.company}`}
+                aria-pressed={active}
+                onClick={() => navigateToRole(index)}
+                className="experience-apex"
+                style={{ borderColor: active ? '#FF2800' : '#2563EB' }}
               >
-                {/* Index Numeral + Timeframe Row */}
+                <span className="sr-only">{index + 1}</span>
+                <span
+                  className="block w-2.5 h-2.5 rounded-full transition-colors duration-200"
+                  style={{ background: active ? '#FF2800' : '#C8D2E0' }}
+                />
+              </button>
+
+              <article className="experience-copy min-w-0">
+                <button
+                  type="button"
+                  className="experience-heading w-full"
+                  onClick={() => navigateToRole(index)}
+                  aria-expanded={active}
+                  aria-controls={`experience-detail-${role.id}`}
+                >
+                  <span className="block font-serif text-5xl text-[#7E8B9B] mb-3">0{index + 1}</span>
+                  <span className="block text-xs font-mono text-[#FF2800] mb-2">{role.period}</span>
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif leading-tight text-[#F4F6F9]">
+                    {role.company}
+                  </h3>
+                  <span className="block text-sm font-sans text-[#C8D2E0] mt-2 font-medium">{role.role}</span>
+                </button>
+                <p className="text-sm sm:text-base text-[#7E8B9B] leading-relaxed mt-3">{role.leadSummary}</p>
                 <div
-                  className={`flex items-center gap-4 text-xs font-mono mb-2 ${
-                    role.side === 'left' ? 'justify-start' : 'justify-end'
-                  }`}
+                  id={`experience-detail-${role.id}`}
+                  className="mt-4 pt-4 border-t border-[#18458B]/30 text-left"
                 >
-                  <span className="font-serif text-5xl sm:text-6xl text-[#7E8B9B] font-light leading-none">
-                    0{role.index + 1}
-                  </span>
-                  <div className="flex flex-col">
-                    <span className="text-[#FF2800] font-semibold tracking-wider uppercase text-[11px]">
-                      {role.period}
-                    </span>
-                    <span className="text-[#7E8B9B] text-[11px]">
-                      {role.year} · Verified Sector
-                    </span>
-                  </div>
-                </div>
-
-                {/* Organization Name (32px–40px Alabaster Serif #F4F6F9) */}
-                <h3
-                  className={`text-2xl sm:text-3xl lg:text-4xl font-serif leading-tight tracking-tight transition-colors duration-200 ${
-                    isHighlighted ? 'text-[#F4F6F9]' : 'text-[#C8D2E0]'
-                  }`}
-                >
-                  {role.company}
-                </h3>
-
-                {/* Role Title (14px Monospace in #FF2800 & #C8D2E0) */}
-                <div className="text-sm font-mono text-[#FF2800] mt-1.5 font-medium">
-                  {role.role}
-                </div>
-
-                {/* Lead Summary */}
-                <p className="text-sm sm:text-base font-sans text-[#7E8B9B] leading-relaxed mt-3 max-w-lg">
-                  {role.leadSummary}
-                </p>
-
-                {/* Smoothly Expanded Impact Points when Active */}
-                {isRoleActive && (
-                  <div
-                    className={`mt-5 pt-4 border-t border-[#18458B]/30 space-y-2.5 transition-all duration-300 animate-fadeIn ${
-                      role.side === 'left' ? 'text-left' : 'text-left'
-                    }`}
-                  >
-                    <div className="text-[10px] font-mono text-[#2563EB] uppercase tracking-wider">
-                      MEASURABLE ENGINEERING OUTCOMES:
+                  <ul className={`space-y-2 text-xs sm:text-sm text-[#C8D2E0] leading-relaxed list-disc ${
+                    index % 2 === 0 ? 'lg:list-none lg:pl-0 pl-4' : 'pl-4'
+                  }`}>
+                    {role.bullets.map((bullet) => (
+                      <li key={bullet} className={index % 2 === 0 ? 'lg:text-right' : 'text-left'}>
+                        {bullet}
+                      </li>
+                    ))}
+                  </ul>
+                  {role.verifiedOutcome && (
+                    <div className={`mt-3 pt-2 text-xs font-mono text-[#FF2800] font-semibold ${
+                      index % 2 === 0 ? 'lg:text-right' : 'text-left'
+                    }`}>
+                      <span className="text-[#7E8B9B]">Outcome: </span>
+                      {role.verifiedOutcome}
                     </div>
-                    <ul className="space-y-1.5 text-xs font-sans text-[#C8D2E0] leading-relaxed">
-                      {role.bullets.map((b, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="text-[#FF2800] mt-0.5 shrink-0">▸</span>
-                          <span>{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* Stack Specification (Middle-dot separated) */}
-                    <div className="pt-2 text-xs font-mono text-[#C8D2E0]/90 tracking-wide">
-                      {role.skillsDemonstrated.join(' · ')}
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                  <p className={`pt-2.5 text-xs font-mono text-[#7E8B9B] ${
+                    index % 2 === 0 ? 'lg:text-right' : 'text-left'
+                  }`}>
+                    {role.skillsDemonstrated.join(' · ')}
+                  </p>
+                </div>
+              </article>
             </div>
           );
         })}
       </div>
+
+      <style jsx>{`
+        .experience-track {
+          container-type: inline-size;
+        }
+        .experience-row {
+          display: grid;
+          grid-template-columns: 44px minmax(0, 1fr);
+          align-items: flex-start;
+          min-height: 220px;
+          padding: 24px 0;
+          transition: background-color 0.25s ease;
+        }
+        .experience-apex {
+          grid-column: 1;
+          grid-row: 1;
+          justify-self: center;
+          margin-top: 6px;
+          display: grid;
+          place-items: center;
+          width: 40px;
+          height: 40px;
+          min-width: 40px;
+          min-height: 40px;
+          border: 1px solid;
+          border-radius: 50%;
+          background: #03050A;
+          cursor: pointer;
+          transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+        .experience-copy {
+          grid-column: 2;
+          grid-row: 1;
+          padding-left: 14px;
+          overflow-wrap: anywhere;
+        }
+        .experience-heading {
+          text-align: left;
+          background: transparent;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+        }
+        .experience-apex:focus-visible,
+        .experience-heading:focus-visible {
+          outline: 2px solid #E6ECF5;
+          outline-offset: 4px;
+        }
+        @container (min-width: 600px) {
+          .experience-row {
+            grid-template-columns: 60px minmax(0, 1fr);
+            padding: 32px 0;
+          }
+          .experience-apex {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
+            margin-top: 8px;
+          }
+          .experience-copy {
+            padding-left: 20px;
+          }
+        }
+        @container (min-width: 900px) {
+          .experience-row {
+            grid-template-columns: minmax(0, 5fr) minmax(180px, 2fr) minmax(0, 5fr);
+            align-items: center;
+            min-height: 280px;
+            padding: 40px 0;
+          }
+          .experience-apex {
+            grid-column: 2;
+            margin-top: 0;
+          }
+          .role-left .experience-apex {
+            transform: translateX(24px);
+          }
+          .role-right .experience-apex {
+            transform: translateX(-24px);
+          }
+          .role-left .experience-copy {
+            grid-column: 1;
+            padding: 0 48px 0 0;
+            text-align: right;
+          }
+          .role-right .experience-copy {
+            grid-column: 3;
+            padding: 0 0 0 48px;
+            text-align: left;
+          }
+          .role-left .experience-heading {
+            text-align: right;
+          }
+        }
+      `}</style>
     </div>
   );
 };

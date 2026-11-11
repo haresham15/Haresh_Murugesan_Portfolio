@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useCanvasStage, type CanvasStageDraw } from '../hooks/useCanvasStage';
 import { useMotionPreference } from './MotionPreference';
 
 /**
@@ -29,16 +30,19 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
   const { isReduced } = useMotionPreference();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const drawRef = useRef<CanvasStageDraw>(() => {});
+  useCanvasStage(canvasRef, canvasRef, (ctx, stage) => drawRef.current(ctx, stage), { animate: !isReduced });
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    let animationFrameId: number;
+
     let width = 0;
     let height = 0;
-    let dpr = 1;
+
 
     // Resting background tint (Brushed Titanium / Machined Silver #7E8B9B)
     const baseColor: ColorRGB = { r: 126, g: 139, b: 155 };
@@ -244,31 +248,6 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
       }
     };
 
-    const handleResize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      width = window.innerWidth;
-      height = window.innerHeight;
-
-      // Adjust spacing: 70px on mobile screens, 56px on desktop
-      SPACING = width < 768 ? 70 : 56;
-      mouse.radius = width < 768 ? 140 : 180;
-
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-
-      ctx.scale(dpr, dpr);
-      initParticles();
-
-      if (isReduced) {
-        ctx.clearRect(0, 0, width, height);
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize, { passive: true });
-
     // Track pointer movement with smooth velocity
     const handlePointerMove = (e: MouseEvent | TouchEvent) => {
       let currentX = 0;
@@ -329,11 +308,16 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
     window.addEventListener('touchstart', handlePointerDown, { passive: true });
     window.addEventListener('touchend', handleMouseLeave, { passive: true });
 
-    // 60fps render loop with battery saving
-    let isRunning = !isReduced;
-    const render = (time: number) => {
-      if (!isRunning) return;
-
+    drawRef.current = (ctx, stage) => {
+      if (width !== stage.width || height !== stage.height) {
+        width = stage.width;
+        height = stage.height;
+        SPACING = width < 768 ? 70 : 56;
+        mouse.radius = width < 768 ? 140 : 180;
+        initParticles();
+      }
+      const time = stage.time;
+      if (isReduced) { ctx.clearRect(0, 0, width, height); return; }
       mouse.vx *= 0.76;
       mouse.vy *= 0.76;
 
@@ -381,44 +365,23 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
         }
       }
 
-      animationFrameId = requestAnimationFrame(render);
     };
-
-    if (!isReduced) {
-      animationFrameId = requestAnimationFrame(render);
-    } else {
-      ctx.clearRect(0, 0, width, height);
-    }
-
-    const handleVisibilityChange = () => {
-      if (document.hidden || isReduced) {
-        isRunning = false;
-        cancelAnimationFrame(animationFrameId);
-      } else {
-        isRunning = true;
-        animationFrameId = requestAnimationFrame(render);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', handleResize);
+      drawRef.current = () => {};
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('touchmove', handlePointerMove);
       window.removeEventListener('touchstart', handlePointerDown);
       window.removeEventListener('touchend', handleMouseLeave);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [isReduced]);
 
   return (
     <canvas
       ref={canvasRef}
-      className={`fixed inset-0 pointer-events-none z-0 ${className}`}
+      className={`fixed inset-0 w-full h-full pointer-events-none z-0 ${className}`}
       style={{ willChange: 'transform' }}
       aria-hidden="true"
     />

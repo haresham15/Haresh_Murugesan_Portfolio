@@ -153,11 +153,11 @@ export const ThemeSection: React.FC<ThemeSectionProps> = ({
         ['--theme-accent-sec' as any]: palette.accentSecondary || palette.accent,
         ['--theme-border' as any]: palette.border,
       }}
-      className={`w-screen max-w-none relative overflow-x-hidden ${minHeight} ${pyPadding} ${className}`}
+      className={`w-full relative overflow-x-hidden ${minHeight} ${pyPadding} ${className}`}
       {...rest}
     >
-      {/* Content Layer floating on open Forged Carbon background */}
-      <div className="relative z-10 w-full h-full flex flex-col">
+      {/* Content Layer floating on open Forged Carbon background with standard responsive padding */}
+      <div className="relative z-10 w-full h-full flex flex-col max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         {children}
       </div>
     </section>

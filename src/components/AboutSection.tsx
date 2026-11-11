@@ -55,7 +55,7 @@ export const AboutSection: React.FC = () => {
       aria-label="About and engineering thesis"
       className="border-b border-[#18458B]/20 py-24 lg:py-36"
     >
-      <div className="w-full flex flex-col justify-center my-auto space-y-24 sm:space-y-32">
+      <div className="w-full flex flex-col justify-center my-auto space-y-28">
         {/* =====================================================================
             PRIMARY SPREAD: 40% PORTRAIT / 60% EDITORIAL NARRATIVE
             ===================================================================== */}
@@ -73,7 +73,7 @@ export const AboutSection: React.FC = () => {
                 rotateY,
                 transformPerspective: 1000,
               }}
-              className="relative w-full aspect-[4/5] max-w-[480px] mx-auto lg:mx-0 select-none cursor-pointer group"
+              className="relative w-full max-w-[280px] sm:max-w-[360px] lg:max-w-[440px] aspect-[4/5] mx-auto lg:mx-0 select-none cursor-pointer group"
             >
               {/* Offset Double-Frame Shadow Contours */}
               <div
@@ -119,7 +119,7 @@ export const AboutSection: React.FC = () => {
               </div>
 
               {/* Clean Floating Marginalia Tag (Outside Bottom-Left Edge) */}
-              <div className="absolute -bottom-8 left-0 text-[11px] font-mono text-[#7E8B9B] tracking-wider whitespace-nowrap hidden sm:block">
+              <div className="relative mt-4 text-[11px] font-mono text-[#7E8B9B] tracking-wider flex flex-wrap gap-y-1">
                 <span className="text-[#F4F6F9] font-semibold">HARESH MURUGESAN</span>
                 <span className="mx-2 text-[#FF2800]">·</span>
                 <span>COLUMBUS, OH [40.0067° N, 83.0305° W]</span>
@@ -210,18 +210,18 @@ export const AboutSection: React.FC = () => {
             </div>
 
             {/* Direct Action Links */}
-            <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 text-xs font-mono">
               <a
                 href="#experience"
                 onClick={scrollToAnchor('experience')}
-                className="px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-semibold rounded-[2px] transition-colors inline-flex items-center gap-2 select-none shadow-[0_4px_16px_rgba(255,40,0,0.3)]"
+                className="px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-semibold rounded-[2px] transition-colors inline-flex items-center justify-center gap-2 select-none shadow-[0_4px_16px_rgba(255,40,0,0.3)] text-center"
               >
                 <span>Follow the Experience S-Curve</span>
                 <span>↓</span>
               </a>
               <Link
                 href="/about"
-                className="px-6 py-3.5 bg-[#060A12] hover:bg-[#0B1E40] text-[#F4F6F9] border border-[#18458B]/30 rounded-[2px] transition-colors inline-flex items-center gap-2 select-none font-medium"
+                className="px-6 py-3.5 bg-[#060A12] hover:bg-[#0B1E40] text-[#F4F6F9] border border-[#18458B]/30 rounded-[2px] transition-colors inline-flex items-center justify-center gap-2 select-none font-medium text-center"
               >
                 <span>Full Leadership Profile</span>
                 <span>→</span>
@@ -252,25 +252,25 @@ export const AboutSection: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7 bg-[#060A12] border border-[#18458B]/25 p-6 rounded-[2px] space-y-4">
-              <div className="flex items-center justify-between text-xs font-mono pb-3 border-b border-[#18458B]/20">
+              <div className="flex flex-wrap gap-2 items-center justify-between text-xs font-mono pb-3 border-b border-[#18458B]/20">
                 <span className="text-[#C8D2E0]">Vectorized Saliency Tensor Architecture</span>
                 <span className="text-[#FF2800] font-semibold">8.09ms Latency</span>
               </div>
               <p className="text-sm font-sans text-[#7E8B9B] leading-relaxed">
                 Applying deep convolutional networks and explainable Grad-CAM saliency heatmaps to gigapixel whole slide pathology images. The pipeline eliminates boundary tiling artifacts across 100,000×100,000px clinical slide tissue sections, benchmarking segmented cellular boundaries against ground-truth pathologist annotations via cross-validated Dice coefficient and Intersection-over-Union (IoU) metrics.
               </p>
-              <div className="grid grid-cols-3 gap-3 pt-2 text-xs font-mono">
-                <div className="p-3 bg-[#03050A] border border-[#18458B]/20 rounded-[2px]">
-                  <div className="text-[#7E8B9B]">Inference Speed</div>
-                  <div className="text-sm font-bold text-[#FF2800] mt-0.5">8.09 ms</div>
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-2 text-xs font-mono">
+                <div className="p-2.5 sm:p-3 bg-[#03050A] border border-[#18458B]/20 rounded-[2px] text-center sm:text-left">
+                  <div className="text-[10px] sm:text-xs text-[#7E8B9B]">Inference Speed</div>
+                  <div className="text-xs sm:text-sm font-bold text-[#FF2800] mt-0.5">8.09 ms</div>
                 </div>
-                <div className="p-3 bg-[#03050A] border border-[#18458B]/20 rounded-[2px]">
-                  <div className="text-[#7E8B9B]">Boundary Overlap</div>
-                  <div className="text-sm font-bold text-[#C8D2E0] mt-0.5">&gt;91% IoU</div>
+                <div className="p-2.5 sm:p-3 bg-[#03050A] border border-[#18458B]/20 rounded-[2px] text-center sm:text-left">
+                  <div className="text-[10px] sm:text-xs text-[#7E8B9B]">Boundary Overlap</div>
+                  <div className="text-xs sm:text-sm font-bold text-[#C8D2E0] mt-0.5">&gt;91% IoU</div>
                 </div>
-                <div className="p-3 bg-[#03050A] border border-[#18458B]/20 rounded-[2px]">
-                  <div className="text-[#7E8B9B]">Tiling Artifacts</div>
-                  <div className="text-sm font-bold text-[#2563EB] mt-0.5">0% Edge Bleed</div>
+                <div className="p-2.5 sm:p-3 bg-[#03050A] border border-[#18458B]/20 rounded-[2px] text-center sm:text-left">
+                  <div className="text-[10px] sm:text-xs text-[#7E8B9B]">Tiling Artifacts</div>
+                  <div className="text-xs sm:text-sm font-bold text-[#2563EB] mt-0.5">0% Bleed</div>
                 </div>
               </div>
             </div>

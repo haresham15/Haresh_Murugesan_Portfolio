@@ -120,10 +120,10 @@ export default function AboutPage() {
         <ForgedCarbonCanvas />
         <SiteHeader />
 
-        <main id="main-content" className="w-full flex-grow max-w-[1280px] mx-auto px-6 sm:px-8 lg:px-12 pt-32 sm:pt-40 pb-24 relative z-10">
+        <main id="main-content" className="w-full flex-grow max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-12 pt-28 sm:pt-40 pb-20 sm:pb-24 relative z-10">
           
           {/* Header Profile Section (40% Portrait / 60% Narrative) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start mb-20 sm:mb-28 pb-16 sm:pb-20 border-b border-[#18458B]/20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start mb-16 sm:mb-28 pb-12 sm:pb-20 border-b border-[#18458B]/20">
             <div className="lg:col-span-8 space-y-6">
               <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800]">
                 <span className="w-6 h-px bg-[#FF2800]" />
@@ -143,19 +143,19 @@ export default function AboutPage() {
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-4">
                 <a
                   href="/Haresh_Murugesan_Resume.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono text-xs font-semibold rounded-[2px] transition-colors select-none inline-flex items-center gap-2 shadow-[0_0_16px_rgba(255,40,0,0.3)]"
+                  className="min-h-[44px] px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono text-xs font-semibold rounded-[2px] transition-colors select-none inline-flex items-center justify-center gap-2 shadow-[0_0_16px_rgba(255,40,0,0.3)] cursor-pointer"
                 >
                   <span>View Verified Résumé</span>
                   <span>↗</span>
                 </a>
                 <Link
                   href="/projects"
-                  className="px-6 py-3.5 bg-[#060A12] hover:bg-[#0B1E40]/40 border border-[#18458B]/25 text-[#F4F6F9] font-mono text-xs font-medium rounded-[2px] transition-colors select-none"
+                  className="min-h-[44px] px-6 py-3.5 bg-[#060A12] hover:bg-[#0B1E40]/40 border border-[#18458B]/25 text-[#F4F6F9] font-mono text-xs font-medium rounded-[2px] transition-colors select-none inline-flex items-center justify-center cursor-pointer"
                 >
                   Explore Systems Index
                 </Link>
@@ -163,7 +163,7 @@ export default function AboutPage() {
             </div>
 
             <div className="lg:col-span-4 flex justify-center">
-              <div className="relative w-full max-w-[340px] aspect-[4/5] bg-[#060A12] border border-[#18458B]/30 rounded-[2px] overflow-hidden shadow-2xl">
+              <div className="relative w-full max-w-[280px] sm:max-w-[340px] aspect-[4/5] bg-[#060A12] border border-[#18458B]/30 rounded-[2px] overflow-hidden shadow-2xl">
                 <Image
                   src="/profile.jpeg"
                   alt="Haresh Murugesan"
@@ -176,7 +176,7 @@ export default function AboutPage() {
           </div>
 
           {/* Current Focus (Now Section) */}
-          <section className="mb-20 sm:mb-28 p-8 sm:p-10 bg-[#060A12]/85 border border-[#18458B]/25 rounded-[2px] backdrop-blur-sm shadow-xl">
+          <section className="mb-16 sm:mb-28 p-5 sm:p-8 md:p-10 bg-[#060A12]/85 border border-[#18458B]/25 rounded-[2px] backdrop-blur-sm shadow-xl">
             <div className="flex items-center gap-2.5 mb-6 text-xs font-mono text-[#7E8B9B]">
               <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
               <span className="uppercase tracking-widest text-[#FF2800] font-semibold">CURRENT FOCUS &amp; AVAILABILITY (NOW)</span>

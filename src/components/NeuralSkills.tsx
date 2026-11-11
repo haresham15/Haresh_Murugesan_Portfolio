@@ -93,7 +93,7 @@ export const NeuralSkills: React.FC = () => {
     >
       <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
         {/* Section Intro (Unboxed & De-Vibecoded) */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#18458B]/20">
+        <div className="pb-8 border-b border-[#18458B]/20">
           <div className="space-y-3 max-w-3xl">
             <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
               Technical Index.
@@ -102,27 +102,23 @@ export const NeuralSkills: React.FC = () => {
               Five structured engineering domains backed by real production deliverables, client-side benchmarks, and collegiate research.
             </p>
           </div>
-
-          <div className="flex items-center gap-2 text-xs font-mono text-[#C8D2E0] shrink-0">
-            <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
-            <span className="text-[#FF2800] font-semibold">5 VERIFIED DOMAINS</span>
-          </div>
         </div>
 
         {/* Category Selector Strip */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 border-b border-[#18458B]/20 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-3 border-b border-[#18458B]/20 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
           {skillCategories.map((cat) => {
             const isActive = activeCategory === cat.id;
             return (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 py-2.5 text-xs font-mono transition-colors whitespace-nowrap cursor-pointer select-none rounded-[2px] ${
+                className={`min-h-[44px] px-3.5 sm:px-4 py-2 text-xs font-mono transition-colors whitespace-nowrap cursor-pointer select-none rounded-[2px] flex items-center gap-2 ${
                   isActive
                     ? 'bg-[#FF2800] text-[#03050A] font-semibold shadow-[0_0_12px_rgba(255,40,0,0.35)]'
                     : 'bg-[#060A12] text-[#7E8B9B] hover:text-[#F4F6F9] hover:bg-[#0B1E40]/40 border border-[#18458B]/20'
                 }`}
               >
+                <span className={`text-[10px] ${isActive ? 'text-[#03050A]/70' : 'text-[#2563EB]'}`}>{cat.number}</span>
                 <span>{cat.title}</span>
               </button>
             );

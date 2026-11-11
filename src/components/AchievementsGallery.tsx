@@ -5,7 +5,7 @@ export const AchievementsGallery: React.FC = () => {
   return (
     <section
       id="achievements"
-      className="relative w-screen max-w-none overflow-hidden py-20 sm:py-28 select-none"
+      className="relative w-full max-w-none overflow-visible py-20 sm:py-28 select-none"
       aria-label="Distinctions, competitive victories and credentials"
     >
       <MedallionCarousel />

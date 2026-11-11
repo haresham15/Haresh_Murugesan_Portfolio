@@ -174,14 +174,14 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
             </h1>
 
             {/* QUICK ACTIONS BAR */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-[2px] bg-[#060A12]/80 border border-[#18458B]/25 mb-8 backdrop-blur-sm">
-              <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-[2px] bg-[#060A12]/80 border border-[#18458B]/25 mb-8 backdrop-blur-sm">
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                 {project.demo && (
                   <a
                     href={project.demo}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-[2px] bg-[#FF2800] text-[#03050A] font-sans font-semibold text-xs hover:bg-[#C8D2E0] transition-colors flex items-center gap-1.5 shadow-[0_0_12px_rgba(255,40,0,0.3)]"
+                    className="min-h-[44px] px-4 py-2 rounded-[2px] bg-[#FF2800] text-[#03050A] font-sans font-semibold text-xs hover:bg-[#C8D2E0] transition-colors flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(255,40,0,0.3)] cursor-pointer"
                   >
                     <span>Open Live System</span>
                     <span>↗</span>
@@ -192,7 +192,7 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                     href={project.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-[2px] bg-[#060A12] border border-[#18458B]/30 text-[#F4F6F9] font-sans font-medium text-xs hover:border-[#FF2800] transition-colors flex items-center gap-1.5"
+                    className="min-h-[44px] px-4 py-2 rounded-[2px] bg-[#060A12] border border-[#18458B]/30 text-[#F4F6F9] font-sans font-medium text-xs hover:border-[#FF2800] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <span>View Repository</span>
                     <span>↗</span>
@@ -203,7 +203,7 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
               <button
                 type="button"
                 onClick={handleCopySummary}
-                className="px-3 py-1.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/30 text-xs font-mono text-[#7E8B9B] hover:text-[#F4F6F9] transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="min-h-[44px] px-3.5 py-2 rounded-[2px] bg-[#060A12] border border-[#18458B]/30 text-xs font-mono text-[#7E8B9B] hover:text-[#F4F6F9] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span>{copiedSummary ? '✓ Copied Summary' : 'Copy Recruiter Summary'}</span>
               </button>
@@ -249,7 +249,7 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
               <div className="lg:col-span-9 space-y-12 sm:space-y-16">
                 
                 {/* 0. Executive Summary */}
-                <section id="summary" className="p-6 sm:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
+                <section id="summary" className="p-4 sm:p-6 md:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
                   <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F4F6F9] mb-4 tracking-tight flex items-center gap-2">
                     <span className="text-[#FF2800] font-mono text-base">01.</span>
                     <span>Executive Summary</span>
@@ -260,7 +260,7 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                 </section>
 
                 {/* 1. Problem & Constraints */}
-                <section id="problem" className="p-6 sm:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
+                <section id="problem" className="p-4 sm:p-6 md:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
                   <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F4F6F9] mb-4 tracking-tight flex items-center gap-2">
                     <span className="text-[#FF2800] font-mono text-base">02.</span>
                     <span>Problem &amp; Constraints</span>
@@ -271,7 +271,7 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                 </section>
 
                 {/* 2. System Architecture */}
-                <section id="architecture" className="p-6 sm:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
+                <section id="architecture" className="p-4 sm:p-6 md:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
                   <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F4F6F9] mb-4 tracking-tight flex items-center gap-2">
                     <span className="text-[#FF2800] font-mono text-base">03.</span>
                     <span>System Architecture</span>
@@ -303,7 +303,7 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                 </section>
 
                 {/* 3. Explicit Engineering Decisions & Tradeoffs */}
-                <section id="tradeoffs" className="p-6 sm:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
+                <section id="tradeoffs" className="p-4 sm:p-6 md:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
                   <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F4F6F9] mb-2 tracking-tight flex items-center gap-2">
                     <span className="text-[#FF2800] font-mono text-base">04.</span>
                     <span>Engineering Decisions &amp; Tradeoffs</span>
@@ -316,35 +316,35 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                     {caseStudy.decisions && caseStudy.decisions.map((dec: EngineeringTradeoff, idx: number) => (
                       <div
                         key={idx}
-                        className="p-5 sm:p-6 rounded-[2px] bg-[#03050A] border border-[#18458B]/20 flex flex-col gap-4"
+                        className="p-4 sm:p-5 md:p-6 rounded-[2px] bg-[#03050A] border border-[#18458B]/20 flex flex-col gap-4"
                       >
                         <h3 className="text-base sm:text-lg font-serif font-bold text-[#F4F6F9] tracking-tight">
                           Decision {idx + 1}: {dec.title}
                         </h3>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
-                          <div className="p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs font-sans">
+                          <div className="p-3 sm:p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
                             <span className="text-[#10B981] font-mono font-semibold uppercase tracking-wider block mb-1">
                               Option Chosen
                             </span>
                             <p className="text-[#F4F6F9] leading-relaxed">{dec.optionChosen}</p>
                           </div>
 
-                          <div className="p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
+                          <div className="p-3 sm:p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
                             <span className="text-[#F87171] font-mono font-semibold uppercase tracking-wider block mb-1">
                               Alternative Rejected
                             </span>
                             <p className="text-[#7E8B9B] leading-relaxed">{dec.alternativeRejected}</p>
                           </div>
 
-                          <div className="p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
+                          <div className="p-3 sm:p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
                             <span className="text-[#FF2800] font-mono font-semibold uppercase tracking-wider block mb-1">
                               Cost Accepted
                             </span>
                             <p className="text-[#F4F6F9] leading-relaxed">{dec.costAccepted}</p>
                           </div>
 
-                          <div className="p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
+                          <div className="p-3 sm:p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
                             <span className="text-[#2563EB] font-mono font-semibold uppercase tracking-wider block mb-1">
                               Measured Impact
                             </span>
@@ -357,7 +357,7 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                 </section>
 
                 {/* 4. Evaluation & Methodology */}
-                <section id="evaluation" className="p-6 sm:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
+                <section id="evaluation" className="p-4 sm:p-6 md:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
                   <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F4F6F9] mb-4 tracking-tight flex items-center gap-2">
                     <span className="text-[#FF2800] font-mono text-base">05.</span>
                     <span>Evaluation &amp; Verified Metrics</span>
@@ -388,7 +388,7 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                 </section>
 
                 {/* 5. Personal Contribution */}
-                <section id="contribution" className="p-6 sm:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
+                <section id="contribution" className="p-4 sm:p-6 md:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
                   <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F4F6F9] mb-4 tracking-tight flex items-center gap-2">
                     <span className="text-[#FF2800] font-mono text-base">06.</span>
                     <span>Personal Contribution</span>
@@ -399,18 +399,18 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                 </section>
 
                 {/* 6. Limitations & Next Steps */}
-                <section id="limitations" className="p-6 sm:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
+                <section id="limitations" className="p-4 sm:p-6 md:p-8 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm scroll-mt-28">
                   <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F4F6F9] mb-4 tracking-tight flex items-center gap-2">
                     <span className="text-[#FF2800] font-mono text-base">07.</span>
                     <span>Limitations &amp; Next Steps</span>
                   </h2>
                   <div className="space-y-4 text-sm sm:text-base font-sans">
-                    <div className="p-4 rounded-[2px] bg-[#03050A] border border-[#18458B]/20">
+                    <div className="p-3.5 sm:p-4 rounded-[2px] bg-[#03050A] border border-[#18458B]/20">
                       <p className="text-xs font-mono uppercase text-[#FF2800] mb-1 font-semibold">Known Limitations:</p>
                       <p className="text-[#7E8B9B] leading-relaxed">{caseStudy.limitations}</p>
                     </div>
 
-                    <div className="p-4 rounded-[2px] bg-[#03050A] border border-[#18458B]/20">
+                    <div className="p-3.5 sm:p-4 rounded-[2px] bg-[#03050A] border border-[#18458B]/20">
                       <p className="text-xs font-mono uppercase text-[#2563EB] mb-1 font-semibold">Next Engineering Steps:</p>
                       <p className="text-[#F4F6F9] leading-relaxed">{caseStudy.nextSteps}</p>
                     </div>

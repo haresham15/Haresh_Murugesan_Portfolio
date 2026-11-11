@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import { useCanvasStage } from '../hooks/useCanvasStage';
 import { useMotionPreference } from './MotionPreference';
 
 interface WheelNavTriggerProps {
@@ -27,15 +28,14 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
   const [rotationDeg, setRotationDeg] = useState(0);
   const smokeCanvasRef = useRef<HTMLCanvasElement>(null);
   const smokeParticlesRef = useRef<SmokeParticle[]>([]);
-  const smokeAnimRef = useRef<number | null>(null);
+  const [smoking, setSmoking] = useState(false);
 
   // Volumetric Smoke Particle Emitter: spawns 30 turbulent radial-gradient smoke puffs
   const triggerBurnoutSmoke = useCallback(() => {
     if (isReduced) return;
     const canvas = smokeCanvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+
 
     // Contact patch origin relative to 180x180 canvas (bottom-left of wheel hub at (75, 115))
     const originX = 75;
@@ -66,18 +66,19 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
 
     smokeParticlesRef.current = newParticles;
 
-    if (smokeAnimRef.current) {
-      cancelAnimationFrame(smokeAnimRef.current);
-    }
+    setSmoking(true);
+  }, [isReduced]);
 
-    const renderSmoke = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  useCanvasStage(smokeCanvasRef, smokeCanvasRef, (ctx, { width, height, deltaTime }) => {
+      ctx.clearRect(0, 0, width, height);
+      if (isReduced) return;
+      ctx.scale(width / 180, height / 180);
       const particles = smokeParticlesRef.current;
       let activeCount = 0;
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        p.life++;
+        p.life += deltaTime / (1000 / 60);
         if (p.life >= p.maxLife) continue;
         activeCount++;
 
@@ -115,22 +116,8 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
         ctx.fill();
       }
 
-      if (activeCount > 0) {
-        smokeAnimRef.current = requestAnimationFrame(renderSmoke);
-      } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        smokeAnimRef.current = null;
-      }
-    };
-
-    smokeAnimRef.current = requestAnimationFrame(renderSmoke);
-  }, [isReduced]);
-
-  useEffect(() => {
-    return () => {
-      if (smokeAnimRef.current) cancelAnimationFrame(smokeAnimRef.current);
-    };
-  }, []);
+      if (activeCount === 0 && smoking) setSmoking(false);
+  }, { animate: smoking && !isReduced });
 
   const handleClick = () => {
     if (!isReduced) {

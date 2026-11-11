@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+
 import { allProjects, Project } from '@/content/projects';
 
 // ---------------------------------------------------------------------------
@@ -19,14 +19,14 @@ export interface DomainModule {
 }
 
 export const DOMAIN_MODULES: DomainModule[] = [
-  // Backend Core Domains (10 Systems Total)
+  // Backend Core Domains
   {
     id: 'domain-cv-lidar',
     coreId: 'core-backend',
     label: 'Computer Vision & Clinical LiDAR',
     tagline: '8.09ms Grad-CAM Saliency, 3D LiDAR topography, and histological AI',
     accentColor: '#FF2800',
-    projectSlugs: ['healios', 'cv-allergy-wheal', 'digital-pathology-wsi'],
+    projectSlugs: ['healios', 'cv-allergy-wheal'],
   },
   {
     id: 'domain-search-nlp',
@@ -34,7 +34,7 @@ export const DOMAIN_MODULES: DomainModule[] = [
     label: 'Hybrid Search & NLP Retrieval',
     tagline: '94.2% Hit@5 FAISS dense embeddings and hybrid BM25 pipelines',
     accentColor: '#FF4419',
-    projectSlugs: ['tamiltrove', 'tutormatch', 'vantage-ai'],
+    projectSlugs: ['tamiltrove', 'tutormatch'],
   },
   {
     id: 'domain-spatial-ml',
@@ -53,7 +53,7 @@ export const DOMAIN_MODULES: DomainModule[] = [
     projectSlugs: ['software-2-projects', 'software-1-projects'],
   },
 
-  // Frontend Core Domains (8 Systems Total)
+  // Frontend Core Domains
   {
     id: 'domain-spatial-3d',
     coreId: 'core-frontend',
@@ -76,564 +76,578 @@ export const DOMAIN_MODULES: DomainModule[] = [
     label: 'Media, Brand & Productivity Platforms',
     tagline: 'Continuous Web Audio DSP, DTCG design tokens, and static SSG',
     accentColor: '#C8D2E0',
-    projectSlugs: ['syntinuum-podcast-website', 'murugesan-rajaram-lab', 'momwebsite'],
+    projectSlugs: ['syntinuum-podcast-website', 'murugesan-rajaram-lab', 'momwebsite', 'portfolio-website', 'anna-birthday'],
   },
 ];
 
+const CORES: { id: CorePortalId; label: string; color: string }[] = [
+  { id: 'core-backend', label: 'Backend, AI/ML & Compute Engines', color: '#FF2800' },
+  { id: 'core-frontend', label: 'Frontend, Spatial UI & Interactive Systems', color: '#2563EB' },
+];
+
 export const SystemsCodeGraph: React.FC = () => {
-  const router = useRouter();
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [path, setPath] = useState<{ core: CorePortalId | null; domain: string | null; project: string | null }>({
+    core: null,
+    domain: null,
+    project: null,
+  });
+  const [view, setView] = useState<'graph' | 'all'>('graph');
+  const stageRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const shouldFocus = useRef(false);
+  const [edges, setEdges] = useState<string[]>([]);
 
-  // View Mode: 'rabbit-hole' vs 'constellation'
-  const [viewMode, setViewMode] = useState<'rabbit-hole' | 'constellation'>('rabbit-hole');
-
-  // Rabbit-Hole Navigation State: activePath = [tier1, tier2, tier3]
-  const [activeDepth, setActiveDepth] = useState<0 | 1 | 2 | 3>(0);
-  const [selectedCoreId, setSelectedCoreId] = useState<CorePortalId | null>(null);
-  const [selectedDomainId, setSelectedDomainId] = useState<string | null>(null);
-  const [selectedProjectSlug, setSelectedProjectSlug] = useState<string | null>(null);
-
-  // Camera Translation
-  const [camX, setCamX] = useState<number>(0);
-  const targetCamX = useRef<number>(0);
-
-  // Fast Project Map
   const projectMap = useMemo(() => {
     const map = new Map<string, Project>();
-    allProjects.forEach((p) => {
-      map.set(p.slug, p);
-      if (p.aliases) {
-        p.aliases.forEach((alias) => map.set(alias, p));
-      }
+    allProjects.forEach(project => {
+      map.set(project.slug, project);
+      project.aliases?.forEach(alias => map.set(alias, project));
     });
     return map;
   }, []);
 
-  // Update target camera X based on active rabbit-hole depth
-  useEffect(() => {
-    if (activeDepth === 0) targetCamX.current = 0;
-    else if (activeDepth === 1) targetCamX.current = -420;
-    else if (activeDepth === 2) targetCamX.current = -880;
-    else if (activeDepth === 3) targetCamX.current = -1240;
-  }, [activeDepth]);
+  const core = CORES.find(item => item.id === path.core);
+  const domain = DOMAIN_MODULES.find(item => item.id === path.domain);
+  const project = path.project ? projectMap.get(path.project) : undefined;
+  const domains = DOMAIN_MODULES.filter(item => item.coreId === path.core);
+  const projects = domain?.projectSlugs.flatMap(slug => {
+    const item = projectMap.get(slug);
+    return item ? [item] : [];
+  }) ?? [];
 
-  // Smooth camera interpolation RAF loop (duration: 650ms easing)
+  const title = project
+    ? project.title
+    : domain
+    ? domain.label
+    : core
+    ? core.label
+    : `${allProjects.length} Engineered Systems`;
+
+  const navigate = (next: typeof path) => {
+    shouldFocus.current = true;
+    setPath(next);
+  };
+
   useEffect(() => {
-    let animId: number;
-    const lerpCamera = () => {
-      setCamX((prev) => {
-        const dx = targetCamX.current - prev;
-        if (Math.abs(dx) < 0.25) return targetCamX.current;
-        return prev + dx * 0.10;
+    if (shouldFocus.current) {
+      headingRef.current?.focus({ preventScroll: true });
+      shouldFocus.current = false;
+    }
+  }, [path, view]);
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage || view !== 'graph') return;
+    // Edges use rendered anchors, so text wrapping and container resizing cannot cause drift.
+    const measure = () => {
+      const bounds = stage.getBoundingClientRect();
+      const nodes = Array.from(stage.querySelectorAll<HTMLElement>('[data-graph-node]'));
+      const next: string[] = [];
+      nodes.forEach(node => {
+        const parent = nodes.find(candidate => candidate.dataset.graphNode === node.dataset.parent);
+        if (!parent) return;
+        const a = parent.getBoundingClientRect();
+        const b = node.getBoundingClientRect();
+        const stacked = b.top >= a.bottom;
+        const x1 = (stacked ? a.left + a.width / 2 : a.right) - bounds.left;
+        const y1 = (stacked ? a.bottom : a.top + a.height / 2) - bounds.top;
+        const x2 = (stacked ? b.left + b.width / 2 : b.left) - bounds.left;
+        const y2 = (stacked ? b.top : b.top + b.height / 2) - bounds.top;
+        next.push(stacked
+          ? `M ${x1} ${y1} C ${x1} ${(y1 + y2) / 2}, ${x2} ${(y1 + y2) / 2}, ${x2} ${y2}`
+          : `M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
       });
-      animId = requestAnimationFrame(lerpCamera);
+      setEdges(next);
     };
-    animId = requestAnimationFrame(lerpCamera);
-    return () => cancelAnimationFrame(animId);
-  }, []);
-
-  // Step-Down Handlers
-  const handleSelectCore = (coreId: CorePortalId) => {
-    setSelectedCoreId(coreId);
-    setSelectedDomainId(null);
-    setSelectedProjectSlug(null);
-    setActiveDepth(1);
-  };
-
-  const handleSelectDomain = (domainId: string) => {
-    setSelectedDomainId(domainId);
-    setSelectedProjectSlug(null);
-    setActiveDepth(2);
-  };
-
-  const handleSelectProject = (slug: string) => {
-    if (selectedProjectSlug === slug) {
-      router.push(`/projects/${slug}`);
-      return;
-    }
-    setSelectedProjectSlug(slug);
-    setActiveDepth(3);
-  };
-
-  // Step-Back Navigation
-  const handleStepBackTo = (depth: 0 | 1 | 2) => {
-    if (depth === 0) {
-      setSelectedCoreId(null);
-      setSelectedDomainId(null);
-      setSelectedProjectSlug(null);
-      setActiveDepth(0);
-    } else if (depth === 1) {
-      setSelectedDomainId(null);
-      setSelectedProjectSlug(null);
-      setActiveDepth(1);
-    } else if (depth === 2) {
-      setSelectedProjectSlug(null);
-      setActiveDepth(2);
-    }
-  };
-
-  const activeProject = useMemo(() => {
-    if (selectedProjectSlug) return projectMap.get(selectedProjectSlug) || null;
-    return null;
-  }, [selectedProjectSlug, projectMap]);
-
-  const activeDomain = useMemo(() => {
-    if (selectedDomainId) return DOMAIN_MODULES.find((d) => d.id === selectedDomainId) || null;
-    return null;
-  }, [selectedDomainId]);
+    const observer = new ResizeObserver(measure);
+    observer.observe(stage);
+    stage.querySelectorAll('[data-graph-node]').forEach(node => observer.observe(node));
+    measure();
+    return () => observer.disconnect();
+  }, [path, view]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-screen max-w-none min-h-[88vh] overflow-hidden select-none py-10 flex flex-col justify-between bg-transparent"
-      aria-label="Linear Rabbit-Hole Systems CodeGraph"
-    >
-      {/* =====================================================================
-          TOP FLOATING RABBIT-HOLE PATH TRAIL & MODE TOGGLE
-          ===================================================================== */}
-      <div className="relative z-30 w-full max-w-[1440px] mx-auto px-[4vw] md:px-[6vw] xl:px-[7vw] flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#2563EB]/20">
-        
-        {/* Floating Top-Left Breadcrumb Trail */}
-        <div className="flex items-center gap-2 text-xs font-mono">
-          <button
-            type="button"
-            onClick={() => handleStepBackTo(0)}
-            className={`px-3 py-1.5 rounded-[2px] transition-all cursor-pointer font-medium flex items-center gap-2 ${
-              activeDepth === 0
-                ? 'bg-[#FF2800] text-[#03050A] font-bold'
-                : 'text-[#C8D2E0] hover:text-[#F4F6F9] hover:bg-[#060A12]'
-            }`}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#F4F6F9]" />
-            <span>All Systems (18)</span>
-          </button>
-
-          {selectedCoreId && (
-            <>
-              <span className="text-[#2563EB]">▸</span>
-              <button
-                type="button"
-                onClick={() => handleStepBackTo(1)}
-                className={`px-3 py-1.5 rounded-[2px] transition-all cursor-pointer font-medium ${
-                  activeDepth === 1
-                    ? 'bg-[#FF2800] text-[#03050A] font-bold'
-                    : 'text-[#C8D2E0] hover:text-[#F4F6F9] hover:bg-[#060A12]'
-                }`}
-              >
-                {selectedCoreId === 'core-backend' ? 'Backend & AI' : 'Frontend & Spatial'}
-              </button>
-            </>
-          )}
-
-          {activeDomain && (
-            <>
-              <span className="text-[#2563EB]">▸</span>
-              <button
-                type="button"
-                onClick={() => handleStepBackTo(2)}
-                className={`px-3 py-1.5 rounded-[2px] transition-all cursor-pointer font-medium ${
-                  activeDepth === 2
-                    ? 'bg-[#FF2800] text-[#03050A] font-bold'
-                    : 'text-[#C8D2E0] hover:text-[#F4F6F9] hover:bg-[#060A12]'
-                }`}
-              >
-                {activeDomain.label}
-              </button>
-            </>
-          )}
-
-          {activeProject && (
-            <>
-              <span className="text-[#2563EB]">▸</span>
-              <span className="px-3 py-1.5 bg-[#FF2800]/20 text-[#F4F6F9] border border-[#FF2800]/40 rounded-[2px] font-semibold">
-                {activeProject.title.split('—')[0].trim()}
-              </span>
-            </>
-          )}
+    <section className="systems-graph" aria-label="Systems CodeGraph">
+      <header className="graph-header">
+        <div>
+          <h2 className="font-serif text-3xl md:text-5xl">Systems CodeGraph</h2>
+          <p>Explore the systems through their engineering domains.</p>
         </div>
-
-        {/* Top-Right Toggle: [Rabbit-Hole Mode] / [Full 18-Node Constellation Map] */}
-        <div className="flex items-center gap-2 text-xs font-mono">
+        <div className="view-switch" aria-label="Archive view">
           <button
             type="button"
-            onClick={() => setViewMode('rabbit-hole')}
-            className={`px-3 py-1.5 rounded-[2px] cursor-pointer transition-colors ${
-              viewMode === 'rabbit-hole'
-                ? 'bg-[#FF2800] text-[#03050A] font-bold'
-                : 'text-[#7E8B9B] hover:text-[#F4F6F9]'
-            }`}
-          >
-            Rabbit-Hole Mode
-          </button>
-          <span className="text-[#2563EB]">|</span>
-          <button
-            type="button"
-            onClick={() => setViewMode('constellation')}
-            className={`px-3 py-1.5 rounded-[2px] cursor-pointer transition-colors ${
-              viewMode === 'constellation'
-                ? 'bg-[#2563EB] text-[#F4F6F9] font-bold'
-                : 'text-[#7E8B9B] hover:text-[#F4F6F9]'
-            }`}
-          >
-            Full 18-Node Constellation Map
-          </button>
-        </div>
-      </div>
-
-      {/* =====================================================================
-          VIEW 1: LINEAR RABBIT-HOLE CAMERA ENGINE (Integrated Open-Page)
-          ===================================================================== */}
-      {viewMode === 'rabbit-hole' ? (
-        <div className="relative w-full flex-1 overflow-hidden flex items-center my-auto py-10">
-          
-          {/* World Camera Container */}
-          <div
-            className="relative w-full h-[640px] transition-none"
-            style={{
-              transform: `translate3d(${camX}px, 0, 0)`,
-              willChange: 'transform',
+            aria-pressed={view === 'graph'}
+            onClick={() => {
+              shouldFocus.current = true;
+              setView('graph');
             }}
           >
-            {/* Connecting SVG Energy Conduits */}
-            <svg
-              className="absolute inset-0 w-[2800px] h-full pointer-events-none overflow-visible"
-              aria-hidden="true"
-            >
-              {/* Spline from Depth 0 to Depth 1 */}
-              {selectedCoreId && (
-                <path
-                  d={`M 360 ${selectedCoreId === 'core-backend' ? 240 : 420} C 500 ${
-                    selectedCoreId === 'core-backend' ? 240 : 420
-                  }, 620 320, 780 320`}
-                  fill="none"
-                  stroke={selectedCoreId === 'core-backend' ? '#FF2800' : '#2563EB'}
-                  strokeWidth="2.5"
-                  strokeDasharray="6 4"
-                />
-              )}
+            Explore graph
+          </button>
+          <button
+            type="button"
+            aria-pressed={view === 'all'}
+            onClick={() => {
+              shouldFocus.current = true;
+              setView('all');
+            }}
+          >
+            All systems
+          </button>
+        </div>
+      </header>
 
-              {/* Spline from Depth 1 to Depth 2 */}
-              {activeDomain && (
-                <path
-                  d="M 940 320 C 1100 320, 1180 320, 1340 320"
-                  fill="none"
-                  stroke="#2563EB"
-                  strokeWidth="2.5"
-                  strokeDasharray="6 4"
-                />
-              )}
+      <h3 ref={headingRef} tabIndex={-1} className="stage-heading font-serif text-2xl">
+        {view === 'all' ? 'All engineered systems' : title}
+      </h3>
+      <p className="sr-only" role="status">{view === 'all' ? 'All systems' : title}</p>
 
-              {/* Spline from Depth 2 to Depth 3 */}
-              {activeProject && (
-                <path
-                  d="M 1520 320 C 1650 320, 1720 320, 1860 320"
-                  fill="none"
-                  stroke="#FF2800"
-                  strokeWidth="2.5"
-                  strokeDasharray="6 4"
-                />
-              )}
-            </svg>
-
-            {/* ===================================================================
-                DEPTH 0: ENTRY PRIMARY ARCHITECTURE PORTALS (worldX ≈ 180px)
-                =================================================================== */}
-            <div
-              className={`absolute top-1/2 -translate-y-1/2 left-[140px] flex flex-col gap-8 transition-all duration-500 ${
-                activeDepth > 0 ? 'opacity-35 hover:opacity-100 scale-95 origin-left' : 'opacity-100 scale-100'
-              }`}
-              style={{ width: '380px' }}
-            >
-              <div className="space-y-1 pb-2 border-b border-[#2563EB]/30 text-xs font-mono">
-                <span className="text-[#FF2800]">DEPTH 00 · CORE ARCHITECTURES</span>
-                <h3 className="font-serif text-2xl text-[#F4F6F9]">Primary Portals</h3>
-              </div>
-
-              {/* Portal A: Backend, AI/ML & Compute Engines (10 Systems) */}
-              <div
-                onClick={() => handleSelectCore('core-backend')}
-                className={`p-6 transition-all duration-300 cursor-pointer border-b ${
-                  selectedCoreId === 'core-backend'
-                    ? 'border-[#FF2800] bg-[#060A12]/80'
-                    : 'border-[#2563EB]/30 hover:border-[#FF2800]'
-                }`}
-              >
-                <div className="flex items-center justify-between text-xs font-mono mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF2800] shadow-[0_0_10px_#FF2800]" />
-                    <span className="text-[#FF2800] font-bold">PORTAL A</span>
-                  </div>
-                  <span className="text-[#C8D2E0] font-mono text-[11px]">10 SYSTEMS</span>
-                </div>
-                <h4 className="text-2xl font-serif text-[#F4F6F9] leading-snug">
-                  Backend, AI/ML &amp; Compute Engines
-                </h4>
-                <p className="text-xs font-sans text-[#7E8B9B] mt-2 leading-relaxed">
-                  PyTorch, Computer Vision Grad-CAM, 3D LiDAR point-clouds, and FAISS vector indices.
-                </p>
-                <div className="mt-4 pt-2 text-[11px] font-mono text-[#FF2800] flex items-center justify-between">
-                  <span>Translate Camera Into Modules</span>
-                  <span>→</span>
-                </div>
-              </div>
-
-              {/* Portal B: Frontend, Spatial UI & Interactive Systems (8 Systems) */}
-              <div
-                onClick={() => handleSelectCore('core-frontend')}
-                className={`p-6 transition-all duration-300 cursor-pointer border-b ${
-                  selectedCoreId === 'core-frontend'
-                    ? 'border-[#2563EB] bg-[#060A12]/80'
-                    : 'border-[#2563EB]/30 hover:border-[#2563EB]'
-                }`}
-              >
-                <div className="flex items-center justify-between text-xs font-mono mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] shadow-[0_0_10px_#2563EB]" />
-                    <span className="text-[#2563EB] font-bold">PORTAL B</span>
-                  </div>
-                  <span className="text-[#C8D2E0] font-mono text-[11px]">8 SYSTEMS</span>
-                </div>
-                <h4 className="text-2xl font-serif text-[#F4F6F9] leading-snug">
-                  Frontend, Spatial UI &amp; Interactive Systems
-                </h4>
-                <p className="text-xs font-sans text-[#7E8B9B] mt-2 leading-relaxed">
-                  60 FPS dedicated Web Workers, Deck.GL 3D runtimes, and local state machines.
-                </p>
-                <div className="mt-4 pt-2 text-[11px] font-mono text-[#2563EB] flex items-center justify-between">
-                  <span>Translate Camera Into Modules</span>
-                  <span>→</span>
-                </div>
-              </div>
-            </div>
-
-            {/* ===================================================================
-                DEPTH 1: DOMAIN SUB-MODULES (Blooms at worldX ≈ 760px)
-                =================================================================== */}
-            {selectedCoreId && (
-              <div
-                className={`absolute top-1/2 -translate-y-1/2 left-[760px] flex flex-col gap-5 transition-all duration-500 ${
-                  activeDepth > 1 ? 'opacity-35 hover:opacity-100 scale-95 origin-left' : 'opacity-100 scale-100'
-                }`}
-                style={{ width: '420px' }}
-              >
-                <div className="space-y-1 pb-2 border-b border-[#2563EB]/30 text-xs font-mono">
-                  <span className="text-[#2563EB]">DEPTH 01 · DOMAIN SUB-MODULES</span>
-                  <h3 className="font-serif text-2xl text-[#F4F6F9]">
-                    {selectedCoreId === 'core-backend' ? 'AI/ML & Compute Modules' : 'Spatial & UI Modules'}
-                  </h3>
-                </div>
-
-                {DOMAIN_MODULES.filter((d) => d.coreId === selectedCoreId).map((domain) => {
-                  const isSelected = selectedDomainId === domain.id;
-                  return (
-                    <div
-                      key={domain.id}
-                      onClick={() => handleSelectDomain(domain.id)}
-                      className={`py-4 px-5 transition-all duration-300 cursor-pointer border-b ${
-                        isSelected
-                          ? 'border-[#FF2800] bg-[#060A12]/80'
-                          : 'border-[#2563EB]/30 hover:border-[#FF2800]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between text-xs font-mono">
-                        <span className="text-[#F4F6F9] font-medium text-sm">{domain.label}</span>
-                        <span className="text-[#FF2800] text-[11px] font-bold">
-                          {domain.projectSlugs.length} Systems →
-                        </span>
-                      </div>
-                      <p className="text-xs font-sans text-[#7E8B9B] mt-1.5 leading-relaxed">
-                        {domain.tagline}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* ===================================================================
-                DEPTH 2: SPECIFIC SYSTEM NODES (72px spacing at worldX ≈ 1340px)
-                =================================================================== */}
-            {activeDomain && (
-              <div
-                className={`absolute top-1/2 -translate-y-1/2 left-[1340px] flex flex-col gap-6 transition-all duration-500 ${
-                  activeDepth > 2 ? 'opacity-35 hover:opacity-100 scale-95 origin-left' : 'opacity-100 scale-100'
-                }`}
-                style={{ width: '460px' }}
-              >
-                <div className="space-y-1 pb-2 border-b border-[#2563EB]/30 text-xs font-mono">
-                  <span className="text-[#FF2800]">DEPTH 02 · PRODUCTION SYSTEMS</span>
-                  <h3 className="font-serif text-2xl text-[#F4F6F9]">Architectural Codebases</h3>
-                </div>
-
-                {activeDomain.projectSlugs.map((slug) => {
-                  const proj = projectMap.get(slug);
-                  if (!proj) return null;
-                  const isSelected = selectedProjectSlug === slug;
-
-                  return (
-                    <div
-                      key={slug}
-                      onClick={() => handleSelectProject(slug)}
-                      className={`py-4 px-5 transition-all duration-300 cursor-pointer border-b ${
-                        isSelected
-                          ? 'border-[#FF2800] bg-[#060A12]/80'
-                          : 'border-[#2563EB]/30 hover:border-[#FF2800]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <h4 className="text-lg font-serif text-[#F4F6F9] leading-snug">
-                          {proj.title}
-                        </h4>
-                        <span className="text-xs font-mono text-[#FF2800] shrink-0 font-bold">
-                          {proj.year}
-                        </span>
-                      </div>
-
-                      <div className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-mono text-[#C8D2E0]">
-                        <span className="text-[#FF2800]">★</span>
-                        <span>{proj.highlight}</span>
-                      </div>
-
-                      <p className="text-xs font-sans text-[#7E8B9B] mt-1.5 line-clamp-2 leading-relaxed">
-                        {proj.description}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* ===================================================================
-                DEPTH 3: UNBOXED HOLOGRAPHIC EDITORIAL SPEC (worldX ≈ 1920px)
-                =================================================================== */}
-            {activeProject && (
-              <div
-                className="absolute top-1/2 -translate-y-1/2 left-[1920px] space-y-6 animate-fadeIn"
-                style={{ width: '540px' }}
-              >
-                <div className="space-y-2 pb-3 border-b border-[#2563EB]/30">
-                  <div className="flex items-center gap-2 text-xs font-mono">
-                    <span className="text-[#FF2800] font-bold">{activeProject.category}</span>
-                    <span className="text-[#2563EB]">·</span>
-                    <span className="text-[#C8D2E0]">{activeProject.year}</span>
-                    <span className="text-[#2563EB]">·</span>
-                    <span className="text-[#2563EB]">Verified Architecture</span>
-                  </div>
-                  <h3 className="text-3xl font-serif text-[#F4F6F9] leading-tight">
-                    {activeProject.title}
-                  </h3>
-                </div>
-
-                {/* Oversized Benchmark Callout */}
-                <div className="py-4 border-y border-[#FF2800]/30 space-y-1">
-                  <div className="text-[10px] font-mono text-[#FF2800] uppercase tracking-wider">
-                    VERIFIED ARCHITECTURAL BENCHMARK:
-                  </div>
-                  <div className="text-xl font-mono text-[#F4F6F9] font-bold">
-                    {activeProject.highlight}
-                  </div>
-                </div>
-
-                {/* Architecture Breakdown Prose */}
-                <p className="text-sm font-sans text-[#C8D2E0] leading-relaxed">
-                  {activeProject.description}
-                </p>
-
-                {/* Tech Stack Pills */}
-                <div className="space-y-2 pt-2 border-t border-[#2563EB]/20">
-                  <span className="text-[10px] font-mono text-[#7E8B9B] uppercase tracking-wider block">
-                    TECH STACK:
-                  </span>
-                  <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-[#C8D2E0]">
-                    {activeProject.stack.split(',').map((tech, i, arr) => (
-                      <span key={i} className="text-[#F4F6F9]">
-                        {tech.trim()}
-                        {i < arr.length - 1 && <span className="ml-2 text-[#2563EB]">·</span>}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Action Buttons: Enter Full Case Study & Source Code */}
-                <div className="pt-4 flex items-center gap-4 text-xs font-mono">
-                  <Link
-                    href={`/projects/${activeProject.slug}`}
-                    className="px-6 py-3.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#F4F6F9] font-bold uppercase tracking-wider rounded-[2px] transition-all inline-flex items-center gap-2 shadow-[0_0_24px_rgba(255,40,0,0.35)]"
-                  >
-                    <span>Enter Full Case Study</span>
-                    <span>→</span>
-                  </Link>
-
-                  {activeProject.github && (
-                    <a
-                      href={activeProject.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-3.5 bg-transparent hover:bg-[#0B1E40]/40 text-[#C8D2E0] border border-[#2563EB]/30 font-medium rounded-[2px] transition-colors inline-flex items-center gap-2"
-                    >
-                      <span>Source Repository</span>
-                      <span>↗</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
-
-          </div>
-
+      {view === 'all' ? (
+        <div className="all-systems">
+          {allProjects.map(item => (
+            <article key={item.slug}>
+              <h4 className="font-serif text-xl">
+                <Link href={`/projects/${item.slug}`}>{item.title}</Link>
+              </h4>
+              <p>{item.year} · {item.category}</p>
+              <p>{item.highlight}</p>
+            </article>
+          ))}
         </div>
       ) : (
-        /* =====================================================================
-            VIEW 2: FULL 18-NODE CONSTELLATION MAP
-            ===================================================================== */
-        <div className="w-full max-w-[1440px] mx-auto px-[4vw] md:px-[6vw] xl:px-[7vw] py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {allProjects.map((p) => (
-            <div
-              key={p.slug}
-              className="py-5 px-6 border-b border-[#2563EB]/30 hover:border-[#FF2800] transition-colors flex flex-col justify-between"
-            >
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-[#FF2800] font-semibold">{p.category}</span>
-                  <span className="text-[#7E8B9B]">{p.year}</span>
-                </div>
-                <h4 className="text-xl font-serif text-[#F4F6F9] leading-snug">
-                  {p.title}
-                </h4>
-                <p className="text-xs font-sans text-[#7E8B9B] line-clamp-2 leading-relaxed">
-                  {p.description}
-                </p>
-              </div>
+        <div
+          ref={stageRef}
+          className={`graph-stage ${project ? 'with-dossier' : ''}`}
+          data-depth={project ? 3 : domain ? 2 : core ? 1 : 0}
+        >
+          <svg className="graph-edges" aria-hidden="true">
+            {edges.map((d, index) => (
+              <path key={index} d={d} fill="none" stroke={core?.color ?? '#2563EB'} strokeWidth="1.5" opacity=".55" />
+            ))}
+          </svg>
 
-              <div className="mt-4 pt-3 border-t border-[#2563EB]/20 flex items-center justify-between text-xs font-mono">
-                <span className="text-[#C8D2E0] text-[11px] truncate max-w-[200px]">
-                  {p.highlight}
-                </span>
-                <Link
-                  href={`/projects/${p.slug}`}
-                  className="text-[#FF2800] hover:text-[#F4F6F9] font-bold"
+          {/* Ancestry / Breadcrumb Rail (0–22% bounded desktop area) */}
+          <nav className="parents" aria-label="Graph breadcrumb">
+            <button
+              type="button"
+              className="graph-node"
+              data-graph-node="origin"
+              aria-current={!core ? 'step' : undefined}
+              onClick={() => navigate({ core: null, domain: null, project: null })}
+            >
+              <span className="orb" />
+              <strong>{allProjects.length} Engineered Systems</strong>
+              <small>Return to origin</small>
+            </button>
+            {core && (
+              <button
+                type="button"
+                className="graph-node"
+                data-graph-node="core"
+                data-parent="origin"
+                aria-current={!domain ? 'step' : undefined}
+                onClick={() => navigate({ core: core.id, domain: null, project: null })}
+              >
+                <span className="orb" style={{ borderColor: core.color }} />
+                <strong>{core.label}</strong>
+                <small>Browse domains</small>
+              </button>
+            )}
+            {domain && (
+              <button
+                type="button"
+                className="graph-node"
+                data-graph-node="domain"
+                data-parent="core"
+                aria-current={!project ? 'step' : undefined}
+                onClick={() => navigate({ core: path.core, domain: domain.id, project: null })}
+              >
+                <span className="orb" style={{ borderColor: domain.accentColor }} />
+                <strong>{domain.label}</strong>
+                <small>Browse projects</small>
+              </button>
+            )}
+          </nav>
+
+          {/* Active Nodes Cluster (22–60% bounded desktop area) */}
+          <div
+            key={project?.slug ?? domain?.id ?? core?.id ?? 'entry'}
+            className="cluster"
+            aria-label={project ? 'Selected project' : domain ? 'Projects' : core ? 'Domains' : 'Core portals'}
+          >
+            {!core &&
+              CORES.map(item => (
+                <button
+                  type="button"
+                  className="graph-node"
+                  key={item.id}
+                  data-graph-node={item.id}
+                  data-parent="origin"
+                  onClick={() => navigate({ core: item.id, domain: null, project: null })}
                 >
-                  Inspect →
+                  <span className="orb" style={{ borderColor: item.color }} />
+                  <strong>{item.label}</strong>
+                  <small>
+                    {DOMAIN_MODULES.filter(d => d.coreId === item.id).reduce((sum, d) => sum + d.projectSlugs.length, 0)} systems
+                  </small>
+                  <small>{DOMAIN_MODULES.filter(d => d.coreId === item.id).map(d => d.label).join(' · ')}</small>
+                </button>
+              ))}
+
+            {core &&
+              !domain &&
+              domains.map(item => (
+                <button
+                  type="button"
+                  className="graph-node"
+                  key={item.id}
+                  data-graph-node={item.id}
+                  data-parent="core"
+                  onClick={() => navigate({ core: path.core, domain: item.id, project: null })}
+                >
+                  <span className="orb" style={{ borderColor: item.accentColor }} />
+                  <strong>{item.label}</strong>
+                  <small>{item.tagline}</small>
+                  <small>{item.projectSlugs.length} systems</small>
+                </button>
+              ))}
+
+            {domain &&
+              (project ? [project] : projects).map(item => (
+                <button
+                  type="button"
+                  className="graph-node"
+                  key={item.slug}
+                  data-graph-node={item.slug}
+                  data-parent="domain"
+                  aria-pressed={project?.slug === item.slug}
+                  onClick={() => navigate({ core: path.core, domain: path.domain, project: item.slug })}
+                >
+                  <span className="orb" />
+                  <strong>{item.title}</strong>
+                  <small>{item.year}</small>
+                  <span className="benchmark">{item.highlight}</span>
+                </button>
+              ))}
+          </div>
+
+          {/* Dossier (60–96% bounded desktop area, max 480px) */}
+          {project && (
+            <aside
+              className="dossier"
+              aria-label={`${project.title} system dossier`}
+              data-graph-node="dossier"
+              data-parent={project.slug}
+            >
+              <p className="metadata">
+                {domain ? `${domain.label} · ` : ''}
+                {project.category} · {project.year}
+              </p>
+              <h4 className="font-serif text-3xl">{project.title}</h4>
+              <p className="dossier-metric">{project.highlight}</p>
+              <p className="narrative">{project.description}</p>
+              <p className="stack">
+                {project.stack
+                  .split(/[,·]/)
+                  .map(tech => tech.trim())
+                  .filter(Boolean)
+                  .join(' · ')}
+              </p>
+              <div className="dossier-actions">
+                <Link href={`/projects/${project.slug}`} className="case-link">
+                  Enter Full Case Study →
                 </Link>
+                {project.github && (
+                  <a href={project.github} target="_blank" rel="noopener noreferrer">
+                    Source Repository ↗
+                  </a>
+                )}
+                <button
+                  type="button"
+                  aria-label="Step Back"
+                  onClick={() => navigate({ core: path.core, domain: path.domain, project: null })}
+                >
+                  <span aria-hidden="true">← </span>Step Back
+                </button>
               </div>
-            </div>
-          ))}
+            </aside>
+          )}
         </div>
       )}
 
-      {/* Bottom Exploration Summary */}
-      <div className="relative z-30 w-full max-w-[1440px] mx-auto px-[4vw] md:px-[6vw] xl:px-[7vw] pt-4 border-t border-[#2563EB]/20 flex flex-wrap items-center justify-between text-xs font-mono text-[#7E8B9B]">
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FF2800]" />
-          <span>Active Exploration Depth: Level 0{activeDepth}</span>
-          <span>·</span>
-          <span>18 Architectural Repositories Indexed</span>
-        </div>
-        <Link href="/projects" className="text-[#FF2800] hover:text-[#F4F6F9] transition-colors">
-          View Master Telemetry Timing Sheet Ledger →
-        </Link>
-      </div>
-    </div>
+      <style jsx>{`
+        .systems-graph {
+          width: 100%;
+          min-width: 0;
+          color: #F4F6F9;
+          padding: 2.5rem clamp(1rem, 3.5vw, 3.5rem);
+        }
+        .graph-header {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1.5rem;
+        }
+        .graph-header p,
+        .dossier p {
+          color: #C8D2E0;
+          line-height: 1.7;
+          margin-top: 1rem;
+        }
+        .view-switch {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+        button {
+          text-align: left;
+          cursor: pointer;
+        }
+        button:focus-visible,
+        .systems-graph :global(a:focus-visible) {
+          outline: 2px solid #E6ECF5;
+          outline-offset: 4px;
+        }
+        .view-switch button,
+        .dossier-actions button {
+          min-height: 44px;
+          padding: 0.6rem 0.8rem;
+          border-bottom: 1px solid #153875;
+          color: #C8D2E0;
+          transition: border-color 0.2s, color 0.2s;
+        }
+        .view-switch button:hover,
+        .dossier-actions button:hover {
+          color: #F4F6F9;
+          border-color: #FF2800;
+        }
+        .view-switch button[aria-pressed='true'] {
+          border-color: #FF2800;
+          color: #F4F6F9;
+          font-weight: 600;
+        }
+        .stage-heading {
+          margin: 2rem 0;
+          overflow-wrap: anywhere;
+        }
+        .stage-heading:focus {
+          outline: none;
+        }
+        /* Desktop bounds: ancestry (0-22%), active nodes (22-60%), dossier (60-96%) */
+        .graph-stage {
+          position: relative;
+          display: grid;
+          grid-template-columns: minmax(0, 22fr) minmax(0, 74fr);
+          gap: 4%;
+          align-items: center;
+          min-height: 640px;
+          height: auto;
+        }
+        .graph-stage.with-dossier {
+          grid-template-columns: minmax(0, 22fr) minmax(0, 38fr) minmax(0, 36fr);
+          gap: 2%;
+        }
+        .graph-edges {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+        }
+        .parents,
+        .cluster {
+          position: relative;
+          min-width: 0;
+          display: grid;
+          gap: 2rem;
+          align-content: center;
+        }
+        .cluster {
+          gap: 1.5rem;
+          animation: arrive 0.35s ease-out;
+        }
+        .graph-node {
+          position: relative;
+          min-width: 0;
+          width: 100%;
+          min-height: 110px;
+          padding: 1rem;
+          border-bottom: 1px solid #153875;
+          background: #03050A;
+          overflow-wrap: anywhere;
+          transition: border-color 0.2s, background-color 0.2s;
+        }
+        .graph-node:hover,
+        .graph-node[aria-pressed='true'],
+        .graph-node[aria-current='step'] {
+          border-color: #FF2800;
+          background: #060A12;
+        }
+        .graph-node strong {
+          display: block;
+          font-weight: 500;
+          font-size: 1.05rem;
+          line-height: 1.35;
+        }
+        .graph-node small {
+          display: block;
+          margin-top: 0.5rem;
+          color: #C8D2E0;
+          line-height: 1.5;
+        }
+        .orb {
+          display: block;
+          width: 20px;
+          height: 20px;
+          margin-bottom: 0.75rem;
+          border: 2px solid #FF2800;
+          border-radius: 50%;
+          box-shadow: 0 0 16px #153875;
+        }
+        .benchmark {
+          display: block;
+          margin-top: 0.75rem;
+          color: #C8D2E0;
+          line-height: 1.5;
+          font-family: monospace;
+          font-size: 0.85rem;
+        }
+        .dossier {
+          position: relative;
+          min-width: 0;
+          max-width: 480px;
+          width: 100%;
+          justify-self: center;
+          overflow-wrap: anywhere;
+          padding: 1.5rem 0;
+          background: #03050A;
+          animation: arrive 0.35s ease-out;
+        }
+        .dossier .metadata {
+          color: #FF4419;
+          font-size: 0.8rem;
+          font-family: monospace;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .dossier h4 {
+          margin-top: 0.5rem;
+          line-height: 1.2;
+        }
+        .dossier .dossier-metric {
+          font-size: 1.25rem;
+          color: #F4F6F9;
+          padding: 0.85rem 0;
+          border-block: 1px solid #153875;
+          font-family: monospace;
+        }
+        .dossier .narrative {
+          font-size: 0.95rem;
+          line-height: 1.7;
+        }
+        .stack {
+          font-size: 0.8rem;
+          color: #7E8B9B;
+          font-family: monospace;
+          margin-top: 1rem;
+        }
+        .dossier-actions {
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0.75rem;
+          margin-top: 1.5rem;
+        }
+        .dossier-actions :global(a) {
+          display: block;
+          min-height: 44px;
+          padding: 0.8rem 1rem;
+          font-size: 0.85rem;
+          border: 1px solid rgba(24, 69, 139, 0.4);
+          text-align: center;
+          transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+        .dossier-actions :global(a:hover) {
+          border-color: #FF2800;
+          color: #F4F6F9;
+        }
+        .dossier-actions :global(.case-link) {
+          background: #FF2800;
+          color: #F4F6F9;
+          border-color: #FF2800;
+          font-weight: 600;
+        }
+        .dossier-actions :global(.case-link:hover) {
+          background: #FF4419;
+          border-color: #FF4419;
+        }
+        .all-systems {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 2rem;
+        }
+        .all-systems article {
+          min-width: 0;
+          overflow-wrap: anywhere;
+          padding: 1rem 0;
+          border-bottom: 1px solid #153875;
+        }
+        .all-systems p {
+          margin-top: 0.75rem;
+          color: #C8D2E0;
+        }
+        @keyframes arrive {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        /* Below 1024px: stack breadcrumb, active node list, and dossier with normal document scrolling */
+        @media (max-width: 1023px) {
+          .graph-stage,
+          .graph-stage.with-dossier {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 2rem;
+            min-height: 0;
+          }
+          .parents {
+            gap: 0.75rem;
+          }
+          .parents .graph-node {
+            min-height: 48px;
+            padding: 0.75rem 1rem;
+          }
+          .parents .orb,
+          .parents small,
+          .graph-edges {
+            display: none;
+          }
+          .dossier {
+            max-width: 100%;
+          }
+          .all-systems {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+        @media (max-width: 640px) {
+          .all-systems {
+            grid-template-columns: minmax(0, 1fr);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cluster,
+          .dossier {
+            animation: none;
+          }
+          .graph-node {
+            transition: none;
+          }
+        }
+      `}</style>
+    </section>
   );
 };
 

@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCanvasStage } from '../hooks/useCanvasStage';
+import { useMotionPreference } from './MotionPreference';
 import { ThemeSection } from './ThemeSection';
 
 const MotionDiv = motion.div as any;
@@ -18,30 +20,39 @@ interface FeaturedDialogue {
 
 const FEATURED_DIALOGUES: FeaturedDialogue[] = [
   {
-    id: 'dhaval-patel',
-    guest: 'Dhaval Patel',
-    role: 'Founder & CEO',
-    org: 'Lotus (ex-Apple Senior Engineering Manager)',
-    focus: 'Zero-touch wearable rings, firmware memory constraints, and high-volume hardware scaling.',
-    runtime: '58 min',
+    id: 'steve-wang',
+    guest: 'Steve Wang',
+    role: 'Founder & Managing Partner',
+    org: 'High-Tech Venture Capital',
+    focus: 'Hardware scaling, deep-tech venture development, and semiconductor / AI infrastructure.',
+    runtime: '49 min',
     url: 'https://syntinuumpodcast.com',
   },
   {
-    id: 'andrea-jacobs',
-    guest: 'Andrea Jacobs',
-    role: 'Director of AI & ML',
-    org: 'Chemical Abstracts Service (CAS)',
-    focus: 'CAS Newton, agentic scientific graph architectures, and fine-tuning biomedical LLMs.',
-    runtime: '52 min',
+    id: 'dhaval-patel',
+    guest: 'Dhaval Patel',
+    role: 'Founder & CEO',
+    org: 'codebasics',
+    focus: 'Democratizing data science, machine learning education, and scalable curriculum architecture.',
+    runtime: '58 min',
     url: 'https://syntinuumpodcast.com',
   },
   {
     id: 'paul-shapiro',
     guest: 'Paul Shapiro',
     role: 'CEO & Author',
-    org: 'The Better Meat Co. (Author of Clean Meat)',
+    org: 'The Better Meat Co.',
     focus: 'Bioreactor fermentation economics, food-tech scaling dilemmas, and industrial microbiology.',
     runtime: '46 min',
+    url: 'https://syntinuumpodcast.com',
+  },
+  {
+    id: 'andrea-jacobs',
+    guest: 'Andrea Jacobs',
+    role: 'Executive Director',
+    org: 'Technology & Human Rights Initiative',
+    focus: 'Algorithmic accountability, AI governance frameworks, and civil liberties in machine learning.',
+    runtime: '52 min',
     url: 'https://syntinuumpodcast.com',
   },
   {
@@ -53,22 +64,14 @@ const FEATURED_DIALOGUES: FeaturedDialogue[] = [
     runtime: '44 min',
     url: 'https://syntinuumpodcast.com',
   },
-  {
-    id: 'steve-wang',
-    guest: 'Steve Wang',
-    role: 'Founder & CEO',
-    org: 'Colorpik AI',
-    focus: 'Sub-millimeter color sensor hardware, pump micro-dispensing, and embedded C firmware.',
-    runtime: '49 min',
-    url: 'https://syntinuumpodcast.com',
-  },
 ];
 
 export const PodcastSection: React.FC = () => {
   const [activeZone, setActiveZone] = useState<PodcastZone>('dialogues');
   const [hoveredZone, setHoveredZone] = useState<PodcastZone | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animFrameRef = useRef<number | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const { isReduced } = useMotionPreference();
 
   const currentZone = hoveredZone || activeZone;
 
@@ -80,27 +83,8 @@ export const PodcastSection: React.FC = () => {
   };
 
   // 100vw Canvas Waveform Loop with 3 Harmonic Frequency Zones
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let width = (canvas.width = canvas.parentElement?.clientWidth || window.innerWidth);
-    let height = (canvas.height = canvas.parentElement?.clientHeight || 240);
-
-    const handleResize = () => {
-      if (!canvas || !canvas.parentElement) return;
-      width = canvas.width = canvas.parentElement.clientWidth;
-      height = canvas.height = canvas.parentElement.clientHeight;
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    let phase = 0;
-
-    const render = () => {
-      phase += 0.024;
+  useCanvasStage(stageRef, canvasRef, (ctx, { width, height, time }) => {
+      const phase = time * 0.00144;
       ctx.clearRect(0, 0, width, height);
 
       const zone1End = width * 0.33;
@@ -188,16 +172,7 @@ export const PodcastSection: React.FC = () => {
       ctx.stroke();
       ctx.restore();
 
-      animFrameRef.current = requestAnimationFrame(render);
-    };
-
-    animFrameRef.current = requestAnimationFrame(render);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [currentZone]);
+  }, { animate: !isReduced });
 
   return (
     <ThemeSection
@@ -219,7 +194,7 @@ export const PodcastSection: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 text-xs font-mono">
+          <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
             <a
               href="https://syntinuumpodcast.com"
               target="_blank"
@@ -244,10 +219,10 @@ export const PodcastSection: React.FC = () => {
         {/* =====================================================================
             EDGE-TO-EDGE 100VW LIVING AUDIO WAVEFORM & GLIDING DNA-LIGHTBULB
             ===================================================================== */}
-        <div className="w-screen -ml-[4vw] md:-ml-[6vw] xl:-ml-[7vw] relative border-y border-[#F4F6F9]/10 bg-[bg-transparent] select-none">
+        <div className="w-full relative border-y border-[#F4F6F9]/10 bg-[bg-transparent] select-none">
           
           {/* Canvas Waveform Container */}
-          <div className="relative w-full h-[220px] sm:h-[260px] overflow-hidden">
+          <div ref={stageRef} className="relative w-full h-[220px] sm:h-[260px] overflow-hidden">
             <canvas ref={canvasRef} className="w-full h-full block" />
 
             {/* Gliding DNA-Lightbulb Floating Selector */}
@@ -281,10 +256,11 @@ export const PodcastSection: React.FC = () => {
               {/* Zone 01: Signal */}
               <button
                 type="button"
+                aria-pressed={activeZone === 'signal'}
                 onClick={() => setActiveZone('signal')}
                 onMouseEnter={() => setHoveredZone('signal')}
                 onMouseLeave={() => setHoveredZone(null)}
-                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer group ${
+                className={`min-w-0 h-full text-left p-2 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer group ${
                   currentZone === 'signal' ? 'bg-[#FF2800]/[0.04]' : 'hover:bg-white/[0.02]'
                 }`}
               >
@@ -301,10 +277,11 @@ export const PodcastSection: React.FC = () => {
               {/* Zone 02: Dialogues */}
               <button
                 type="button"
+                aria-pressed={activeZone === 'dialogues'}
                 onClick={() => setActiveZone('dialogues')}
                 onMouseEnter={() => setHoveredZone('dialogues')}
                 onMouseLeave={() => setHoveredZone(null)}
-                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer border-x border-[#18458B]/20 group ${
+                className={`min-w-0 h-full text-left p-2 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer border-x border-[#18458B]/20 group ${
                   currentZone === 'dialogues' ? 'bg-[#2563EB]/[0.06]' : 'hover:bg-white/[0.02]'
                 }`}
               >
@@ -321,10 +298,11 @@ export const PodcastSection: React.FC = () => {
               {/* Zone 03: Architecture */}
               <button
                 type="button"
+                aria-pressed={activeZone === 'architecture'}
                 onClick={() => setActiveZone('architecture')}
                 onMouseEnter={() => setHoveredZone('architecture')}
                 onMouseLeave={() => setHoveredZone(null)}
-                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer group ${
+                className={`min-w-0 h-full text-left p-2 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer group ${
                   currentZone === 'architecture' ? 'bg-[#FF2800]/[0.04]' : 'hover:bg-white/[0.02]'
                 }`}
               >

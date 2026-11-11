@@ -6,7 +6,7 @@ interface CarbonFlake {
   radius: number;
   angle: number; // fiber orientation θ ∈ [0, π]
   sides: number;
-  vertices: { x: number; y: number }[];
+  vertices: { x: number; y: number }[]; // offsets relative to center
   baseColor: string;
 }
 
@@ -22,51 +22,56 @@ export const ForgedCarbonCanvas: React.FC = () => {
     let width = 0;
     let height = 0;
     let dpr = 1;
-    let flakes: CarbonFlake[] = [];
     let animId: number | null = null;
-    let mouse = { x: 0.5, y: 0.35, rawX: 0, rawY: 0 };
+    let mouse = { rawX: undefined as number | undefined, rawY: undefined as number | undefined };
     let scrollOffset = 0;
     let isTicking = false;
 
-    // Strict Dark Clamp: Base flake fill colors MUST stay between #04070E and #080E1A (never grey!)
+    // Contract: 512px repeating procedural tile, 160 facets
+    const TILE_SIZE = 512;
+    const FACET_COUNT = 160;
+
+    // Contract: Base facet colors strictly clamped between #04070D, #060B14, and #080F1C
     const DARK_FLAKE_PALETTE = [
-      '#04070E',
-      '#050811',
-      '#060913',
-      '#060A15',
-      '#070B17',
-      '#070C19',
-      '#080E1A',
+      '#04070D',
+      '#050910',
+      '#060B14',
+      '#070D18',
+      '#080F1C',
     ];
 
-    const generateFlakes = (w: number, h: number) => {
-      const flakeList: CarbonFlake[] = [];
-      // 180 overlapping, sharp-edged angular polygons (20px–70px across)
-      const count = Math.max(180, Math.floor((w * h) / 7500));
+    // Offscreen canvas for the 512x512 repeating procedural tile
+    const tileCanvas = document.createElement('canvas');
+    tileCanvas.width = TILE_SIZE;
+    tileCanvas.height = TILE_SIZE;
+    const tileCtx = tileCanvas.getContext('2d', { alpha: false });
 
-      // Deterministic PRNG to avoid layout shift between renders
-      let seed = 1337;
+    // Generate 160 angular 4-6-vertex facets (22px-64px wide) deterministically
+    const generateTileFlakes = (): CarbonFlake[] => {
+      const flakeList: CarbonFlake[] = [];
+      let seed = 421337;
       const rnd = () => {
         seed = (seed * 16807) % 2147483647;
         return (seed - 1) / 2147483646;
       };
 
-      for (let i = 0; i < count; i++) {
-        const x = rnd() * w;
-        const y = rnd() * h;
-        const radius = 20 + rnd() * 50; // 20px–70px across
-        const angle = rnd() * Math.PI; // θ_i ∈ [0, π]
-        const sides = 4 + Math.floor(rnd() * 3); // 4-to-6-sided Voronoi/tow flake
+      for (let i = 0; i < FACET_COUNT; i++) {
+        const x = rnd() * TILE_SIZE;
+        const y = rnd() * TILE_SIZE;
+        // 22px-64px wide (radius = 11px-32px)
+        const radius = 11 + rnd() * 21;
+        const angle = rnd() * Math.PI; // theta in [0, pi]
+        const sides = 4 + Math.floor(rnd() * 3); // 4, 5, or 6 vertices
         const baseColor = DARK_FLAKE_PALETTE[Math.floor(rnd() * DARK_FLAKE_PALETTE.length)];
 
-        // Generate sharp angular polygon vertices
+        // Generate sharp angular polygon vertices (offsets relative to 0,0)
         const vertices: { x: number; y: number }[] = [];
         for (let s = 0; s < sides; s++) {
           const vAngle = (s / sides) * Math.PI * 2 + (rnd() - 0.5) * 0.45;
-          const r = radius * (0.75 + rnd() * 0.5);
+          const r = radius * (0.8 + rnd() * 0.4);
           vertices.push({
-            x: x + Math.cos(vAngle) * r,
-            y: y + Math.sin(vAngle) * r,
+            x: Math.cos(vAngle) * r,
+            y: Math.sin(vAngle) * r,
           });
         }
 
@@ -84,6 +89,151 @@ export const ForgedCarbonCanvas: React.FC = () => {
       return flakeList;
     };
 
+    const flakes = generateTileFlakes();
+
+    const renderTile = (lightAngle: number) => {
+      if (!tileCtx) return;
+
+      // 1. Base Layer: Solid #03050A (Midnight Obsidian)
+      tileCtx.fillStyle = '#03050A';
+      tileCtx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+
+      // 2. Render 160 Angular Facets with Periodic Boundary Condition (Toroidal Wrapping)
+      for (let i = 0; i < flakes.length; i++) {
+        const f = flakes[i];
+        if (f.vertices.length < 3) continue;
+
+        // Contract: Directional glints using Math.pow(Math.abs(Math.cos(theta - lightAngle)), 16)
+        const theta = f.angle;
+        const glint = Math.pow(Math.abs(Math.cos(theta - lightAngle)), 16);
+
+        // Periodic wrapping offsets to eliminate seams across the 512px tile boundaries
+        const r = f.radius;
+        const wrapX = [0];
+        if (f.x - r < 0) wrapX.push(TILE_SIZE);
+        if (f.x + r > TILE_SIZE) wrapX.push(-TILE_SIZE);
+
+        const wrapY = [0];
+        if (f.y - r < 0) wrapY.push(TILE_SIZE);
+        if (f.y + r > TILE_SIZE) wrapY.push(-TILE_SIZE);
+
+        for (const ox of wrapX) {
+          for (const oy of wrapY) {
+            const cx = f.x + ox;
+            const cy = f.y + oy;
+
+            // Path for polygon facet
+            tileCtx.beginPath();
+            tileCtx.moveTo(cx + f.vertices[0].x, cy + f.vertices[0].y);
+            for (let v = 1; v < f.vertices.length; v++) {
+              tileCtx.lineTo(cx + f.vertices[v].x, cy + f.vertices[v].y);
+            }
+            tileCtx.closePath();
+
+            // Base facet fill (strictly clamped between #04070D, #060B14, and #080F1C)
+            tileCtx.fillStyle = f.baseColor;
+            tileCtx.fill();
+
+            // Striations and highlights inside the polygon
+            tileCtx.save();
+            tileCtx.clip();
+
+            const cosA = Math.cos(theta);
+            const sinA = Math.sin(theta);
+            const perpX = -sinA;
+            const perpY = cosA;
+
+            // 1px micro-striations along fiber angle theta
+            tileCtx.strokeStyle = 'rgba(200, 210, 224, ' + (0.02 + glint * 0.04).toFixed(3) + ')';
+            tileCtx.lineWidth = 1;
+
+            for (let line = -r; line <= r; line += 5) {
+              tileCtx.beginPath();
+              tileCtx.moveTo(
+                cx + perpX * line - cosA * r,
+                cy + perpY * line - sinA * r
+              );
+              tileCtx.lineTo(
+                cx + perpX * line + cosA * r,
+                cy + perpY * line + sinA * r
+              );
+              tileCtx.stroke();
+            }
+
+            // Restrained cobalt and silver highlights
+            if (glint > 0.015) {
+              // Deep cobalt sheen
+              const cobaltAlpha = Math.min(0.20, glint * 0.20);
+              tileCtx.fillStyle = 'rgba(21, 56, 117, ' + cobaltAlpha.toFixed(3) + ')';
+              tileCtx.fill();
+
+              // Bright cobalt highlight
+              const electricAlpha = Math.min(0.12, glint * 0.12);
+              tileCtx.fillStyle = 'rgba(37, 99, 235, ' + electricAlpha.toFixed(3) + ')';
+              tileCtx.fill();
+
+              // Machined silver highlight
+              const silverAlpha = Math.min(0.08, glint * 0.08);
+              tileCtx.fillStyle = 'rgba(200, 210, 224, ' + silverAlpha.toFixed(3) + ')';
+              tileCtx.fill();
+            }
+
+            tileCtx.restore();
+
+            // 0.5px edge bevel
+            const bevelAlpha = Math.max(0.02, Math.min(0.10, glint * 0.10));
+            tileCtx.strokeStyle = 'rgba(200, 210, 224, ' + bevelAlpha.toFixed(3) + ')';
+            tileCtx.lineWidth = 0.5;
+            tileCtx.stroke();
+          }
+        }
+      }
+    };
+
+    const render = () => {
+      if (!ctx || width === 0 || height === 0) return;
+
+      // Directional light angle derived from cursor and scroll
+      const mx = mouse.rawX !== undefined ? mouse.rawX : width * 0.65;
+      const my = mouse.rawY !== undefined ? mouse.rawY : height * 0.35;
+      const lightAngle = Math.atan2(my - height * 0.5, mx - width * 0.5) + scrollOffset * 0.002;
+
+      // 1. Render the 512px repeating procedural tile
+      renderTile(lightAngle);
+
+      // 2. Tile the 512px procedural pattern across the viewport
+      const pattern = ctx.createPattern(tileCanvas, 'repeat');
+      if (pattern) {
+        ctx.fillStyle = pattern;
+        ctx.fillRect(0, 0, width, height);
+      } else {
+        ctx.fillStyle = '#03050A';
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      // 3. Ambient depth vignette
+      const vignette = ctx.createRadialGradient(
+        width * 0.5,
+        height * 0.35,
+        Math.min(width, height) * 0.15,
+        width * 0.5,
+        height * 0.35,
+        Math.max(width, height) * 0.85
+      );
+      vignette.addColorStop(0, 'rgba(11, 30, 64, 0.22)');
+      vignette.addColorStop(0.5, 'rgba(3, 5, 10, 0.52)');
+      vignette.addColorStop(0.8, 'rgba(3, 5, 10, 0.85)');
+      vignette.addColorStop(1, '#03050A');
+
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, width, height);
+    };
+
+    const animateStep = () => {
+      render();
+      isTicking = false;
+    };
+
     const handleResize = () => {
       if (!canvas) return;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -92,20 +242,17 @@ export const ForgedCarbonCanvas: React.FC = () => {
 
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
 
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
-      flakes = generateFlakes(width, height);
       render();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       mouse.rawX = e.clientX;
       mouse.rawY = e.clientY;
-      mouse.x = e.clientX / Math.max(1, width);
-      mouse.y = e.clientY / Math.max(1, height);
       if (!isTicking) {
         isTicking = true;
         animId = requestAnimationFrame(animateStep);
@@ -118,113 +265,6 @@ export const ForgedCarbonCanvas: React.FC = () => {
         isTicking = true;
         animId = requestAnimationFrame(animateStep);
       }
-    };
-
-    const render = () => {
-      if (!ctx || width === 0 || height === 0) return;
-
-      // 1. BASE LAYER: Solid #03050A (Midnight Obsidian)
-      ctx.fillStyle = '#03050A';
-      ctx.fillRect(0, 0, width, height);
-
-      // Scroll-derived rotation component
-      const scrollAlpha = scrollOffset * 0.002;
-
-      // 2. RENDER 180 ANGULAR FORGED CARBON-TOW FACETS
-      for (let i = 0; i < flakes.length; i++) {
-        const f = flakes[i];
-        if (f.vertices.length < 3) continue;
-
-        // Virtual light angle α (slowly shifting with scroll window.scrollY * 0.002 and cursor)
-        const dx = (mouse.rawX || width * 0.5) - f.x;
-        const dy = (mouse.rawY || height * 0.35) - f.y;
-        const cursorAngle = Math.atan2(dy, dx);
-        const alpha = cursorAngle + scrollAlpha;
-
-        // Anisotropic Specular Factor: Math.pow(Math.abs(Math.cos(θ_i - α)), 14)
-        const cosDiff = Math.cos(f.angle - alpha);
-        const spec = Math.pow(Math.abs(cosDiff), 14);
-
-        // Path for Polygon Flake
-        ctx.beginPath();
-        ctx.moveTo(f.vertices[0].x, f.vertices[0].y);
-        for (let v = 1; v < f.vertices.length; v++) {
-          ctx.lineTo(f.vertices[v].x, f.vertices[v].y);
-        }
-        ctx.closePath();
-
-        // Base Flake Fill (Dark clamp #04070E to #080E1A)
-        ctx.fillStyle = f.baseColor;
-        ctx.fill();
-
-        // Internal Parallel 1px Micro-Striations along θ_i
-        ctx.save();
-        ctx.clip();
-
-        const cosA = Math.cos(f.angle);
-        const sinA = Math.sin(f.angle);
-        const perpX = -sinA;
-        const perpY = cosA;
-
-        ctx.strokeStyle = `rgba(200, 210, 224, ${(0.03 + spec * 0.04).toFixed(3)})`;
-        ctx.lineWidth = 1;
-
-        for (let line = -f.radius; line <= f.radius; line += 6) {
-          ctx.beginPath();
-          ctx.moveTo(
-            f.x + perpX * line - cosA * f.radius,
-            f.y + perpY * line - sinA * f.radius
-          );
-          ctx.lineTo(
-            f.x + perpX * line + cosA * f.radius,
-            f.y + perpY * line + sinA * f.radius
-          );
-          ctx.stroke();
-        }
-
-        // Anisotropic Cobalt & Silver Specular Sheen:
-        // Dark Cobalt (rgba(21, 56, 117, spec * 0.22)) + Machined Silver (rgba(200, 210, 224, spec * 0.07))
-        if (spec > 0.02) {
-          const cobaltAlpha = Math.min(0.22, spec * 0.22);
-          ctx.fillStyle = `rgba(21, 56, 117, ${cobaltAlpha.toFixed(3)})`;
-          ctx.fill();
-
-          const silverAlpha = Math.min(0.07, spec * 0.07);
-          ctx.fillStyle = `rgba(200, 210, 224, ${silverAlpha.toFixed(3)})`;
-          ctx.fill();
-        }
-
-        ctx.restore();
-
-        // 0.5px Edge Bevel: rgba(200, 210, 224, spec * 0.12)
-        const bevelAlpha = Math.max(0.02, Math.min(0.12, spec * 0.12));
-        ctx.strokeStyle = `rgba(200, 210, 224, ${bevelAlpha.toFixed(3)})`;
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-      }
-
-      // 3. AMBIENT DEPTH VIGNETTE:
-      // radial-gradient(circle at 50% 30%, rgba(11, 30, 64, 0.24), rgba(3, 5, 10, 0.88) 75%)
-      const vignette = ctx.createRadialGradient(
-        width * 0.5,
-        height * 0.3,
-        Math.min(width, height) * 0.12,
-        width * 0.5,
-        height * 0.3,
-        Math.max(width, height) * 0.85
-      );
-      vignette.addColorStop(0, 'rgba(11, 30, 64, 0.24)');
-      vignette.addColorStop(0.5, 'rgba(3, 5, 10, 0.55)');
-      vignette.addColorStop(0.75, 'rgba(3, 5, 10, 0.88)');
-      vignette.addColorStop(1, '#03050A');
-
-      ctx.fillStyle = vignette;
-      ctx.fillRect(0, 0, width, height);
-    };
-
-    const animateStep = () => {
-      render();
-      isTicking = false;
     };
 
     handleResize();
@@ -243,7 +283,7 @@ export const ForgedCarbonCanvas: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10 pointer-events-none w-screen h-screen block"
+      className="fixed inset-0 -z-10 pointer-events-none w-full h-full block"
       style={{ background: '#03050A' }}
       aria-hidden="true"
     />

@@ -109,22 +109,61 @@ All colors MUST reference these exact DTCG 3-tier tokens defined in [`design/tok
 ### 4.6 3D Machined Medallion Orbital Carousel ([`MedallionCarousel.tsx`](file:///src/components/MedallionCarousel.tsx))
 - 5 medallions (310px diameter, `perspective: 1500px`) celebrating 2× 1st Place ASA DataFest and key distinctions.
 - 72-tooth knurled silver bezel (`strokeDasharray="4 9.4"`), glowing `#FF2800` active center ring, 360° circular SVG textPath engraving, recessed cobalt well with vector crest, and $\pm 15^\circ$ cursor-tilt spring physics.
+- Responsive container-derived spacing ensures 0 horizontal page overflow on 390px mobile viewports.
+- Reserved plinth height eliminates layout shifts upon selection changes.
+
+### 4.7 Three-Row Stage Plates ([`src/components/plates/`](file:///src/components/plates/))
+- Standardized across `PlateHealios.tsx`, `PlateApexis.tsx`, `PlateRouteRx.tsx`, and `PlateTempo.tsx`:
+  - **Row 1**: Interactive mode tabs (updating real state, not mock tabs).
+  - **Row 2**: Flexible canvas drawing area (`min-h-0`).
+  - **Row 3**: Real-time telemetry readouts strictly isolated outside the drawing region.
 
 ---
 
-## 5. Verification & Deployment Pipeline
+## 5. V5 Master Audit & Remediation Ledger (Resolved)
+
+| ID | Component / Area | Status | Verification Summary |
+| :--- | :--- | :--- | :--- |
+| **FL-01** | `BentoHero.tsx` | **Resolved** | Exact `100dvh` lock, container width (no horizontal overflow), coordinate datum `40.00° N, 83.03° W · COLUMBUS, OH`, >48px CTA clearance. |
+| **FL-02** | `AsciiDnaLightbulbCanvas.tsx` | **Resolved** | Desktop center `(0.71W, 0.38H)`, radius `0.21 * min(W,H)`; smooth-min pear SDF, continuous DNA, supersonic plume with 4 shock diamonds, mobile protection. |
+| **FL-03** | `ForgedCarbonCanvas.tsx` | **Resolved** | 512px repeating tile, 160 facets, base clamp `#04070D`–`#080F1C`, `pow(..., 16)` glints, zero grey washes. |
+| **FL-04** | `UnifiedProjectField.tsx` | **Resolved** | Unboxed desktop 5/7 split in 12-column grid (`max-w-[1380px]`), clean responsive mobile stacking. |
+| **FL-05** | Plates (`Healios`, `Apexis`, `RouteRx`, `Tempo`) | **Resolved** | Standardized 3-row architecture, 3 interactive modes per plate, real telemetry outside drawing region. |
+| **FL-06** | `VerticalGrandPrixTrack.tsx` | **Resolved** | DOM-anchored track, 5 sectors, forward-only wrap-around loop kinematics, continuous tangent unwrapping, 0 text collisions. |
+| **FL-07** | `SystemsCodeGraph.tsx` | **Resolved** | 0–22%/22–60%/60–96% bounded desktop layout, max 480px dossier, DOM Bezier edges, stacked mobile layout. |
+| **FL-08** | `MedallionCarousel.tsx` | **Resolved** | 5 evidence medallions, `[-2..2]` signed offsets, unflattened 3D subtree, dynamic mobile spacing, stable plinth height. |
+| **FL-09** | Lower Sections (`Podcast`, `About`, `History`, `Now`) | **Resolved** | 5 verified podcast guests, 40/60 portrait/narrative, 112px research gap, unboxed history/skills/now/contact. |
+| **FL-10** | Mobile & iPad Recruiter Ergonomics | **Resolved** | Zero-overflow `w-full` container layout, always-visible experience sectors, Ohio State + Résumé CTAs in Hero, 44px touch targets, verified across 390px/768px viewports. |
+
+---
+
+## 6. Multi-Agent Delegation Protocol
+
+- **Coordinator**: Oversees architecture, ground truths, verification gates, and deployment promotions.
+- **Worker A** (`frontend-director`): Hero, Forged Carbon Engine, and Systems CodeGraph.
+- **Worker B** (`staff-engineer`): Selected Works 3-Row Plates and 3D Medallion Carousel.
+- **Worker C** (`frontend-director`): Grand Prix Experience Circuit and Lower Sections.
+
+Each subagent operates on isolated owned files without collisions, verifying all changes via `npm run typecheck`, `npm run validate-content`, and headless Playwright matrix audits before handoff.
+
+---
+
+## 7. Verification & Deployment Pipeline
 
 ```bash
-# 1. Typecheck TypeScript contracts
+# 1. Typecheck TypeScript contracts (0 errors)
 npm run typecheck
 
-# 2. Validate content registry & evidence claims
+# 2. Validate content registry & evidence claims (100% integrity)
 npm run validate-content
 
-# 3. Build & pre-render static HTML export to out/
+# 3. Verify vertical track geometry math
+node src/components/experience/verticalTrackGeometry.test.mjs
+
+# 4. Build & pre-render static HTML export to out/ (40 routes)
 npm run build
 
-# 4. Deploy to Vercel production edge
+# 5. Deploy to Vercel production edge
 npx vercel deploy --prod --yes
 ```
 

@@ -7,6 +7,7 @@
 - **Language**: TypeScript 5.0 (strict type-checking)
 - **Styling**: Tailwind CSS v4 Alpha + CSS Variables mapped in `design/tokens.json` & `src/index.css`
 - **Animation & Physics**: Framer Motion (spring physics, layout morphs) + GSAP (parametric spline kinematics) + HTML5 Canvas (procedural Voronoi carbon fiber & burnout smoke)
+- **Shared Canvas Hook**: `src/hooks/useCanvasStage.ts` (CSS-pixel coordinates, capped DPR `min(2, window.devicePixelRatio)`, ResizeObserver, visibilitychange pause/resume)
 - **Production Target**: [https://haresh-portfolio-livid.vercel.app](https://haresh-portfolio-livid.vercel.app)
 - **Deployment**: Vercel Global Edge Network (`npx vercel deploy --prod --yes`)
 
@@ -130,10 +131,12 @@ function smin(d1: number, d2: number, k: number): number {
   return Math.min(d1, d2) - h * h * k * 0.25;
 }
 ```
-Supersonic plume renders 4 diamond shocks expanding along $-45^\circ$ vector from the base socket.
+- Desktop bulb center is anchored at `(0.71 * W, 0.38 * H)` with radius `0.21 * min(W, H)`; mobile viewports scale to `(0.85 * W, 0.28 * H)` to preserve text readability.
+- Supersonic plume renders 4 diamond shocks expanding along $-45^\circ$ vector from the base socket, paired with 22 CFD wind-tunnel streamlines.
+- Zero extraneous HUD text labels drawn to canvas; bottom datum renders clean geographic coordinates `40.00° N, 83.03° W · COLUMBUS, OH`.
 
 ### 4.3 Forward-Only Grand Prix Kinematics
-In `VerticalGrandPrixTrack.tsx`, the prototype car never reverses along the spline:
+In `VerticalGrandPrixTrack.tsx` and `verticalTrackGeometry.ts`, the prototype car never reverses along the spline:
 ```typescript
 if (targetIndex >= fromIndex) {
   // Move down the track
@@ -164,21 +167,58 @@ if (targetIndex >= fromIndex) {
   });
 }
 ```
+- Dynamic DOM-anchored track geometry recalculates apex positions via `ResizeObserver` upon font loading and window resizing.
+- Car orientation uses continuous tangent angle unwrapping (`unwrapTrackAngle`) to eliminate 360° spin flips during path navigation.
+- Full stroke clearance allocated: 64px glow, 52px barrier, 46px asphalt, and 3px racing line.
+
+### 4.4 Bounded Systems CodeGraph Architecture
+In `SystemsCodeGraph.tsx`, open-page camera progression navigates 4 discrete hierarchical depths:
+- **Depth 0 (Origin)**: Core software and systems portal.
+- **Depth 1 (Domain Modules)**: Computer Vision & LiDAR, Semantic Search & NLP, Spatial & Machine Learning, Serverless Cloud Architecture.
+- **Depth 2 (Project Cluster)**: 18 canonical systems dynamically arranged with >110px center-to-center spacing.
+- **Depth 3 (Project Dossier)**: Title, domain/year, verified benchmark metric, architectural narrative, tech stack, and primary case-study link.
+- **Spatial Geometry**: Desktop divides the stage into three strictly bounded columns: parent ancestry (0–22%), active cluster (22–60%), and dossier (60–96%, max 480px width), strictly preserving 5–95% safe horizontal bounds.
+- **Mobile Adaptation**: Screens <1024px stack breadcrumbs, active nodes, and dossier with native document scrolling and 48px touch targets.
+- **Edge Routing**: Dynamic cubic Bezier curves connect actual DOM anchor coordinates rather than ungrounded canvas points.
+
+### 4.5 3D Machined Medallion Orbital Carousel
+In `MedallionCarousel.tsx`, 5 competitive medallions honor verified achievements:
+- **Circular Offsets**: Signed offsets `((idx - activeIndex + 7) % 5) - 2` produce symmetrical indices `[-2, -1, 0, 1, 2]`.
+- **Spring Transforms**: Desktop translates along X (up to 260px spacing), Z-depth (`-abs(offset) * 180px`), Y-rotation (`offset * -28deg`), and active scale (1.08).
+- **Responsive Containment**: Mobile spacing and medallion diameter dynamically scale with container width via `ResizeObserver`, ensuring zero horizontal page overflow.
+- **Unflattened 3D Subtree**: Opacity and SVG filters are isolated to inner elements, keeping outer 3D button containers purely geometric.
+- **Stable Plinth**: Reserved plinth height prevents vertical layout shift when switching between entries with varying text lengths.
+
+### 4.6 Three-Row Stage Plates (Selected Works)
+In `PlateHealios.tsx`, `PlateApexis.tsx`, `PlateRouteRx.tsx`, and `PlateTempo.tsx`:
+- **Standardized Stage Architecture**: Row 1 contains interactive mode tabs; Row 2 houses the flexible drawing canvas (`min-h-0`); Row 3 renders real-time telemetry readouts.
+- **Telemetry Isolation**: HTML controls and data counters live strictly outside the canvas drawing bounds.
+- **Dual Mode State**: Every mode button actively updates React state, altering real computational shaders and vector visualizations.
+
+### 4.7 Recruiter-First Mobile & Tablet (iPad) Responsive Engineering
+- **Zero Horizontal Overflow Invariant**: Replaced all `w-screen max-w-none` wrappers with `w-full` across `ThemeSection.tsx`, `SectionContainer.tsx`, `ScrollyExperience.tsx`, and `ContactFooter.tsx`, preventing scrollbar-induced horizontal overflow on devices with 375px–430px screens.
+- **Recruiter Hierarchy in Hero (`BentoHero.tsx`)**: Prominently surfaces academic credentials (`THE OHIO STATE UNIVERSITY · B.S. CSE (AI SPECIALIZATION)`) and direct recruiter call-to-actions (`Résumé (PDF) ↗` and `Explore Work →`) immediately on load.
+- **Always-Visible Experience Outcomes (`VerticalGrandPrixTrack.tsx`)**: Removed `opacity-0` hiding of inactive roles on touch devices; all 5 career sectors, quantified achievements, and skill tags remain immediately readable for 10-second recruiter scanning.
+- **Proportional Tablet Scaling (`AsciiDnaLightbulbCanvas.tsx`)**: Dedicated `isTablet` viewport handler offsets the DNA lightbulb to `w * 0.76` and `h * 0.35` (radius `0.19`), preserving typography clarity on iPads (768px–1024px).
+- **Tactile Touch Targets (WCAG 2.5.5 / 2.5.8)**: All interactive buttons, category chips, tabs, and outbound links feature `min-h-[44px]` (or `min-h-[36px]` for micro-switches) with active click/tap states.
 
 ---
 
 ## 5. Development & Pre-Flight Verification
 
 ```bash
-# 1. Typecheck: Zero TypeScript errors
+# 1. Typecheck: Zero TypeScript errors across entire codebase
 npm run typecheck
 
-# 2. Content Validation: Checks all projects, evidence, and sectors
+# 2. Content Validation: Checks all projects, evidence, and sectors with 100% integrity
 npm run validate-content
 
-# 3. Static Export Build: Compiles Next.js app to out/
+# 3. Track Geometry Test: Verifies spline math, tangent unwrapping, and wrap decisions
+node src/components/experience/verticalTrackGeometry.test.mjs
+
+# 4. Static Export Build: Compiles Next.js app to out/ (40 static routes)
 npm run build
 
-# 4. Production Promotion: Deploys out/ to Vercel production edge
+# 5. Production Promotion: Deploys out/ to Vercel production edge
 npx vercel deploy --prod --yes
 ```

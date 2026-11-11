@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion';
-
-const MotionDiv = motion.div as any;
+import { motion, useSpring, useMotionValue, useReducedMotion } from 'framer-motion';
 
 export interface MedallionData {
   id: string;
@@ -23,7 +21,7 @@ export const MEDALLIONS: MedallionData[] = [
     number: '01',
     title: '1st Place — Best Use of External Data',
     orgAndYear: 'American Statistical Association · 2026',
-    project: 'RouteRx / Careline',
+    project: 'RouteRx (Careline)',
     summary:
       'Synthesized OpenStreetMap road networks, CDC social vulnerability indexes, and municipal bus timetables into sub-15ms multi-modal transit isochrones, identifying healthcare deserts across 141 Topeka census blocks.',
     link: '/projects/routerx-careline-hub',
@@ -39,7 +37,7 @@ export const MEDALLIONS: MedallionData[] = [
     project: 'Hack to the Future (2× Consecutive Winner)',
     summary:
       'Constructed spatial econometric regression models across 500,000+ data points to evaluate how municipal corporate tax incentives alter commercial distribution footprint clustering.',
-    link: '#projects',
+    link: '/projects',
     inscription: 'AMERICAN STATISTICAL ASSOCIATION · DATAFEST 2025 · 1ST PLACE CHAMPION ·',
     centerBadge: '2×',
     accentColor: '#FF4419',
@@ -52,7 +50,7 @@ export const MEDALLIONS: MedallionData[] = [
     project: 'Vantage Platform',
     summary:
       'Architected zero-shot curriculum adaptation trees that guide non-traditional students through personalized computer science pathways with <250ms latency using IBM watsonx.ai.',
-    link: '#projects',
+    link: '/projects',
     inscription: 'IBM SKILLSBUILD AI HACKATHON · NATIONAL SHOWCASE · IBM WATSONX ·',
     centerBadge: 'AI',
     accentColor: '#2563EB',
@@ -78,7 +76,7 @@ export const MEDALLIONS: MedallionData[] = [
     project: 'AI/ML Digital Pathology & Academic Leadership',
     summary:
       'Recognized for computational pathology research contributions at OSU and nominated to the National Society of Leadership and Success (NSLS) for academic and executive leadership.',
-    link: '#experience',
+    link: '/about',
     inscription: 'NATIONAL SOCIETY OF LEADERSHIP AND SUCCESS · OSU RESEARCH DISTINCTION ·',
     centerBadge: 'OSU',
     accentColor: '#FF2800',
@@ -89,11 +87,47 @@ export const MedallionCarousel: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // 3D Mouse Tilt physics for active center medallion (±14deg)
+  // 3D Pointer Tilt physics for active center medallion (±15deg)
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const tiltX = useSpring(mouseY, { stiffness: 220, damping: 20 });
   const tiltY = useSpring(mouseX, { stiffness: 220, damping: 20 });
+
+  const reducedMotion = useReducedMotion();
+  const [containerWidth, setContainerWidth] = useState<number>(1200);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry && entry.contentRect.width > 0) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  // Compute responsive sizing and spacing strictly derived from container width
+  // to guarantee 100% containment across mobile (390px), tablet (768px), and desktop (1440px)
+  const W = containerWidth;
+  const isMobile = W < 640;
+  const isTablet = W >= 640 && W < 1024;
+
+  let medalSize = 280;
+  let spacing = 240;
+
+  if (isMobile) {
+    medalSize = Math.min(180, Math.max(130, W * 0.38));
+    // Contain furthest visible medallion (offset = ±2): 2 * spacing + (medalSize * 0.64) / 2 <= W * 0.48
+    spacing = Math.min(110, Math.max(46, (W * 0.48 - (medalSize * 0.64) / 2) / 2));
+  } else if (isTablet) {
+    medalSize = Math.min(240, Math.max(180, W * 0.28));
+    spacing = Math.min(180, Math.max(110, (W * 0.48 - (medalSize * 0.64) / 2) / 2));
+  } else {
+    medalSize = 280;
+    spacing = Math.min(260, Math.max(180, W * 0.18));
+  }
 
   const total = MEDALLIONS.length;
 
@@ -106,12 +140,12 @@ export const MedallionCarousel: React.FC = () => {
   }, [total]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || reducedMotion) return;
     const rect = containerRef.current.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    const nx = (e.clientX - cx) / (rect.width / 2);
-    const ny = (e.clientY - cy) / (rect.height / 2);
+    const nx = Math.max(-1, Math.min(1, (e.clientX - cx) / (rect.width / 2)));
+    const ny = Math.max(-1, Math.min(1, (e.clientY - cy) / (rect.height / 2)));
     mouseX.set(nx * 15);
     mouseY.set(-ny * 15);
   };
@@ -121,30 +155,34 @@ export const MedallionCarousel: React.FC = () => {
     mouseY.set(0);
   };
 
-  // Keyboard navigation
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') handlePrev();
-      else if (e.key === 'ArrowRight') handleNext();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [handlePrev, handleNext]);
-
-  const active = MEDALLIONS[activeIndex];
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      handlePrev();
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      handleNext();
+    }
+  };
 
   return (
     <div
       ref={containerRef}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Recognition & Distinctions"
+      tabIndex={0}
+      onKeyDown={onKeyDown}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative w-full flex flex-col items-center select-none py-6"
+      className="relative w-full flex flex-col items-center select-none py-6 outline-none"
     >
       {/* Editorial Header Bar (Unboxed & Monumental) */}
-      <div className="w-full max-w-[1440px] px-[4vw] md:px-[6vw] xl:px-[7vw] flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#18458B]/20">
+      <div className="w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#2563EB]/20">
         <div className="space-y-3">
           <div className="flex flex-wrap items-baseline gap-4">
-            <span className="text-6xl sm:text-7xl lg:text-8xl font-serif font-normal text-[#F4F6F9] tracking-tight leading-none">
+            <span className="text-5xl sm:text-7xl lg:text-8xl font-serif font-normal text-[#F4F6F9] tracking-tight leading-none">
               2× <span className="text-[#FF2800]">1st</span>
             </span>
             <div className="flex flex-col text-xs sm:text-sm font-mono text-[#C8D2E0]">
@@ -161,18 +199,18 @@ export const MedallionCarousel: React.FC = () => {
           <button
             type="button"
             onClick={handlePrev}
-            className="w-10 h-10 rounded-[2px] bg-[#060A12] border border-[#18458B]/30 hover:border-[#FF2800] text-[#C8D2E0] hover:text-[#F4F6F9] transition-colors flex items-center justify-center cursor-pointer"
+            className="w-11 h-11 rounded-[2px] bg-[#060A12] border border-[#2563EB]/30 hover:border-[#FF2800] text-[#C8D2E0] hover:text-[#F4F6F9] transition-colors flex items-center justify-center cursor-pointer active:scale-95"
             aria-label="Previous Medallion"
           >
             ←
           </button>
-          <span className="text-[#7E8B9B]">
+          <span className="text-[#7E8B9B] min-w-[48px] text-center font-mono">
             {activeIndex + 1} / {total}
           </span>
           <button
             type="button"
             onClick={handleNext}
-            className="w-10 h-10 rounded-[2px] bg-[#060A12] border border-[#18458B]/30 hover:border-[#FF2800] text-[#C8D2E0] hover:text-[#F4F6F9] transition-colors flex items-center justify-center cursor-pointer"
+            className="w-11 h-11 rounded-[2px] bg-[#060A12] border border-[#2563EB]/30 hover:border-[#FF2800] text-[#C8D2E0] hover:text-[#F4F6F9] transition-colors flex items-center justify-center cursor-pointer active:scale-95"
             aria-label="Next Medallion"
           >
             →
@@ -182,201 +220,219 @@ export const MedallionCarousel: React.FC = () => {
 
       {/* =====================================================================
           3D PERSPECTIVE MEDALLION ORBITAL CAROUSEL (perspective: 1500px)
+          Subtree kept strictly free of flattening overflow, opacity, or filter
           ===================================================================== */}
       <div
-        className="relative w-full h-[380px] sm:h-[440px] flex items-center justify-center overflow-visible my-8"
-        style={{ perspective: '1500px' }}
+        className="relative w-full h-[260px] sm:h-[360px] lg:h-[440px] flex items-center justify-center overflow-visible my-6 sm:my-8"
+        style={{ perspective: '1500px', transformStyle: 'preserve-3d' }}
       >
         {MEDALLIONS.map((m, idx) => {
-          const offset = (idx - activeIndex + total) % total;
-          let rel = offset;
-          if (rel > total / 2) rel -= total;
+          // Contract Requirement 2: Retain signed circular offsets ((i - activeIndex + 7) % 5) - 2 for five entries
+          const offset = ((idx - activeIndex + 7) % 5) - 2;
+          const isCenter = offset === 0;
 
-          const isCenter = rel === 0;
-          const isVisible = Math.abs(rel) <= 2;
-          if (!isVisible) return null;
-
-          const x = rel * 270;
-          const z = -Math.abs(rel) * 180;
-          const rotateY = rel * -28;
-          const scale = isCenter ? 1.08 : 0.82;
-          const opacity = isCenter ? 1 : Math.abs(rel) === 1 ? 0.6 : 0.25;
+          // Contract Requirement 3: Desktop targets: spacing up to 260px, depth -abs(offset)*180px, rotation offset*-28deg, active scale 1.08
+          const x = offset * spacing;
+          const z = -Math.abs(offset) * 180;
+          const rotateY = offset * -28;
+          const scale = isCenter ? 1.08 : 1 - Math.abs(offset) * 0.18;
+          const opacity = isCenter ? 1 : Math.abs(offset) === 1 ? 0.65 : 0.30;
 
           return (
-            <MotionDiv
+            <motion.button
+              type="button"
               key={m.id}
               onClick={() => setActiveIndex(idx)}
+              aria-label={`Select ${m.project}: ${m.title}`}
+              aria-pressed={isCenter}
               animate={{
                 x,
                 z,
                 rotateY,
                 scale,
-                opacity,
               }}
-              style={
-                isCenter
-                  ? {
-                      rotateX: tiltX,
-                      rotateY: tiltY,
-                      transformPerspective: 1200,
-                      transformStyle: 'preserve-3d',
-                    }
-                  : { transformStyle: 'preserve-3d' }
+              style={{
+                width: medalSize,
+                height: medalSize,
+                zIndex: 30 - Math.abs(offset) * 10,
+                transformStyle: 'preserve-3d',
+              }}
+              transition={
+                reducedMotion
+                  ? { duration: 0 }
+                  : { type: 'spring', stiffness: 220, damping: 24 }
               }
-              transition={{ type: 'spring', stiffness: 220, damping: 24 }}
-              className="absolute w-[310px] h-[310px] rounded-full flex items-center justify-center cursor-pointer transition-shadow duration-300"
+              className="absolute p-0 border-0 bg-transparent rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FF2800] flex items-center justify-center cursor-pointer select-none"
             >
-              {/* SVG 3D Machined Medallion Disc */}
-              <svg
-                viewBox="0 0 320 320"
-                className="w-full h-full block filter drop-shadow-[0_20px_45px_rgba(0,0,0,0.85)]"
-                aria-hidden="true"
+              {/* Inner container: Applies tilt and opacity without flattening the outer 3D button */}
+              <motion.div
+                style={{
+                  opacity,
+                  transformStyle: 'preserve-3d',
+                  ...(isCenter && !reducedMotion
+                    ? {
+                        rotateX: tiltX,
+                        rotateY: tiltY,
+                      }
+                    : {}),
+                }}
+                className="w-full h-full relative flex items-center justify-center"
               >
-                <defs>
-                  {/* Outer Bezel Knurling Metallic Gradient */}
-                  <linearGradient id={`bezel-grad-${m.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#C8D2E0" />
-                    <stop offset="35%" stopColor="#7E8B9B" />
-                    <stop offset="70%" stopColor="#C8D2E0" />
-                    <stop offset="100%" stopColor="#4A5568" />
-                  </linearGradient>
-
-                  {/* Recessed Dark Cobalt Center Well */}
-                  <radialGradient id={`core-grad-${m.id}`} cx="40%" cy="35%" r="75%">
-                    <stop offset="0%" stopColor="#0B1E40" />
-                    <stop offset="50%" stopColor="#060A12" />
-                    <stop offset="100%" stopColor="#03050A" />
-                  </radialGradient>
-
-                  {/* Circular Text Inscription Path */}
-                  <path
-                    id={`text-path-${m.id}`}
-                    d="M 160 30 A 130 130 0 1 1 159.9 30"
-                    fill="none"
-                  />
-                </defs>
-
-                {/* 1. Outer Knurled Bezel (72 Micro-Notches) */}
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="156"
-                  fill={`url(#bezel-grad-${m.id})`}
-                  stroke="#C8D2E0"
-                  strokeWidth="2"
-                />
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="154"
-                  fill="none"
-                  stroke="#03050A"
-                  strokeWidth="3.5"
-                  strokeDasharray="4 9.4"
-                />
-
-                {/* 2. Anodized Inner Ring (Glowing Red-Orange on Active) */}
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="144"
-                  fill="none"
-                  stroke={isCenter ? '#FF2800' : '#18458B'}
-                  strokeWidth={isCenter ? '3' : '1.5'}
-                  style={isCenter ? { filter: 'drop-shadow(0 0 10px rgba(255,40,0,0.85))' } : undefined}
-                />
-
-                {/* 3. Circular Perimeter Inscription (360° textPath) */}
-                <text
-                  fontSize="7.8"
-                  fontFamily="monospace"
-                  fontWeight="600"
-                  letterSpacing="2.2"
-                  fill={isCenter ? '#F4F6F9' : '#7E8B9B'}
-                  opacity={isCenter ? '0.95' : '0.6'}
+                {/* SVG 3D Machined Medallion Disc */}
+                <svg
+                  viewBox="0 0 320 320"
+                  className="w-full h-full block filter drop-shadow-[0_20px_45px_rgba(0,0,0,0.85)]"
+                  aria-hidden="true"
                 >
-                  <textPath href={`#text-path-${m.id}`} startOffset="0%">
-                    {m.inscription}
-                  </textPath>
-                </text>
+                  <defs>
+                    {/* Outer Bezel Knurling Metallic Gradient */}
+                    <linearGradient id={`bezel-grad-${m.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#C8D2E0" />
+                      <stop offset="35%" stopColor="#7E8B9B" />
+                      <stop offset="70%" stopColor="#C8D2E0" />
+                      <stop offset="100%" stopColor="#4A5568" />
+                    </linearGradient>
 
-                {/* 4. Recessed Dark Cobalt Center Well */}
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="112"
-                  fill={`url(#core-grad-${m.id})`}
-                  stroke={isCenter ? m.accentColor : '#18458B'}
-                  strokeWidth="1.5"
-                />
+                    {/* Recessed Dark Cobalt Center Well */}
+                    <radialGradient id={`core-grad-${m.id}`} cx="40%" cy="35%" r="75%">
+                      <stop offset="0%" stopColor="#0B1E40" />
+                      <stop offset="50%" stopColor="#060A12" />
+                      <stop offset="100%" stopColor="#03050A" />
+                    </radialGradient>
 
-                {/* Precision Concentric Drafting Coordinate Lines */}
-                <circle cx="160" cy="160" r="92" fill="none" stroke="#18458B" strokeWidth="0.8" strokeDasharray="4 6" opacity="0.4" />
-                <circle cx="160" cy="160" r="72" fill="none" stroke="#C8D2E0" strokeWidth="0.6" strokeDasharray="3 5" opacity="0.25" />
+                    {/* Circular Text Inscription Path */}
+                    <path
+                      id={`text-path-${m.id}`}
+                      d="M 160 30 A 130 130 0 1 1 159.9 30"
+                      fill="none"
+                    />
+                  </defs>
 
-                {/* 5. Center Embossed Numeral & Vector Crest */}
-                <g transform="translate(160, 160)">
-                  {/* Decorative Diagonal Vector Crosshairs */}
-                  <line x1="-30" y1="-30" x2="30" y2="30" stroke="#18458B" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
-                  <line x1="30" y1="-30" x2="-30" y2="30" stroke="#18458B" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
-
-                  {/* Embossed Center Numeral */}
-                  <text
-                    x="0"
-                    y="12"
-                    textAnchor="middle"
-                    fill={isCenter ? '#F4F6F9' : '#C8D2E0'}
-                    stroke="#03050A"
+                  {/* 1. Outer Knurled Bezel (72 Micro-Notches) */}
+                  <circle
+                    cx="160"
+                    cy="160"
+                    r="156"
+                    fill={`url(#bezel-grad-${m.id})`}
+                    stroke="#C8D2E0"
                     strokeWidth="2"
-                    style={{ paintOrder: 'stroke fill' }}
-                    fontSize="36"
-                    fontFamily="Geist Serif, serif"
-                    fontWeight="600"
-                  >
-                    {m.centerBadge}
-                  </text>
+                  />
+                  <circle
+                    cx="160"
+                    cy="160"
+                    r="154"
+                    fill="none"
+                    stroke="#03050A"
+                    strokeWidth="3.5"
+                    strokeDasharray="4 9.4"
+                  />
 
-                  {/* Record Index */}
+                  {/* 2. Anodized Inner Ring (Glowing Red-Orange on Active) */}
+                  <circle
+                    cx="160"
+                    cy="160"
+                    r="144"
+                    fill="none"
+                    stroke={isCenter ? '#FF2800' : '#18458B'}
+                    strokeWidth={isCenter ? '3' : '1.5'}
+                    style={isCenter ? { filter: 'drop-shadow(0 0 10px rgba(255,40,0,0.85))' } : undefined}
+                  />
+
+                  {/* 3. Circular Perimeter Inscription (360° textPath) */}
                   <text
-                    x="0"
-                    y="36"
-                    textAnchor="middle"
-                    fill={m.accentColor}
-                    fontSize="9"
+                    fontSize="7.8"
                     fontFamily="monospace"
-                    letterSpacing="1.5"
-                    fontWeight="700"
+                    fontWeight="600"
+                    letterSpacing="2.2"
+                    fill={isCenter ? '#F4F6F9' : '#7E8B9B'}
+                    opacity={isCenter ? '0.95' : '0.6'}
                   >
-                    RECORD {m.number}
+                    <textPath href={`#text-path-${m.id}`} startOffset="0%">
+                      {m.inscription}
+                    </textPath>
                   </text>
-                </g>
 
-                {/* 6. Dynamic Specular Sheen Arc */}
-                <path
-                  d="M 60 90 A 110 110 0 0 1 260 90"
-                  fill="none"
-                  stroke="rgba(255, 255, 255, 0.22)"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </MotionDiv>
+                  {/* 4. Recessed Dark Cobalt Center Well */}
+                  <circle
+                    cx="160"
+                    cy="160"
+                    r="112"
+                    fill={`url(#core-grad-${m.id})`}
+                    stroke={isCenter ? m.accentColor : '#18458B'}
+                    strokeWidth="1.5"
+                  />
+
+                  {/* Precision Concentric Drafting Coordinate Lines */}
+                  <circle cx="160" cy="160" r="92" fill="none" stroke="#18458B" strokeWidth="0.8" strokeDasharray="4 6" opacity="0.4" />
+                  <circle cx="160" cy="160" r="72" fill="none" stroke="#C8D2E0" strokeWidth="0.6" strokeDasharray="3 5" opacity="0.25" />
+
+                  {/* 5. Center Embossed Numeral & Vector Crest */}
+                  <g transform="translate(160, 160)">
+                    {/* Decorative Diagonal Vector Crosshairs */}
+                    <line x1="-30" y1="-30" x2="30" y2="30" stroke="#18458B" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
+                    <line x1="30" y1="-30" x2="-30" y2="30" stroke="#18458B" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
+
+                    {/* Embossed Center Numeral */}
+                    <text
+                      x="0"
+                      y="12"
+                      textAnchor="middle"
+                      fill={isCenter ? '#F4F6F9' : '#C8D2E0'}
+                      stroke="#03050A"
+                      strokeWidth="2"
+                      style={{ paintOrder: 'stroke fill' }}
+                      fontSize="36"
+                      fontFamily="Geist Serif, serif"
+                      fontWeight="600"
+                    >
+                      {m.centerBadge}
+                    </text>
+
+                    {/* Record Index */}
+                    <text
+                      x="0"
+                      y="36"
+                      textAnchor="middle"
+                      fill={m.accentColor}
+                      fontSize="9"
+                      fontFamily="monospace"
+                      letterSpacing="1.5"
+                      fontWeight="700"
+                    >
+                      RECORD {m.number}
+                    </text>
+                  </g>
+
+                  {/* 6. Dynamic Specular Sheen Arc */}
+                  <path
+                    d="M 60 90 A 110 110 0 0 1 260 90"
+                    fill="none"
+                    stroke="rgba(255, 255, 255, 0.22)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </motion.div>
+            </motion.button>
           );
         })}
       </div>
 
       {/* =====================================================================
           UNBOXED EDITORIAL PLINTH BELOW THE ACTIVE MEDALLION
+          Reserved min-height per breakpoint prevents layout jump on selection
           ===================================================================== */}
-      <div className="w-full max-w-[840px] px-4 text-center my-6">
-        <AnimatePresence mode="wait">
-          <MotionDiv
+      <div className="w-full max-w-[840px] px-4 text-center my-6 grid min-h-[300px] sm:min-h-[250px] lg:min-h-[220px]">
+        {MEDALLIONS.map((active, index) => (
+          <div
             key={active.id}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="space-y-4"
+            aria-hidden={index !== activeIndex}
+            style={{
+              gridArea: '1 / 1',
+              visibility: index === activeIndex ? 'visible' : 'hidden',
+              pointerEvents: index === activeIndex ? 'auto' : 'none',
+            }}
+            className="space-y-4 flex flex-col items-center justify-start transition-opacity duration-200"
           >
             {/* Issuing Org & Year */}
             <div className="text-xs font-mono text-[#FF2800] uppercase tracking-wider font-semibold">
@@ -397,14 +453,14 @@ export const MedallionCarousel: React.FC = () => {
             <div className="pt-2">
               <Link
                 href={active.link}
-                className="inline-flex items-center gap-2 text-xs font-mono font-bold text-[#FF2800] hover:text-[#F4F6F9] transition-colors uppercase border-b border-[#FF2800] pb-0.5"
+                className="min-h-[44px] inline-flex items-center gap-2 text-xs font-mono font-bold text-[#FF2800] hover:text-[#F4F6F9] transition-colors uppercase border-b border-[#FF2800] pb-0.5"
               >
-                <span>Explore Case Study</span>
+                <span>{active.link.startsWith('/projects/') ? 'Explore Case Study' : 'Explore Related Work'}</span>
                 <span>→</span>
               </Link>
             </div>
-          </MotionDiv>
-        </AnimatePresence>
+          </div>
+        ))}
       </div>
     </div>
   );

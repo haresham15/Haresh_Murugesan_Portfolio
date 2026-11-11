@@ -23,7 +23,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Track mouse coordinates for interactive elevation ruler and anisotropic wind perturbation
+  // Track mouse coordinates for interactive elevation ruler and trajectory perturbation
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const canvas = canvasRef.current;
@@ -62,16 +62,27 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
     const perpX = invSqrt2;
     const perpY = invSqrt2;
 
+    // Sizing from container element with capped DPR min(window.devicePixelRatio || 1, 2)
     const handleResize = () => {
+      if (!canvas) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = canvas.clientWidth || window.innerWidth;
-      const h = canvas.clientHeight || window.innerHeight;
+      const parent = canvas.parentElement;
+      const w = Math.round(parent ? parent.clientWidth : (canvas.clientWidth || window.innerWidth));
+      const h = Math.round(parent ? parent.clientHeight : (canvas.clientHeight || window.innerHeight));
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
     };
 
     handleResize();
     window.addEventListener('resize', handleResize, { passive: true });
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && canvas.parentElement) {
+      resizeObserver = new ResizeObserver(() => {
+        handleResize();
+      });
+      resizeObserver.observe(canvas.parentElement);
+    }
 
     // Polynomial smooth-minimum for pear-shaped dome/neck SDF (blending without step-gap)
     const smin = (a: number, b: number, k: number): number => {
@@ -103,15 +114,17 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
 
       const animTime = isReduced ? 0 : (now - startTime) * 0.001;
       const isMobile = w < 768;
+      const isTablet = w >= 768 && w < 1024;
 
-      // Positioning: Bulb center cx = 0.72 * W, cy = 0.37 * H
-      const bulbCx = isMobile ? w * 0.78 : w * 0.72;
-      const bulbCy = isMobile ? h * 0.38 : h * 0.37;
-      const R = Math.min(w, h) * (isMobile ? 0.21 : 0.195);
+      // Responsive Positioning: Protects editorial headline and subcopy on mobile and tablet
+      // Desktop bulb center: (0.71 * W, 0.38 * H), radius: 0.21 * min(W, H).
+      const bulbCx = isMobile ? w * 0.85 : isTablet ? w * 0.76 : w * 0.71;
+      const bulbCy = isMobile ? h * 0.28 : isTablet ? h * 0.35 : h * 0.38;
+      const R = Math.min(w, h) * (isMobile ? 0.16 : isTablet ? 0.19 : 0.21);
 
-      // Trajectory Launch Origin: ox = 0.34 * W, oy = 0.78 * H
-      const ox = isMobile ? w * 0.28 : w * 0.34;
-      const oy = isMobile ? h * 0.82 : h * 0.78;
+      // Trajectory Launch Origin
+      const ox = isMobile ? w * 0.24 : isTablet ? w * 0.28 : w * 0.34;
+      const oy = isMobile ? h * 0.82 : isTablet ? h * 0.80 : h * 0.78;
 
       // =======================================================================
       // 1. CONCEPT D HYBRID WIND-TUNNEL & ORBITAL BLUEPRINT
@@ -137,7 +150,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
       // B. Concentric Orbital Protractor Rings (Centered on Bulb: r = 150, 245, 375, 560px)
       const ringRadii = [150, 245, 375, 560];
       ringRadii.forEach((rad, idx) => {
-        const ringRad = rad * (isMobile ? 0.7 : 1.0);
+        const ringRad = rad * (isMobile ? 0.65 : 1.0);
         ctx.beginPath();
         ctx.arc(bulbCx, bulbCy, ringRad, 0, Math.PI * 2);
         ctx.strokeStyle = idx % 2 === 0 ? 'rgba(37, 99, 235, 0.22)' : 'rgba(200, 210, 224, 0.14)';
@@ -168,7 +181,6 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
       });
 
       // C. 45.0° Launch Corridor & Lower-Left Origin Reticle
-      // Primary 45.0° Trajectory Axis Line
       const axisLen = Math.max(w, h) * 1.6;
       ctx.beginPath();
       ctx.setLineDash([6, 6]);
@@ -207,7 +219,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
         }
       });
 
-      // Concentric Origin Circles (r = 24, 52px) and 45° Protractor Arc (Zero Text Strings!)
+      // Concentric Origin Circles (r = 24, 52px) and 45° Protractor Arc (Zero HUD Text Stamps)
       ctx.beginPath();
       ctx.arc(ox, oy, 24, 0, Math.PI * 2);
       ctx.strokeStyle = 'rgba(37, 99, 235, 0.35)';
@@ -220,7 +232,6 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
       ctx.lineWidth = 0.8;
       ctx.stroke();
 
-      // 45° Protractor Arc
       ctx.beginPath();
       ctx.arc(ox, oy, 38, -Math.PI * 0.25, 0);
       ctx.strokeStyle = 'rgba(255, 40, 0, 0.45)';
@@ -260,10 +271,9 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
       }
 
       // E. Continuous Aerodynamic CFD Streamlines & Parabolic Mach Bow-Shockwave
-      // 22 Streamline Ribbons flowing from top-right to bottom-left (-45°)
+      // Exactly 22 Streamline Ribbons flowing from top-right to bottom-left (-45°)
       ctx.font = '8px monospace';
       streamlineOffsets.forEach((off, idx) => {
-        // Streamline baseline along -45° flow
         const startX = bulbCx + perpX * off + dirX * 600;
         const startY = bulbCy + perpY * off + dirY * 600;
         const endX = bulbCx + perpX * off - dirX * 900;
@@ -272,14 +282,12 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
         ctx.beginPath();
         ctx.moveTo(startX, startY);
 
-        // Smooth deflection around Mach cone
         const steps = 30;
         for (let s = 1; s <= steps; s++) {
           const st = s / steps;
           const currX = startX + (endX - startX) * st;
           const currY = startY + (endY - startY) * st;
 
-          // Distance to bulb center
           const distToBulb = Math.hypot(currX - bulbCx, currY - bulbCy);
           const deflect = distToBulb < R * 1.5 ? Math.sin((1 - distToBulb / (R * 1.5)) * Math.PI) * 22 : 0;
           const defX = currX + perpX * (off > 0 ? deflect : -deflect);
@@ -303,8 +311,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
         }
       });
 
-      // Ahead of bulb dome (v = +0.92): Double Parabolic Mach Bow-Shockwave (38° cone angle)
-      // Cone apex at bulbCx + dirX * (R * 0.95), bulbCy + dirY * (R * 0.95)
+      // Ahead of bulb dome: Double Parabolic Mach Bow-Shockwave
       const shockApexX = bulbCx + dirX * (R * 1.05);
       const shockApexY = bulbCy + dirY * (R * 1.05);
 
@@ -315,7 +322,6 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
         for (let i = -shockSteps; i <= shockSteps; i++) {
           const tNorm = i / shockSteps;
           const perpDist = tNorm * span;
-          // Parabolic curve opening back along -dir
           const backDist = offsetDist + Math.pow(Math.abs(tNorm), 1.6) * 180;
           const sx = shockApexX + perpX * perpDist - dirX * backDist;
           const sy = shockApexY + perpY * perpDist - dirY * backDist;
@@ -359,16 +365,40 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
           const u = (normDx + normDy) * invSqrt2;
 
           // -------------------------------------------------------------------
-          // A. SUPERSONIC -45° THRUST PLUME & 4 MACH SHOCK DIAMONDS (v < -0.95)
+          // A. SUPERSONIC -45° THRUST PLUME & 4 MACH SHOCK DIAMONDS (v < -0.92)
           // -------------------------------------------------------------------
-          if (v < -0.92 && v > -2.2) {
+          if (v < -0.92 && v > -2.25) {
             const plumeWidth = 0.28 + Math.abs(v + 0.92) * 0.12;
             if (Math.abs(u) <= plumeWidth) {
-              // 4 Mach shock diamonds along plume
-              const diamondPhase = Math.sin((v + animTime * 3.5) * 14);
-              const isDiamond = Math.abs(diamondPhase) > 0.65;
-              const char = isDiamond ? '@' : (Math.abs(u) < 0.1 ? '#' : '%');
-              const color = isDiamond ? '#FFFFFF' : (Math.abs(u) < 0.12 ? '#FF2800' : '#153875');
+              // 4 Mach shock diamonds along supersonic exhaust plume
+              const diamondCenters = [-1.16, -1.46, -1.76, -2.06];
+              let insideDiamond = false;
+              let isCore = false;
+
+              for (let k = 0; k < diamondCenters.length; k++) {
+                const dCenter = diamondCenters[k];
+                const dv = Math.abs(v - dCenter);
+                const halfH = 0.11;
+                const halfW = 0.13 - k * 0.015;
+                if (dv <= halfH && Math.abs(u) <= halfW * (1 - dv / halfH)) {
+                  insideDiamond = true;
+                  isCore = dv < halfH * 0.45 && Math.abs(u) < halfW * 0.45;
+                  break;
+                }
+              }
+
+              if (insideDiamond) {
+                // Standing shock wave core: white/silver (#F4F6F9, #C8D2E0)
+                const char = isCore ? '@' : '#';
+                const color = isCore ? '#F4F6F9' : '#C8D2E0';
+                ctx.fillStyle = color;
+                ctx.fillText(char, px, py);
+                continue;
+              }
+
+              // Exhaust plume plasma stream in #FF2800, #FF4419, #153875
+              const char = Math.abs(u) < 0.10 ? '%' : (Math.abs(u) < 0.18 ? '*' : '~');
+              const color = Math.abs(u) < 0.10 ? '#FF2800' : (Math.abs(u) < 0.18 ? '#FF4419' : '#153875');
               ctx.fillStyle = color;
               ctx.fillText(char, px, py);
               continue;
@@ -435,13 +465,13 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
                 const distToBackbone = isStrand1 ? dist1 : dist2;
 
                 if (z > 0) {
-                  // Foreground Strand: Blazing Chrome Silver & White (#FFFFFF, #E6ECF5) with #FF2800 outer glow
+                  // Foreground Strand: silver/white (#F4F6F9 / #C8D2E0)
                   const char = distToBackbone < 0.035 ? '@' : (distToBackbone < 0.065 ? '#' : '$');
-                  const color = z > 0.4 ? '#FFFFFF' : '#E6ECF5';
+                  const color = z > 0.4 ? '#F4F6F9' : '#C8D2E0';
                   ctx.fillStyle = color;
                   ctx.fillText(char, px, py);
                 } else {
-                  // Background Strand: Sharp Reddish-Orange (#FF2800) using %, *, +
+                  // Background Strand: red-orange (#FF2800)
                   const char = distToBackbone < 0.035 ? '%' : (distToBackbone < 0.065 ? '*' : '+');
                   ctx.fillStyle = '#FF2800';
                   ctx.fillText(char, px, py);
@@ -450,29 +480,29 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
                 continue;
               }
 
-              // Horizontal Base-Pair Rungs (A═T, C≡G) bridging u1 and u2 in #2563EB and #FF4419
+              // Horizontal Base-Pair Rungs bridging u1 and u2:
+              // Alternating cobalt (#2563EB) and crimson (#FF4419) rungs
+              const rungPhase = v * helixFreq * 2;
               if (
-                Math.abs(Math.sin(v * helixFreq * 2)) < 0.28 &&
+                Math.abs(Math.sin(rungPhase)) < 0.30 &&
                 u > Math.min(u1, u2) &&
                 u < Math.max(u1, u2)
               ) {
+                const rungIndex = Math.floor((rungPhase + Math.PI * 0.5) / Math.PI);
+                const isCobalt = Math.abs(rungIndex) % 2 === 0;
+                const rungColor = isCobalt ? '#2563EB' : '#FF4419';
+
                 const minU = Math.min(u1, u2);
                 const maxU = Math.max(u1, u2);
                 const span = Math.max(0.001, maxU - minU);
                 const rungT = (u - minU) / span;
 
-                let rungChar = '═';
-                let rungColor = '#2563EB';
-
-                if (rungT > 0.35 && rungT < 0.65) {
-                  rungChar = '═';
-                  rungColor = '#2563EB';
-                } else if (rungT <= 0.35) {
-                  rungChar = 'A';
-                  rungColor = '#FF4419';
-                } else {
-                  rungChar = 'T';
-                  rungColor = '#2563EB';
+                // Base pairs: C≡G for cobalt, A═T for crimson
+                let rungChar = isCobalt ? '≡' : '═';
+                if (rungT < 0.30) {
+                  rungChar = isCobalt ? 'C' : 'A';
+                } else if (rungT > 0.70) {
+                  rungChar = isCobalt ? 'G' : 'T';
                 }
 
                 ctx.fillStyle = rungColor;
@@ -527,6 +557,7 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      resizeObserver?.disconnect();
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
   }, [isVisible, isReduced]);

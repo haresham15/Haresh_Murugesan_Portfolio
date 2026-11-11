@@ -38,10 +38,10 @@ export const SectionContainer = React.forwardRef<HTMLElement, SectionContainerPr
 
     // Full-bleed fluid horizontal architecture eliminating rigid max-w boxes & artificial rails
     const containerClasses: Record<ContainerVariant, string> = {
-      wide: 'w-full max-w-none px-[4vw] md:px-[6vw] xl:px-[7vw] relative',
-      editorial: 'w-full max-w-none px-[4vw] md:px-[6vw] xl:px-[7vw] relative',
-      reading: 'w-full max-w-[85ch] mx-auto px-6 sm:px-8 relative',
-      full: 'w-full max-w-none px-[4vw] md:px-[6vw] xl:px-[7vw] relative',
+      wide: 'w-full max-w-none px-4 sm:px-6 md:px-8 lg:px-12 relative',
+      editorial: 'w-full max-w-none px-4 sm:px-6 md:px-8 lg:px-12 relative',
+      reading: 'w-full max-w-[85ch] mx-auto px-4 sm:px-6 md:px-8 relative',
+      full: 'w-full max-w-none px-4 sm:px-6 md:px-8 lg:px-12 relative',
     };
 
     const ElementTag = Component as any;
@@ -50,7 +50,7 @@ export const SectionContainer = React.forwardRef<HTMLElement, SectionContainerPr
       <ElementTag
         id={id}
         ref={ref}
-        className={`w-screen max-w-none relative ${bgClasses[bgMode]} ${
+        className={`w-full relative ${bgClasses[bgMode]} ${
           bordered ? 'border-b border-current/10' : ''
         } ${className}`}
         {...rest}
