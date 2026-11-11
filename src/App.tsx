@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './components/Header';
 import BentoHero from './components/BentoHero';
 import ProjectLab from './components/ProjectLab';
+import HomeCodeGraph from './components/HomeCodeGraph';
 import ScrollyExperience from './components/ScrollyExperience';
 import PodcastSection from './components/PodcastSection';
 import NeuralSkills from './components/NeuralSkills';
@@ -35,6 +36,7 @@ function App() {
             <AboutSection />
             <ScrollyExperience />
             <ProjectLab />
+            <HomeCodeGraph />
             <PodcastSection />
             <NeuralSkills />
             <AchievementsGallery />

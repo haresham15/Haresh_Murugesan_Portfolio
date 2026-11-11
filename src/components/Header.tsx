@@ -32,7 +32,7 @@ export default function Header() {
   // 9 Preserved Destinations: Work, Archive, Experience, Syntinuum, Technical Index, Recognition, About, Résumé, Contact
   const navDestinations = [
     { num: '01', label: 'Work', href: '/#projects', note: 'Selected Works & Architecture' },
-    { num: '02', label: 'Archive', href: '/projects', note: 'Linear Systems CodeGraph (18 Repositories)' },
+    { num: '02', label: 'Archive', href: '/#archive', note: 'Systems Constellation (18 Repositories)' },
     { num: '03', label: 'Experience', href: '/#experience', note: 'Naturally Curvy Grand Prix Circuit' },
     { num: '04', label: 'Syntinuum', href: '/#podcast', note: 'Waveform Studio & Technical Dialogues' },
     { num: '05', label: 'Technical Index', href: '/#skills', note: 'Production Stacks & Competencies' },

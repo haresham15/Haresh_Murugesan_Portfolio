@@ -89,11 +89,24 @@ All colors MUST reference these exact DTCG 3-tier tokens defined in [`design/tok
 - Concept D hybrid background: 4 concentric orbital drafting rings, 45° launch corridor, 22 CFD streamlines with particles, double parabolic Mach bow-shockwave at 38° cone angle.
 - 8×10 micro-ASCII grid rendering a pear SDF via $\text{smin}(d_{\text{dome}}, d_{\text{neck}}, 0.35)$, continuous 3D double-helix DNA with $\text{A=T}/\text{C}\equiv\text{G}$ rungs, and supersonic $-45^\circ$ plume with 4 shock diamonds.
 
-### 4.4 Systems CodeGraph Linear Rabbit Hole ([`SystemsCodeGraph.tsx`](file:///src/components/SystemsCodeGraph.tsx))
-- Camera translation across depths: Depth 0 (Core) $\to$ Depth 1 (Domain Modules) $\to$ Depth 2 (Projects) $\to$ Depth 3 (Case Study).
-- World translation along X axis ($\text{camX} = 0 \to -420 \to -880 \to -1240$).
-- Anchored parent breadcrumbs on the left for 1-click step-back reverse translation.
-- Top-right mode switch between `[Rabbit-Hole Mode]` and `[Full 18-Node Constellation Map]`.
+### 4.4 Systems CodeGraph & Home Constellation
+- **Linear Systems CodeGraph ([`SystemsCodeGraph.tsx`](file:///src/components/SystemsCodeGraph.tsx))**:
+  - Full-page camera translation across depths on `/projects`: Depth 0 (Core) $\to$ Depth 1 (Domain Modules) $\to$ Depth 2 (Projects) $\to$ Depth 3 (Case Study).
+  - World translation along X axis ($\text{camX} = 0 \to -420 \to -880 \to -1240$) with 1-click step-back reverse translation.
+- **Home Systems Constellation ([`HomeCodeGraph.tsx`](file:///src/components/HomeCodeGraph.tsx))**:
+  - Background-integrated dot-module constellation suspended directly above the forged carbon canvas (`#archive`). Zero boxes or outer card containers.
+  - Tier 0 central origin reticle (6px machined silver, 32px dashed reticle).
+  - Tier 1 primary super-dots: `Backend, AI/ML & Compute [8]` in `#FF2800` and `Frontend, Spatial UI & Interactive [10]` in `#2563EB`.
+  - Tier 2 domain dots (6.5px core + 16px hairline ring + uppercase monospace labels).
+  - Tier 3 all 18 project dots (4.5px vector dots with non-colliding polar angle micro-labels).
+  - Hovering any project dot illuminates parent synaptic threads and displays a floating Whisper Callout HUD with title, metric, synopsis, stack, and direct CTA.
+  - Clicking any project dot executes an expanding 180ms shockwave ripple and routes directly to `/projects/${project.slug}`.
+
+### 4.5 Compacted Flagship Telemetry Deck ([`UnifiedProjectField.tsx`](file:///src/components/UnifiedProjectField.tsx))
+- Single-viewport 740px (~85dvh) console consolidating the 4 flagship systems (01 Healios V2, 02 Apexis Telemetry Engine, 03 RouteRx / Careline, 04 Tempo Task Suite).
+- Shrinks vertical scroll footprint by ~2,360px without losing any thesis, narrative, or benchmark metrics.
+- Left 5-column accordion rail: 54px collapsed strips with index, title, primary metric, and `+` expand trigger; expanded active drawer with complete technical narrative, 2-column benchmark strip, stack, and direct action CTAs (`Read Case Study →`, `Source Code ↗`).
+- Right 7-column stationary blueprint stage: framed with 4 corner L-brackets (`⌜ ⌝ ⌞ ⌟` in `#2563EB`) and 32px blueprint grid, rendering active simulation plates (`PlateHealios`, `PlateApexis`, `PlateRouteRx`, `PlateTempo`) with keyed crossfading, system live ID (`01 // HEALIOS_V2`), prev/next step buttons (`←` / `→`), and deterministic hotkey navigation (`ArrowUp` / `ArrowDown`).
 
 ### 4.5 Grand Prix Experience Circuit ([`VerticalGrandPrixTrack.tsx`](file:///src/components/experience/VerticalGrandPrixTrack.tsx))
 - SVG spline (`viewBox="0 0 1440 1750"`) spanning 5 verified apexes:

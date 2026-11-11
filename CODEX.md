@@ -32,8 +32,9 @@ c:\Users\hares\OneDrive\Desktop\CS_Projects\Haresh_Murugesan_Portfolio
 │   │   ├── Header.tsx                # Fixed header: [HM] badge + Haresh Murugesan + WheelNavTrigger
 │   │   ├── BentoHero.tsx             # 100vw x 100dvh locked hero stage
 │   │   ├── AsciiDnaLightbulbCanvas.tsx # 45° pear SDF ASCII lightbulb with continuous DNA & supersonic plume
-│   │   ├── UnifiedProjectField.tsx   # Unboxed 38/62 project exhibition spreads
-│   │   ├── SystemsCodeGraph.tsx      # Open-page linear rabbit-hole camera progression (Depth 0->3)
+│   │   ├── UnifiedProjectField.tsx   # Single-viewport split-stage telemetry deck (Accordion Rail + Stationary Blueprint Stage)
+│   │   ├── HomeCodeGraph.tsx         # Seamless dot-module systems constellation (18 project dots, 2 cores, 6 domains, background-woven)
+│   │   ├── SystemsCodeGraph.tsx      # Dedicated full-page linear rabbit-hole camera progression (pages/projects.tsx)
 │   │   ├── ScrollyExperience.tsx     # Top-to-bottom Grand Prix circuit section wrapper
 │   │   ├── MedallionCarousel.tsx     # 3D machined medallion carousel (310px, +/-15° tilt)
 │   │   ├── PodcastSection.tsx        # Syntinuum: Endless Evolutions audio waveform & episode scrubber
@@ -189,7 +190,18 @@ In `MedallionCarousel.tsx`, 5 competitive medallions honor verified achievements
 - **Unflattened 3D Subtree**: Opacity and SVG filters are isolated to inner elements, keeping outer 3D button containers purely geometric.
 - **Stable Plinth**: Reserved plinth height prevents vertical layout shift when switching between entries with varying text lengths.
 
-### 4.6 Three-Row Stage Plates (Selected Works)
+### 4.6 Single-Viewport Telemetry Console & Background-Integrated Dot-Module CodeGraph (V5.5)
+- **Compacted Flagship Telemetry Deck (`UnifiedProjectField.tsx`)**:
+  - Consolidates 4 flagship systems (01 Healios V2, 02 Apexis Telemetry Engine, 03 RouteRx / Careline, 04 Tempo Task Suite) into a single-viewport (`740px`, ~85dvh) console, shrinking vertical scroll footprint by ~2,360px without losing any thesis, prose, or benchmark metrics.
+  - **Left 5-Column Accordion Rail**: Inactive projects render as crisp 54px strips with index, title, primary metric, and expand trigger (`+`). The active drawer reveals full narrative, 2-column benchmark strip, stack, and direct action CTAs (`Read Case Study →`, `Source Code ↗`). Supports hotkey navigation (`ArrowUp` / `ArrowDown`).
+  - **Right 7-Column Stationary Blueprint Stage**: Framed with 4 corner L-brackets (`⌜ ⌝ ⌞ ⌟` in `#2563EB`) and 32px blueprint grid. Houses the active project simulation plate (`PlateHealios`, `PlateApexis`, `PlateRouteRx`, `PlateTempo`) with smooth keyed crossfade, live system identifier (`01 // HEALIOS_V2`), prev/next cycle arrows (`←` / `→`), and deterministic telemetry footer.
+
+- **Seamless Dot-Module Systems Constellation (`HomeCodeGraph.tsx`)**:
+  - Weaves the 18-project archive directly into the home page background with `background: transparent`, zero boxes or container borders, and subtle central cobalt radial glow (`radial-gradient(circle at 50% 50%, rgba(21, 56, 117, 0.20) 0%, transparent 75%)`).
+  - **Precision Dot-Module Hierarchy**: Tier 0 central origin reticle (6px machined silver + 32px dashed reticle); Tier 1 primary super-dots (`Backend, AI/ML & Compute [8]` in `#FF2800`, `Frontend, Spatial UI & Interactive [10]` in `#2563EB`) with 26px orbital rings; Tier 2 domain dots (6.5px core + 16px hairline ring + uppercase monospace labels); Tier 3 all 18 project dots (4.5px vector dots with non-colliding polar angle micro-labels).
+  - **Interactive Camera Glide & Direct Case Study Routing**: Clicking Tier 1 or Tier 2 dots glides the camera (550ms ease) to focus that cluster; breadcrumbs on top allow 1-click step-back; hovering any project dot illuminates connected threads and opens a floating Whisper Callout HUD with title, year, metric, synopsis, stack, and `Click dot to open Case Study →`; clicking triggers a 180ms shockwave ring and routes directly to `/projects/${project.slug}`.
+
+### 4.7 Three-Row Stage Plates (Selected Works)
 In `PlateHealios.tsx`, `PlateApexis.tsx`, `PlateRouteRx.tsx`, and `PlateTempo.tsx`:
 - **Standardized Stage Architecture**: Row 1 contains interactive mode tabs; Row 2 houses the flexible drawing canvas (`min-h-0`); Row 3 renders real-time telemetry readouts.
 - **Telemetry Isolation**: HTML controls and data counters live strictly outside the canvas drawing bounds.
