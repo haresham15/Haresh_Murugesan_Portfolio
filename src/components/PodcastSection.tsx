@@ -143,12 +143,12 @@ export const PodcastSection: React.FC = () => {
         ctx.restore();
       };
 
-      // Primary Gold Filament wave
+      // Primary Reddish-Orange Filament wave
       drawHarmonic(1.2, 0.008, '#FF2800', 2.2, 1.8);
-      // Secondary Bio-Luminescent Cyan wave
-      drawHarmonic(0.85, 0.012, '#82B7FF', 1.6, 1.6);
-      // Ambient Muted Navy/Silver wave
-      drawHarmonic(0.5, 0.016, 'rgba(115, 138, 156, 0.35)', 1.0, 1.2);
+      // Secondary Cobalt Blue wave
+      drawHarmonic(0.85, 0.012, '#2563EB', 1.6, 1.6);
+      // Ambient Machined Silver wave
+      drawHarmonic(0.5, 0.016, 'rgba(200, 210, 224, 0.35)', 1.0, 1.2);
 
       // Draw Frequency Histogram Bars in Background
       const barCount = 48;
@@ -165,11 +165,11 @@ export const PodcastSection: React.FC = () => {
 
         ctx.fillStyle = isBarActive
           ? barZone === 'signal'
-            ? 'rgba(245, 158, 11, 0.35)'
+            ? 'rgba(255, 40, 0, 0.35)'
             : barZone === 'dialogues'
-            ? 'rgba(56, 189, 248, 0.35)'
-            : 'rgba(245, 158, 11, 0.35)'
-          : 'rgba(115, 138, 156, 0.08)';
+            ? 'rgba(37, 99, 235, 0.35)'
+            : 'rgba(200, 210, 224, 0.35)'
+          : 'rgba(126, 139, 155, 0.08)';
 
         ctx.fillRect(barX, height / 2 - barHeight / 2, barWidth * 0.5, barHeight);
       }
@@ -177,7 +177,7 @@ export const PodcastSection: React.FC = () => {
 
       // Vertical hairline zone dividers
       ctx.save();
-      ctx.strokeStyle = 'rgba(248, 250, 252, 0.08)';
+      ctx.strokeStyle = 'rgba(24, 69, 139, 0.25)';
       ctx.lineWidth = 1;
       ctx.setLineDash([4, 6]);
       ctx.beginPath();
@@ -202,23 +202,19 @@ export const PodcastSection: React.FC = () => {
   return (
     <ThemeSection
       id="podcast"
-      theme="studio-midnight"
+      theme="obsidian"
       aria-label="Syntinuum technical journalism podcast and audio architecture"
-      className="border-b border-[#F4F6F9]/10 flex flex-col justify-between py-24 lg:py-36"
+      className="border-b border-[#18458B]/20 flex flex-col justify-between py-24 lg:py-36"
     >
       <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
         
-        {/* Section Headline & Top Platforms Strip */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-          <div className="space-y-4 max-w-2xl">
-            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#82B7FF]">
-              <span className="w-6 h-px bg-[#82B7FF]" />
-              <span>03  Frontier Intelligence &amp; Production Reality</span>
-            </div>
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
-              Syntinuum
+        {/* Section Headline & Top Platforms Strip (Unboxed & De-Vibecoded) */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pb-8 border-b border-[#18458B]/20">
+          <div className="space-y-3 max-w-3xl">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
+              Syntinuum: Endless Evolutions
             </h2>
-            <p className="text-base sm:text-lg font-sans text-[#7E8B9B] leading-relaxed">
+            <p className="text-base sm:text-xl font-sans text-[#7E8B9B] leading-relaxed">
               Where frontier machine intelligence meets human implementation. Long-form technical dialogues dissecting how theoretical research moves into production systems.
             </p>
           </div>
@@ -228,7 +224,7 @@ export const PodcastSection: React.FC = () => {
               href="https://syntinuumpodcast.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-3 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#060A12] font-semibold rounded-[2px] inline-flex items-center gap-2 transition-colors shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+              className="px-5 py-3 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-semibold rounded-[2px] inline-flex items-center gap-2 transition-colors shadow-[0_0_20px_rgba(255,40,0,0.35)]"
             >
               <span>Explore SyntinuumPodcast.com</span>
               <span>↗</span>
@@ -237,10 +233,10 @@ export const PodcastSection: React.FC = () => {
               href="https://www.youtube.com/@syntinuum"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-3 bg-[#0E1526] hover:bg-[#16213B] text-[#F4F6F9] border border-[#F4F6F9]/15 rounded-[2px] inline-flex items-center gap-2 transition-colors"
+              className="px-4 py-3 bg-[#060A12] hover:bg-[#0B1E40] text-[#F4F6F9] border border-[#18458B]/30 rounded-[2px] inline-flex items-center gap-2 transition-colors"
             >
               <span>YouTube [8k+ Views]</span>
-              <span className="text-[#82B7FF]">↗</span>
+              <span className="text-[#2563EB]">↗</span>
             </a>
           </div>
         </div>
@@ -261,15 +257,15 @@ export const PodcastSection: React.FC = () => {
               className="absolute top-6 -translate-x-1/2 pointer-events-none z-20 flex flex-col items-center"
             >
               {/* Stylized DNA-Lightbulb Vector Icon */}
-              <div className="w-12 h-12 rounded-full bg-[#060A12] border-2 border-[#FF2800] flex items-center justify-center text-[#FF2800] shadow-[0_0_24px_rgba(245,158,11,0.6)]">
+              <div className="w-12 h-12 rounded-full bg-[#060A12] border-2 border-[#FF2800] flex items-center justify-center text-[#FF2800] shadow-[0_0_24px_rgba(255,40,0,0.6)]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M9 18h6" />
                   <path d="M10 22h4" />
                   <path d="M12 2v2" />
                   <path d="M12 6a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V18H9v-.8C7.21 16.16 6 14.22 6 12a6 6 0 0 1 6-6z" />
                   {/* Internal DNA Double Helix Filament */}
-                  <path d="M10 10c1 1 3-1 4 0" stroke="#82B7FF" strokeWidth="1.5" />
-                  <path d="M10 13c1-1 3 1 4 0" stroke="#82B7FF" strokeWidth="1.5" />
+                  <path d="M10 10c1 1 3-1 4 0" stroke="#2563EB" strokeWidth="1.5" />
+                  <path d="M10 13c1-1 3 1 4 0" stroke="#C8D2E0" strokeWidth="1.5" />
                 </svg>
               </div>
 
@@ -308,12 +304,12 @@ export const PodcastSection: React.FC = () => {
                 onClick={() => setActiveZone('dialogues')}
                 onMouseEnter={() => setHoveredZone('dialogues')}
                 onMouseLeave={() => setHoveredZone(null)}
-                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer border-x border-[#F4F6F9]/10 group ${
-                  currentZone === 'dialogues' ? 'bg-[#82B7FF]/[0.04]' : 'hover:bg-white/[0.02]'
+                className={`h-full text-left p-6 sm:p-8 flex flex-col justify-end transition-colors cursor-pointer border-x border-[#18458B]/20 group ${
+                  currentZone === 'dialogues' ? 'bg-[#2563EB]/[0.06]' : 'hover:bg-white/[0.02]'
                 }`}
               >
                 <div className="space-y-1">
-                  <span className="text-xs font-mono text-[#82B7FF] font-semibold tracking-wider">
+                  <span className="text-xs font-mono text-[#2563EB] font-semibold tracking-wider">
                     02  The Dialogues
                   </span>
                   <div className="text-sm sm:text-base font-sans font-semibold text-[#F4F6F9]">
@@ -362,10 +358,10 @@ export const PodcastSection: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[bg-transparent] border border-[#F4F6F9]/10 rounded-[2px]"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[#060A12]/80 border border-[#18458B]/25 rounded-[2px]"
               >
                 <div className="lg:col-span-7 space-y-6">
-                  <div className="text-xs font-mono text-[#FF2800] uppercase tracking-widest">
+                  <div className="text-xs font-mono text-[#FF2800] uppercase tracking-widest font-semibold">
                     FOUNDED &amp; HOSTED BY HARESH MURUGESAN · 8,000+ YOUTUBE VIEWS
                   </div>
                   <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F4F6F9] leading-snug">
@@ -387,8 +383,8 @@ export const PodcastSection: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="lg:col-span-5 bg-[#060A12] p-6 rounded-[2px] border border-[#F4F6F9]/10 space-y-4">
-                  <div className="text-xs font-mono text-[#82B7FF] uppercase tracking-wider pb-2 border-b border-[#F4F6F9]/10">
+                <div className="lg:col-span-5 bg-[#060A12] p-6 rounded-[2px] border border-[#18458B]/25 space-y-4">
+                  <div className="text-xs font-mono text-[#2563EB] uppercase tracking-wider pb-2 border-b border-[#18458B]/25 font-semibold">
                     PUBLICATION METRICS
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-xs font-mono">
@@ -406,7 +402,7 @@ export const PodcastSection: React.FC = () => {
                     </div>
                     <div>
                       <div className="text-[#7E8B9B]">Editorial Focus:</div>
-                      <div className="text-[#82B7FF]">Systems Tradeoffs</div>
+                      <div className="text-[#2563EB]">Systems Tradeoffs</div>
                     </div>
                   </div>
                 </div>
@@ -436,7 +432,7 @@ export const PodcastSection: React.FC = () => {
                     href="https://syntinuumpodcast.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-mono text-[#82B7FF] hover:underline shrink-0"
+                    className="text-xs font-mono text-[#2563EB] hover:underline shrink-0"
                   >
                     ALL EPISODES (10+) ↗
                   </a>
@@ -450,11 +446,11 @@ export const PodcastSection: React.FC = () => {
                       href={d.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-5 bg-[bg-transparent] hover:bg-[#10172A] border border-[#F4F6F9]/10 hover:border-[#82B7FF]/40 rounded-[2px] transition-all duration-200 group flex flex-col justify-between select-none"
+                      className="p-5 bg-[#060A12]/80 hover:bg-[#0B1E40]/30 border border-[#18458B]/25 hover:border-[#2563EB]/50 rounded-[2px] transition-all duration-200 group flex flex-col justify-between select-none"
                     >
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between text-xs font-mono">
-                          <span className="text-[#82B7FF] font-semibold">{d.runtime}</span>
+                          <span className="text-[#2563EB] font-semibold">{d.runtime}</span>
                           <span className="text-[#7E8B9B] group-hover:text-[#F4F6F9] transition-colors">↗</span>
                         </div>
                         <h4 className="text-base font-sans font-semibold text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors">
@@ -468,9 +464,9 @@ export const PodcastSection: React.FC = () => {
                         </p>
                       </div>
 
-                      <div className="mt-4 pt-3 border-t border-[#F4F6F9]/[0.08] text-[10px] font-mono text-[#7E8B9B] flex items-center justify-between">
+                      <div className="mt-4 pt-3 border-t border-[#18458B]/20 text-[10px] font-mono text-[#7E8B9B] flex items-center justify-between">
                         <span>LISTEN EPISODE</span>
-                        <span className="text-[#82B7FF]">syntinuumpodcast.com</span>
+                        <span className="text-[#2563EB]">syntinuumpodcast.com</span>
                       </div>
                     </a>
                   ))}
@@ -486,10 +482,10 @@ export const PodcastSection: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[bg-transparent] border border-[#F4F6F9]/10 rounded-[2px]"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 bg-[#060A12]/80 border border-[#18458B]/25 rounded-[2px]"
               >
                 <div className="lg:col-span-7 space-y-6">
-                  <div className="text-xs font-mono text-[#FF2800] uppercase tracking-widest">
+                  <div className="text-xs font-mono text-[#FF2800] uppercase tracking-widest font-semibold">
                     SYSTEMS-ENGINEERED PRODUCTION WORKFLOW
                   </div>
                   <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F4F6F9] leading-snug">
@@ -503,7 +499,7 @@ export const PodcastSection: React.FC = () => {
                       href="https://syntinuumpodcast.com"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-3 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#060A12] font-mono text-xs font-semibold rounded-[2px] transition-colors"
+                      className="px-5 py-3 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono text-xs font-semibold rounded-[2px] transition-colors"
                     >
                       <span>Listen on SyntinuumPodcast.com ↗</span>
                     </a>
@@ -511,7 +507,7 @@ export const PodcastSection: React.FC = () => {
                       href="https://www.youtube.com/@syntinuum"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-3 bg-[#060A12] hover:bg-[#10172A] text-[#F4F6F9] border border-[#F4F6F9]/20 font-mono text-xs rounded-[2px] transition-colors"
+                      className="px-5 py-3 bg-[#060A12] hover:bg-[#0B1E40] text-[#F4F6F9] border border-[#18458B]/30 font-mono text-xs rounded-[2px] transition-colors"
                     >
                       <span>Watch on YouTube ↗</span>
                     </a>
@@ -519,13 +515,13 @@ export const PodcastSection: React.FC = () => {
                 </div>
 
                 <div className="lg:col-span-5 space-y-3 font-mono text-xs">
-                  <div className="p-4 bg-[#060A12] rounded-[2px] border border-[#F4F6F9]/10">
-                    <span className="text-[#82B7FF] block font-semibold mb-1">01. DISCOVERY ENGINE</span>
+                  <div className="p-4 bg-[#060A12] rounded-[2px] border border-[#18458B]/25">
+                    <span className="text-[#2563EB] block font-semibold mb-1">01. DISCOVERY ENGINE</span>
                     <p className="text-[#7E8B9B] font-sans">
                       Python BeautifulSoup &amp; SMTP scraper identifying top arXiv authors, serial founders, and executive architects.
                     </p>
                   </div>
-                  <div className="p-4 bg-[#060A12] rounded-[2px] border border-[#F4F6F9]/10">
+                  <div className="p-4 bg-[#060A12] rounded-[2px] border border-[#18458B]/25">
                     <span className="text-[#FF2800] block font-semibold mb-1">02. AUDIO DSP &amp; DAVINCI 20</span>
                     <p className="text-[#7E8B9B] font-sans">
                       Phase-coherent multiband gating, ITU-R BS.1770-4 loudness normalization, and DaVinci YRGB Color-Managed pipeline.

@@ -40,7 +40,7 @@ export const EXPERIENCE_ROLES: ExperienceRole[] = [
     verifiedOutcome: '12 serverless agentic workflows processing scientific metadata with sub-second retrieval.',
     side: 'left',
     apexX: 880,
-    apexY: 190,
+    apexY: 220,
     t: 0.12,
   },
   {
@@ -61,8 +61,8 @@ export const EXPERIENCE_ROLES: ExperienceRole[] = [
     skillsDemonstrated: ['Computer Vision', 'PyTorch', 'TensorFlow', 'OpenCV', 'Digital Pathology', 'Explainable AI (Grad-CAM)'],
     verifiedOutcome: 'Automated tissue feature extraction pipelines with cross-validated benchmark evaluations.',
     side: 'right',
-    apexX: 520,
-    apexY: 520,
+    apexX: 460,
+    apexY: 540,
     t: 0.33,
   },
   {
@@ -83,8 +83,8 @@ export const EXPERIENCE_ROLES: ExperienceRole[] = [
     skillsDemonstrated: ['Connected Vehicle Telemetry', 'Spatial Analytics', 'Python', 'Pandas', 'Geospatial Visualization'],
     verifiedOutcome: '1,000+ telemetry models developed; strategic findings presented to Honda Research leadership.',
     side: 'left',
-    apexX: 940,
-    apexY: 870,
+    apexX: 920,
+    apexY: 880,
     t: 0.55,
   },
   {
@@ -105,8 +105,8 @@ export const EXPERIENCE_ROLES: ExperienceRole[] = [
     skillsDemonstrated: ['Next.js', 'React', 'TypeScript', 'Recursive Tree Schemas', 'Fiscal Strategy', 'Operations Management'],
     verifiedOutcome: 'Engineered nested argument-tree deliberation engine and directed product roadmap.',
     side: 'right',
-    apexX: 480,
-    apexY: 1200,
+    apexX: 440,
+    apexY: 1220,
     t: 0.77,
   },
   {
@@ -127,8 +127,8 @@ export const EXPERIENCE_ROLES: ExperienceRole[] = [
     skillsDemonstrated: ['Technical Journalism', 'Audio Engineering', 'React', 'Next.js', 'System Architecture'],
     verifiedOutcome: '10+ technical founder dialogues produced; 100K+ impressions generated.',
     side: 'left',
-    apexX: 920,
-    apexY: 1520,
+    apexX: 860,
+    apexY: 1540,
     t: 0.94,
   },
 ];
@@ -148,9 +148,9 @@ export const VerticalGrandPrixTrack: React.FC = () => {
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const prevIndexRef = useRef<number>(0);
 
-  // SVG Spline geometry: 1440 x 1650 coordinate system
+  // SVG Spline geometry: 1440 x 1750 coordinate system
   const trackPathD = useMemo(() => {
-    return 'M 720 0 C 730 60, 840 120, 880 190 C 920 280, 680 420, 520 520 C 380 620, 850 750, 940 870 C 1030 990, 580 1080, 480 1200 C 380 1320, 850 1420, 920 1520 C 970 1590, 850 1620, 720 1650';
+    return 'M 720 0 C 730 70, 850 130, 880 220 C 920 330, 640 440, 460 540 C 310 650, 830 760, 920 880 C 1010 1010, 560 1100, 440 1220 C 330 1340, 780 1430, 860 1540 C 910 1620, 810 1680, 720 1750';
   }, []);
 
   // Compute transform (x, y, angle) along the spline
@@ -268,9 +268,9 @@ export const VerticalGrandPrixTrack: React.FC = () => {
 
       // 2. NON-REVERSING WRAP-AROUND FORWARD LOOP (Moving Upwards)
       // Never drive in reverse!
-      // Phase A: Blast downward off bottom edge (t -> 1.05) in 420ms
-      // Phase B: Instant wrap to top entry straight (t = -0.05)
-      // Phase C: Dive down into selected upper apex (-0.05 -> targetT) in 520ms
+      // Phase A: Blast downward off bottom exit (t -> 1.06) in 420ms
+      // Phase B: Instant wrap to top entry straight (t = -0.06)
+      // Phase C: Dive down into selected upper apex (-0.06 -> targetT) in 520ms
       const tl = gsap.timeline({
         onComplete: () => {
           progressRef.current.t = targetT;
@@ -280,7 +280,7 @@ export const VerticalGrandPrixTrack: React.FC = () => {
       });
 
       tl.to(progressRef.current, {
-        t: 1.05,
+        t: 1.06,
         duration: 0.42,
         ease: 'power2.in',
         onUpdate: () => {
@@ -289,9 +289,9 @@ export const VerticalGrandPrixTrack: React.FC = () => {
       });
 
       tl.set(progressRef.current, {
-        t: -0.05,
+        t: -0.06,
         onComplete: () => {
-          applyCarTransform(-0.05);
+          applyCarTransform(-0.06);
         },
       });
 
@@ -313,13 +313,13 @@ export const VerticalGrandPrixTrack: React.FC = () => {
     <div
       ref={containerRef}
       className="relative w-full max-w-[1440px] mx-auto select-none py-12"
-      style={{ minHeight: '1700px' }}
+      style={{ minHeight: '1750px' }}
     >
       {/* =====================================================================
           GRAND 4-PASS OPEN-CANVAS SVG MOTORSPORT CIRCUIT
           ===================================================================== */}
       <svg
-        viewBox="0 0 1440 1650"
+        viewBox="0 0 1440 1750"
         className="absolute inset-0 w-full h-full pointer-events-none overflow-visible z-10"
         preserveAspectRatio="xMidYMid meet"
         aria-hidden="true"
@@ -604,16 +604,9 @@ export const VerticalGrandPrixTrack: React.FC = () => {
                       ))}
                     </ul>
 
-                    {/* Stack Tags */}
-                    <div className="pt-2 flex flex-wrap gap-1.5">
-                      {role.skillsDemonstrated.map((s, i) => (
-                        <span
-                          key={i}
-                          className="px-2 py-0.5 bg-[#060A12] border border-[#18458B]/40 rounded-[2px] text-[10px] font-mono text-[#C8D2E0]"
-                        >
-                          {s}
-                        </span>
-                      ))}
+                    {/* Stack Specification (Middle-dot separated) */}
+                    <div className="pt-2 text-xs font-mono text-[#C8D2E0]/90 tracking-wide">
+                      {role.skillsDemonstrated.join(' · ')}
                     </div>
                   </div>
                 )}

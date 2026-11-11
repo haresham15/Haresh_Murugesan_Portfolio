@@ -73,13 +73,13 @@ export const MEDALLIONS: MedallionData[] = [
   {
     id: 'nsls-osu',
     number: '05',
-    title: 'NSLS Nominee & OSU Innovation Analyst',
-    orgAndYear: 'National Society of Leadership and Success · 2026',
-    project: 'Philocracy & Honda 99P Labs',
+    title: 'NSLS & Ohio State Research Distinction',
+    orgAndYear: 'The Ohio State University & NSLS · 2026',
+    project: 'AI/ML Digital Pathology & Academic Leadership',
     summary:
-      'Nominated to the NSLS Ohio State Chapter for academic integrity and executive leadership; co-leading Philocracy and directing corporate connected-mobility research at OSU CIS.',
+      'Recognized for computational pathology research contributions at OSU and nominated to the National Society of Leadership and Success (NSLS) for academic and executive leadership.',
     link: '#experience',
-    inscription: 'NATIONAL SOCIETY OF LEADERSHIP AND SUCCESS · OSU HONORS ·',
+    inscription: 'NATIONAL SOCIETY OF LEADERSHIP AND SUCCESS · OSU RESEARCH DISTINCTION ·',
     centerBadge: 'OSU',
     accentColor: '#FF2800',
   },
@@ -112,8 +112,8 @@ export const MedallionCarousel: React.FC = () => {
     const cy = rect.top + rect.height / 2;
     const nx = (e.clientX - cx) / (rect.width / 2);
     const ny = (e.clientY - cy) / (rect.height / 2);
-    mouseX.set(nx * 14);
-    mouseY.set(-ny * 14);
+    mouseX.set(nx * 15);
+    mouseY.set(-ny * 15);
   };
 
   const handleMouseLeave = () => {
@@ -140,18 +140,24 @@ export const MedallionCarousel: React.FC = () => {
       onMouseLeave={handleMouseLeave}
       className="relative w-full flex flex-col items-center select-none py-6"
     >
-      {/* Controls Bar */}
-      <div className="w-full max-w-[1440px] px-[4vw] md:px-[6vw] xl:px-[7vw] flex items-center justify-between pb-8 border-b border-[#18458B]/20">
-        <div className="space-y-1">
-          <span className="text-xs font-mono text-[#FF2800] uppercase tracking-widest font-bold">
-            04  COMPETITIVE AWARDS &amp; DISTINCTIONS
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-serif text-[#F4F6F9]">
+      {/* Editorial Header Bar (Unboxed & Monumental) */}
+      <div className="w-full max-w-[1440px] px-[4vw] md:px-[6vw] xl:px-[7vw] flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#18458B]/20">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-baseline gap-4">
+            <span className="text-6xl sm:text-7xl lg:text-8xl font-serif font-normal text-[#F4F6F9] tracking-tight leading-none">
+              2× <span className="text-[#FF2800]">1st</span>
+            </span>
+            <div className="flex flex-col text-xs sm:text-sm font-mono text-[#C8D2E0]">
+              <span className="text-[#F4F6F9] font-semibold">American Statistical Association DataFest</span>
+              <span className="text-[#7E8B9B]">2025 &amp; 2026 Consecutive Winner · Best Use of External Data</span>
+            </div>
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-serif text-[#F4F6F9] tracking-tight">
             Recognition.
           </h2>
         </div>
 
-        <div className="flex items-center gap-3 text-xs font-mono">
+        <div className="flex items-center gap-3 text-xs font-mono shrink-0">
           <button
             type="button"
             onClick={handlePrev}
@@ -175,11 +181,11 @@ export const MedallionCarousel: React.FC = () => {
       </div>
 
       {/* =====================================================================
-          3D PERSPECTIVE MEDALLION ORBITAL CAROUSEL (perspective: 1400px)
+          3D PERSPECTIVE MEDALLION ORBITAL CAROUSEL (perspective: 1500px)
           ===================================================================== */}
       <div
         className="relative w-full h-[380px] sm:h-[440px] flex items-center justify-center overflow-visible my-8"
-        style={{ perspective: '1400px' }}
+        style={{ perspective: '1500px' }}
       >
         {MEDALLIONS.map((m, idx) => {
           const offset = (idx - activeIndex + total) % total;
@@ -218,7 +224,7 @@ export const MedallionCarousel: React.FC = () => {
                   : { transformStyle: 'preserve-3d' }
               }
               transition={{ type: 'spring', stiffness: 220, damping: 24 }}
-              className="absolute w-[290px] sm:w-[330px] aspect-square rounded-full flex items-center justify-center cursor-pointer transition-shadow duration-300"
+              className="absolute w-[310px] h-[310px] rounded-full flex items-center justify-center cursor-pointer transition-shadow duration-300"
             >
               {/* SVG 3D Machined Medallion Disc */}
               <svg
@@ -266,7 +272,7 @@ export const MedallionCarousel: React.FC = () => {
                   fill="none"
                   stroke="#03050A"
                   strokeWidth="3.5"
-                  strokeDasharray="2.5 10.9"
+                  strokeDasharray="4 9.4"
                 />
 
                 {/* 2. Anodized Inner Ring (Glowing Red-Orange on Active) */}
@@ -275,9 +281,9 @@ export const MedallionCarousel: React.FC = () => {
                   cy="160"
                   r="144"
                   fill="none"
-                  stroke={isCenter ? m.accentColor : '#18458B'}
+                  stroke={isCenter ? '#FF2800' : '#18458B'}
                   strokeWidth={isCenter ? '3' : '1.5'}
-                  filter={isCenter ? 'drop-shadow(0 0 8px rgba(255,40,0,0.6))' : undefined}
+                  style={isCenter ? { filter: 'drop-shadow(0 0 10px rgba(255,40,0,0.85))' } : undefined}
                 />
 
                 {/* 3. Circular Perimeter Inscription (360° textPath) */}
@@ -393,7 +399,7 @@ export const MedallionCarousel: React.FC = () => {
                 href={active.link}
                 className="inline-flex items-center gap-2 text-xs font-mono font-bold text-[#FF2800] hover:text-[#F4F6F9] transition-colors uppercase border-b border-[#FF2800] pb-0.5"
               >
-                <span>Explore Winning System</span>
+                <span>Explore Case Study</span>
                 <span>→</span>
               </Link>
             </div>

@@ -3,32 +3,31 @@
 @import "tailwindcss/utilities";
 
 :root {
-  /* V3.0 High-Contrast Motorsport & Computational System */
-  --bg-midnight: #03050A;
-  --bg-obsidian: #060A12;
-  --cobalt-deep: #0B1E40;
-  --cobalt-bright: #18458B;
-  --cobalt-electric: #2563EB;
-  --accent-red-orange: #FF2800;
-  --accent-crimson-glow: #FF4419;
-  --metal-silver: #C8D2E0;
-  --metal-titanium: #7E8B9B;
-  --text-primary: #F4F6F9;
-  --text-secondary: #C8D2E0;
-  --text-muted: #7E8B9B;
+  /* V4.0 Forged Carbon & Motorsport Computational System */
+  --bg-midnight: #03050A;          /* Primary deep obsidian base — NEVER grey */
+  --bg-obsidian: #060A12;          /* Secondary depth surface */
+  --cobalt-deep: #0B1E40;          /* Deep dark cobalt blue structural ambient */
+  --cobalt-mid: #153875;           /* Mid cobalt blue for blueprint geometry */
+  --cobalt-bright: #2563EB;        /* Electric cobalt highlight for shockwaves & active vectors */
+  --accent-red-orange: #FF2800;    /* Primary sharp reddish-orange (Rosso/McLaren) */
+  --accent-crimson-glow: #FF4419;  /* Incandescent reddish-orange glow */
+  --metal-silver: #C8D2E0;         /* Machined metallic silver */
+  --metal-chrome: #E6ECF5;         /* High-luster silver specular highlight */
+  --metal-titanium: #7E8B9B;       /* Brushed titanium secondary text/lines */
+  --text-alabaster: #F4F6F9;       /* Primary editorial serif headline color */
 
   --bg-canvas: #03050A;
   --bg-surface: #060A12;
   --bg-raised: #0B1E40;
   --color-accent: #FF2800;
   --color-accent-halo: #FF4419;
-  --color-accent-crest: #FFB86C;
-  --color-accent-hot: #FFE9AE;
+  --color-accent-crest: #FF2800;
+  --color-accent-hot: #E6ECF5;
   --color-warm-highlight: #C8D2E0;
-  --color-blue: #18458B;
+  --color-blue: #153875;
   --color-link-blue: #2563EB;
-  --color-technical-blue: #18458B;
-  --border-hairline: rgba(200, 210, 224, 0.08);
+  --color-technical-blue: #153875;
+  --border-hairline: rgba(200, 210, 224, 0.10);
 
   /* Spacing Scale Tokens */
   --space-1: 8px;
@@ -165,14 +164,14 @@ h1, h2, h3, h4, h5, h6 {
 /* Chassis Rim-Lighting on Media Frames */
 .chassis-rim-lighting {
   border-top: 1px solid transparent;
-  border-image: linear-gradient(90deg, #F5D998 0%, #FF6B35 18%, rgba(130, 183, 255, 0.35) 55%, transparent 100%) 1;
+  border-image: linear-gradient(90deg, #E6ECF5 0%, #FF2800 18%, rgba(37, 99, 235, 0.35) 55%, transparent 100%) 1;
 }
 
-/* 3-Stop Self-Illuminated Orange Gradient Utility */
+/* 3-Stop Self-Illuminated Red-Orange Gradient Utility */
 .bg-3stop-orange {
-  background: linear-gradient(180deg, #FF8547 0%, #FF6B35 100%);
-  border-top: 1px solid #FFE9AE;
-  box-shadow: 0 0 30px rgba(255, 107, 53, 0.35);
+  background: linear-gradient(180deg, #FF4419 0%, #FF2800 100%);
+  border-top: 1px solid #E6ECF5;
+  box-shadow: 0 0 30px rgba(255, 40, 0, 0.35);
 }
 
 /* Tactile Analog Film Grain Overlay (35mm) */

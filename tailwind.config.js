@@ -16,15 +16,16 @@ module.exports = {
         mono: ['"Geist Mono"', '"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       colors: {
-        // V3.0 Computational & Motorsport Color Palette
+        // V4.0 Forged Carbon & Motorsport Color Palette
         'bg-midnight': '#03050A',
         'bg-obsidian': '#060A12',
         'cobalt-deep': '#0B1E40',
-        'cobalt-bright': '#18458B',
-        'cobalt-electric': '#2563EB',
+        'cobalt-mid': '#153875',
+        'cobalt-bright': '#2563EB',
         'accent-red-orange': '#FF2800',
         'accent-crimson-glow': '#FF4419',
         'metal-silver': '#C8D2E0',
+        'metal-chrome': '#E6ECF5',
         'metal-titanium': '#7E8B9B',
         'text-alabaster': '#F4F6F9',
 
@@ -36,7 +37,7 @@ module.exports = {
         'editorial-muted': '#C8D2E0',
         'accent-orange': '#FF2800',
         'warm-highlight': '#C8D2E0',
-        'technical-blue': '#18458B',
+        'technical-blue': '#153875',
 
         // Master 85 / 12 / 3 Color Palette & Backward Compatibility
         canvas: '#03050A',
@@ -53,22 +54,22 @@ module.exports = {
         // 3-Stop Self-Illuminated Red-Orange
         'thermal-halo': '#FF4419',
         'slipstream-orange': '#FF2800',
-        'specular-crest': '#FFB86C',
-        'hot-core': '#FFE9AE',
+        'specular-crest': '#FF2800',
+        'hot-core': '#E6ECF5',
         accent: '#FF2800',
         amber: '#FF2800',
         gold: '#C8D2E0',
         
         // Atmospheric blues & ivories
         prism: '#2563EB',
-        'prism-light': '#18458B',
+        'prism-light': '#153875',
         ivory: '#F4F6F9',
         'text-primary': '#F4F6F9',
         'text-secondary': '#C8D2E0',
         'text-muted': '#7E8B9B',
 
         // Token mappings & backward compatibility
-        'brand-blue': '#18458B',
+        'brand-blue': '#153875',
         'link-blue': '#2563EB',
         'brand-orange': '#FF2800',
         'page-base': '#03050A',
@@ -78,7 +79,7 @@ module.exports = {
         'primary-ink': '#F4F6F9',
         'muted-ink': '#C8D2E0',
         'light-gray': '#F4F6F9',
-        'glass-border': 'rgba(200, 210, 224, 0.08)',
+        'glass-border': 'rgba(200, 210, 224, 0.10)',
         'glass-bg': 'rgba(6, 10, 18, 0.85)',
 
         'signal-emerald': '#4CC38A',

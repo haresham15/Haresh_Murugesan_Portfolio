@@ -18,7 +18,7 @@ export const ScrollyExperience: React.FC = () => {
               Experience.
             </h2>
             <p className="text-base sm:text-xl font-sans text-[#7E8B9B] leading-relaxed">
-              Steering through production engineering roles across enterprise serverless, digital pathology AI, and connected-vehicle mobility telematics.
+              Production software engineering, clinical computer vision research, and executive technical leadership.
             </p>
           </div>
 

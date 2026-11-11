@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 export type TempoTab = 'buffer' | 'statemachine' | 'security';
 
@@ -28,222 +28,193 @@ export const PlateTempo: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TempoTab>('buffer');
   const [slots, setSlots] = useState<BufferSlot[]>(INITIAL_SLOTS);
   const [headIndex, setHeadIndex] = useState<number>(4);
-  const [burstActive, setBurstActive] = useState<boolean>(false);
-  const [lastPacket, setLastPacket] = useState<string>('Unread Feedback Freeze');
+  const [isInjecting, setIsInjecting] = useState<boolean>(false);
 
-  const simulateTaskBurst = () => {
-    setBurstActive(true);
-    const newPackets: { label: string; category: 'crisis' | 'burnout' | 'normal' }[] = [
-      { label: 'Executive "Can We Talk?" Trigger', category: 'crisis' },
-      { label: 'Refactoring Architecture RFC', category: 'normal' },
-      { label: 'Impostor Syndrome Drift', category: 'burnout' },
-      { label: 'Weekly Standup Agenda', category: 'normal' },
+  const handleSimulatePacket = () => {
+    setIsInjecting(true);
+    const samplePackets: { label: string; category: 'crisis' | 'burnout' | 'normal' }[] = [
+      { label: 'High Priority Production Slack Trigger', category: 'crisis' },
+      { label: 'Weekly Status Report Draft', category: 'normal' },
+      { label: 'Cognitive Fatigue Intercept', category: 'burnout' },
     ];
 
-    let currentHead = headIndex;
-    newPackets.forEach((pkt, idx) => {
+    let nextHead = headIndex;
+    samplePackets.forEach((pkt, i) => {
       setTimeout(() => {
-        currentHead = (currentHead + 1) % slots.length;
-        setHeadIndex(currentHead);
-        setLastPacket(pkt.label);
+        nextHead = (nextHead + 1) % slots.length;
+        setHeadIndex(nextHead);
         setSlots((prev) => {
           const updated = [...prev];
-          const nowStr = new Date().toTimeString().slice(0, 8);
-          updated[currentHead] = {
-            id: currentHead,
+          const nowTime = new Date().toTimeString().slice(0, 8);
+          updated[nextHead] = {
+            id: nextHead,
             label: pkt.label,
             category: pkt.category,
-            timestamp: nowStr,
+            timestamp: nowTime,
           };
           return updated;
         });
 
-        if (idx === newPackets.length - 1) {
-          setTimeout(() => setBurstActive(false), 400);
+        if (i === samplePackets.length - 1) {
+          setIsInjecting(false);
         }
-      }, (idx + 1) * 220);
+      }, (i + 1) * 260);
     });
   };
 
   return (
-    <div className="w-full h-full min-h-[440px] flex flex-col justify-between select-none">
-      {/* Top Controls Header */}
-      <div className="flex items-center justify-between pb-3 mb-2 border-b border-[#2563EB]/20 text-xs font-mono">
+    <div className="w-full h-full min-h-[460px] flex flex-col justify-between select-none">
+      {/* Clean Underline Mode Tabs Header */}
+      <div className="flex flex-wrap items-center justify-between pb-3 mb-2 border-b border-[#2563EB]/20 text-xs font-mono">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#38BDF8] animate-pulse" />
-          <span className="text-[#2563EB] font-semibold tracking-wider">PLATE 04 · ENCRYPTED RING BUFFER &amp; STATE MACHINE</span>
+          <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
+          <span className="text-[#C8D2E0] font-semibold tracking-wider">
+            AIR-GAPPED LOCAL-FIRST RING BUFFER &amp; STATE MACHINE
+          </span>
         </div>
 
-        {/* Mode Tabs */}
-        <div className="flex items-center gap-1 bg-[#060A12]/80 p-1 rounded-[2px] border border-[#F4F6F9]/10">
-          <button
-            type="button"
-            onClick={() => setActiveTab('buffer')}
-            className={`px-2.5 py-1 rounded-[2px] transition-colors ${
-              activeTab === 'buffer'
-                ? 'bg-[#FF2800] text-[#070B12] font-semibold'
-                : 'text-[#7E8B9B] hover:text-[#F4F6F9]'
-            }`}
-          >
-            Ring Buffer
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('statemachine')}
-            className={`px-2.5 py-1 rounded-[2px] transition-colors ${
-              activeTab === 'statemachine'
-                ? 'bg-[#FF2800] text-[#070B12] font-semibold'
-                : 'text-[#7E8B9B] hover:text-[#F4F6F9]'
-            }`}
-          >
-            Triage State Machine
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('security')}
-            className={`px-2.5 py-1 rounded-[2px] transition-colors ${
-              activeTab === 'security'
-                ? 'bg-[#FF2800] text-[#070B12] font-semibold'
-                : 'text-[#7E8B9B] hover:text-[#F4F6F9]'
-            }`}
-          >
-            Air-Gap Security
-          </button>
+        {/* Clean Underline Tabs */}
+        <div className="flex items-center gap-6 pt-2 sm:pt-0">
+          {(
+            [
+              { id: 'buffer', label: 'Encrypted Ring Buffer' },
+              { id: 'statemachine', label: 'Triage State Machine' },
+              { id: 'security', label: 'Air-Gapped Privacy' },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`pb-1 transition-colors cursor-pointer text-xs font-mono tracking-wider ${
+                activeTab === tab.id
+                  ? 'text-[#F4F6F9] border-b-2 border-[#FF2800] font-semibold'
+                  : 'text-[#7E8B9B] hover:text-[#C8D2E0] border-b-2 border-transparent'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Main Interactive Stage Body */}
-      <div className="relative flex-1 w-full flex items-center justify-center p-4">
-        {/* TAB 1: 12-Slot Encrypted Ring Buffer */}
+      <div className="relative flex-1 w-full min-h-[400px] flex items-center justify-center p-2">
+        {/* TAB 1: Encrypted Ring Buffer */}
         {activeTab === 'buffer' && (
-          <div className="w-full h-full flex flex-col justify-between space-y-4">
-            {/* Top Ingestion Flow Visualizer */}
-            <div className="flex items-center justify-between p-3 bg-[#060A12]/80 rounded-[2px] border border-[#F4F6F9]/10 text-xs font-mono">
-              <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${burstActive ? 'bg-[#FF2800] animate-ping' : 'bg-[#4CC38A]'}`} />
-                <span className="text-[#7E8B9B]">INGESTION HEAD:</span>
-                <span className="text-[#C8D2E0] font-bold">SLOT #{headIndex}</span>
-              </div>
-              <div className="truncate max-w-[240px] text-[#2563EB]">{lastPacket}</div>
-              <button
-                type="button"
-                onClick={simulateTaskBurst}
-                disabled={burstActive}
-                className="px-3 py-1 bg-[#FF2800] hover:bg-[#FF4419] text-[#070B12] font-bold rounded-[2px] cursor-pointer transition-colors"
-              >
-                {burstActive ? 'STREAMING...' : '⚡ Simulate Task Burst'}
-              </button>
-            </div>
-
-            {/* Circular Ring Buffer Graphic Representation */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
+          <div className="relative w-full h-full min-h-[390px] flex flex-col justify-between py-2">
+            {/* 12-Slot Orbital / Ring Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-auto">
               {slots.map((slot) => {
                 const isHead = slot.id === headIndex;
                 const isCrisis = slot.category === 'crisis';
                 const isBurnout = slot.category === 'burnout';
-                const isNormal = slot.category === 'normal';
+                const isEmpty = slot.category === 'empty';
 
                 return (
                   <div
                     key={slot.id}
-                    className={`p-2.5 rounded-[2px] border transition-all ${
+                    className={`p-3 border-b transition-all duration-200 ${
                       isHead
-                        ? 'border-[#FF2800] bg-[#FF2800]/10 shadow-[0_0_14px_rgba(255,107,53,0.3)]'
+                        ? 'border-[#FF2800] bg-[#FF2800]/5'
                         : isCrisis
-                        ? 'border-[#F87171]/40 bg-[#F87171]/5'
+                        ? 'border-[#FF2800]/60'
                         : isBurnout
-                        ? 'border-[#C8D2E0]/40 bg-[#C8D2E0]/5'
-                        : isNormal
-                        ? 'border-[#2563EB]/30 bg-[#2563EB]/5'
-                        : 'border-white/5 bg-transparent'
+                        ? 'border-[#2563EB]/60'
+                        : isEmpty
+                        ? 'border-[#2563EB]/15 opacity-40'
+                        : 'border-[#C8D2E0]/40'
                     }`}
                   >
                     <div className="flex items-center justify-between text-[10px] font-mono mb-1">
-                      <span className={isHead ? 'text-[#FF2800] font-bold' : 'text-[#7A889B]'}>
-                        #{slot.id}
+                      <span className={isHead ? 'text-[#FF2800] font-bold' : 'text-[#7E8B9B]'}>
+                        SLOT {slot.id < 10 ? `0${slot.id}` : slot.id} {isHead && '◀ HEAD'}
                       </span>
-                      <span className="text-[#7A889B]">{slot.timestamp}</span>
+                      <span className="text-[#7E8B9B]">{slot.timestamp}</span>
                     </div>
-                    <div className="text-[11px] font-sans font-medium text-[#F4F6F9] line-clamp-1">
+                    <div className="text-xs font-mono text-[#F4F6F9] truncate font-medium">
                       {slot.label}
-                    </div>
-                    <div className="mt-1 flex items-center justify-between text-[9px] font-mono">
-                      <span
-                        className={
-                          isCrisis
-                            ? 'text-[#F87171] font-bold'
-                            : isBurnout
-                            ? 'text-[#C8D2E0]'
-                            : isNormal
-                            ? 'text-[#2563EB]'
-                            : 'text-[#7A889B]'
-                        }
-                      >
-                        {slot.category.toUpperCase()}
-                      </span>
-                      {isHead && <span className="text-[#FF2800] animate-pulse">● HEAD</span>}
                     </div>
                   </div>
                 );
               })}
+            </div>
+
+            {/* Injection Trigger Button */}
+            <div className="flex items-center justify-between pt-3 border-t border-[#2563EB]/20 text-xs font-mono">
+              <span className="text-[#7E8B9B]">LOCAL SQLITE PERSISTENCE: AES-256</span>
+              <button
+                type="button"
+                onClick={handleSimulatePacket}
+                disabled={isInjecting}
+                className="px-4 py-2 bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] font-bold rounded-[2px] transition-colors cursor-pointer flex items-center gap-2 disabled:opacity-50"
+              >
+                <span>{isInjecting ? 'Processing Gate...' : 'Inject Incoming Task Packet'}</span>
+                <span>→</span>
+              </button>
             </div>
           </div>
         )}
 
         {/* TAB 2: Triage State Machine */}
         {activeTab === 'statemachine' && (
-          <div className="w-full h-full flex flex-col justify-center p-6 space-y-4 text-xs font-mono">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 bg-[#060A12]/80 border border-[#F87171]/40 rounded-[2px]">
-                <div className="text-[10px] text-[#F87171]">CIRCUIT BREAKER</div>
-                <div className="text-base font-bold text-[#F4F6F9] mt-1">Regex Intercept</div>
-                <div className="text-[10px] text-[#4CC38A] mt-0.5">0.20ms Deterministic Gate</div>
+          <div className="w-full h-full flex flex-col justify-center space-y-6 text-xs font-mono py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="pb-3 border-b border-[#FF2800]">
+                <span className="text-[10px] text-[#FF2800]">STATE 01: INTERCEPT</span>
+                <div className="text-sm font-bold text-[#F4F6F9] mt-1">Regex Circuit Breaker</div>
+                <span className="text-[#FF2800] text-[11px]">0.20ms Deterministic Gate</span>
               </div>
-              <div className="p-3 bg-[#060A12]/80 border border-[#C8D2E0]/40 rounded-[2px]">
-                <div className="text-[10px] text-[#C8D2E0]">SEMANTIC REFRAME</div>
-                <div className="text-base font-bold text-[#F4F6F9] mt-1">Local pgvector</div>
-                <div className="text-[10px] text-[#4CC38A] mt-0.5">0.14ms Cosine Similarity</div>
+              <div className="pb-3 border-b border-[#2563EB]">
+                <span className="text-[10px] text-[#2563EB]">STATE 02: TRIAGE</span>
+                <div className="text-sm font-bold text-[#F4F6F9] mt-1">Cognitive Delay Buffer</div>
+                <span className="text-[#2563EB] text-[11px]">Zero-Impulse Cooldown</span>
               </div>
-              <div className="p-3 bg-[#060A12]/80 border border-[#2563EB]/40 rounded-[2px]">
-                <div className="text-[10px] text-[#2563EB]">ACTIVE-PASSIVE</div>
-                <div className="text-base font-bold text-[#F4F6F9] mt-1">Dual-LLM Failover</div>
-                <div className="text-[10px] text-[#4CC38A] mt-0.5">Primary → Fallback</div>
+              <div className="pb-3 border-b border-[#C8D2E0]">
+                <span className="text-[10px] text-[#C8D2E0]">STATE 03: PERSIST</span>
+                <div className="text-sm font-bold text-[#F4F6F9] mt-1">Encrypted Ring Buffer</div>
+                <span className="text-[#4CC38A] text-[11px]">100% Local Journal</span>
               </div>
             </div>
 
-            <div className="p-4 bg-transparent border border-[#F4F6F9]/10 rounded-[2px] text-[#7E8B9B] leading-relaxed">
-              Deterministic finite state machine (FSM) classifies incoming messages before display, routing high-arousal rejection sensitivity triggers into cognitive buffer delays without external telemetry.
-            </div>
+            <p className="text-sm font-sans text-[#7E8B9B] leading-relaxed max-w-xl">
+              Deterministic finite state machine processes incoming notifications and communications through regex circuit breakers before presenting them to the user, preventing cognitive burnout during high-stress operational cycles.
+            </p>
           </div>
         )}
 
-        {/* TAB 3: Air-Gap Security */}
+        {/* TAB 3: Air-Gapped Privacy */}
         {activeTab === 'security' && (
-          <div className="w-full h-full flex flex-col justify-center p-6 space-y-4 text-xs font-mono">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-[#060A12]/80 border border-[#4CC38A]/30 rounded-[2px]">
-                <span className="text-[#7E8B9B] text-[10px]">NETWORK EXFILTRATION</span>
-                <div className="text-2xl font-bold text-[#4CC38A] mt-1">0.0 KB</div>
-                <div className="text-[10px] text-[#7A889B] mt-1">Zero external tracking requests</div>
+          <div className="w-full h-full flex flex-col justify-center space-y-6 text-xs font-mono py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="pb-3 border-b border-[#4CC38A]">
+                <span className="text-[10px] text-[#4CC38A]">NETWORK EXFILTRATION</span>
+                <div className="text-sm font-bold text-[#F4F6F9] mt-1">0.0 KB (Air-Gapped)</div>
+                <span className="text-[#4CC38A] text-[11px]">Strict Zero-Telemetry</span>
               </div>
-              <div className="p-4 bg-[#060A12]/80 border border-[#2563EB]/30 rounded-[2px]">
-                <span className="text-[#7E8B9B] text-[10px]">LOCAL STORAGE</span>
-                <div className="text-2xl font-bold text-[#2563EB] mt-1">100% SQLite</div>
-                <div className="text-[10px] text-[#7A889B] mt-1">AES-256 client-side encryption</div>
+              <div className="pb-3 border-b border-[#2563EB]/30">
+                <span className="text-[10px] text-[#7E8B9B]">LOCAL STORAGE</span>
+                <div className="text-sm font-bold text-[#F4F6F9] mt-1">SQLite + IndexedDB</div>
+                <span className="text-[#C8D2E0] text-[11px]">AES-256 Encrypted</span>
+              </div>
+              <div className="pb-3 border-b border-[#FF2800]">
+                <span className="text-[10px] text-[#FF2800]">CRISIS RECALL</span>
+                <div className="text-sm font-bold text-[#F4F6F9] mt-1">100% Recall Rate</div>
+                <span className="text-[#FF2800] text-[11px]">Verified Invariant</span>
               </div>
             </div>
 
-            <div className="p-4 bg-transparent border border-[#F4F6F9]/10 rounded-[2px] text-[#7E8B9B] leading-relaxed">
-              Complete local execution model: all emotional history embeddings, message drafts, and cognitive models remain on-device with zero cloud telemetry.
-            </div>
+            <p className="text-sm font-sans text-[#7E8B9B] leading-relaxed max-w-xl">
+              Engineered for absolute client data sovereignty. No analytical telemetry, user metrics, or message payloads ever leave the local machine boundary.
+            </p>
           </div>
         )}
       </div>
 
-      {/* Bottom Status Footer */}
-      <div className="pt-3 border-t border-[#2563EB]/20 flex items-center justify-between text-[11px] font-mono text-[#7A889B]">
-        <span>ENCRYPTION: Local SQLite (AES-256)</span>
-        <span className="text-[#4CC38A]">0.0 KB Exfiltration</span>
+      {/* Clean Bottom Status Line */}
+      <div className="pt-3 border-t border-[#2563EB]/20 flex items-center justify-between text-[11px] font-mono text-[#7E8B9B]">
+        <span>RUNTIME: Electron · React · SQLite · IndexedDB</span>
+        <span className="text-[#4CC38A]">0.0 KB Exfiltration · 100% Local Persistence</span>
       </div>
     </div>
   );

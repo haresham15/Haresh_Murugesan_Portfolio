@@ -40,12 +40,12 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
     let height = 0;
     let dpr = 1;
 
-    // Resting background tint (Soft Titanium / Prussian Slate)
-    const baseColor: ColorRGB = { r: 135, g: 155, b: 185 };
+    // Resting background tint (Brushed Titanium / Machined Silver #7E8B9B)
+    const baseColor: ColorRGB = { r: 126, g: 139, b: 155 };
 
-    // Subtle warm amber & ember accent ramp (understated, non-radioactive)
-    const colorOrange: ColorRGB = { r: 255, g: 125, b: 55 }; // Amber Orange
-    const colorPeach: ColorRGB = { r: 245, g: 195, b: 135 }; // Warm Peach-Gold
+    // V4.0 Sharp Reddish-Orange (#FF2800) & Machined Silver (#C8D2E0)
+    const colorRedOrange: ColorRGB = { r: 255, g: 40, b: 0 }; // Sharp Reddish-Orange
+    const colorSilver: ColorRGB = { r: 200, g: 210, b: 224 }; // Machined Silver
 
     const mouse = {
       x: -1000,
@@ -183,14 +183,14 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
         if (activeLevel > 0.03) {
           if (activeLevel < 0.45) {
             const t = activeLevel / 0.45;
-            r = Math.round(baseColor.r + (colorOrange.r - baseColor.r) * t);
-            g = Math.round(colorOrange.g + (colorOrange.g - baseColor.g) * t);
-            b = Math.round(colorOrange.b + (colorOrange.b - baseColor.b) * t);
+            r = Math.round(baseColor.r + (colorSilver.r - baseColor.r) * t);
+            g = Math.round(baseColor.g + (colorSilver.g - baseColor.g) * t);
+            b = Math.round(baseColor.b + (colorSilver.b - baseColor.b) * t);
           } else {
             const t = (activeLevel - 0.45) / 0.55;
-            r = Math.round(colorOrange.r + (colorPeach.r - colorOrange.r) * t);
-            g = Math.round(colorOrange.g + (colorPeach.g - colorOrange.g) * t);
-            b = Math.round(colorOrange.b + (colorPeach.b - colorOrange.b) * t);
+            r = Math.round(colorSilver.r + (colorRedOrange.r - colorSilver.r) * t);
+            g = Math.round(colorSilver.g + (colorRedOrange.g - colorSilver.g) * t);
+            b = Math.round(colorSilver.b + (colorRedOrange.b - colorSilver.b) * t);
           }
         }
 
@@ -373,7 +373,7 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
                 ctx.beginPath();
                 ctx.moveTo(p1.x, p1.y);
                 ctx.lineTo(p2.x, p2.y);
-                ctx.strokeStyle = `rgba(255, 140, 70, ${linkFactor * 0.12})`;
+                ctx.strokeStyle = `rgba(255, 40, 0, ${(linkFactor * 0.16).toFixed(3)})`;
                 ctx.stroke();
               }
             }

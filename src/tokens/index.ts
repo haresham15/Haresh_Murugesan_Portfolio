@@ -1,38 +1,38 @@
 /**
- * Design Token System for hareshmurugesan.com (Version 2.0 Architectural & Editorial Refinement)
+ * Design Token System for hareshmurugesan.com (Version 4.0 Forged Carbon & Motorsport Specification)
  * Ground Truth: DTCG Three-Tier Token Architecture (design/tokens.json)
- * Palette: Deep BG #070B12 | Navy Surface #101B30 | Elevated Surface #17243A | Ivory #F3EFE7 | Accent Orange #FF6B35
+ * Palette: Midnight Obsidian #03050A | Surface #060A12 | Cobalt Deep #0B1E40 | Alabaster #F4F6F9 | Accent Red-Orange #FF2800
  */
 
 export const tokens = {
   colors: {
-    canvas: '#070B12',
-    surface: '#101B30',
-    deepBlue: '#101B30',
-    elevatedSurface: '#17243A',
-    deepBg: '#070B12',
-    blue: '#82B7FF',
-    linkBlue: '#82B7FF',
-    orange: '#FF6B35',
-    accentOrange: '#FF6B35',
-    warmHighlight: '#F5D998',
-    technicalBlue: '#82B7FF',
-    primaryText: '#F3EFE7',
-    secondaryText: '#A7B2C3',
-    textMuted: '#7A889B',
-    borderSubtle: 'rgba(243, 239, 231, 0.08)',
-    borderCrisp: 'rgba(130, 183, 255, 0.25)',
-    borderOrange: 'rgba(255, 107, 53, 0.5)',
+    canvas: '#03050A',
+    surface: '#060A12',
+    deepBlue: '#0B1E40',
+    elevatedSurface: '#0B1E40',
+    deepBg: '#03050A',
+    blue: '#2563EB',
+    linkBlue: '#2563EB',
+    orange: '#FF2800',
+    accentOrange: '#FF2800',
+    warmHighlight: '#C8D2E0',
+    technicalBlue: '#153875',
+    primaryText: '#F4F6F9',
+    secondaryText: '#C8D2E0',
+    textMuted: '#7E8B9B',
+    borderSubtle: 'rgba(200, 210, 224, 0.10)',
+    borderCrisp: 'rgba(37, 99, 235, 0.35)',
+    borderOrange: 'rgba(255, 40, 0, 0.5)',
     // Backward compatibility mappings
-    base: '#070B12',
-    surfaceRaised: '#17243A',
-    surfaceSubtle: '#101B30',
-    primaryInk: '#F3EFE7',
-    mutedInk: '#A7B2C3',
-    subtleInk: '#7A889B',
-    signalBlue: '#82B7FF',
+    base: '#03050A',
+    surfaceRaised: '#0B1E40',
+    surfaceSubtle: '#060A12',
+    primaryInk: '#F4F6F9',
+    mutedInk: '#C8D2E0',
+    subtleInk: '#7E8B9B',
+    signalBlue: '#2563EB',
     signalTeal: '#4CC38A',
-    signalOrange: '#FF6B35',
+    signalOrange: '#FF2800',
   },
   typography: {
     raleway: '"Raleway", sans-serif',

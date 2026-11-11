@@ -4,11 +4,10 @@ interface CarbonFlake {
   x: number;
   y: number;
   radius: number;
-  angle: number; // fiber orientation θ
+  angle: number; // fiber orientation θ ∈ [0, π]
   sides: number;
   vertices: { x: number; y: number }[];
   baseColor: string;
-  isCobaltTint: boolean;
 }
 
 export const ForgedCarbonCanvas: React.FC = () => {
@@ -25,29 +24,28 @@ export const ForgedCarbonCanvas: React.FC = () => {
     let dpr = 1;
     let flakes: CarbonFlake[] = [];
     let animId: number | null = null;
-    let targetMouse = { x: 0.5, y: 0.35 };
-    let currentMouse = { x: 0.5, y: 0.35 };
+    let mouse = { x: 0.5, y: 0.35, rawX: 0, rawY: 0 };
+    let scrollOffset = 0;
     let isTicking = false;
 
-    // Pitch-black matrix shades (Strict dark luminance clamp: #04070E, #070C17, #0A1222)
-    const DARK_PALETTES = [
+    // Strict Dark Clamp: Base flake fill colors MUST stay between #04070E and #080E1A (never grey!)
+    const DARK_FLAKE_PALETTE = [
       '#04070E',
-      '#050912',
-      '#070C17',
-      '#080E1C',
-      '#060B15',
-      '#03060C',
-      '#0A1222',
+      '#050811',
+      '#060913',
+      '#060A15',
+      '#070B17',
+      '#070C19',
+      '#080E1A',
     ];
 
     const generateFlakes = (w: number, h: number) => {
       const flakeList: CarbonFlake[] = [];
-      // Approximate 180-220 flakes per large screen
-      const area = w * h;
-      const count = Math.min(260, Math.max(120, Math.floor(area / 9000)));
+      // 180 overlapping, sharp-edged angular polygons (20px–70px across)
+      const count = Math.max(180, Math.floor((w * h) / 7500));
 
-      // Deterministic pseudo-random seed generator
-      let seed = 42;
+      // Deterministic PRNG to avoid layout shift between renders
+      let seed = 1337;
       const rnd = () => {
         seed = (seed * 16807) % 2147483647;
         return (seed - 1) / 2147483646;
@@ -56,20 +54,19 @@ export const ForgedCarbonCanvas: React.FC = () => {
       for (let i = 0; i < count; i++) {
         const x = rnd() * w;
         const y = rnd() * h;
-        const radius = 22 + rnd() * 45; // 22px to 67px
-        const angle = rnd() * Math.PI; // θ in [0, π]
-        const sides = 4 + Math.floor(rnd() * 3); // 4, 5, or 6 sides
-        const baseColor = DARK_PALETTES[Math.floor(rnd() * DARK_PALETTES.length)];
-        const isCobaltTint = rnd() > 0.6;
+        const radius = 20 + rnd() * 50; // 20px–70px across
+        const angle = rnd() * Math.PI; // θ_i ∈ [0, π]
+        const sides = 4 + Math.floor(rnd() * 3); // 4-to-6-sided Voronoi/tow flake
+        const baseColor = DARK_FLAKE_PALETTE[Math.floor(rnd() * DARK_FLAKE_PALETTE.length)];
 
-        // Generate irregular polygon vertices
+        // Generate sharp angular polygon vertices
         const vertices: { x: number; y: number }[] = [];
         for (let s = 0; s < sides; s++) {
-          const vertexAngle = (s / sides) * Math.PI * 2 + (rnd() - 0.5) * 0.45;
+          const vAngle = (s / sides) * Math.PI * 2 + (rnd() - 0.5) * 0.45;
           const r = radius * (0.75 + rnd() * 0.5);
           vertices.push({
-            x: x + Math.cos(vertexAngle) * r,
-            y: y + Math.sin(vertexAngle) * r,
+            x: x + Math.cos(vAngle) * r,
+            y: y + Math.sin(vAngle) * r,
           });
         }
 
@@ -81,7 +78,6 @@ export const ForgedCarbonCanvas: React.FC = () => {
           sides,
           vertices,
           baseColor,
-          isCobaltTint,
         });
       }
 
@@ -94,61 +90,62 @@ export const ForgedCarbonCanvas: React.FC = () => {
       width = window.innerWidth;
       height = window.innerHeight;
 
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
 
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
       flakes = generateFlakes(width, height);
       render();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      targetMouse.x = e.clientX / Math.max(1, width);
-      targetMouse.y = e.clientY / Math.max(1, height);
+      mouse.rawX = e.clientX;
+      mouse.rawY = e.clientY;
+      mouse.x = e.clientX / Math.max(1, width);
+      mouse.y = e.clientY / Math.max(1, height);
       if (!isTicking) {
         isTicking = true;
-        animId = requestAnimationFrame(animateLoop);
+        animId = requestAnimationFrame(animateStep);
       }
     };
 
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      targetMouse.y = ((scrollY * 0.15) % height) / height;
+      scrollOffset = window.scrollY;
       if (!isTicking) {
         isTicking = true;
-        animId = requestAnimationFrame(animateLoop);
+        animId = requestAnimationFrame(animateStep);
       }
     };
 
     const render = () => {
       if (!ctx || width === 0 || height === 0) return;
 
-      // 1. Pitch-Black Matrix Base (#03050A)
+      // 1. BASE LAYER: Solid #03050A (Midnight Obsidian)
       ctx.fillStyle = '#03050A';
       ctx.fillRect(0, 0, width, height);
 
-      // Light source vector in pixel space
-      const lightX = currentMouse.x * width;
-      const lightY = currentMouse.y * height;
+      // Scroll-derived rotation component
+      const scrollAlpha = scrollOffset * 0.002;
 
-      // 2. Render each chopped carbon-tow facet
+      // 2. RENDER 180 ANGULAR FORGED CARBON-TOW FACETS
       for (let i = 0; i < flakes.length; i++) {
         const f = flakes[i];
         if (f.vertices.length < 3) continue;
 
-        // Angle from flake to light source
-        const dx = lightX - f.x;
-        const dy = lightY - f.y;
-        const lightAngle = Math.atan2(dy, dx);
+        // Virtual light angle α (slowly shifting with scroll window.scrollY * 0.002 and cursor)
+        const dx = (mouse.rawX || width * 0.5) - f.x;
+        const dy = (mouse.rawY || height * 0.35) - f.y;
+        const cursorAngle = Math.atan2(dy, dx);
+        const alpha = cursorAngle + scrollAlpha;
 
-        // Anisotropic glint: peaks when flake orientation aligns with light vector
-        // Math.pow(Math.abs(Math.cos(θ - lightAngle)), 12)
-        const dot = Math.abs(Math.cos(f.angle - lightAngle));
-        const glint = Math.pow(dot, 12);
+        // Anisotropic Specular Factor: Math.pow(Math.abs(Math.cos(θ_i - α)), 14)
+        const cosDiff = Math.cos(f.angle - alpha);
+        const spec = Math.pow(Math.abs(cosDiff), 14);
 
-        // Draw Polygon Flake
+        // Path for Polygon Flake
         ctx.beginPath();
         ctx.moveTo(f.vertices[0].x, f.vertices[0].y);
         for (let v = 1; v < f.vertices.length; v++) {
@@ -156,28 +153,23 @@ export const ForgedCarbonCanvas: React.FC = () => {
         }
         ctx.closePath();
 
-        // Base Flake Fill
+        // Base Flake Fill (Dark clamp #04070E to #080E1A)
         ctx.fillStyle = f.baseColor;
         ctx.fill();
 
-        // Flake Border (micro-edge relief)
-        ctx.strokeStyle = 'rgba(24, 69, 139, 0.08)';
-        ctx.lineWidth = 0.6;
-        ctx.stroke();
-
-        // Internal Parallel Micro-Striations (unidirectional carbon filaments)
+        // Internal Parallel 1px Micro-Striations along θ_i
         ctx.save();
         ctx.clip();
 
-        ctx.strokeStyle = 'rgba(200, 210, 224, 0.04)';
-        ctx.lineWidth = 0.5;
         const cosA = Math.cos(f.angle);
         const sinA = Math.sin(f.angle);
         const perpX = -sinA;
         const perpY = cosA;
 
-        // Draw 4-6 parallel striation lines inside the flake
-        for (let line = -f.radius; line <= f.radius; line += 8) {
+        ctx.strokeStyle = `rgba(200, 210, 224, ${(0.03 + spec * 0.04).toFixed(3)})`;
+        ctx.lineWidth = 1;
+
+        for (let line = -f.radius; line <= f.radius; line += 6) {
           ctx.beginPath();
           ctx.moveTo(
             f.x + perpX * line - cosA * f.radius,
@@ -190,49 +182,49 @@ export const ForgedCarbonCanvas: React.FC = () => {
           ctx.stroke();
         }
 
-        // Anisotropic Sheen Overlay
-        if (glint > 0.04) {
-          if (f.isCobaltTint) {
-            ctx.fillStyle = `rgba(24, 69, 139, ${Math.min(0.24, glint * 0.28)})`;
-          } else {
-            ctx.fillStyle = `rgba(200, 210, 224, ${Math.min(0.12, glint * 0.16)})`;
-          }
+        // Anisotropic Cobalt & Silver Specular Sheen:
+        // Dark Cobalt (rgba(21, 56, 117, spec * 0.22)) + Machined Silver (rgba(200, 210, 224, spec * 0.07))
+        if (spec > 0.02) {
+          const cobaltAlpha = Math.min(0.22, spec * 0.22);
+          ctx.fillStyle = `rgba(21, 56, 117, ${cobaltAlpha.toFixed(3)})`;
+          ctx.fill();
+
+          const silverAlpha = Math.min(0.07, spec * 0.07);
+          ctx.fillStyle = `rgba(200, 210, 224, ${silverAlpha.toFixed(3)})`;
           ctx.fill();
         }
 
         ctx.restore();
+
+        // 0.5px Edge Bevel: rgba(200, 210, 224, spec * 0.12)
+        const bevelAlpha = Math.max(0.02, Math.min(0.12, spec * 0.12));
+        ctx.strokeStyle = `rgba(200, 210, 224, ${bevelAlpha.toFixed(3)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
       }
 
-      // 3. Studio Lighting Radial Vignette
+      // 3. AMBIENT DEPTH VIGNETTE:
+      // radial-gradient(circle at 50% 30%, rgba(11, 30, 64, 0.24), rgba(3, 5, 10, 0.88) 75%)
       const vignette = ctx.createRadialGradient(
         width * 0.5,
-        height * 0.35,
-        Math.min(width, height) * 0.1,
+        height * 0.3,
+        Math.min(width, height) * 0.12,
         width * 0.5,
-        height * 0.35,
-        Math.max(width, height) * 0.9
+        height * 0.3,
+        Math.max(width, height) * 0.85
       );
-      vignette.addColorStop(0, 'rgba(11, 30, 64, 0.28)');
-      vignette.addColorStop(0.5, 'rgba(3, 5, 10, 0.45)');
-      vignette.addColorStop(0.85, '#03050A');
+      vignette.addColorStop(0, 'rgba(11, 30, 64, 0.24)');
+      vignette.addColorStop(0.5, 'rgba(3, 5, 10, 0.55)');
+      vignette.addColorStop(0.75, 'rgba(3, 5, 10, 0.88)');
       vignette.addColorStop(1, '#03050A');
 
       ctx.fillStyle = vignette;
       ctx.fillRect(0, 0, width, height);
     };
 
-    const animateLoop = () => {
-      // Lerp mouse
-      const dx = targetMouse.x - currentMouse.x;
-      const dy = targetMouse.y - currentMouse.y;
-      if (Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001) {
-        currentMouse.x += dx * 0.08;
-        currentMouse.y += dy * 0.08;
-        render();
-        animId = requestAnimationFrame(animateLoop);
-      } else {
-        isTicking = false;
-      }
+    const animateStep = () => {
+      render();
+      isTicking = false;
     };
 
     handleResize();
@@ -251,7 +243,7 @@ export const ForgedCarbonCanvas: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10 pointer-events-none w-full h-full block"
+      className="fixed inset-0 -z-10 pointer-events-none w-screen h-screen block"
       style={{ background: '#03050A' }}
       aria-hidden="true"
     />

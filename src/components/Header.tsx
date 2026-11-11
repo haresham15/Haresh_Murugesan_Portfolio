@@ -4,13 +4,11 @@ import { useRouter } from 'next/router';
 import { WheelNavTrigger } from './WheelNavTrigger';
 import { useLockBodyScroll } from '@/lib/useLockBodyScroll';
 import { Portal } from './ui/Portal';
-import { useActiveTheme, THEME_PALETTES } from './ThemeSection';
 
 export default function Header() {
   const router = useRouter();
   const [navOpen, setNavOpen] = useState(false);
   const navContainerRef = useRef<HTMLDivElement>(null);
-  const { activeTheme } = useActiveTheme();
 
   // Close navigation when route changes
   useEffect(() => {
@@ -31,25 +29,17 @@ export default function Header() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [navOpen]);
 
-  // Primary destinations
-  const primaryLinks = [
-    { label: 'Work', href: '/#projects', note: 'Deterministic Systems CodeGraph & Architecture' },
-    { label: 'Experience', href: '/#experience', note: 'Top-to-Bottom Grand Prix Circuit' },
-    { label: 'About', href: '/#about', note: 'Engineering Thesis & Academic Research' },
-    { label: 'Syntinuum', href: '/#podcast', note: 'Waveform Studio & Research Synthesis' },
-    { label: 'Recognition', href: '/#achievements', note: '3D Medallion Awards Carousel' },
-  ];
-
-  // Secondary architectural index
-  const secondaryLinks = [
-    { num: '01', label: 'Selected Works', href: '/#projects', note: 'Flagship systems & deep inspection' },
-    { num: '02', label: 'Syntinuum Podcast', href: '/#podcast', note: 'Episodes & studio pipeline' },
-    { num: '03', label: 'Technical Index', href: '/#skills', note: 'Core competencies & stacks' },
-    { num: '04', label: 'Distinctions', href: '/#achievements', note: '2× 1st ASA DataFest & medals' },
-    { num: '05', label: 'Trajectory', href: '/#history', note: 'Winding chronology 2023–2026' },
-    { num: '06', label: 'Field Notes', href: '/#now', note: 'Active research inquiries' },
-    { num: '07', label: 'Contact', href: '/#contact', note: 'Direct correspondence & inquiries' },
-    { num: '08', label: 'Curriculum Vitae', href: '/Haresh_Murugesan_Resume.pdf', external: true },
+  // 9 Preserved Destinations: Work, Archive, Experience, Syntinuum, Technical Index, Recognition, About, Résumé, Contact
+  const navDestinations = [
+    { num: '01', label: 'Work', href: '/#projects', note: 'Selected Works & Architecture' },
+    { num: '02', label: 'Archive', href: '/projects', note: 'Linear Systems CodeGraph (18 Repositories)' },
+    { num: '03', label: 'Experience', href: '/#experience', note: 'Naturally Curvy Grand Prix Circuit' },
+    { num: '04', label: 'Syntinuum', href: '/#podcast', note: 'Waveform Studio & Technical Dialogues' },
+    { num: '05', label: 'Technical Index', href: '/#skills', note: 'Production Stacks & Competencies' },
+    { num: '06', label: 'Recognition', href: '/#achievements', note: '3D Medallion Awards Carousel' },
+    { num: '07', label: 'About', href: '/#about', note: 'Engineering Thesis & Digital Pathology Artifact' },
+    { num: '08', label: 'Résumé', href: '/Haresh_Murugesan_Resume.pdf', note: 'Verified CV & Background', external: true },
+    { num: '09', label: 'Contact', href: '/#contact', note: 'Direct Dispatch & Correspondence' },
   ];
 
   const handleLinkClick = (href: string) => {
@@ -63,64 +53,40 @@ export default function Header() {
     }
   };
 
-  const isLight = THEME_PALETTES[activeTheme]?.isLight;
-
   return (
     <>
       <a href="#about" className="skip-to-content">
         Skip to content
       </a>
 
-      {/* Floating De-Coupled Corner Controls (Zero Full-Width Spanning Bar) */}
-      <header className="fixed top-0 left-0 w-full z-50 pointer-events-none p-4 sm:p-6 lg:p-8">
-        <div className="w-full flex items-center justify-between">
-          
-          {/* Top-Left Floating Identity: Initials Logo + Frameless Hovering Name */}
+      {/* Top Navigation Bar: Minimal Fixed Elements */}
+      <header className="fixed top-0 left-0 w-full z-50 pointer-events-none">
+        {/* Top-Left Floating Identity: [HM] badge + Haresh Murugesan (15px medium tracking) */}
+        <div className="fixed top-6 left-6 md:left-12 pointer-events-auto z-50">
           <Link
             href="/"
             aria-label="Haresh Murugesan — Home"
-            className="pointer-events-auto flex items-center gap-3 group focus-visible:outline-2 focus-visible:outline-[#FF2800] select-none transition-transform duration-150 active:scale-95"
+            className="flex items-center gap-3 group focus-visible:outline-2 focus-visible:outline-[#FF2800] select-none transition-transform duration-150 active:scale-95"
           >
-            {/* Initials Logo Badge */}
-            <span
-              className={`w-8 h-8 sm:w-9 sm:h-9 border rounded-[2px] flex items-center justify-center font-raleway text-xs sm:text-sm font-bold transition-all duration-300 shrink-0 shadow-[0_2px_12px_rgba(0,0,0,0.35)] ${
-                isLight
-                  ? 'bg-[#0B0B0E] text-[#F4F6F9] border-[#0B0B0E]/30 group-hover:border-[#FF2800]'
-                  : 'bg-[#060A12] text-[#F4F6F9] border-[#18458B]/30 group-hover:border-[#FF2800] group-hover:text-[#FF2800]'
-              }`}
-            >
+            <span className="w-8 h-8 rounded-[2px] bg-[#060A12] border border-[#C8D2E0]/30 text-[#F4F6F9] flex items-center justify-center font-mono text-xs font-semibold group-hover:border-[#FF2800] group-hover:text-[#FF2800] transition-colors duration-200 shadow-[0_2px_12px_rgba(3,5,10,0.85)]">
               HM
             </span>
-
-            {/* Name hovering freely over background */}
-            <span
-              className={`font-raleway font-semibold text-[15px] sm:text-[16px] tracking-tight transition-colors duration-300 whitespace-nowrap drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] ${
-                isLight
-                  ? 'text-[#0B0B0E] group-hover:text-[#FF2800]'
-                  : 'text-[#F4F6F9] group-hover:text-[#FF2800]'
-              }`}
-            >
+            <span className="font-sans font-medium text-[15px] tracking-tight text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors duration-200 whitespace-nowrap drop-shadow-[0_2px_8px_rgba(3,5,10,0.9)]">
               Haresh Murugesan
             </span>
           </Link>
+        </div>
 
-          {/* Top-Right Floating Wheel Rim Trigger */}
-          <div className="pointer-events-auto group relative flex items-center">
-            <WheelNavTrigger
-              isOpen={navOpen}
-              onToggle={() => setNavOpen(!navOpen)}
-            />
-
-            {/* Precision Architectural Tooltip */}
-            <span className="absolute right-0 top-full mt-2.5 px-2 py-1 bg-[#060A12]/95 border border-[#18458B]/30 text-[10px] font-mono uppercase tracking-widest text-[#F4F6F9] opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none whitespace-nowrap shadow-xl rounded-[2px] translate-y-1 group-hover:translate-y-0">
-              {navOpen ? 'CLOSE' : 'INDEX'}
-            </span>
-          </div>
-
+        {/* Top-Right Floating 64px x 64px Wheel Rim Trigger */}
+        <div className="fixed top-6 right-6 md:right-12 pointer-events-auto z-50">
+          <WheelNavTrigger
+            isOpen={navOpen}
+            onToggle={() => setNavOpen(!navOpen)}
+          />
         </div>
       </header>
 
-      {/* Top-level portal for site navigation drawer (z-[100] guarantee) */}
+      {/* Borderless Frosted-Obsidian Navigation Overlay (z-[100]) */}
       <Portal>
         <div
           ref={navContainerRef}
@@ -134,122 +100,104 @@ export default function Header() {
           aria-modal="true"
           aria-label="Site Navigation"
         >
-          {/* Backdrop Tint & Blur */}
+          {/* Frosted Obsidian Backdrop */}
           <div
             onClick={() => setNavOpen(false)}
-            className="absolute inset-0 bg-[#03050A]/96 backdrop-blur-xl transition-opacity duration-300 cursor-pointer"
+            className="absolute inset-0 bg-[#03050A]/95 backdrop-blur-2xl transition-opacity duration-300 cursor-pointer"
           />
 
-          {/* Diagonal Subtle Hairline Background Elements */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20">
-            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-[#C8D2E0]/40 to-transparent top-1/4 -rotate-12 transform origin-left" />
-            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-[#FF2800]/40 to-transparent bottom-1/3 -rotate-12 transform origin-right" />
-          </div>
+          {/* Anisotropic Radial Depth Sheen */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse at 80% 20%, rgba(21, 56, 117, 0.22) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(255, 40, 0, 0.12) 0%, transparent 65%)',
+            }}
+          />
 
           {/* Content Container */}
-          <div className="relative z-10 w-full h-full max-w-none px-[4vw] md:px-[6vw] xl:px-[7vw] pt-24 sm:pt-28 pb-10 flex flex-col justify-between overflow-y-auto">
+          <div className="relative z-10 w-full h-full max-w-[1440px] mx-auto px-[4vw] md:px-[6vw] xl:px-[7vw] pt-28 pb-12 flex flex-col justify-between overflow-y-auto">
             
-            {/* Top Navigation Grid: Primary Left, Secondary Index Right */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 my-auto items-start">
-              
-              {/* Left Column: Primary Monumental Links (Span 7) */}
-              <div className="lg:col-span-7 space-y-4 sm:space-y-5">
-                <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF2800] mb-3">
-                  <span className="w-2.5 h-px bg-[#FF2800]" />
-                  <span>PRIMARY DESTINATIONS</span>
-                </div>
-
-                <nav aria-label="Main Destinations" className="space-y-3 sm:space-y-4">
-                  {primaryLinks.map((item) => (
-                    <div key={item.label} className="group">
-                      <Link
-                        href={item.href}
-                        onClick={() => handleLinkClick(item.href)}
-                        className="inline-flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 transition-transform duration-300 group-hover:translate-x-2"
-                      >
-                        <span className="font-raleway font-bold text-[2rem] sm:text-[3rem] md:text-[3.5rem] text-[#F4F6F9] group-hover:text-[#C8D2E0] leading-none transition-colors tracking-tight">
-                          {item.label}
-                        </span>
-                        <span className="text-xs sm:text-sm font-mono text-[#7E8B9B] group-hover:text-[#C8D2E0] transition-colors">
-                          / {item.note}
-                        </span>
-                      </Link>
-                    </div>
-                  ))}
-                </nav>
-              </div>
-
-              {/* Right Column: Architectural Secondary Index (Span 5) */}
-              <div className="lg:col-span-5 bg-[#060A12]/80 border border-[#18458B]/25 p-6 sm:p-7 space-y-5 rounded-[2px] backdrop-blur-md">
-                <div className="flex items-center justify-between text-xs font-mono tracking-wider text-[#7E8B9B] uppercase pb-2.5 border-b border-[#18458B]/20">
-                  <span className="text-[#C8D2E0]">SECTIONS &amp; ARCHITECTURAL INDEX</span>
-                  <span>(08 RECORDS)</span>
-                </div>
-
-                <div className="space-y-1.5">
-                  {secondaryLinks.map((item) => {
-                    if (item.external) {
-                      return (
-                        <a
-                          key={item.label}
-                          href={item.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setNavOpen(false)}
-                          className="flex items-center justify-between py-2 px-3 text-xs font-mono text-[#7E8B9B] hover:text-[#F4F6F9] hover:bg-[#0B1E40]/30 border-b border-[#18458B]/10 transition-colors group rounded-[2px]"
-                        >
-                          <span className="flex items-center gap-3">
-                            <span className="text-[#FF2800]">{item.num}</span>
-                            <span className="font-medium text-[#F4F6F9]">{item.label}</span>
-                          </span>
-                          <span className="text-xs text-[#C8D2E0] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
-                            ↗
-                          </span>
-                        </a>
-                      );
-                    }
-
-                    return (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        onClick={() => handleLinkClick(item.href)}
-                        className="flex items-center justify-between py-2 px-3 text-xs font-mono text-[#7E8B9B] hover:text-[#F4F6F9] hover:bg-[#0B1E40]/30 border-b border-[#18458B]/10 transition-colors group rounded-[2px]"
-                      >
-                        <span className="flex items-center gap-3">
-                          <span className="text-[#FF2800]">{item.num}</span>
-                          <span className="font-medium text-[#F4F6F9]">{item.label}</span>
-                        </span>
-                        <span className="text-[#7E8B9B] group-hover:text-[#FF2800] transition-colors">
-                          →
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-
-                {/* Direct Quick Contact Dispatch */}
-                <div className="pt-3 border-t border-[#18458B]/20 flex items-center justify-between text-xs font-mono text-[#7E8B9B]">
-                  <span>DIRECT DISPATCH:</span>
-                  <a
-                    href="mailto:haresh.murugesan@gmail.com"
-                    className="text-[#FF2800] hover:text-[#C8D2E0] transition-colors"
-                  >
-                    haresh.murugesan@gmail.com ↗
-                  </a>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Bottom Colophon / Status Bar */}
-            <div className="pt-6 border-t border-[#18458B]/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-[#7E8B9B]">
+            {/* Header / Esc Instruction */}
+            <div className="flex items-center justify-between pb-6 border-b border-[#20324F]/30 text-xs font-mono text-[#7E8B9B]">
               <div className="flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
-                <span>COLUMBUS, OH · THE OHIO STATE UNIVERSITY</span>
+                <span className="text-[#F4F6F9] font-medium tracking-wider uppercase">ARCHITECTURAL NAVIGATION</span>
+                <span>·</span>
+                <span className="text-[#C8D2E0]">09 DESTINATIONS</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setNavOpen(false)}
+                className="hover:text-[#FF2800] transition-colors cursor-pointer flex items-center gap-2"
+              >
+                <span>PRESS [ESC] TO CLOSE</span>
+                <span className="text-[#FF2800]">✕</span>
+              </button>
+            </div>
+
+            {/* 9 Preserved Destinations Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 my-auto py-8">
+              {navDestinations.map((dest) => {
+                if (dest.external) {
+                  return (
+                    <a
+                      key={dest.label}
+                      href={dest.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setNavOpen(false)}
+                      className="group py-5 px-6 border-b border-[#20324F]/30 hover:border-[#FF2800] transition-all duration-200 flex flex-col justify-between select-none"
+                    >
+                      <div className="flex items-center justify-between text-xs font-mono mb-2">
+                        <span className="text-[#FF2800] font-bold">{dest.num}</span>
+                        <span className="text-[#C8D2E0] group-hover:translate-x-1 transition-transform">↗</span>
+                      </div>
+                      <h3 className="text-2xl sm:text-3xl font-serif text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors leading-tight">
+                        {dest.label}
+                      </h3>
+                      <p className="text-xs font-mono text-[#7E8B9B] mt-2 group-hover:text-[#C8D2E0] transition-colors">
+                        {dest.note}
+                      </p>
+                    </a>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={dest.label}
+                    href={dest.href}
+                    onClick={() => handleLinkClick(dest.href)}
+                    className="group py-5 px-6 border-b border-[#20324F]/30 hover:border-[#FF2800] transition-all duration-200 flex flex-col justify-between select-none"
+                  >
+                    <div className="flex items-center justify-between text-xs font-mono mb-2">
+                      <span className="text-[#FF2800] font-bold">{dest.num}</span>
+                      <span className="text-[#C8D2E0] group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl font-serif text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors leading-tight">
+                      {dest.label}
+                    </h3>
+                    <p className="text-xs font-mono text-[#7E8B9B] mt-2 group-hover:text-[#C8D2E0] transition-colors">
+                      {dest.note}
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Bottom Colophon / Direct Contact Dispatch */}
+            <div className="pt-6 border-t border-[#20324F]/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#7E8B9B]">
+              <div className="flex items-center gap-3">
+                <span className="text-[#C8D2E0]">DIRECT DISPATCH:</span>
+                <a
+                  href="mailto:haresh.murugesan@gmail.com"
+                  className="text-[#FF2800] hover:text-[#F4F6F9] transition-colors"
+                >
+                  haresh.murugesan@gmail.com ↗
+                </a>
               </div>
               <div className="flex items-center gap-6">
-                <span>PRESS [ESC] TO CLOSE</span>
+                <span>COLUMBUS, OH · THE OHIO STATE UNIVERSITY</span>
                 <span>© {new Date().getFullYear()} HARESH MURUGESAN</span>
               </div>
             </div>

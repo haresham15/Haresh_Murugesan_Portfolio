@@ -30,16 +30,11 @@ export const ContactFooter: React.FC = () => {
       >
         <div className="w-full flex flex-col my-auto space-y-16 sm:space-y-24">
           
-          {/* Expansive Statement Composition */}
-          <div className="max-w-4xl space-y-8">
-            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800]">
-              <span className="w-6 h-px bg-[#FF2800]" />
-              <span>07  Direct Dispatch &amp; Correspondence</span>
-            </div>
-
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl text-[#F4F6F9] leading-[1.05] tracking-tight">
-              <span className="font-raleway font-bold block sm:inline">Have an interesting problem? </span>
-              <span className="font-serif italic font-normal text-[#C8D2E0] block sm:inline">
+          {/* Expansive Statement Composition (Unboxed & De-Vibecoded) */}
+          <div className="max-w-4xl space-y-6">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif text-[#F4F6F9] leading-[1.08] tracking-tight">
+              Have an interesting problem?{' '}
+              <span className="italic text-[#FF2800]">
                 Let’s talk about how I can help.
               </span>
             </h2>
@@ -50,7 +45,7 @@ export const ContactFooter: React.FC = () => {
           </div>
 
           {/* 3-Tier Action Hierarchy */}
-          <div className="space-y-10 border-t border-[#F4F6F9]/10 pt-12 sm:pt-16">
+          <div className="space-y-10 border-t border-[#18458B]/20 pt-12 sm:pt-16">
             
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 max-w-3xl">
               {/* Primary Action: Direct Email */}
@@ -66,7 +61,7 @@ export const ContactFooter: React.FC = () => {
               <button
                 onClick={handleCopyEmail}
                 type="button"
-                className="bg-[#0C0F17] hover:bg-[#151B28] text-[#F4F6F9] border border-[#F4F6F9]/15 rounded-[2px] font-mono text-xs px-6 py-5 flex items-center justify-between sm:justify-center gap-3 transition-colors cursor-pointer select-none"
+                className="bg-[#060A12] hover:bg-[#0B1E40] text-[#F4F6F9] border border-[#18458B]/30 rounded-[2px] font-mono text-xs px-6 py-5 flex items-center justify-between sm:justify-center gap-3 transition-colors cursor-pointer select-none"
               >
                 <div className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full ${copied ? 'bg-[#10B981]' : 'bg-[#FF2800]'}`} />
@@ -80,7 +75,7 @@ export const ContactFooter: React.FC = () => {
                 href="/Haresh_Murugesan_Resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#0C0F17] hover:bg-[#151B28] text-[#F4F6F9] border border-[#F4F6F9]/15 rounded-[2px] font-mono text-xs px-6 py-5 flex items-center justify-between sm:justify-center gap-2 transition-colors select-none font-medium"
+                className="bg-[#060A12] hover:bg-[#0B1E40] text-[#F4F6F9] border border-[#18458B]/30 rounded-[2px] font-mono text-xs px-6 py-5 flex items-center justify-between sm:justify-center gap-2 transition-colors select-none font-medium"
               >
                 <span>Download Résumé</span>
                 <span className="text-[#C8D2E0]">↗</span>
@@ -88,7 +83,7 @@ export const ContactFooter: React.FC = () => {
             </div>
 
             {/* Social Links & Back to Top */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-6 text-xs font-mono text-[#7E8B9B] border-t border-[#F4F6F9]/[0.06]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-6 text-xs font-mono text-[#7E8B9B] border-t border-[#18458B]/20">
               <div className="flex items-center gap-6">
                 <a
                   href="https://github.com/haresham15"

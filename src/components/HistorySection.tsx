@@ -134,29 +134,24 @@ export const HistorySection: React.FC = () => {
       carbonType="forged"
       carbonOpacity={0.28}
       aria-label="Trajectory and formative curvy milestones"
-      className="border-b border-[#F4F6F9]/10 flex flex-col justify-between py-24 lg:py-36"
+      className="border-b border-[#18458B]/20 flex flex-col justify-between py-24 lg:py-36"
     >
       <div ref={containerRef} className="w-full relative my-auto space-y-12 sm:space-y-16">
         
-        {/* Section Intro */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-4 max-w-2xl">
-            <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800]">
-              <span className="w-6 h-px bg-[#FF2800]" />
-              <span>05  Trajectory &amp; Curvilinear Milestones</span>
-            </div>
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
-              Trajectory &amp; Curvy Milestones
+        {/* Section Intro (Unboxed & De-Vibecoded) */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#18458B]/20">
+          <div className="space-y-3 max-w-3xl">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
+              Trajectory.
             </h2>
-            <p className="text-base sm:text-lg font-sans text-[#7E8B9B] leading-relaxed">
+            <p className="text-base sm:text-xl font-sans text-[#7E8B9B] leading-relaxed">
               A winding, non-linear progression of technical breakthroughs, collegiate leadership, and competitive hackathon victories.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-mono text-[#7E8B9B] shrink-0">
-            <span className="px-3 py-1.5 bg-[#060A12] border border-[#FF2800]/30 rounded-[2px] text-[#C8D2E0]">
-              ● 5-YEAR CHRONOLOGICAL EXPANSION
-            </span>
+          <div className="flex items-center gap-2 text-xs font-mono text-[#C8D2E0] shrink-0">
+            <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
+            <span className="text-[#FF2800] font-semibold">CHRONOLOGICAL PROGRESSION</span>
           </div>
         </div>
 
@@ -175,7 +170,7 @@ export const HistorySection: React.FC = () => {
               <linearGradient id="curvySpineGlow" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stopColor="#FF2800" stopOpacity="0.85" />
                 <stop offset="30%" stopColor="#C8D2E0" stopOpacity="0.95" />
-                <stop offset="60%" stopColor="#38BDF8" stopOpacity="0.85" />
+                <stop offset="60%" stopColor="#2563EB" stopOpacity="0.85" />
                 <stop offset="85%" stopColor="#10B981" stopOpacity="0.95" />
                 <stop offset="100%" stopColor="#FF2800" stopOpacity="1" />
               </linearGradient>
@@ -191,7 +186,7 @@ export const HistorySection: React.FC = () => {
             <path
               d="M 720 50 C 420 180, 240 280, 320 440 C 400 600, 1200 640, 1120 840 C 1040 1040, 260 1100, 320 1300 C 380 1500, 1220 1560, 1120 1740 C 1020 1920, 620 1960, 720 2000"
               fill="none"
-              stroke="rgba(244, 241, 234, 0.07)"
+              stroke="rgba(24, 69, 139, 0.2)"
               strokeWidth="14"
               strokeLinecap="round"
             />
@@ -240,7 +235,7 @@ export const HistorySection: React.FC = () => {
           </svg>
 
           {/* =====================================================================
-              CURVY MILESTONE DOSSIER CARDS (Interleaved on curves)
+              UNBOXED STAGGERED EDITORIAL CHRONOLOGY
               ===================================================================== */}
           <div className="relative z-10 space-y-24 sm:space-y-36 pt-12 pb-20">
             {CURVY_MILESTONES.map((m) => {
@@ -259,27 +254,25 @@ export const HistorySection: React.FC = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, amount: 0.25 }}
                     transition={{ duration: 0.45 }}
-                    className={`w-full max-w-xl p-6 sm:p-8 lg:p-10 rounded-[2px] border transition-all duration-300 shadow-2xl cursor-pointer select-none ${
-                      isSelected
-                        ? 'bg-[#060A12] border-[#FF2800] shadow-[0_12px_45px_rgba(232,93,4,0.22)]'
-                        : 'bg-[#060A12]/95 border-[#F4F6F9]/10 hover:border-[#FF2800]/40'
+                    className={`w-full max-w-xl transition-all duration-300 cursor-pointer select-none pb-6 border-b border-[#18458B]/25 ${
+                      isLeft ? 'text-left' : 'text-left'
                     }`}
                   >
-                    {/* Header */}
-                    <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#F4F6F9]/10 text-xs font-mono">
-                      <div className="flex items-center gap-3">
+                    {/* Oversized 64px Serif Year Numeral & Phase Row */}
+                    <div className="flex items-baseline justify-between gap-4 pb-3 mb-4 border-b border-[#18458B]/20 text-xs font-mono">
+                      <div className="flex items-baseline gap-3">
                         <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-[#FF2800] animate-pulse' : 'bg-[#7E8B9B]'}`} />
-                        <span className="font-serif text-3xl sm:text-4xl text-[#FF2800] font-normal leading-none">
+                        <span className="font-serif text-5xl sm:text-6xl text-[#F4F6F9] font-normal leading-none">
                           {m.year}
                         </span>
                       </div>
-                      <span className="text-[#C8D2E0] font-medium tracking-wider">
+                      <span className="text-[#FF2800] font-semibold tracking-wider uppercase text-[11px]">
                         {m.phase}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl sm:text-2xl font-sans font-bold text-[#F4F6F9] mb-3">
+                    <h3 className="text-xl sm:text-2xl font-serif text-[#F4F6F9] mb-3 leading-snug">
                       {m.title}
                     </h3>
 
@@ -289,8 +282,8 @@ export const HistorySection: React.FC = () => {
                     </p>
 
                     {/* Bottom Specs */}
-                    <div className="pt-4 border-t border-[#F4F6F9]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
-                      <span className="text-[#64748B]">{m.detail}</span>
+                    <div className="pt-4 border-t border-[#18458B]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+                      <span className="text-[#C8D2E0]">{m.detail}</span>
                       {m.link && (
                         <Link
                           href={m.link}

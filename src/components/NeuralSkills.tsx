@@ -92,18 +92,21 @@ export const NeuralSkills: React.FC = () => {
       className="border-b border-[#18458B]/20 flex flex-col justify-between"
     >
       <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
-        {/* Section Intro */}
-        <div className="max-w-3xl space-y-4">
-          <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800]">
-            <span className="w-6 h-px bg-[#FF2800]" />
-            <span>04  Technical Index &amp; Competencies</span>
+        {/* Section Intro (Unboxed & De-Vibecoded) */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#18458B]/20">
+          <div className="space-y-3 max-w-3xl">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
+              Technical Index.
+            </h2>
+            <p className="text-base sm:text-xl font-sans text-[#7E8B9B] leading-relaxed">
+              Five structured engineering domains backed by real production deliverables, client-side benchmarks, and collegiate research.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
-            Technical Index
-          </h2>
-          <p className="text-base sm:text-lg font-sans text-[#7E8B9B] leading-relaxed">
-            Five structured engineering domains backed by real production deliverables, client-side benchmarks, and collegiate research.
-          </p>
+
+          <div className="flex items-center gap-2 text-xs font-mono text-[#C8D2E0] shrink-0">
+            <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
+            <span className="text-[#FF2800] font-semibold">5 VERIFIED DOMAINS</span>
+          </div>
         </div>
 
         {/* Category Selector Strip */}
