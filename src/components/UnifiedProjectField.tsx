@@ -1,399 +1,387 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
-import { PlateHealios } from './plates/PlateHealios';
-import { PlateApexis } from './plates/PlateApexis';
-import { PlateRouteRx } from './plates/PlateRouteRx';
-import { PlateTempo } from './plates/PlateTempo';
+import { AnimatePresence, motion } from 'framer-motion';
+import { archiveProjects, flagshipProjects, getProjectBySlug } from '../content/projects';
+import { useMotionPreference } from './MotionPreference';
+import { PlateStage } from './plates/PlateStage';
+import { healiosPlate } from './plates/PlateHealios';
+import { apexisPlate } from './plates/PlateApexis';
+import { routeRxPlate } from './plates/PlateRouteRx';
+import { tempoPlate } from './plates/PlateTempo';
+import type { PlateDefinition } from './plates/stageKit';
 
-interface FlagshipExhibitionItem {
+interface Benchmark { value: string; label: string }
+interface FlagshipSystem {
+  key: string;
   index: string;
-  domain: string;
-  title: string;
-  thesis: string;
-  paragraph: string;
-  metric1: { value: string; label: string };
-  metric2: { value: string; label: string };
-  stack: string;
   slug: string;
-  github: string;
-  liveId: string;
-  plateComponent: React.ReactNode;
+  title: string;
+  domain: string;
+  thesis: string;
+  narrative: string;
+  bench: [Benchmark, Benchmark];
+  stack: string;
+  plate: PlateDefinition;
 }
 
-const EXHIBITION_PROJECTS: FlagshipExhibitionItem[] = [
+/* Copy and figures are drawn from src/content/projects.ts and evidence.ts. */
+const SYSTEMS: FlagshipSystem[] = [
   {
+    key: 'healios',
     index: '01',
-    domain: 'CLINICAL COMPUTER VISION & 3D LIDAR',
-    title: 'Healios V2',
-    thesis: 'Multimodal Post-Operative Wound Diagnostic Engine',
-    paragraph:
-      'Uniting mobile 3D LiDAR point-cloud elevation topography with an 8.09ms explainable deep learning pipeline. Eliminates Matplotlib GUI locks through vectorized NumPy linear Jet colormapping, delivering millimeter-level tissue margin tracking without cloud GPU latency.',
-    metric1: {
-      value: '8.09 ms',
-      label: 'Vectorized Grad-CAM Saliency',
-    },
-    metric2: {
-      value: '±0.08 mm',
-      label: 'LiDAR Elevation Accuracy Margin',
-    },
-    stack: 'Swift · ARKit · Metal · FastAPI · Three.js · NumPy',
     slug: 'healios',
-    github: 'https://github.com/HareshMurugesan/Healios-V2',
-    liveId: '01 // HEALIOS_V2',
-    plateComponent: <PlateHealios />,
+    title: 'Healios V2',
+    domain: 'Clinical computer vision · explainable AI',
+    thesis: 'Wound monitoring that shows surgeons the reasoning, not just a score.',
+    narrative:
+      'The patient app runs a Laplacian blur check in the browser in under 35 ms, so unusable photos never upload. On the FastAPI side, tissue beds are segmented in 2.00 ms and a Grad-CAM overlay renders in 8.09 ms with vectorized NumPy, so surgeons see what drove each classification.',
+    bench: [
+      { value: '8.09 ms', label: 'Grad-CAM saliency' },
+      { value: '2.00 ms', label: 'HSV tissue segmentation' },
+    ],
+    stack: 'Next.js · TypeScript · Python 3.11 · FastAPI · TensorFlow/Keras · OpenCV',
+    plate: healiosPlate,
   },
   {
+    key: 'apexis',
     index: '02',
-    domain: 'MOTORSPORT TELEMETRY & MULTI-CAR SIMULATION',
-    title: 'Apexis Telemetry Engine',
-    thesis: 'Real-Time Multi-Car Simulation & Deterministic Race Analytics',
-    paragraph:
-      'Deterministic 60 FPS multi-car race simulation Web Worker, client-side broadcast OCR, and sub-12ms historical SQLite lookups. Runs intensive kinetic physics and fuel-flow calculations in off-main-thread workers with zero UI thread jank across 1950–present Formula 1 telemetry archives.',
-    metric1: {
-      value: '60 FPS Locked',
-      label: '16.6ms Dedicated Worker Budget',
-    },
-    metric2: {
-      value: '< 12 ms',
-      label: 'Indexed SQLite Telemetry Lookup',
-    },
-    stack: 'Next.js · TypeScript · Web Workers · SQLite · Canvas · Tesseract.js',
     slug: 'apexis',
-    github: 'https://github.com/HareshMurugesan/Apexis-F1-Telemetry',
-    liveId: '02 // APEXIS_ENGINE',
-    plateComponent: <PlateApexis />,
+    title: 'Apexis',
+    domain: 'Motorsport telemetry · web workers',
+    thesis: 'Multi-series race telemetry in one tab, with the heavy math off the main thread.',
+    narrative:
+      'A dedicated simulator worker computes 2D car positions against OpenF1 track coordinates at 60 fps, and a Tesseract.js worker reads broadcast timing graphics in the browser. An embedded SQLite database answers historical queries back to 1950 in under 12 ms.',
+    bench: [
+      { value: '60 fps', label: 'Worker sim · 16.7 ms frame' },
+      { value: '< 12 ms', label: 'Indexed SQLite lookup' },
+    ],
+    stack: 'Next.js 14 · React · TypeScript · TensorFlow.js · Tesseract.js · SQLite',
+    plate: apexisPlate,
   },
   {
+    key: 'routerx',
     index: '03',
-    domain: 'SPATIAL ISOCHRONE ENGINE · 1ST PLACE ASA DATAFEST',
+    slug: 'routerx-careline',
     title: 'RouteRx (Careline)',
-    thesis: 'Transit Desert Accessibility & Healthcare Routing Architecture',
-    paragraph:
-      'Sub-15ms OSRM isochrone routing engine identifying patient healthcare transit deserts across 141 Shawnee County census blocks. Synthesized OpenStreetMap road networks, CDC vulnerability indexes, and municipal bus timetables, winning 1st Place at ASA DataFest 2026.',
-    metric1: {
-      value: '1st Place',
-      label: 'ASA DataFest 2026 Winner',
-    },
-    metric2: {
-      value: '< 15 ms',
-      label: 'OSRM Isochrone Matrix',
-    },
-    stack: 'Python · RStudio · OSRM · Folium · GeoPandas · Spatial Isochrones',
-    slug: 'routerx-careline-hub',
-    github: 'https://github.com/HareshMurugesan/RouteRx-Careline',
-    liveId: '03 // ROUTERX_CARELINE',
-    plateComponent: <PlateRouteRx />,
+    domain: 'Spatial logistics · healthcare access',
+    thesis: 'One shuttle fleet that handles both patient pickups and discharge returns.',
+    narrative:
+      'Built for Stormont Vail Health in Topeka, KS. Census, OpenStreetMap and GTFS data feed a Transit Vulnerability Index; 43 of 141 census blocks had no bus stop within 800 m. DBSCAN finds pickup clusters and OSRM routes a single fleet in both directions.',
+    bench: [
+      { value: '1st Place', label: 'ASA DataFest 2026' },
+      { value: '43 of 141', label: 'Blocks with no stop in 800 m' },
+    ],
+    stack: 'RStudio · Python · Tigercensus · OpenStreetMap · GTFS · OSRM · React',
+    plate: routeRxPlate,
   },
   {
+    key: 'tempo',
     index: '04',
-    domain: 'AIR-GAPPED LOCAL-FIRST STATE MACHINE',
-    title: 'Tempo Task Suite',
-    thesis: 'Air-Gapped Cognitive Buffer & Encrypted SQLite Persistence',
-    paragraph:
-      'Air-gapped communication buffer with pgvector emotional memory, 100% crisis recall, and dual-provider active-passive failover. Routes incoming communications through deterministic 0.20ms regex circuit breakers before cognitive display, storing sensitive telemetry exclusively in encrypted local SQLite.',
-    metric1: {
-      value: '0.0 KB',
-      label: 'Network Exfiltration (Air-Gapped)',
-    },
-    metric2: {
-      value: '100% Local',
-      label: 'AES-256 SQLite Persistence',
-    },
-    stack: 'Electron · React · TypeScript · SQLite · IndexedDB · Tailwind CSS',
     slug: 'tempo',
-    github: 'https://github.com/HareshMurugesan/Tempo-Cognitive-Suite',
-    liveId: '04 // TEMPO_SUITE',
-    plateComponent: <PlateTempo />,
+    title: 'Tempo',
+    domain: 'Communication safety · state machines',
+    thesis: 'A zero-destination buffer for drafting through rejection-sensitive moments.',
+    narrative:
+      'There is no send button by design, so drafts stay in the sandbox. A deterministic regex gate runs in 0.20 ms before any model call, pgvector recall surfaces how similar moments were resolved, and DeepSeek V3 fails over to Gemini on a timeout or a broken schema.',
+    bench: [
+      { value: '100% (5/5)', label: 'Crisis recall' },
+      { value: '0.20 ms', label: 'Safety gate latency' },
+    ],
+    stack: 'Next.js 15 · React 19 · TypeScript · PostgreSQL (pgvector) · Supabase',
+    plate: tempoPlate,
   },
 ];
 
+const SPRING = { type: 'spring' as const, stiffness: 210, damping: 30, mass: 0.9 };
+const FOCUS_RING = 'focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#FF2800] focus-visible:-outline-offset-1';
+
 export const UnifiedProjectField: React.FC = () => {
-  const [activeProjectIndex, setActiveProjectIndex] = useState<number>(0);
-  const activeProject = EXHIBITION_PROJECTS[activeProjectIndex];
+  const { isReduced } = useMotionPreference();
+  const [active, setActive] = useState(0);
+  const [modes, setModes] = useState<Record<string, string>>(() =>
+    Object.fromEntries(SYSTEMS.map((s) => [s.key, s.plate.modes[0].id])),
+  );
+  const headRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const coordsRef = useRef<HTMLSpanElement>(null);
+  const readoutRef = useRef<HTMLSpanElement>(null);
+  const actionRef = useRef<((id: string) => void) | null>(null);
 
-  const handlePrev = useCallback(() => {
-    setActiveProjectIndex((prev) => (prev === 0 ? EXHIBITION_PROJECTS.length - 1 : prev - 1));
+  const system = SYSTEMS[active];
+  const modeId = modes[system.key];
+  const actions = (system.plate.actions ?? []).filter((a) => !a.modes || a.modes.includes(modeId));
+  const transition = isReduced ? { duration: 0 } : SPRING;
+
+  const select = useCallback((i: number, focus = false) => {
+    const n = SYSTEMS.length;
+    const next = ((i % n) + n) % n;
+    setActive(next);
+    if (focus) headRefs.current[next]?.focus();
   }, []);
 
-  const handleNext = useCallback(() => {
-    setActiveProjectIndex((prev) => (prev === EXHIBITION_PROJECTS.length - 1 ? 0 : prev + 1));
-  }, []);
+  const onRailKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const idx = headRefs.current.findIndex((el) => el === e.target);
+    if (idx < 0) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); select(idx + 1, true); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); select(idx - 1, true); }
+    else if (e.key === 'Home') { e.preventDefault(); select(0, true); }
+    else if (e.key === 'End') { e.preventDefault(); select(SYSTEMS.length - 1, true); }
+  };
 
-  // Keyboard navigation: ArrowUp/ArrowDown cycle through projects
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle if not focused on input or textarea
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+  const setMode = (id: string) => setModes((m) => ({ ...m, [system.key]: id }));
+  const onTabKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const list = system.plate.modes;
+    const idx = list.findIndex((m) => m.id === modeId);
+    let next = -1;
+    if (e.key === 'ArrowRight') next = (idx + 1) % list.length;
+    else if (e.key === 'ArrowLeft') next = (idx - 1 + list.length) % list.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = list.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    setMode(list[next].id);
+    tabRefs.current[next]?.focus();
+  };
 
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        handleNext();
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        handlePrev();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleNext, handlePrev]);
+  const repoCount = flagshipProjects.length + archiveProjects.length;
 
   return (
-    <section
-      id="projects"
-      className="relative w-full py-16 sm:py-24 select-none bg-transparent overflow-hidden"
-      aria-label="Selected Works & Architectural Systems Exhibition"
-    >
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-        {/* Unboxed Editorial Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-[#C8D2E0]/10">
-          <div className="space-y-2">
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-serif text-[#F4F6F9] leading-tight tracking-tight">
+    <section id="projects" className="relative w-full bg-transparent" aria-labelledby="flagship-heading">
+      <div className="mx-auto w-full max-w-[1400px] px-6 py-16 md:px-12">
+        <div className="flex flex-col justify-between gap-6 border-b border-[#C8D2E0]/12 pb-8 sm:flex-row sm:items-end">
+          <div className="max-w-2xl space-y-3">
+            <h2 id="flagship-heading" className="font-serif text-4xl leading-tight tracking-tight text-[#F4F6F9] sm:text-5xl lg:text-6xl">
               Selected Works.
             </h2>
-            <p className="text-sm sm:text-base lg:text-lg font-sans text-[#7E8B9B] leading-relaxed max-w-2xl">
-              Four flagship production architectures across clinical computer vision, 60 FPS multi-car simulations, and spatial graph algorithms.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 text-xs font-mono text-[#7E8B9B] shrink-0">
-            <div className="px-3 py-1.5 border border-[#2563EB]/25 bg-[#0B1E40]/30 text-[#C8D2E0] rounded-[2px] tracking-wider uppercase">
-              01 — 04 ACTIVE SYSTEMS · SELECT TO INSPECT
-            </div>
-            <Link
-              href="/#archive"
-              className="text-[#FF2800] hover:text-[#F4F6F9] transition-colors inline-flex items-center gap-1.5 uppercase tracking-wider font-semibold"
-            >
-              <span>Explore Archive Graph</span>
-              <span>↓</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* SINGLE-VIEWPORT SPLIT-STAGE TELEMETRY CONSOLE (max-w-[1400px], ~740px height on lg) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-stretch min-h-[640px] lg:h-[740px]">
-          {/* LEFT 5 COLUMNS: Interactive 4-System Accordion Rail */}
-          <div className="lg:col-span-5 flex flex-col justify-between border border-[#C8D2E0]/15 bg-[#03050A]/70 backdrop-blur-sm rounded-[2px] overflow-hidden">
-            {/* Top Micro-Bar */}
-            <div className="px-4 py-2.5 bg-[#060A12] border-b border-[#C8D2E0]/10 flex items-center justify-between text-[11px] font-mono text-[#7E8B9B]">
-              <span className="uppercase tracking-wider text-[#C8D2E0]">System Navigation Index</span>
-              <span className="text-[#FF2800] font-semibold">{activeProject.index} / 04 ACTIVE</span>
-            </div>
-
-            {/* Accordion Stack Container */}
-            <div className="flex-1 flex flex-col divide-y divide-[#C8D2E0]/10 min-h-0 overflow-y-auto">
-              {EXHIBITION_PROJECTS.map((project, idx) => {
-                const isActive = idx === activeProjectIndex;
-
-                if (!isActive) {
-                  {/* Collapsed Inactive Row (Crisp 54px strip) */}
-                  return (
-                    <button
-                      key={project.index}
-                      type="button"
-                      onClick={() => setActiveProjectIndex(idx)}
-                      className="w-full text-left px-4 sm:px-5 py-3.5 flex items-center justify-between transition-colors duration-200 hover:bg-[#C8D2E0]/[0.04] group cursor-pointer focus:outline-none focus:bg-[#C8D2E0]/[0.06]"
-                      aria-label={`Expand ${project.title}`}
-                    >
-                      <div className="flex items-center gap-3.5 min-w-0">
-                        <span className="font-mono text-xs sm:text-sm font-semibold text-[#FF2800] shrink-0">
-                          [{project.index}]
-                        </span>
-                        <span className="font-serif text-[15px] sm:text-[16px] text-[#F4F6F9] group-hover:text-white transition-colors truncate">
-                          {project.title}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0 ml-3">
-                        <span className="text-[10px] sm:text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider hidden sm:inline-block">
-                          {project.metric1.value}
-                        </span>
-                        <span className="font-mono text-sm text-[#FF2800] font-bold group-hover:scale-125 transition-transform">
-                          +
-                        </span>
-                      </div>
-                    </button>
-                  );
-                }
-
-                {/* Expanded Active Drawer */}
-                return (
-                  <div
-                    key={project.index}
-                    className="flex-1 flex flex-col justify-between p-4 sm:p-6 bg-[#C8D2E0]/[0.02] border-l-2 border-[#FF2800] space-y-4 sm:space-y-5 transition-all duration-300 overflow-y-auto"
-                  >
-                    {/* Header Row: Index Numeral + Monospace Domain */}
-                    <div className="space-y-2.5">
-                      <div className="flex items-baseline justify-between gap-3">
-                        <div className="flex items-baseline gap-3">
-                          <span className="font-serif text-[32px] sm:text-[38px] leading-none text-[#FF2800] font-normal">
-                            {project.index}
-                          </span>
-                          <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#C8D2E0] uppercase font-semibold">
-                            // {project.domain}
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-mono text-[#4CC38A] uppercase tracking-wider bg-[#4CC38A]/10 px-2 py-0.5 rounded-[2px] shrink-0">
-                          ENGAGED
-                        </span>
-                      </div>
-
-                      {/* Title & Italic Thesis */}
-                      <div className="space-y-1">
-                        <h3 className="text-xl sm:text-2xl lg:text-[28px] font-serif text-[#F4F6F9] leading-tight tracking-tight">
-                          {project.title}
-                        </h3>
-                        <p className="text-sm sm:text-[15px] font-serif italic text-[#C8D2E0] leading-snug">
-                          {project.thesis}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Single Concise Prose Paragraph */}
-                    <p className="text-xs sm:text-[13.5px] font-sans text-[#7E8B9B] leading-[1.68]">
-                      {project.paragraph}
-                    </p>
-
-                    {/* 2-Column Architectural Metric Grid (Border-y hairlines) */}
-                    <div className="grid grid-cols-2 gap-3 py-3 border-y border-[#C8D2E0]/15">
-                      <div className="space-y-0.5">
-                        <div className="font-mono text-lg sm:text-xl font-bold text-[#F4F6F9]">
-                          {project.metric1.value}
-                        </div>
-                        <div className="text-[10px] font-mono text-[#7E8B9B] uppercase tracking-wider leading-tight">
-                          {project.metric1.label}
-                        </div>
-                      </div>
-                      <div className="space-y-0.5">
-                        <div className="font-mono text-lg sm:text-xl font-bold text-[#4CC38A]">
-                          {project.metric2.value}
-                        </div>
-                        <div className="text-[10px] font-mono text-[#7E8B9B] uppercase tracking-wider leading-tight">
-                          {project.metric2.label}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Tech Stack & Action CTAs */}
-                    <div className="space-y-4 pt-1">
-                      <div className="text-[11px] font-mono text-[#2563EB] tracking-wide leading-relaxed">
-                        {project.stack}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-3 text-xs font-mono pt-1">
-                        <Link
-                          href={`/projects/${project.slug}`}
-                          className="px-5 py-2.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#F4F6F9] font-semibold rounded-[2px] transition-colors inline-flex items-center justify-center gap-2 select-none shadow-[0_0_16px_rgba(255,40,0,0.35)] text-center min-h-[40px]"
-                        >
-                          <span>Read Case Study</span>
-                          <span>→</span>
-                        </Link>
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-4 py-2.5 bg-transparent hover:bg-[#0B1E40]/40 text-[#F4F6F9] border border-[#2563EB]/30 rounded-[2px] transition-colors inline-flex items-center justify-center gap-2 select-none text-center min-h-[40px]"
-                        >
-                          <span>Source Code</span>
-                          <span>↗</span>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* RIGHT 7 COLUMNS: Stationary High-Craft Blueprint Stage */}
-          <div className="lg:col-span-7 relative flex flex-col justify-between min-w-0 p-3 sm:p-5 border border-[#2563EB]/25 bg-[#03050A]/80 rounded-[2px] overflow-hidden shadow-[0_0_40px_rgba(3,5,10,0.8)]">
-            {/* 32px Technical Blueprint Grid Background */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                backgroundImage:
-                  'linear-gradient(to right, rgba(37, 99, 235, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(37, 99, 235, 0.05) 1px, transparent 1px)',
-                backgroundSize: '32px 32px',
-              }}
-              aria-hidden="true"
-            />
-
-            {/* 4 Corner L-Shaped Registration Brackets (12px x 12px, 1px solid #2563EB) */}
-            <div className="absolute top-0 left-0 w-3 h-3 pointer-events-none border-t border-l border-[#2563EB]" />
-            <div className="absolute top-0 right-0 w-3 h-3 pointer-events-none border-t border-r border-[#2563EB]" />
-            <div className="absolute bottom-0 left-0 w-3 h-3 pointer-events-none border-b border-l border-[#2563EB]" />
-            <div className="absolute bottom-0 right-0 w-3 h-3 pointer-events-none border-b border-r border-[#2563EB]" />
-
-            {/* Blueprint Stage Top Bar: Live Identifier + Step Arrow Controls */}
-            <div className="relative z-20 flex items-center justify-between pb-3 sm:pb-4 border-b border-[#2563EB]/20 mb-2">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs sm:text-[13px] text-[#C8D2E0] uppercase tracking-wider font-semibold">
-                  {activeProject.liveId}
-                </span>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-[#4CC38A]/10 text-[#4CC38A] font-mono text-[10px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#4CC38A] animate-pulse" />
-                  LIVE BLUEPRINT STAGE
-                </span>
-              </div>
-
-              {/* Prev / Next Cycle Controls */}
-              <div className="flex items-center gap-1.5 font-mono text-xs">
-                <button
-                  type="button"
-                  onClick={handlePrev}
-                  className="px-2.5 py-1 bg-[#0B1E40]/40 hover:bg-[#2563EB]/30 text-[#F4F6F9] border border-[#2563EB]/30 rounded-[2px] transition-colors cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
-                  aria-label="Previous System Blueprint"
-                >
-                  ←
-                </button>
-                <span className="px-2 text-[11px] text-[#7E8B9B]">
-                  {activeProject.index} / 04
-                </span>
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="px-2.5 py-1 bg-[#0B1E40]/40 hover:bg-[#2563EB]/30 text-[#F4F6F9] border border-[#2563EB]/30 rounded-[2px] transition-colors cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
-                  aria-label="Next System Blueprint"
-                >
-                  →
-                </button>
-              </div>
-            </div>
-
-            {/* Interactive Blueprint Stage Content with Smooth Keyed Morph */}
-            <div className="relative z-10 w-full flex-1 flex flex-col justify-center min-w-0 py-2">
-              <div key={activeProject.slug} className="w-full h-full transition-opacity duration-300">
-                {activeProject.plateComponent}
-              </div>
-            </div>
-
-            {/* Blueprint Stage Footer Bar: Verification Metadata */}
-            <div className="relative z-20 pt-3 border-t border-[#2563EB]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10px] font-mono text-[#7E8B9B]">
-              <div className="flex items-center gap-2">
-                <span className="text-[#2563EB]">●</span>
-                <span>STAGE VERIFIED: 60 FPS DETERMINISTIC CANVAS · CLIENT WORKER THREADS</span>
-              </div>
-              <div className="text-[#C8D2E0]/60">
-                HOTKEYS: [↑ / ↓] SWITCH SYSTEM
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Closing Forward Link to Full Constellation */}
-        <div className="pt-8 pb-4 border-t border-[#C8D2E0]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <h4 className="text-lg sm:text-xl font-serif text-[#F4F6F9]">
-              Archive Systems Constellation
-            </h4>
-            <p className="text-xs font-mono text-[#7E8B9B]">
-              18 production repositories suspended across 2 architectural cores and 6 domains.
+            <p className="font-sans text-base leading-relaxed text-[#7E8B9B] lg:text-lg">
+              Four flagship systems across clinical computer vision, motorsport telemetry, spatial logistics and
+              safety-first state machines. Each view on the right is live and follows your cursor.
             </p>
           </div>
           <Link
             href="/#archive"
-            className="px-5 py-2.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#F4F6F9] font-mono text-xs font-semibold rounded-[2px] transition-colors shrink-0 inline-flex items-center gap-2 shadow-[0_0_16px_rgba(255,40,0,0.35)]"
+            className={`inline-flex min-h-11 shrink-0 items-center gap-2 font-mono text-[13px] text-[#FF2800] transition-colors hover:text-[#F4F6F9] ${FOCUS_RING}`}
           >
-            <span>Explore Constellation Below</span>
-            <span>↓</span>
+            <span>Explore the archive</span>
+            <span aria-hidden="true">↓</span>
+          </Link>
+        </div>
+
+        <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
+          {/* Accordion rail */}
+          <div className="lg:col-span-5" onKeyDown={onRailKey}>
+            <p className="sr-only">Use the up and down arrow keys to move between systems.</p>
+            {SYSTEMS.map((s, i) => {
+              const open = i === active;
+              const headId = `flagship-head-${s.key}`;
+              const drawerId = `flagship-drawer-${s.key}`;
+              const p = getProjectBySlug(s.slug);
+              return (
+                <div key={s.key} className="border-b border-[#C8D2E0]/12 first:border-t">
+                  <h3 className="m-0">
+                    <button
+                      ref={(el) => { headRefs.current[i] = el; }}
+                      id={headId}
+                      type="button"
+                      aria-expanded={open}
+                      aria-controls={drawerId}
+                      onClick={() => select(i)}
+                      className={`group relative flex h-[54px] w-full items-center gap-4 text-left ${FOCUS_RING}`}
+                    >
+                      <span className={`w-6 shrink-0 font-mono text-[12px] tabular-nums transition-colors duration-300 ${open ? 'text-[#FF2800]' : 'text-[#7E8B9B] group-hover:text-[#C8D2E0]'}`}>
+                        {s.index}
+                      </span>
+                      <span className="relative h-full min-w-0 flex-1">
+                        <motion.span
+                          aria-hidden={open}
+                          initial={false}
+                          animate={{ opacity: open ? 0 : 1, y: open ? -10 : 0 }}
+                          transition={transition}
+                          className="absolute inset-0 flex items-center gap-3"
+                        >
+                          <span className="truncate font-serif text-[17px] text-[#F4F6F9]">{s.title}</span>
+                          <span className="ml-auto hidden shrink-0 font-mono text-[12px] text-[#7E8B9B] sm:inline">{s.bench[0].value}</span>
+                        </motion.span>
+                        <motion.span
+                          aria-hidden={!open}
+                          initial={false}
+                          animate={{ opacity: open ? 1 : 0, y: open ? 0 : 10 }}
+                          transition={transition}
+                          className="absolute inset-0 flex items-center truncate font-mono text-[12px] text-[#C8D2E0]"
+                        >
+                          {s.domain}
+                        </motion.span>
+                      </span>
+                      <motion.span
+                        aria-hidden="true"
+                        initial={false}
+                        animate={{ rotate: open ? 45 : 0 }}
+                        transition={transition}
+                        className="flex h-11 w-11 shrink-0 items-center justify-center font-mono text-lg text-[#FF2800]"
+                      >
+                        +
+                      </motion.span>
+                    </button>
+                  </h3>
+                  <AnimatePresence initial={false}>
+                    {open && (
+                      <motion.div
+                        key="drawer"
+                        id={drawerId}
+                        role="region"
+                        aria-labelledby={headId}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={isReduced ? { duration: 0 } : { height: SPRING, opacity: { duration: 0.25 } }}
+                        className="overflow-hidden"
+                      >
+                        <div className="flex flex-col pb-5 pl-10 lg:h-[406px]">
+                          <p className="font-serif text-[34px] leading-[1.1] tracking-tight text-[#F4F6F9]">{s.title}</p>
+                          <p className="mt-2 font-serif text-[16.5px] italic leading-snug text-[#C8D2E0]">{s.thesis}</p>
+                          <p className="mt-3 font-sans text-[14.5px] leading-[1.65] text-[#7E8B9B] lg:line-clamp-4 xl:line-clamp-none">
+                            {s.narrative}
+                          </p>
+                          <dl className="my-3 grid grid-cols-2 gap-4 border-y border-[#C8D2E0]/12 py-3">
+                            {s.bench.map((b) => (
+                              <div key={b.label} className="min-w-0">
+                                <dt className="sr-only">{b.label}</dt>
+                                <dd className="font-mono text-[20px] leading-tight text-[#F4F6F9]">{b.value}</dd>
+                                <dd className="mt-1 font-mono text-[11px] leading-snug text-[#7E8B9B]">{b.label}</dd>
+                              </div>
+                            ))}
+                          </dl>
+                          <p className="font-mono text-[11.5px] leading-relaxed text-[#C8D2E0]/80">{s.stack}</p>
+                          <div className="mt-auto flex flex-wrap items-center gap-x-6 pt-3 font-mono text-[13px]">
+                            <Link
+                              href={`/projects/${s.slug}`}
+                              className={`inline-flex min-h-11 items-center gap-2 text-[#FF2800] transition-colors hover:text-[#FF4419] ${FOCUS_RING}`}
+                            >
+                              Read Case Study <span aria-hidden="true">→</span>
+                            </Link>
+                            {p?.github && (
+                              <a
+                                href={p.github}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`inline-flex min-h-11 items-center gap-2 text-[#C8D2E0] transition-colors hover:text-[#F4F6F9] ${FOCUS_RING}`}
+                              >
+                                Source Code <span aria-hidden="true">↗</span>
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Stage: mode bar, canvas, telemetry strip */}
+          <div className="flex h-[500px] min-w-0 flex-col sm:h-[560px] lg:col-span-7 lg:h-[622px]">
+            <div className="flex h-11 shrink-0 items-stretch border-b border-[#C8D2E0]/12 lg:h-10">
+              <button
+                type="button"
+                onClick={() => select(active - 1)}
+                aria-label="Previous system"
+                className={`flex w-11 shrink-0 items-center justify-center font-mono text-[#C8D2E0] transition-colors hover:text-[#FF2800] lg:w-10 ${FOCUS_RING}`}
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                onClick={() => select(active + 1)}
+                aria-label="Next system"
+                className={`flex w-11 shrink-0 items-center justify-center font-mono text-[#C8D2E0] transition-colors hover:text-[#FF2800] lg:w-10 ${FOCUS_RING}`}
+              >
+                →
+              </button>
+              <span className="hidden items-center pl-2 pr-3 font-mono text-[12px] tabular-nums text-[#7E8B9B] sm:flex">
+                {system.index} / 0{SYSTEMS.length}
+              </span>
+              <div
+                role="tablist"
+                aria-label={`${system.title} views`}
+                onKeyDown={onTabKey}
+                className="flex min-w-0 items-stretch overflow-x-auto"
+                style={{ scrollbarWidth: 'none' }}
+              >
+                {system.plate.modes.map((m, i) => {
+                  const selected = m.id === modeId;
+                  return (
+                    <button
+                      key={`${system.key}-${m.id}`}
+                      ref={(el) => { tabRefs.current[i] = el; }}
+                      id={`flagship-tab-${system.key}-${m.id}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={selected}
+                      aria-controls="flagship-stage"
+                      tabIndex={selected ? 0 : -1}
+                      onClick={() => setMode(m.id)}
+                      className={`relative flex shrink-0 items-center whitespace-nowrap px-3 font-mono text-[12px] transition-colors ${selected ? 'text-[#F4F6F9]' : 'text-[#7E8B9B] hover:text-[#C8D2E0]'} ${FOCUS_RING}`}
+                    >
+                      {m.label}
+                      {selected && (
+                        <motion.span
+                          layoutId="flagship-tab-rule"
+                          transition={transition}
+                          className="absolute inset-x-3 bottom-0 h-px bg-[#FF2800]"
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              {actions.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => actionRef.current?.(a.id)}
+                  className={`ml-auto flex shrink-0 items-center whitespace-nowrap px-3 font-mono text-[12px] text-[#FF2800] transition-colors hover:text-[#F4F6F9] ${FOCUS_RING}`}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
+
+            <PlateStage
+              definition={system.plate}
+              systemKey={system.key}
+              modeId={modeId}
+              reduced={isReduced}
+              panelId="flagship-stage"
+              labelledBy={`flagship-tab-${system.key}-${modeId}`}
+              coordsRef={coordsRef}
+              readoutRef={readoutRef}
+              actionRef={actionRef}
+            />
+
+            <div className="flex h-8 shrink-0 items-center gap-4 overflow-hidden border-t border-[#C8D2E0]/12 font-mono text-[11px] tabular-nums text-[#7E8B9B]">
+              <span ref={coordsRef} className="hidden w-[132px] shrink-0 sm:inline">cursor idle</span>
+              <span ref={readoutRef} className="min-w-0 flex-1 truncate text-[#C8D2E0]" />
+              <span className="hidden shrink-0 text-[#F4F6F9] md:inline">
+                {system.bench[0].value} <span className="text-[#7E8B9B]">{system.bench[0].label}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-14 flex flex-col justify-between gap-4 border-t border-[#C8D2E0]/12 pt-8 sm:flex-row sm:items-center">
+          <div className="space-y-1">
+            <h4 className="font-serif text-xl text-[#F4F6F9]">The rest of the work</h4>
+            <p className="font-mono text-[12px] text-[#7E8B9B]">
+              {repoCount} repositories, mapped by stack and domain in the archive below.
+            </p>
+          </div>
+          <Link
+            href="/#archive"
+            className={`inline-flex min-h-11 shrink-0 items-center gap-2 font-mono text-[13px] text-[#FF2800] transition-colors hover:text-[#F4F6F9] ${FOCUS_RING}`}
+          >
+            <span>Open the archive</span>
+            <span aria-hidden="true">↓</span>
           </Link>
         </div>
       </div>

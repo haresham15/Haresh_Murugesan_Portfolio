@@ -1,572 +1,706 @@
-import React, { useState, useRef } from 'react';
-import { useCanvasStage } from '../../hooks/useCanvasStage';
-import { useMotionPreference } from '../MotionPreference';
+import { getProjectBySlug } from '../../content/projects';
+import {
+  C, MONO, bez, clamp, drawGrid, drawVignette, easeOutCubic, fbm, glow, hexRgb, isoSegments, label, phosphor, ramp,
+  rgba, smoothstep, strokeSegments, type PlateDefinition, type PlateScene, type StageFrame,
+} from './stageKit';
 
-export type HealiosTab = 'elevation' | 'saliency' | 'topology';
+/* ============================================================
+ * 1. Depth cloud: synthetic wound surface, rotating, sliced by cursor
+ * ============================================================ */
 
-export const PlateHealios: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<HealiosTab>('elevation');
-  const [sliceX, setSliceX] = useState<number>(50);
-  const [lensPos, setLensPos] = useState<number>(50);
-  const [activeStage, setActiveStage] = useState<number>(4); // 1: Edge, 2: Morphology, 3: CNN, 4: Grad-CAM
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const { isReduced } = useMotionPreference();
+const A = 28; // wound semi-axis (model mm)
+const B = 18;
+const DMAX = 6; // floor depth (model mm)
+const EXTENT = 1.5; // sampled radius as multiple of A
+const ELEV = 0.58; // camera elevation (rad)
+const Z_EXAG = 2.2;
 
-  // Calculate slice depth metric from sliceX
-  const normDist = Math.abs((sliceX - 50) / 40);
-  const calculatedSliceDepth = normDist <= 1.0 ? Math.pow(Math.max(0, 1 - normDist), 1.8) * -34 : 0;
-  const sliceDzMm = (calculatedSliceDepth * 0.08).toFixed(2);
+function surfaceZ(X: number, Y: number): number {
+  const re = Math.sqrt((X / A) ** 2 + (Y / B) ** 2);
+  const grain = fbm(X * 0.18 + 11, Y * 0.18 + 3, 3) - 0.5;
+  if (re < 1) {
+    const bowl = Math.pow(1 - re * re, 1.35);
+    return -DMAX * bowl * (0.86 + 0.28 * fbm(X * 0.06, Y * 0.06, 2)) + grain * 0.7 * bowl;
+  }
+  return 0.9 * Math.exp(-(((re - 1) / 0.16) ** 2)) + grain * 0.35;
+}
 
-  // 3D Isometric LiDAR Point Cloud & 12 Elevation Rings Canvas Loop
-  useCanvasStage(
-    stageRef,
-    canvasRef,
-    (ctx, { width, height, time }) => {
-      const ringCount = 12;
-      const angle = isReduced ? 0 : time * 0.00042;
-      ctx.clearRect(0, 0, width, height);
+interface CloudData {
+  X: Float32Array;
+  Y: Float32Array;
+  Z: Float32Array;
+  bucket: Uint8Array;
+  iso: { level: number; segs: Float32Array }[];
+  gridStep: number;
+  gridN: number;
+}
 
-      const cx = width / 2;
-      const cy = height / 2 + 10;
-      const rx = Math.min(width * 0.38, 220);
-      const ry = rx * 0.52; // 3D Isometric foreshortening
+let cloudCache: CloudData | null = null;
+function cloud(): CloudData {
+  if (cloudCache) return cloudCache;
+  const N = 66;
+  const R = EXTENT * A;
+  const step = (2 * R) / (N - 1);
+  const xs: number[] = [];
+  const ys: number[] = [];
+  const zs: number[] = [];
+  const field = new Float32Array(N * N);
+  for (let j = 0; j < N; j++) {
+    for (let i = 0; i < N; i++) {
+      const X = -R + i * step;
+      const Y = -R + j * step;
+      const z = surfaceZ(X, Y);
+      field[j * N + i] = z;
+      if (X * X + Y * Y > R * R) continue;
+      // jitter so the cloud reads as a scan, not a lattice
+      const jx = (fbm(i * 1.7, j * 2.3, 1) - 0.5) * step * 0.7;
+      const jy = (fbm(j * 1.3, i * 2.9, 1) - 0.5) * step * 0.7;
+      xs.push(X + jx);
+      ys.push(Y + jy);
+      zs.push(surfaceZ(X + jx, Y + jy));
+    }
+  }
+  const Z = new Float32Array(zs);
+  const bucket = new Uint8Array(Z.length);
+  for (let k = 0; k < Z.length; k++) bucket[k] = Math.min(7, Math.max(0, Math.floor(((1 - Z[k]) / (DMAX + 1)) * 8)));
+  const iso = [-1, -2, -3, -4, -5].map((level) => ({ level, segs: isoSegments(field, N, N, level) }));
+  cloudCache = { X: new Float32Array(xs), Y: new Float32Array(ys), Z, bucket, iso, gridStep: step, gridN: N };
+  return cloudCache;
+}
 
-      // 1. Draw 12 Concentric Elevation Contour Rings
-      for (let r = 1; r <= ringCount; r++) {
-        const ringT = r / ringCount; // 0 (center crater) to 1 (outer wound margin)
-        const currentRx = rx * ringT;
-        const currentRy = ry * ringT;
-        // Depth depression: center is -34px deep, rim is 0px
-        const elevationZ = Math.pow(1 - ringT, 1.8) * -34;
+const DEPTH_STOPS = [C.cobalt, C.silver, C.silver, C.crimson, C.red] as const;
 
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(cx, cy + elevationZ, currentRx, currentRy, 0, 0, Math.PI * 2);
+function createDepthScene(): PlateScene {
+  const data = cloud();
+  const n = data.X.length;
+  const sx = new Float32Array(n);
+  const sy = new Float32Array(n);
+  const sd = new Float32Array(n);
+  const view = { cx: 0, cy: 0, k: 1, theta: 0 };
 
-        // Color coding by elevation depth: Red-orange for deep crater, Silver for margin, Cobalt for outer rim
-        ctx.strokeStyle = ringT < 0.35 ? '#FF2800' : ringT < 0.7 ? '#C8D2E0' : '#2563EB';
-        ctx.lineWidth = r % 3 === 0 ? 1.5 : 0.8;
-        ctx.globalAlpha = 0.25 + ringT * 0.55;
-        if (r % 2 === 0) ctx.setLineDash([4, 3]);
-        ctx.stroke();
-        ctx.restore();
+  const project = (X: number, Y: number, Z: number, out: number[]) => {
+    const c = Math.cos(view.theta);
+    const s = Math.sin(view.theta);
+    const x1 = X * c - Y * s;
+    const y1 = X * s + Y * c;
+    out[0] = view.cx + x1 * view.k;
+    out[1] = view.cy + (y1 * Math.sin(ELEV) - Z * Z_EXAG * Math.cos(ELEV)) * view.k;
+    out[2] = y1; // depth (toward viewer is +)
+  };
+
+  return {
+    idle: (f) => [f.width / 2 + Math.sin(f.time * 0.45) * Math.min(f.width, f.height) * 0.3, f.height * 0.45],
+    draw(ctx, f) {
+      const { width: w, height: h } = f;
+      drawVignette(ctx, w, h, w / 2, h * 0.42);
+      drawGrid(ctx, w, h, 32, 0.045);
+
+      const plotH = Math.max(64, h * 0.2);
+      view.cx = w / 2;
+      view.cy = (h - plotH) * 0.5 + 6;
+      view.k = Math.min(w * 0.86, (h - plotH) * 1.45) / (2 * EXTENT * A);
+      view.theta = f.time * 0.2 + 0.6;
+      const intro = easeOutCubic(f.age / 0.9);
+
+      const tmp = [0, 0, 0];
+      for (let k = 0; k < n; k++) {
+        project(data.X[k], data.Y[k], data.Z[k] * intro, tmp);
+        sx[k] = tmp[0];
+        sy[k] = tmp[1];
+        sd[k] = tmp[2];
       }
 
-      // 2. Draw 3D Rotating LiDAR Point Cloud Vertices (96 points)
-      const pointCount = 96;
-      for (let i = 0; i < pointCount; i++) {
-        const ptRing = (i % ringCount) / ringCount;
-        const ptAngle = (i / pointCount) * Math.PI * 4 + angle;
-        const rad = rx * Math.pow(ptRing, 0.75);
+      // slicing plane in view space, from the damped cursor
+      const sliceView = clamp((f.pointer.x - view.cx) / view.k, -EXTENT * A, EXTENT * A);
 
-        const x3d = rad * Math.cos(ptAngle);
-        const y3d = rad * Math.sin(ptAngle);
-        const z3d = Math.pow(1 - ptRing, 1.8) * -36 + Math.sin(ptAngle * 3 + angle * 2) * 3;
-
-        const projX = cx + x3d;
-        const projY = cy + y3d * 0.52 + z3d;
-
-        const isDeep = ptRing < 0.38;
-        ctx.fillStyle = isDeep ? '#FF2800' : ptRing < 0.75 ? '#C8D2E0' : '#2563EB';
-        ctx.globalAlpha = 0.85;
-        ctx.beginPath();
-        ctx.arc(projX, projY, isDeep ? 2.2 : 1.6, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // 3. Interactive Slicer Cross-Section Line & Real-Time Depth Profile
-      const currentSliceX = Math.max(cx - rx, Math.min(cx + rx, (width * sliceX) / 100));
+      // iso-depth contours projected through the same camera
       ctx.save();
-      ctx.strokeStyle = '#2563EB';
-      ctx.lineWidth = 1.2;
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(currentSliceX, 24);
-      ctx.lineTo(currentSliceX, height - 24);
-      ctx.stroke();
-
-      // Intersection node on active slice
-      const normD = Math.abs((currentSliceX - cx) / rx);
-      if (normD <= 1.0) {
-        const sliceDepth = Math.pow(Math.max(0, 1 - normD), 1.8) * -34;
-        ctx.fillStyle = '#FF2800';
+      ctx.lineWidth = 0.5;
+      const p0 = [0, 0, 0];
+      const p1 = [0, 0, 0];
+      const R = EXTENT * A;
+      for (const { level, segs } of data.iso) {
+        const t = -level / DMAX;
+        const [r, g, b] = ramp(DEPTH_STOPS, 0.15 + t * 0.85);
+        ctx.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${0.35 * intro})`;
         ctx.beginPath();
-        ctx.arc(currentSliceX, cy + sliceDepth, 4, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Elevation readout
-        ctx.font = '11px "Geist Mono", monospace';
-        ctx.fillStyle = '#F4F6F9';
-        ctx.fillText(`Δz: ${(sliceDepth * 0.08).toFixed(2)}mm`, currentSliceX + 8, cy + sliceDepth - 8);
+        for (let q = 0; q < segs.length; q += 4) {
+          project(-R + segs[q] * data.gridStep, -R + segs[q + 1] * data.gridStep, level * intro, p0);
+          project(-R + segs[q + 2] * data.gridStep, -R + segs[q + 3] * data.gridStep, level * intro, p1);
+          ctx.moveTo(p0[0], p0[1]);
+          ctx.lineTo(p1[0], p1[1]);
+        }
+        ctx.stroke();
       }
       ctx.restore();
+
+      // point cloud: additive, batched by depth bucket and fog band
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const c = Math.cos(view.theta);
+      const s = Math.sin(view.theta);
+      for (let fog = 0; fog < 3; fog++) {
+        for (let bk = 0; bk < 8; bk++) {
+          ctx.beginPath();
+          let any = false;
+          for (let k = 0; k < n; k++) {
+            if (data.bucket[k] !== bk) continue;
+            const band = sd[k] > R * 0.33 ? 2 : sd[k] > -R * 0.33 ? 1 : 0;
+            if (band !== fog) continue;
+            const x1 = data.X[k] * c - data.Y[k] * s;
+            if (Math.abs(x1 - sliceView) < 0.9) continue; // drawn in the slice pass
+            ctx.rect(sx[k] - 0.6, sy[k] - 0.6, 1.2, 1.2);
+            any = true;
+          }
+          if (!any) continue;
+          const [r, g, b] = ramp(DEPTH_STOPS, bk / 7);
+          ctx.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${(0.32 + fog * 0.24) * intro})`;
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+
+      // exact cross-section: sample the analytic surface along the plane
+      const SAMPLES = 160;
+      const prof: number[] = [];
+      let floor = 0;
+      let floorT = 0;
+      let openFrom = Infinity;
+      let openTo = -Infinity;
+      const half = Math.sqrt(Math.max(0, R * R - sliceView * sliceView));
+      for (let i = 0; i <= SAMPLES; i++) {
+        const t = -half + (2 * half * i) / SAMPLES;
+        const X = sliceView * c + t * s;
+        const Y = -sliceView * s + t * c;
+        const z = surfaceZ(X, Y) * intro;
+        prof.push(t, z);
+        if (z < floor) { floor = z; floorT = t; }
+        if (z < -0.25) { openFrom = Math.min(openFrom, t); openTo = Math.max(openTo, t); }
+      }
+
+      // slice ribbon in 3D
+      if (half > 0) {
+        ctx.beginPath();
+        for (let i = 0; i < prof.length; i += 2) {
+          const t = prof[i];
+          project(sliceView * c + t * s, -sliceView * s + t * c, prof[i + 1], tmp);
+          if (i === 0) ctx.moveTo(tmp[0], tmp[1]);
+          else ctx.lineTo(tmp[0], tmp[1]);
+        }
+        phosphor(ctx, C.red, 1, 0.14 * f.pointer.presence + 0.08);
+        // slice plane trace
+        project(sliceView * c - R * s, -sliceView * s - R * c, 0, p0);
+        project(sliceView * c + R * s, -sliceView * s + R * c, 0, p1);
+        ctx.save();
+        ctx.setLineDash([3, 4]);
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = rgba(C.silver, 0.45);
+        ctx.beginPath();
+        ctx.moveTo(p0[0], p0[1]);
+        ctx.lineTo(p1[0], p1[1]);
+        ctx.stroke();
+        ctx.restore();
+        project(sliceView * c + floorT * s, -sliceView * s + floorT * c, floor, tmp);
+        glow(ctx, tmp[0], tmp[1], 18, C.red, 0.55);
+        ctx.fillStyle = C.alabaster;
+        ctx.beginPath();
+        ctx.arc(tmp[0], tmp[1], 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 2D profile plot
+      const px0 = 24;
+      const px1 = w - 24;
+      const py0 = h - plotH + 8;
+      const py1 = h - 14;
+      ctx.save();
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = rgba(C.silver, 0.12);
+      ctx.beginPath();
+      ctx.moveTo(px0, py0 - 4);
+      ctx.lineTo(px1, py0 - 4);
+      ctx.stroke();
+      const zTop = 1.2;
+      const zBot = -DMAX - 0.6;
+      const mapX = (t: number) => px0 + ((t + R) / (2 * R)) * (px1 - px0);
+      const mapY = (z: number) => py0 + ((zTop - z) / (zTop - zBot)) * (py1 - py0);
+      // depth ticks
+      for (let z = 0; z >= -DMAX; z -= 2) {
+        const y = mapY(z);
+        ctx.strokeStyle = rgba(C.cobalt, z === 0 ? 0.35 : 0.14);
+        ctx.beginPath();
+        ctx.moveTo(px0, y);
+        ctx.lineTo(px1, y);
+        ctx.stroke();
+        label(ctx, `${z === 0 ? ' 0' : z} mm`, px0, y - 3, C.titanium, 9);
+      }
+      if (half > 0) {
+        const grad = ctx.createLinearGradient(0, mapY(0), 0, mapY(-DMAX));
+        grad.addColorStop(0, rgba(C.cobalt, 0.0));
+        grad.addColorStop(1, rgba(C.red, 0.28));
+        ctx.beginPath();
+        ctx.moveTo(mapX(prof[0]), mapY(0));
+        for (let i = 0; i < prof.length; i += 2) ctx.lineTo(mapX(prof[i]), mapY(Math.min(0, prof[i + 1])));
+        ctx.lineTo(mapX(prof[prof.length - 2]), mapY(0));
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.beginPath();
+        for (let i = 0; i < prof.length; i += 2) {
+          const x = mapX(prof[i]);
+          const y = mapY(prof[i + 1]);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        phosphor(ctx, C.silver, 0.75, 0.1);
+        const fx = mapX(floorT);
+        const fy = mapY(floor);
+        glow(ctx, fx, fy, 14, C.red, 0.6);
+        label(ctx, `${floor.toFixed(2)} mm`, Math.min(fx + 8, px1 - 60), fy + 12, C.alabaster, 10);
+      }
+      ctx.restore();
+
+      label(ctx, 'synthetic wound surface · model units', 16, 22, C.titanium, 10);
+      label(ctx, 'move to slice', w - 16, 22, rgba(C.silver, 0.55 + 0.45 * (1 - f.pointer.presence)), 10, 'right');
+
+      const open = openTo > openFrom ? (openTo - openFrom).toFixed(1) : '0.0';
+      return `slice ${sliceView >= 0 ? '+' : ''}${sliceView.toFixed(1)} mm · floor ${floor.toFixed(2)} mm · open ${open} mm`;
     },
-    { enabled: activeTab === 'elevation', animate: !isReduced }
-  );
+  };
+}
 
+/* ============================================================
+ * 2. Grad-CAM saliency: procedural tissue + saliency field,
+ *    marching-squares isocontours, cursor lens
+ * ============================================================ */
+
+const GW = 96;
+const GH = 72;
+
+interface SaliencyData {
+  field: Float32Array;
+  tissue: HTMLCanvasElement;
+  heat: HTMLCanvasElement;
+  iso: { level: number; segs: Float32Array }[];
+  peak: [number, number, number];
+}
+
+let salCache: SaliencyData | null = null;
+function saliency(): SaliencyData {
+  if (salCache) return salCache;
+  const field = new Float32Array(GW * GH);
+  const blobs = [
+    { x: 0.44, y: 0.46, sx: 0.11, sy: 0.08, a: 1.0, rot: 0.5 },
+    { x: 0.6, y: 0.56, sx: 0.07, sy: 0.05, a: 0.72, rot: -0.3 },
+    { x: 0.34, y: 0.62, sx: 0.06, sy: 0.04, a: 0.45, rot: 0.9 },
+  ];
+  let max = 0;
+  let peak: [number, number, number] = [0, 0, 0];
+  for (let j = 0; j < GH; j++) {
+    for (let i = 0; i < GW; i++) {
+      const u = i / (GW - 1);
+      const v = j / (GH - 1);
+      let s = 0;
+      for (const b of blobs) {
+        const dx = u - b.x;
+        const dy = (v - b.y) * 0.75;
+        const rx = dx * Math.cos(b.rot) + dy * Math.sin(b.rot);
+        const ry = -dx * Math.sin(b.rot) + dy * Math.cos(b.rot);
+        s += b.a * Math.exp(-0.5 * ((rx / b.sx) ** 2 + (ry / b.sy) ** 2));
+      }
+      s *= 0.85 + 0.3 * fbm(u * 7, v * 7, 3);
+      field[j * GW + i] = s;
+      if (s > max) { max = s; peak = [u, v, s]; }
+    }
+  }
+  for (let k = 0; k < field.length; k++) field[k] /= max;
+  peak[2] = 1;
+
+  const make = (fn: (u: number, v: number, s: number) => [number, number, number, number]) => {
+    const cv = document.createElement('canvas');
+    const W = 288;
+    const H = 216;
+    cv.width = W;
+    cv.height = H;
+    const cx = cv.getContext('2d');
+    if (!cx) return cv;
+    const img = cx.createImageData(W, H);
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const u = x / (W - 1);
+        const v = y / (H - 1);
+        const gi = u * (GW - 1);
+        const gj = v * (GH - 1);
+        const i0 = Math.min(GW - 2, Math.floor(gi));
+        const j0 = Math.min(GH - 2, Math.floor(gj));
+        const fx = gi - i0;
+        const fy = gj - j0;
+        const s =
+          field[j0 * GW + i0] * (1 - fx) * (1 - fy) +
+          field[j0 * GW + i0 + 1] * fx * (1 - fy) +
+          field[(j0 + 1) * GW + i0] * (1 - fx) * fy +
+          field[(j0 + 1) * GW + i0 + 1] * fx * fy;
+        const [r, g, b, a] = fn(u, v, s);
+        const o = (y * W + x) * 4;
+        img.data[o] = r;
+        img.data[o + 1] = g;
+        img.data[o + 2] = b;
+        img.data[o + 3] = a;
+      }
+    }
+    cx.putImageData(img, 0, 0);
+    return cv;
+  };
+
+  const skin = hexRgb(C.titanium);
+  const bed = hexRgb(C.crimson);
+  const tissue = make((u, v) => {
+    const dx = (u - 0.48) / 0.3;
+    const dy = (v - 0.53) / 0.22;
+    const re = Math.sqrt(dx * dx + dy * dy) + (fbm(u * 6, v * 6, 3) - 0.5) * 0.35;
+    const inBed = 1 - smoothstep(0.85, 1.05, re);
+    const tex = fbm(u * 26, v * 26, 4);
+    const pores = fbm(u * 60 + 4, v * 60, 2);
+    const lum = 0.1 + tex * 0.16 + pores * 0.05;
+    const r = skin[0] * lum * (1 - inBed) + bed[0] * (0.16 + tex * 0.32) * inBed;
+    const g = skin[1] * lum * (1 - inBed) + bed[1] * (0.1 + tex * 0.2) * inBed;
+    const b = skin[2] * lum * (1 - inBed) + bed[2] * (0.1 + tex * 0.18) * inBed;
+    return [r, g, b, 255];
+  });
+  const HEAT = [C.midnight, C.cobaltDeep, C.cobalt, C.silver, C.crimson, C.red] as const;
+  const heat = make((_u, _v, s) => {
+    const [r, g, b] = ramp(HEAT, s);
+    return [r, g, b, Math.round(255 * smoothstep(0.06, 0.38, s))];
+  });
+  const iso = [0.2, 0.4, 0.6, 0.8].map((level) => ({ level, segs: isoSegments(field, GW, GH, level) }));
+  salCache = { field, tissue, heat, iso, peak };
+  return salCache;
+}
+
+function sampleField(field: Float32Array, u: number, v: number): number {
+  if (u < 0 || u > 1 || v < 0 || v > 1) return 0;
+  const gi = u * (GW - 1);
+  const gj = v * (GH - 1);
+  const i0 = Math.min(GW - 2, Math.floor(gi));
+  const j0 = Math.min(GH - 2, Math.floor(gj));
+  const fx = gi - i0;
+  const fy = gj - j0;
   return (
-    <div className="w-full flex flex-col justify-between select-none">
-      {/* ROW 1: HTML Controls (clean underline mode tabs, toggles) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#2563EB]/20 text-xs font-mono">
-        {/* Left: Mode Underline Tabs */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          {(
-            [
-              { id: 'elevation', label: '3D Elevation' },
-              { id: 'saliency', label: 'Grad-CAM Saliency' },
-              { id: 'topology', label: 'Pipeline Topology' },
-            ] as const
-          ).map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              aria-pressed={activeTab === tab.id}
-              className={`pb-1 transition-colors cursor-pointer text-xs font-mono tracking-wider min-h-[36px] flex items-center ${
-                activeTab === tab.id
-                  ? 'text-[#F4F6F9] border-b-2 border-[#FF2800] font-semibold'
-                  : 'text-[#7E8B9B] hover:text-[#C8D2E0] border-b-2 border-transparent'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Right: Contextual HTML Controls */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          {activeTab === 'elevation' && (
-            <label className="flex items-center gap-2 text-[#7E8B9B]">
-              <span>Slice:</span>
-              <span className="text-[#F4F6F9] font-bold w-9">{sliceX}%</span>
-              <input
-                type="range"
-                min="10"
-                max="90"
-                value={sliceX}
-                onChange={(e) => setSliceX(Number(e.target.value))}
-                aria-label="Elevation Cross-Section Slicer"
-                className="w-24 sm:w-32 accent-[#FF2800] cursor-ew-resize"
-              />
-            </label>
-          )}
-
-          {activeTab === 'saliency' && (
-            <div className="flex items-center gap-2 text-[#7E8B9B]">
-              <span>Lens:</span>
-              <button
-                type="button"
-                onClick={() => setLensPos(0)}
-                className={`px-2 py-0.5 rounded-[2px] transition-colors cursor-pointer ${
-                  lensPos === 0 ? 'bg-[#FF2800] text-[#F4F6F9]' : 'text-[#7E8B9B] hover:text-[#C8D2E0]'
-                }`}
-              >
-                100% Saliency
-              </button>
-              <button
-                type="button"
-                onClick={() => setLensPos(50)}
-                className={`px-2 py-0.5 rounded-[2px] transition-colors cursor-pointer ${
-                  lensPos === 50 ? 'bg-[#2563EB] text-[#F4F6F9]' : 'text-[#7E8B9B] hover:text-[#C8D2E0]'
-                }`}
-              >
-                50/50 Split
-              </button>
-              <button
-                type="button"
-                onClick={() => setLensPos(100)}
-                className={`px-2 py-0.5 rounded-[2px] transition-colors cursor-pointer ${
-                  lensPos === 100 ? 'bg-[#C8D2E0] text-[#03050A]' : 'text-[#7E8B9B] hover:text-[#C8D2E0]'
-                }`}
-              >
-                100% RGB
-              </button>
-            </div>
-          )}
-
-          {activeTab === 'topology' && (
-            <div className="flex items-center gap-1.5 text-[11px]">
-              <span className="text-[#7E8B9B] mr-1">Stage:</span>
-              {[
-                { num: 1, name: 'Laplacian' },
-                { num: 2, name: 'HSV' },
-                { num: 3, name: 'CNN' },
-                { num: 4, name: 'Grad-CAM' },
-              ].map((s) => (
-                <button
-                  key={s.num}
-                  type="button"
-                  onClick={() => setActiveStage(s.num)}
-                  className={`px-2 py-0.5 rounded-[2px] transition-colors cursor-pointer ${
-                    activeStage === s.num
-                      ? 'bg-[#FF2800] text-[#F4F6F9] font-bold'
-                      : 'bg-[#0B1E40]/60 text-[#7E8B9B] hover:text-[#F4F6F9]'
-                  }`}
-                >
-                  {s.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ROW 2: Flexible canvas/drawing container (min-height: 0, height ~460px on desktop, ~280px on mobile) */}
-      <div className="relative w-full min-h-0 h-[280px] sm:h-[360px] lg:h-[460px] flex items-center justify-center my-3 overflow-hidden bg-[#03050A]/80 border border-[#2563EB]/15">
-        {/* TAB 1: 3D Isometric Elevation & LiDAR Point Cloud Canvas */}
-        {activeTab === 'elevation' && (
-          <div ref={stageRef} className="relative w-full h-full flex items-center justify-center">
-            <canvas
-              ref={canvasRef}
-              className="absolute inset-0 w-full h-full block"
-              aria-label="LiDAR elevation mesh"
-              role="img"
-            />
-            {/* Elevation Depth Scale Legend */}
-            <div className="absolute top-4 left-4 p-2 bg-[#03050A]/85 border border-[#2563EB]/20 text-[10px] font-mono space-y-1 pointer-events-none">
-              <div className="text-[#7E8B9B] uppercase tracking-wider font-semibold">Elevation Scale</div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2 bg-[#FF2800] inline-block" />
-                <span className="text-[#C8D2E0]">-2.72mm (Ulcer Crater)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2 bg-[#C8D2E0] inline-block" />
-                <span className="text-[#C8D2E0]">-1.20mm (Epithelial Margin)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2 bg-[#2563EB] inline-block" />
-                <span className="text-[#C8D2E0]">0.00mm (Healthy Periwound)</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 2: Vectorized Grad-CAM Saliency Comparison Lens */}
-        {activeTab === 'saliency' && (
-          <div className="relative w-full h-full flex items-center justify-center p-4">
-            <div className="relative w-full max-w-[560px] aspect-[4/3] max-h-[420px] overflow-hidden select-none border border-[#2563EB]/30 bg-[#060A12]">
-              {/* Left Underlay: Clinical Surface RGB */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <svg viewBox="0 0 400 300" className="w-full h-full">
-                  <rect width="400" height="300" fill="#0B1220" />
-                  {/* Subtle skin texture and tissue bed */}
-                  <ellipse cx="200" cy="150" rx="130" ry="100" fill="#201111" />
-                  <ellipse cx="200" cy="150" rx="100" ry="75" fill="#301616" stroke="#4A1E1E" strokeWidth="2" />
-                  {/* Granulation tissue centers */}
-                  <circle cx="185" cy="140" r="25" fill="#421A1A" opacity="0.8" />
-                  <circle cx="215" cy="160" r="20" fill="#3A1717" opacity="0.8" />
-                  {/* Margin wound incision path */}
-                  <path
-                    d="M 130 110 Q 180 160 220 185 T 270 190"
-                    stroke="#FF4419"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                    fill="none"
-                    opacity="0.85"
-                  />
-                  <path
-                    d="M 130 110 Q 180 160 220 185 T 270 190"
-                    stroke="#FF2800"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                  {/* RGB Lens Annotation */}
-                  <text x="20" y="30" fill="#7E8B9B" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                    CLINICAL RGB (PERIWOUND)
-                  </text>
-                </svg>
-              </div>
-
-              {/* Right Overlay: Vectorized Grad-CAM Saliency Reveal (Clipped) */}
-              <div
-                className="absolute inset-0 overflow-hidden"
-                style={{ clipPath: `inset(0 0 0 ${lensPos}%)` }}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <svg viewBox="0 0 400 300" className="w-full h-full">
-                    <defs>
-                      <radialGradient id="healiosHeatPrimary" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#FF2800" stopOpacity="0.95" />
-                        <stop offset="30%" stopColor="#FF4419" stopOpacity="0.80" />
-                        <stop offset="55%" stopColor="#2563EB" stopOpacity="0.60" />
-                        <stop offset="80%" stopColor="#153875" stopOpacity="0.30" />
-                        <stop offset="100%" stopColor="#0B1220" stopOpacity="0.0" />
-                      </radialGradient>
-                      <radialGradient id="healiosHeatSecondary" cx="42%" cy="45%" r="35%">
-                        <stop offset="0%" stopColor="#FF2800" stopOpacity="0.90" />
-                        <stop offset="40%" stopColor="#FF4419" stopOpacity="0.65" />
-                        <stop offset="85%" stopColor="#2563EB" stopOpacity="0.25" />
-                        <stop offset="100%" stopColor="transparent" stopOpacity="0.0" />
-                      </radialGradient>
-                    </defs>
-                    <rect width="400" height="300" fill="#060A12" />
-                    {/* Primary Saliency Hotspot */}
-                    <ellipse cx="200" cy="150" rx="125" ry="95" fill="url(#healiosHeatPrimary)" />
-                    <circle cx="185" cy="140" r="45" fill="url(#healiosHeatSecondary)" />
-
-                    {/* Saliency Isocontours */}
-                    <ellipse cx="200" cy="150" rx="100" ry="75" fill="none" stroke="#2563EB" strokeWidth="1" strokeDasharray="3 3" opacity="0.6" />
-                    <ellipse cx="195" cy="145" rx="60" ry="45" fill="none" stroke="#FF4419" strokeWidth="1.2" opacity="0.8" />
-                    <circle cx="188" cy="140" r="22" fill="none" stroke="#FF2800" strokeWidth="1.5" />
-
-                    {/* Peak Activation Crosshair */}
-                    <line x1="183" y1="140" x2="193" y2="140" stroke="#F4F6F9" strokeWidth="1.5" />
-                    <line x1="188" y1="135" x2="188" y2="145" stroke="#F4F6F9" strokeWidth="1.5" />
-                    <text x="196" y="137" fill="#F4F6F9" fontSize="9" fontFamily="monospace">0.942 PEAK</text>
-
-                    {/* Grad-CAM Label */}
-                    <text x="380" y="30" fill="#FF2800" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="end">
-                      GRAD-CAM JET SALIENCY
-                    </text>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Specular Hairline Divider */}
-              <div
-                className="absolute top-0 bottom-0 w-px bg-[#F4F6F9] pointer-events-none shadow-[0_0_12px_rgba(255,255,255,0.95)]"
-                style={{ left: `${lensPos}%` }}
-              >
-                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-[#03050A] border border-[#FF2800] text-[#FF2800] flex items-center justify-center text-[10px] font-mono shadow-[0_0_10px_rgba(255,40,0,0.5)]">
-                  ↔
-                </div>
-              </div>
-
-              {/* Interactive Range Slider (Scrubbing Surface) */}
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={lensPos}
-                onChange={(e) => setLensPos(Number(e.target.value))}
-                aria-label="Grad-CAM Saliency Lens Split Slider"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-20"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: Pipeline Topology (Interactive SVG Architectural DAG Graph) */}
-        {activeTab === 'topology' && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
-            <svg viewBox="0 0 680 340" className="w-full h-full max-h-[420px] overflow-visible">
-              <defs>
-                <linearGradient id="pipeGradActive" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#2563EB" />
-                  <stop offset="100%" stopColor="#FF2800" />
-                </linearGradient>
-              </defs>
-
-              {/* Connecting Spline Paths */}
-              {/* Path 1 -> 2 */}
-              <path
-                d="M 150 140 C 190 140, 190 140, 230 140"
-                fill="none"
-                stroke={activeStage >= 2 ? '#2563EB' : 'rgba(37, 99, 235, 0.2)'}
-                strokeWidth="2"
-                strokeDasharray={activeStage >= 2 ? 'none' : '4 4'}
-              />
-              {/* Path 2 -> 3 */}
-              <path
-                d="M 330 140 C 370 140, 370 140, 410 140"
-                fill="none"
-                stroke={activeStage >= 3 ? '#2563EB' : 'rgba(37, 99, 235, 0.2)'}
-                strokeWidth="2"
-                strokeDasharray={activeStage >= 3 ? 'none' : '4 4'}
-              />
-              {/* Path 3 -> 4 */}
-              <path
-                d="M 510 140 C 540 140, 540 140, 570 140"
-                fill="none"
-                stroke={activeStage >= 4 ? '#FF2800' : 'rgba(37, 99, 235, 0.2)'}
-                strokeWidth="2.5"
-              />
-
-              {/* Animated Data Packets / Pulses along paths */}
-              <circle cx={activeStage >= 2 ? 190 : 150} cy="140" r="3.5" fill="#2563EB" className="animate-ping" />
-              <circle cx={activeStage >= 3 ? 370 : 330} cy="140" r="3.5" fill="#2563EB" />
-              <circle cx={activeStage >= 4 ? 540 : 510} cy="140" r="4" fill="#FF2800" className="animate-pulse" />
-
-              {/* NODE 1: Edge Gate (Laplacian) */}
-              <g
-                role="button"
-                tabIndex={0}
-                onClick={() => setActiveStage(1)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveStage(1); } }}
-                className="cursor-pointer"
-              >
-                <rect
-                  x="50"
-                  y="90"
-                  width="100"
-                  height="100"
-                  fill="#060A12"
-                  stroke={activeStage === 1 ? '#FF2800' : '#2563EB'}
-                  strokeWidth={activeStage === 1 ? '2' : '1'}
-                />
-                <text x="100" y="112" fill="#7E8B9B" fontSize="9" fontFamily="monospace" textAnchor="middle">
-                  01. EDGE GATE
-                </text>
-                <text x="100" y="132" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle">
-                  Laplacian
-                </text>
-                <text x="100" y="152" fill="#4CC38A" fontSize="9" fontFamily="monospace" textAnchor="middle">
-                  &lt; 35ms Filter
-                </text>
-                <text x="100" y="172" fill="#7E8B9B" fontSize="8" fontFamily="monospace" textAnchor="middle">
-                  [1, 1, 512, 512]
-                </text>
-              </g>
-
-              {/* NODE 2: Morphology (HSV Tissue Bed) */}
-              <g
-                role="button"
-                tabIndex={0}
-                onClick={() => setActiveStage(2)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveStage(2); } }}
-                className="cursor-pointer"
-              >
-                <rect
-                  x="230"
-                  y="90"
-                  width="100"
-                  height="100"
-                  fill="#060A12"
-                  stroke={activeStage === 2 ? '#FF2800' : '#2563EB'}
-                  strokeWidth={activeStage === 2 ? '2' : '1'}
-                />
-                <text x="280" y="112" fill="#7E8B9B" fontSize="9" fontFamily="monospace" textAnchor="middle">
-                  02. MORPHOLOGY
-                </text>
-                <text x="280" y="132" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle">
-                  HSV Tissue Bed
-                </text>
-                <text x="280" y="152" fill="#4CC38A" fontSize="9" fontFamily="monospace" textAnchor="middle">
-                  2.00ms Vector
-                </text>
-                <text x="280" y="172" fill="#7E8B9B" fontSize="8" fontFamily="monospace" textAnchor="middle">
-                  [1, 3, 512, 512]
-                </text>
-              </g>
-
-              {/* NODE 3: Classifier (CNN Tensor) */}
-              <g
-                role="button"
-                tabIndex={0}
-                onClick={() => setActiveStage(3)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveStage(3); } }}
-                className="cursor-pointer"
-              >
-                <rect
-                  x="410"
-                  y="90"
-                  width="100"
-                  height="100"
-                  fill="#060A12"
-                  stroke={activeStage === 3 ? '#FF2800' : '#2563EB'}
-                  strokeWidth={activeStage === 3 ? '2' : '1'}
-                />
-                <text x="460" y="112" fill="#7E8B9B" fontSize="9" fontFamily="monospace" textAnchor="middle">
-                  03. CLASSIFIER
-                </text>
-                <text x="460" y="132" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle">
-                  CNN Tensor
-                </text>
-                <text x="460" y="152" fill="#4CC38A" fontSize="9" fontFamily="monospace" textAnchor="middle">
-                  14.2ms Backbone
-                </text>
-                <text x="460" y="172" fill="#7E8B9B" fontSize="8" fontFamily="monospace" textAnchor="middle">
-                  [1, 512, 16, 16]
-                </text>
-              </g>
-
-              {/* NODE 4: Explainable (Grad-CAM Saliency) */}
-              <g
-                role="button"
-                tabIndex={0}
-                onClick={() => setActiveStage(4)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveStage(4); } }}
-                className="cursor-pointer"
-              >
-                <rect
-                  x="570"
-                  y="90"
-                  width="100"
-                  height="100"
-                  fill="#0B1E40"
-                  stroke={activeStage === 4 ? '#FF2800' : '#FF4419'}
-                  strokeWidth={activeStage === 4 ? '2.5' : '1.5'}
-                />
-                <text x="620" y="112" fill="#FF2800" fontSize="9" fontFamily="monospace" fontWeight="bold" textAnchor="middle">
-                  04. EXPLAINABLE
-                </text>
-                <text x="620" y="132" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle">
-                  Grad-CAM Jet
-                </text>
-                <text x="620" y="152" fill="#FF2800" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="middle">
-                  8.09ms Latency
-                </text>
-                <text x="620" y="172" fill="#C8D2E0" fontSize="8" fontFamily="monospace" textAnchor="middle">
-                  [1, 1, 512, 512]
-                </text>
-              </g>
-
-              {/* Bottom Architectural Callout Bar in SVG */}
-              <line x1="50" y1="225" x2="670" y2="225" stroke="rgba(37, 99, 235, 0.25)" />
-              <text x="50" y="255" fill="#C8D2E0" fontSize="11" fontFamily="sans-serif">
-                {activeStage === 1 && 'Stage 1: In-browser Laplacian edge gate rejects blurred or unaligned camera frames before inference.'}
-                {activeStage === 2 && 'Stage 2: Vectorized NumPy HSV color segmentation extracts the granulation tissue bed in 2.00ms.'}
-                {activeStage === 3 && 'Stage 3: Deep CNN extracts feature maps [1, 512, 16, 16] across 14.2ms of local CPU/GPU runtime.'}
-                {activeStage === 4 && 'Stage 4: Vectorized linear Jet colormapping synthesizes full 512x512 explainability saliency in 8.09ms with zero Matplotlib thread locks.'}
-              </text>
-              <text x="50" y="278" fill="#7E8B9B" fontSize="9" fontFamily="monospace">
-                MEMORY FOOTPRINT: 0.0 MB Matplotlib Lock | HARDWARE: Client-Side CPU/GPU WebGL
-              </text>
-            </svg>
-          </div>
-        )}
-      </div>
-
-      {/* ROW 3: HTML Telemetry footer (outside drawing canvas; never overlaying or clipping artwork) */}
-      <div className="pt-3 border-t border-[#2563EB]/20 w-full min-w-0 text-xs font-mono">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-[#7E8B9B]">
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">
-              {activeTab === 'elevation' ? 'Slice Elevation Δz' : activeTab === 'saliency' ? 'Peak Saliency' : 'End-to-End Latency'}
-            </span>
-            <span className="text-sm font-bold text-[#FF2800]">
-              {activeTab === 'elevation' ? `${sliceDzMm} mm` : activeTab === 'saliency' ? '0.942 Intensity' : '59.29 ms Total'}
-            </span>
-          </div>
-
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">
-              {activeTab === 'elevation' ? 'LiDAR Margin' : activeTab === 'saliency' ? 'Vectorized Latency' : 'Grad-CAM Step'}
-            </span>
-            <span className="text-sm font-bold text-[#F4F6F9]">
-              {activeTab === 'elevation' ? '±0.08 mm Accuracy' : '8.09 ms Verified'}
-            </span>
-          </div>
-
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">
-              {activeTab === 'elevation' ? 'Point Density' : activeTab === 'saliency' ? 'GUI Overhead' : 'Memory Profile'}
-            </span>
-            <span className="text-sm font-bold text-[#4CC38A]">
-              {activeTab === 'elevation' ? '96 LiDAR Vertices' : activeTab === 'saliency' ? '0 MB GUI Lock' : '< 42 MB In-Memory'}
-            </span>
-          </div>
-
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">Hardware Target</span>
-            <span className="text-sm font-bold text-[#2563EB]">Zero Cloud GPU</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    field[j0 * GW + i0] * (1 - fx) * (1 - fy) +
+    field[j0 * GW + i0 + 1] * fx * (1 - fy) +
+    field[(j0 + 1) * GW + i0] * (1 - fx) * fy +
+    field[(j0 + 1) * GW + i0 + 1] * fx * fy
   );
+}
+
+function createSaliencyScene(): PlateScene {
+  const data = saliency();
+  const rect = { x: 0, y: 0, w: 1, h: 1 };
+  const fit = (f: StageFrame) => {
+    const pad = 20;
+    const barW = 46;
+    const availW = f.width - pad * 2 - barW;
+    const availH = f.height - pad * 2 - 14;
+    const w = Math.min(availW, (availH * 4) / 3);
+    const h = (w * 3) / 4;
+    rect.x = pad + (availW - w) / 2;
+    rect.y = pad + 14 + (availH - h) / 2;
+    rect.w = w;
+    rect.h = h;
+  };
+  return {
+    idle(f) {
+      fit(f);
+      const t = f.time * 0.35;
+      return [
+        rect.x + rect.w * (data.peak[0] + Math.sin(t) * 0.22),
+        rect.y + rect.h * (data.peak[1] + Math.sin(t * 1.7 + 1) * 0.16),
+      ];
+    },
+    draw(ctx, f) {
+      fit(f);
+      const { x, y, w, h } = rect;
+      const intro = easeOutCubic(f.age / 0.8);
+      drawVignette(ctx, f.width, f.height);
+
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(data.tissue, x, y, w, h);
+      // faint global saliency so the heat reads outside the lens
+      ctx.globalAlpha = 0.22 * intro;
+      ctx.drawImage(data.heat, x, y, w, h);
+      ctx.restore();
+
+      // lens: full saliency inside a circle around the damped cursor
+      const lr = Math.min(w, h) * 0.24;
+      const lx = clamp(f.pointer.x, x, x + w);
+      const ly = clamp(f.pointer.y, y, y + h);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(lx, ly, lr * intro, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.globalAlpha = 0.92;
+      ctx.drawImage(data.heat, x, y, w, h);
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = 0.25;
+      ctx.drawImage(data.heat, x, y, w, h);
+      ctx.restore();
+
+      // isocontours
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.clip();
+      const sxs = w / (GW - 1);
+      const sys = h / (GH - 1);
+      for (const { level, segs } of data.iso) {
+        const [r, g, b] = ramp([C.cobalt, C.silver, C.crimson, C.red], (level - 0.2) / 0.6);
+        ctx.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${0.75 * intro})`;
+        ctx.lineWidth = level >= 0.8 ? 1 : 0.5;
+        ctx.setLineDash(level === 0.2 ? [3, 3] : []);
+        strokeSegments(ctx, segs, sxs, sys, x, y);
+      }
+      ctx.restore();
+
+      // lens rim
+      ctx.save();
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = rgba(C.alabaster, 0.7);
+      ctx.beginPath();
+      ctx.arc(lx, ly, lr * intro, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = rgba(C.red, 0.35);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(lx, ly, lr * intro + 2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // peak crosshair
+      const pkx = x + data.peak[0] * w;
+      const pky = y + data.peak[1] * h;
+      glow(ctx, pkx, pky, 22, C.red, 0.5 * intro);
+      ctx.save();
+      ctx.strokeStyle = C.alabaster;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(pkx - 9, pky); ctx.lineTo(pkx - 3, pky);
+      ctx.moveTo(pkx + 3, pky); ctx.lineTo(pkx + 9, pky);
+      ctx.moveTo(pkx, pky - 9); ctx.lineTo(pkx, pky - 3);
+      ctx.moveTo(pkx, pky + 3); ctx.lineTo(pkx, pky + 9);
+      ctx.stroke();
+      ctx.restore();
+      label(ctx, 'peak 1.000', pkx + 12, pky - 8, C.alabaster, 10);
+
+      // frame
+      ctx.save();
+      ctx.strokeStyle = rgba(C.silver, 0.18);
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(x + 0.25, y + 0.25, w - 0.5, h - 0.5);
+      ctx.restore();
+      label(ctx, 'grad-cam activation over tissue bed · illustrative input', x, y - 8, C.titanium, 10);
+
+      // colour bar
+      const bx = x + w + 18;
+      const by0 = y;
+      const by1 = y + h;
+      const steps = 48;
+      for (let i = 0; i < steps; i++) {
+        const [r, g, b] = ramp([C.midnight, C.cobaltDeep, C.cobalt, C.silver, C.crimson, C.red], 1 - i / steps);
+        ctx.fillStyle = `rgb(${r | 0},${g | 0},${b | 0})`;
+        ctx.fillRect(bx, by0 + ((by1 - by0) * i) / steps, 6, (by1 - by0) / steps + 0.5);
+      }
+      const a = sampleField(data.field, (f.pointer.x - x) / w, (f.pointer.y - y) / h);
+      const ay = by1 - a * (by1 - by0);
+      ctx.fillStyle = C.alabaster;
+      ctx.beginPath();
+      ctx.moveTo(bx - 2, ay);
+      ctx.lineTo(bx - 7, ay - 4);
+      ctx.lineTo(bx - 7, ay + 4);
+      ctx.closePath();
+      ctx.fill();
+      label(ctx, '1.0', bx + 10, by0 + 8, C.titanium, 9);
+      label(ctx, '0.0', bx + 10, by1, C.titanium, 9);
+
+      return `activation ${a.toFixed(3)} at cursor · isolines 0.2 / 0.4 / 0.6 / 0.8`;
+    },
+  };
+}
+
+/* ============================================================
+ * 3. Pipeline: the Healios C4 container graph from content
+ * ============================================================ */
+
+interface DagNode { id: string; label: string; sub: string; desc: string; x: number; y: number; w: number; h: number }
+
+function createPipelineScene(): PlateScene {
+  const c4 = getProjectBySlug('healios')?.caseStudy.c4Diagram;
+  const srcNodes = c4?.nodes ?? [];
+  const edges = c4?.edges ?? [];
+  const nodes: DagNode[] = srcNodes.map((nd) => ({ id: nd.id, label: nd.label, sub: nd.sublabel ?? '', desc: nd.description ?? '', x: 0, y: 0, w: 0, h: 0 }));
+  const byId = new Map(nodes.map((nd) => [nd.id, nd]));
+  // column = longest path depth from the sources
+  const depth = new Map<string, number>();
+  nodes.forEach((nd) => depth.set(nd.id, 0));
+  for (let pass = 0; pass < nodes.length; pass++) {
+    for (const e of edges) depth.set(e.to, Math.max(depth.get(e.to) ?? 0, (depth.get(e.from) ?? 0) + 1));
+  }
+  const cols = Math.max(0, ...Array.from(depth.values())) + 1;
+  let hovered: DagNode | null = null;
+
+  const layout = (f: StageFrame) => {
+    const top = 34;
+    const bottom = f.height - 74;
+    const colW = f.width / cols;
+    const nw = Math.min(200, colW * 0.84);
+    const nh = f.width < 520 ? 40 : 46;
+    for (let c = 0; c < cols; c++) {
+      const col = nodes.filter((nd) => depth.get(nd.id) === c);
+      const gap = (bottom - top) / col.length;
+      col.forEach((nd, i) => {
+        nd.w = nw;
+        nd.h = nh;
+        nd.x = colW * c + (colW - nw) / 2;
+        nd.y = top + gap * i + (gap - nh) / 2;
+      });
+    }
+  };
+
+  const fitText = (ctx: CanvasRenderingContext2D, text: string, max: number) => {
+    if (ctx.measureText(text).width <= max) return text;
+    let t = text;
+    while (t.length > 1 && ctx.measureText(t + '…').width > max) t = t.slice(0, -1);
+    return t + '…';
+  };
+
+  return {
+    idle(f) {
+      layout(f);
+      if (!nodes.length) return [f.width / 2, f.height / 2];
+      const nd = nodes[Math.floor(f.time / 2.6) % nodes.length];
+      return [nd.x + nd.w / 2, nd.y + nd.h / 2];
+    },
+    draw(ctx, f) {
+      layout(f);
+      drawVignette(ctx, f.width, f.height);
+      drawGrid(ctx, f.width, f.height, 24, 0.04);
+      const intro = easeOutCubic(f.age / 0.9);
+      const px = f.pointer.x;
+      const py = f.pointer.y;
+      hovered = nodes.find((nd) => px >= nd.x - 6 && px <= nd.x + nd.w + 6 && py >= nd.y - 6 && py <= nd.y + nd.h + 6) ?? hovered ?? nodes[0] ?? null;
+
+      // edges
+      edges.forEach((e, ei) => {
+        const a = byId.get(e.from);
+        const b = byId.get(e.to);
+        if (!a || !b) return;
+        const x0 = a.x + a.w;
+        const y0 = a.y + a.h / 2;
+        const x3 = b.x;
+        const y3 = b.y + b.h / 2;
+        const dx = (x3 - x0) * 0.5;
+        const hot = hovered && (hovered.id === e.from || hovered.id === e.to);
+        const reveal = clamp(intro * 1.4 - ei * 0.08, 0, 1);
+        ctx.beginPath();
+        const N = 32;
+        for (let i = 0; i <= N * reveal; i++) {
+          const t = i / N;
+          const x = bez(x0, x0 + dx, x3 - dx, x3, t);
+          const y = bez(y0, y0, y3, y3, t);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        if (hot) phosphor(ctx, C.red, 0.9, 0.12);
+        else {
+          ctx.lineWidth = 0.5;
+          ctx.strokeStyle = rgba(C.cobalt, 0.6);
+          ctx.stroke();
+        }
+        // packets with trailing samples
+        if (reveal >= 1) {
+          for (let k = 0; k < 2; k++) {
+            const head = (f.time * 0.32 + k * 0.5 + ei * 0.17) % 1;
+            for (let tr = 0; tr < 7; tr++) {
+              const t = head - tr * 0.018;
+              if (t < 0) continue;
+              const x = bez(x0, x0 + dx, x3 - dx, x3, t);
+              const y = bez(y0, y0, y3, y3, t);
+              const al = (1 - tr / 7) * (hot ? 0.95 : 0.6);
+              ctx.fillStyle = rgba(hot ? C.red : C.silver, al);
+              ctx.fillRect(x - 1, y - 1, 2, 2);
+            }
+            const x = bez(x0, x0 + dx, x3 - dx, x3, head);
+            const y = bez(y0, y0, y3, y3, head);
+            glow(ctx, x, y, hot ? 12 : 8, hot ? C.red : C.cobalt, hot ? 0.6 : 0.35);
+          }
+        }
+      });
+
+      // nodes
+      const small = f.width < 520;
+      nodes.forEach((nd, i) => {
+        const appear = clamp(intro * 1.5 - i * 0.06, 0, 1);
+        if (appear <= 0) return;
+        const isHot = hovered?.id === nd.id;
+        ctx.save();
+        ctx.globalAlpha = appear;
+        const g = ctx.createLinearGradient(nd.x, nd.y, nd.x, nd.y + nd.h);
+        g.addColorStop(0, rgba(isHot ? C.cobaltMid : C.cobaltDeep, isHot ? 0.55 : 0.4));
+        g.addColorStop(1, rgba(C.midnight, 0.6));
+        ctx.fillStyle = g;
+        ctx.fillRect(nd.x, nd.y, nd.w, nd.h);
+        ctx.lineWidth = isHot ? 1 : 0.5;
+        ctx.strokeStyle = isHot ? C.red : rgba(C.silver, 0.35);
+        ctx.strokeRect(nd.x + 0.25, nd.y + 0.25, nd.w - 0.5, nd.h - 0.5);
+        if (isHot) glow(ctx, nd.x + nd.w / 2, nd.y + nd.h / 2, nd.w * 0.6, C.red, 0.12);
+        ctx.font = `${small ? 10 : 11.5}px ${MONO}`;
+        ctx.fillStyle = C.alabaster;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(fitText(ctx, nd.label, nd.w - 16), nd.x + 8, nd.y + (small ? 17 : 19));
+        ctx.font = `${small ? 9 : 10}px ${MONO}`;
+        ctx.fillStyle = isHot ? C.silver : C.titanium;
+        ctx.fillText(fitText(ctx, nd.sub, nd.w - 16), nd.x + 8, nd.y + (small ? 31 : 35));
+        ctx.restore();
+      });
+
+      // detail line under the graph
+      if (hovered) {
+        ctx.save();
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = rgba(C.silver, 0.12);
+        ctx.beginPath();
+        ctx.moveTo(20, f.height - 58);
+        ctx.lineTo(f.width - 20, f.height - 58);
+        ctx.stroke();
+        ctx.restore();
+        label(ctx, hovered.label, 20, f.height - 38, C.red, 11);
+        ctx.font = `${small ? 10 : 11}px ${MONO}`;
+        ctx.fillStyle = C.silver;
+        ctx.textAlign = 'left';
+        ctx.fillText(fitText(ctx, hovered.desc, f.width - 40), 20, f.height - 20);
+      }
+
+      const out = hovered ? edges.filter((e) => e.from === hovered!.id || e.to === hovered!.id) : [];
+      return hovered
+        ? `${hovered.label} · ${out.length} link${out.length === 1 ? '' : 's'}${out[0]?.protocol ? ` · ${out[0].protocol}` : ''}`
+        : 'pipeline';
+    },
+  };
+}
+
+export const healiosPlate: PlateDefinition = {
+  modes: [
+    { id: 'depth', label: 'Depth cloud', description: 'Rotating point cloud of a synthetic wound surface. Moving the cursor slices it and plots the depth profile.' },
+    { id: 'saliency', label: 'Grad-CAM', description: 'Grad-CAM saliency heatmap with isocontours. A lens follows the cursor and reads the activation under it.' },
+    { id: 'pipeline', label: 'Pipeline', description: 'The Healios container diagram: patient app, FastAPI gateway, Grad-CAM engine, tissue analyzer, protocol retrieval and EHR store.' },
+  ],
+  createScene(modeId) {
+    if (modeId === 'saliency') return createSaliencyScene();
+    if (modeId === 'pipeline') return createPipelineScene();
+    return createDepthScene();
+  },
 };
 
-export default PlateHealios;
+export default healiosPlate;

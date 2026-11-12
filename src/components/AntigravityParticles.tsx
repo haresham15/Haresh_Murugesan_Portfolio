@@ -31,7 +31,8 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const drawRef = useRef<CanvasStageDraw>(() => {});
-  useCanvasStage(canvasRef, canvasRef, (ctx, stage) => drawRef.current(ctx, stage), { animate: !isReduced });
+  // The loop sleeps once the field settles and wakes on pointer input.
+  const { invalidate } = useCanvasStage(canvasRef, canvasRef, (ctx, stage) => drawRef.current(ctx, stage), { animate: !isReduced });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -63,6 +64,7 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
     };
 
     let SPACING = 56;
+    let lastInputAt = performance.now();
 
     class Particle {
       x0: number;
@@ -263,6 +265,9 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
         return;
       }
 
+      lastInputAt = performance.now();
+      invalidate();
+
       if (!mouse.active) {
         mouse.x = currentX;
         mouse.y = currentY;
@@ -293,12 +298,16 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
 
       // Gentle, subtle shockwave impulse on click or tap
       particles.forEach((p) => p.applyImpulse(currentX, currentY, 1.4));
+      lastInputAt = performance.now();
+      invalidate();
     };
 
     const handleMouseLeave = () => {
       mouse.active = false;
       mouse.x = -1000;
       mouse.y = -1000;
+      lastInputAt = performance.now();
+      invalidate();
     };
 
     window.addEventListener('mousemove', handlePointerMove, { passive: true });
@@ -325,11 +334,16 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
 
       const len = particles.length;
       const activeParticles: Particle[] = [];
+      let maxSpeed = 0;
+      let maxExcitationDelta = 0;
 
       for (let i = 0; i < len; i++) {
         const p = particles[i];
         if (p) {
+          const prevExcitation = p.excitation;
           p.update(time);
+          maxSpeed = Math.max(maxSpeed, Math.abs(p.vx) + Math.abs(p.vy));
+          maxExcitationDelta = Math.max(maxExcitationDelta, Math.abs(p.excitation - prevExcitation));
           if (p.proximity > 0.2 || p.excitation > 0.25) {
             activeParticles.push(p);
           }
@@ -365,6 +379,9 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
         }
       }
 
+      // Sleep once the field has settled: no input for a beat, no motion, no fading colour.
+      const settled = performance.now() - lastInputAt > 1200 && maxSpeed < 0.02 && maxExcitationDelta < 0.002;
+      return !settled;
     };
 
     return () => {
@@ -376,7 +393,7 @@ export const AntigravityParticles: React.FC<AntigravityParticlesProps> = ({ clas
       window.removeEventListener('touchstart', handlePointerDown);
       window.removeEventListener('touchend', handleMouseLeave);
     };
-  }, [isReduced]);
+  }, [isReduced, invalidate]);
 
   return (
     <canvas

@@ -1,475 +1,703 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useMotionPreference } from '../MotionPreference';
+import {
+  C, clamp, drawGrid, drawVignette, easeOutCubic, glow, label, lerp, phosphor, ramp, rgba,
+  type PlateDefinition, type PlateScene, type StageFrame,
+} from './stageKit';
 
-export type ApexisTab = 'oscilloscope' | 'sectors' | 'worker';
+/* ============================================================
+ * Lap model: closed centripetal Catmull-Rom circuit, curvature-limited
+ * speed with forward (traction) and backward (braking) passes.
+ * Two cars with different grip/power envelopes produce real deltas.
+ * Everything here is a simulation, not recorded telemetry.
+ * ============================================================ */
 
-export const PlateApexis: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ApexisTab>('oscilloscope');
-  const [scrubT, setScrubT] = useState<number>(0.48); // 0.0 to 1.0 along the lap
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
-  const [selectedSector, setSelectedSector] = useState<number | 'all'>('all');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const animFrameRef = useRef<number | null>(null);
-  const { isReduced } = useMotionPreference();
+const N = 720;
+const LAP_M = 5000;
+const PLAYBACK = 5; // sim seconds per wall second
 
-  // Dynamic telemetry metrics computed continuously from scrubT
-  // Sector 1: [0.0 - 0.33], Sector 2: [0.33 - 0.66], Sector 3: [0.66 - 1.0]
-  const currentSector = scrubT < 0.33 ? 1 : scrubT < 0.66 ? 2 : 3;
+const CONTROL: [number, number][] = [
+  [0.1, 0.62], [0.17, 0.3], [0.32, 0.17], [0.55, 0.2], [0.7, 0.11], [0.88, 0.2], [0.9, 0.42],
+  [0.76, 0.52], [0.81, 0.74], [0.63, 0.87], [0.46, 0.72], [0.3, 0.87], [0.14, 0.84],
+];
 
-  // Real-time speed trace modeling: fast straights (312 km/h), heavy braking into chicanes (118 km/h)
-  const baseSpeed =
-    currentSector === 1
-      ? 285 + Math.sin(scrubT * Math.PI * 6) * 32
-      : currentSector === 2
-      ? 195 + Math.sin(scrubT * Math.PI * 6) * 75
-      : 308 - Math.sin((scrubT - 0.66) * Math.PI * 4) * 45;
+interface Car { aLat: number; aAcc: number; aBrk: number; vTop: number }
+const CAR_A: Car = { aLat: 39, aAcc: 13.5, aBrk: 44, vTop: 91 };
+const CAR_B: Car = { aLat: 37.6, aAcc: 14.2, aBrk: 42.5, vTop: 92.2 };
 
-  const verSpeed = Math.round(baseSpeed);
-  const norSpeed = Math.round(baseSpeed * 0.985 - 2);
-  const lecSpeed = Math.round(baseSpeed * 0.97 - 5);
+interface CarTrace { v: Float32Array; thr: Float32Array; brk: Float32Array; t: Float32Array; lap: number }
+interface Lap {
+  x: Float32Array; // normalized track coords
+  y: Float32Array;
+  ds: number; // metres per sample
+  a: CarTrace;
+  b: CarTrace;
+  delta: Float32Array; // tB - tA at each sample
+  sectorIdx: [number, number, number];
+  sectorDelta: [number, number, number];
+}
 
-  const throttleVal = Math.max(0, Math.min(1, Math.sin(scrubT * Math.PI * 8) * 0.6 + 0.5));
-  const brakeVal = throttleVal < 0.25 ? (0.25 - throttleVal) * 4 : 0;
-  const sectorDelta = +(0.248 + Math.sin(scrubT * Math.PI * 4) * 0.045).toFixed(3);
+function catmull(points: [number, number][], samplesPer: number) {
+  const out: [number, number][] = [];
+  const n = points.length;
+  for (let i = 0; i < n; i++) {
+    const p0 = points[(i - 1 + n) % n];
+    const p1 = points[i];
+    const p2 = points[(i + 1) % n];
+    const p3 = points[(i + 2) % n];
+    const d = (a: [number, number], b: [number, number]) => Math.pow(Math.hypot(b[0] - a[0], b[1] - a[1]), 0.5) || 1e-4;
+    const t0 = 0;
+    const t1 = t0 + d(p0, p1);
+    const t2 = t1 + d(p1, p2);
+    const t3 = t2 + d(p2, p3);
+    for (let s = 0; s < samplesPer; s++) {
+      const t = t1 + ((t2 - t1) * s) / samplesPer;
+      const pt: [number, number] = [0, 0];
+      for (let k = 0; k < 2; k++) {
+        const A1 = ((t1 - t) / (t1 - t0)) * p0[k] + ((t - t0) / (t1 - t0)) * p1[k];
+        const A2 = ((t2 - t) / (t2 - t1)) * p1[k] + ((t - t1) / (t2 - t1)) * p2[k];
+        const A3 = ((t3 - t) / (t3 - t2)) * p2[k] + ((t - t2) / (t3 - t2)) * p3[k];
+        const B1 = ((t2 - t) / (t2 - t0)) * A1 + ((t - t0) / (t2 - t0)) * A2;
+        const B2 = ((t3 - t) / (t3 - t1)) * A2 + ((t - t1) / (t3 - t1)) * A3;
+        pt[k] = ((t2 - t) / (t2 - t1)) * B1 + ((t - t1) / (t2 - t1)) * B2;
+      }
+      out.push(pt);
+    }
+  }
+  return out;
+}
 
-  // Playback loop
-  useEffect(() => {
-    if (!isPlaying || isReduced) return;
-    let lastTime = performance.now();
+function simulate(kappa: Float32Array, ds: number, car: Car): CarTrace {
+  const vmax = new Float32Array(N);
+  for (let i = 0; i < N; i++) vmax[i] = Math.min(car.vTop, Math.sqrt(car.aLat / Math.max(Math.abs(kappa[i]), 1e-6)));
+  const v = new Float32Array(N);
+  // forward pass, two laps so the start converges on a periodic solution
+  let cur = vmax[0];
+  for (let k = 1; k < 2 * N; k++) {
+    const i = k % N;
+    const acc = car.aAcc * Math.max(0, 1 - cur / car.vTop) + 0.4;
+    cur = Math.min(vmax[i], Math.sqrt(cur * cur + 2 * acc * ds));
+    if (k >= N) v[i] = cur;
+  }
+  v[0] = Math.min(v[0] || cur, vmax[0]);
+  // backward pass
+  for (let pass = 0; pass < 2; pass++) {
+    for (let k = N - 1; k >= 0; k--) {
+      const nxt = v[(k + 1) % N];
+      v[k] = Math.min(v[k], Math.sqrt(nxt * nxt + 2 * car.aBrk * ds));
+    }
+  }
+  const thr = new Float32Array(N);
+  const brk = new Float32Array(N);
+  const t = new Float32Array(N);
+  let time = 0;
+  for (let i = 0; i < N; i++) {
+    const v0 = v[i];
+    const v1 = v[(i + 1) % N];
+    const aLong = (v1 * v1 - v0 * v0) / (2 * ds);
+    if (aLong < -2) {
+      brk[i] = clamp(-aLong / car.aBrk, 0, 1);
+      thr[i] = 0;
+    } else if (aLong > 0.6) {
+      thr[i] = clamp(0.55 + aLong / (car.aAcc * 0.8), 0, 1);
+    } else {
+      thr[i] = 0.3 + 0.7 * (v0 / car.vTop) ** 2;
+    }
+    t[i] = time;
+    time += ds / ((v0 + v1) / 2);
+  }
+  return { v, thr, brk, t, lap: time };
+}
 
-    const loop = (time: number) => {
-      const dt = (time - lastTime) / 1000;
-      lastTime = time;
-      setScrubT((prev) => (prev + dt * 0.065) % 1.0);
-      animFrameRef.current = requestAnimationFrame(loop);
-    };
-
-    animFrameRef.current = requestAnimationFrame(loop);
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [isPlaying, isReduced]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-    const t = x / rect.width;
-    setScrubT(t);
+let lapCache: Lap | null = null;
+function lap(): Lap {
+  if (lapCache) return lapCache;
+  const dense = catmull(CONTROL, 60);
+  const cum = [0];
+  for (let i = 1; i <= dense.length; i++) {
+    const a = dense[i - 1];
+    const b = dense[i % dense.length];
+    cum.push(cum[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1]));
+  }
+  const total = cum[cum.length - 1];
+  const x = new Float32Array(N);
+  const y = new Float32Array(N);
+  let j = 0;
+  for (let i = 0; i < N; i++) {
+    const s = (total * i) / N;
+    while (cum[j + 1] < s) j++;
+    const f = (s - cum[j]) / (cum[j + 1] - cum[j]);
+    const a = dense[j];
+    const b = dense[(j + 1) % dense.length];
+    x[i] = lerp(a[0], b[0], f);
+    y[i] = lerp(a[1], b[1], f);
+  }
+  const ds = LAP_M / N;
+  const head = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    const k = (i + 1) % N;
+    head[i] = Math.atan2(y[k] - y[i], x[k] - x[i]);
+  }
+  const raw = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    let d = head[i] - head[(i - 1 + N) % N];
+    while (d > Math.PI) d -= 2 * Math.PI;
+    while (d < -Math.PI) d += 2 * Math.PI;
+    raw[i] = d / ds;
+  }
+  const kappa = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    let s = 0;
+    for (let k = -3; k <= 3; k++) s += raw[(i + k + N) % N];
+    kappa[i] = s / 7;
+  }
+  const a = simulate(kappa, ds, CAR_A);
+  const b = simulate(kappa, ds, CAR_B);
+  const delta = new Float32Array(N);
+  for (let i = 0; i < N; i++) delta[i] = b.t[i] - a.t[i];
+  const s1 = Math.round(N / 3);
+  const s2 = Math.round((2 * N) / 3);
+  const end = (tr: CarTrace, i: number) => (i >= N ? tr.lap : tr.t[i]);
+  const sec = (i0: number, i1: number) => end(b, i1) - b.t[i0] - (end(a, i1) - a.t[i0]);
+  lapCache = {
+    x, y, ds, a, b, delta,
+    sectorIdx: [0, s1, s2],
+    sectorDelta: [sec(0, s1), sec(s1, s2), sec(s2, N)],
   };
+  return lapCache;
+}
 
-  return (
-    <div className="w-full flex flex-col justify-between select-none">
-      {/* ROW 1: HTML Controls (clean underline mode tabs, toggles) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#2563EB]/20 text-xs font-mono">
-        {/* Left: Mode Underline Tabs */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          {(
-            [
-              { id: 'oscilloscope', label: 'Oscilloscope Traces' },
-              { id: 'sectors', label: 'Sector Delta Map' },
-              { id: 'worker', label: 'Worker Frame Budget' },
-            ] as const
-          ).map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              aria-pressed={activeTab === tab.id}
-              className={`pb-1 transition-colors cursor-pointer text-xs font-mono tracking-wider min-h-[36px] flex items-center ${
-                activeTab === tab.id
-                  ? 'text-[#F4F6F9] border-b-2 border-[#FF2800] font-semibold'
-                  : 'text-[#7E8B9B] hover:text-[#C8D2E0] border-b-2 border-transparent'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+/** Index at which a car has covered `tau` seconds of its lap. */
+function indexAtTime(tr: CarTrace, tau: number): number {
+  const t = ((tau % tr.lap) + tr.lap) % tr.lap;
+  let lo = 0;
+  let hi = N - 1;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (tr.t[mid] <= t) lo = mid;
+    else hi = mid - 1;
+  }
+  return lo;
+}
 
-        {/* Right: Contextual HTML Controls */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={() => setIsPlaying((p) => !p)}
-            className="px-2.5 py-1 min-h-[32px] bg-[#0B1E40] hover:bg-[#153875] text-[#F4F6F9] border border-[#2563EB]/30 rounded-[2px] transition-colors cursor-pointer text-[11px]"
-          >
-            {isPlaying ? '⏸ PAUSE' : '▶ PLAY'}
-          </button>
+const kmh = (ms: number) => Math.round(ms * 3.6);
+const signed = (s: number, d = 3) => `${s >= 0 ? '+' : '−'}${Math.abs(s).toFixed(d)}`;
+const sectorOf = (i: number, L: Lap) => (i < L.sectorIdx[1] ? 0 : i < L.sectorIdx[2] ? 1 : 2);
 
-          <label className="flex items-center gap-2 text-[#7E8B9B] text-[11px]">
-            <span>Lap:</span>
-            <input
-              type="range"
-              min="0"
-              max="1000"
-              value={Math.round(scrubT * 1000)}
-              onChange={(e) => {
-                setIsPlaying(false);
-                setScrubT(Number(e.target.value) / 1000);
-              }}
-              aria-label="Lap Position Scrubber"
-              className="w-20 sm:w-28 accent-[#FF2800] cursor-ew-resize"
-            />
-          </label>
-        </div>
-      </div>
+/* ---------- 1. oscilloscope ---------- */
 
-      {/* ROW 2: Flexible canvas/drawing container (min-height: 0, height ~460px on desktop, ~280px on mobile) */}
-      <div className="relative w-full min-h-0 h-[280px] sm:h-[360px] lg:h-[460px] flex items-center justify-center my-3 overflow-hidden bg-[#03050A]/80 border border-[#2563EB]/15">
-        {/* TAB 1: Oscilloscope Traces with Live Mouse Scrubbing */}
-        {activeTab === 'oscilloscope' && (
-          <div
-            ref={containerRef}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsPlaying(false)}
-            onMouseLeave={() => setIsPlaying(true)}
-            className="relative w-full h-full flex flex-col justify-between cursor-ew-resize p-3 sm:p-4"
-          >
-            <div className="relative w-full h-full flex items-center justify-center">
-              <svg viewBox="0 0 640 320" className="w-full h-full max-h-[420px] overflow-visible">
-                <defs>
-                  <linearGradient id="apexisTraceGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#FF2800" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#FF2800" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
+function createScopeScene(): PlateScene {
+  const L = lap();
+  const box = { x0: 0, x1: 0 };
+  const geo = (f: StageFrame) => {
+    box.x0 = 50;
+    box.x1 = f.width - 18;
+  };
+  const xOf = (i: number) => box.x0 + (i / (N - 1)) * (box.x1 - box.x0);
 
-                {/* Y-Axis Speed Reference Guidelines */}
-                <line x1="0" y1="50" x2="640" y2="50" stroke="rgba(200, 210, 224, 0.08)" strokeDasharray="3 3" />
-                <line x1="0" y1="120" x2="640" y2="120" stroke="rgba(200, 210, 224, 0.08)" strokeDasharray="3 3" />
-                <line x1="0" y1="190" x2="640" y2="190" stroke="rgba(200, 210, 224, 0.08)" strokeDasharray="3 3" />
-                <line x1="0" y1="260" x2="640" y2="260" stroke="rgba(200, 210, 224, 0.08)" strokeDasharray="3 3" />
+  return {
+    idle(f) {
+      geo(f);
+      return [xOf(indexAtTime(L.a, f.time * PLAYBACK)), f.height * 0.5];
+    },
+    draw(ctx, f) {
+      geo(f);
+      const { width: w, height: h } = f;
+      drawVignette(ctx, w, h);
+      const intro = easeOutCubic(f.age / 0.7);
+      const top = 34;
+      const avail = h - top - 12;
+      const ch = [
+        { key: 'speed', h: 0.44, lo: 0, hi: 100 },
+        { key: 'thr', h: 0.15, lo: 0, hi: 1 },
+        { key: 'brk', h: 0.15, lo: 0, hi: 1 },
+        { key: 'delta', h: 0.18, lo: 0, hi: 0 },
+      ];
+      let maxD = 0;
+      for (let i = 0; i < N; i++) maxD = Math.max(maxD, Math.abs(L.delta[i]));
+      ch[3].lo = -maxD * 1.15;
+      ch[3].hi = maxD * 1.15;
+      const gap = 8;
+      const usable = avail - gap * (ch.length - 1);
+      let yCursor = top;
+      const rows = ch.map((c) => {
+        const r = { ...c, y0: yCursor, y1: yCursor + usable * c.h / 0.92 };
+        yCursor = r.y1 + gap;
+        return r;
+      });
 
-                <text x="10" y="46" fill="#7E8B9B" fontSize="9" fontFamily="monospace">320 km/h</text>
-                <text x="10" y="116" fill="#7E8B9B" fontSize="9" fontFamily="monospace">240 km/h</text>
-                <text x="10" y="186" fill="#7E8B9B" fontSize="9" fontFamily="monospace">160 km/h</text>
-                <text x="10" y="256" fill="#7E8B9B" fontSize="9" fontFamily="monospace">80 km/h</text>
+      const idx = clamp(Math.round(((f.pointer.x - box.x0) / (box.x1 - box.x0)) * (N - 1)), 0, N - 1);
+      const sec = sectorOf(idx, L);
 
-                {/* Sector 1/2/3 Vertical Divisions */}
-                <line x1="213" y1="20" x2="213" y2="290" stroke="rgba(37, 99, 235, 0.3)" strokeDasharray="4 4" />
-                <line x1="426" y1="20" x2="426" y2="290" stroke="rgba(37, 99, 235, 0.3)" strokeDasharray="4 4" />
-                <text x="100" y="32" fill="#7E8B9B" fontSize="10" fontFamily="monospace" textAnchor="middle">SECTOR 1 (SPEED TRAP)</text>
-                <text x="320" y="32" fill="#7E8B9B" fontSize="10" fontFamily="monospace" textAnchor="middle">SECTOR 2 (TECHNICAL)</text>
-                <text x="533" y="32" fill="#7E8B9B" fontSize="10" fontFamily="monospace" textAnchor="middle">SECTOR 3 (FULL ACCEL)</text>
+      // sector bands
+      for (let s = 0; s < 3; s++) {
+        const i0 = L.sectorIdx[s];
+        const i1 = s === 2 ? N - 1 : L.sectorIdx[s + 1];
+        const x0 = xOf(i0);
+        const x1 = xOf(i1);
+        if (s === sec) {
+          const g = ctx.createLinearGradient(0, top, 0, h);
+          g.addColorStop(0, rgba(C.cobalt, 0.09));
+          g.addColorStop(1, rgba(C.cobalt, 0.0));
+          ctx.fillStyle = g;
+          ctx.fillRect(x0, top - 18, x1 - x0, h - top + 18);
+        }
+        if (s > 0) {
+          ctx.save();
+          ctx.setLineDash([2, 4]);
+          ctx.lineWidth = 0.5;
+          ctx.strokeStyle = rgba(C.silver, 0.3);
+          ctx.beginPath();
+          ctx.moveTo(x0 + 0.25, top - 18);
+          ctx.lineTo(x0 + 0.25, h - 10);
+          ctx.stroke();
+          ctx.restore();
+        }
+        const d = L.sectorDelta[s];
+        label(ctx, `S${s + 1}`, x0 + 6, top - 8, s === sec ? C.alabaster : C.titanium, 10);
+        label(ctx, `${signed(d)} s`, x0 + 26, top - 8, d >= 0 ? C.red : C.cobalt, 10);
+      }
 
-                {/* Lead Car (VER) Speed Trace (#FF2800) */}
-                <path
-                  d="M 0 70 C 70 50, 140 75, 213 60 C 270 170, 330 210, 426 150 C 490 70, 560 48, 640 55"
-                  fill="none"
-                  stroke="#FF2800"
-                  strokeWidth="2.8"
-                />
+      const seriesY = (r: (typeof rows)[number], v: number) => r.y1 - ((v - r.lo) / (r.hi - r.lo)) * (r.y1 - r.y0);
+      const reveal = Math.floor((N - 1) * intro);
 
-                {/* Chasing Car 1 (NOR) Speed Trace (#2563EB) */}
-                <path
-                  d="M 0 78 C 70 60, 140 82, 213 68 C 270 178, 330 218, 426 158 C 490 78, 560 56, 640 64"
-                  fill="none"
-                  stroke="#2563EB"
-                  strokeWidth="2"
-                  strokeDasharray="5 3"
-                />
+      const trace = (r: (typeof rows)[number], arr: Float32Array, scale: number, color: string, core: number, halo: number) => {
+        ctx.beginPath();
+        for (let i = 0; i <= reveal; i++) {
+          const x = xOf(i);
+          const y = seriesY(r, arr[i] * scale);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        phosphor(ctx, color, core, halo);
+      };
 
-                {/* Chasing Car 2 (LEC) Speed Trace (#C8D2E0) */}
-                <path
-                  d="M 0 86 C 70 68, 140 90, 213 76 C 270 186, 330 226, 426 166 C 490 86, 560 64, 640 72"
-                  fill="none"
-                  stroke="#C8D2E0"
-                  strokeWidth="1.2"
-                  strokeDasharray="2 2"
-                  opacity="0.75"
-                />
+      rows.forEach((r, ri) => {
+        // channel frame + gridlines
+        ctx.save();
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = rgba(C.silver, 0.1);
+        ctx.beginPath();
+        ctx.moveTo(box.x0, r.y1 + 0.25);
+        ctx.lineTo(box.x1, r.y1 + 0.25);
+        if (r.key === 'speed') {
+          for (const kv of [100, 200, 300]) {
+            const y = seriesY(r, kv / 3.6);
+            ctx.moveTo(box.x0, y);
+            ctx.lineTo(box.x1, y);
+          }
+        }
+        if (r.key === 'delta') {
+          const y = seriesY(r, 0);
+          ctx.moveTo(box.x0, y);
+          ctx.lineTo(box.x1, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+        const name = ['speed', 'throttle', 'brake', 'gap'][ri];
+        label(ctx, name, 8, r.y0 + 10, C.titanium, 9);
+        if (r.key === 'speed') {
+          for (const kv of [100, 200, 300]) label(ctx, String(kv), box.x0 - 6, seriesY(r, kv / 3.6) + 3, rgba(C.titanium, 0.8), 9, 'right');
+        }
 
-                {/* Interactive Scrubber Cursor Line */}
-                <line
-                  x1={scrubT * 640}
-                  y1="20"
-                  x2={scrubT * 640}
-                  y2="295"
-                  stroke="#FFFFFF"
-                  strokeWidth="1.5"
-                />
+        if (r.key === 'speed') {
+          // area under car A for depth
+          const g = ctx.createLinearGradient(0, r.y0, 0, r.y1);
+          g.addColorStop(0, rgba(C.red, 0.16));
+          g.addColorStop(1, rgba(C.red, 0));
+          ctx.beginPath();
+          ctx.moveTo(xOf(0), r.y1);
+          for (let i = 0; i <= reveal; i++) ctx.lineTo(xOf(i), seriesY(r, L.a.v[i]));
+          ctx.lineTo(xOf(reveal), r.y1);
+          ctx.closePath();
+          ctx.fillStyle = g;
+          ctx.fill();
+          trace(r, L.b.v, 1, C.cobalt, 0.75, 0.1);
+          trace(r, L.a.v, 1, C.red, 1, 0.12);
+        } else if (r.key === 'thr') {
+          trace(r, L.b.thr, 1, C.cobalt, 0.5, 0.06);
+          trace(r, L.a.thr, 1, C.silver, 0.75, 0.08);
+        } else if (r.key === 'brk') {
+          trace(r, L.b.brk, 1, C.cobalt, 0.5, 0.06);
+          trace(r, L.a.brk, 1, C.red, 0.75, 0.1);
+        } else {
+          // gap: fill red where car B is behind, cobalt where ahead
+          const zero = seriesY(r, 0);
+          for (const sign of [1, -1]) {
+            ctx.beginPath();
+            ctx.moveTo(xOf(0), zero);
+            for (let i = 0; i <= reveal; i++) {
+              const d = L.delta[i];
+              ctx.lineTo(xOf(i), seriesY(r, sign > 0 ? Math.max(0, d) : Math.min(0, d)));
+            }
+            ctx.lineTo(xOf(reveal), zero);
+            ctx.closePath();
+            ctx.fillStyle = rgba(sign > 0 ? C.red : C.cobalt, 0.22);
+            ctx.fill();
+          }
+          trace(r, L.delta, 1, C.silver, 0.5, 0.06);
+        }
+      });
 
-                {/* Active Vehicle Intersection Node */}
-                <circle
-                  cx={scrubT * 640}
-                  cy={
-                    currentSector === 1
-                      ? 68 + Math.sin(scrubT * Math.PI * 6) * 12
-                      : currentSector === 2
-                      ? 165 - Math.sin(scrubT * Math.PI * 6) * 35
-                      : 55
-                  }
-                  r="5"
-                  fill="#FF2800"
-                  stroke="#FFFFFF"
-                  strokeWidth="1.8"
-                  className="shadow-[0_0_10px_rgba(255,40,0,0.8)]"
-                />
+      // persistence sweep: bright window behind the playhead
+      const span = 70;
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      for (let k = 0; k < span; k += 2) {
+        const i = idx - k;
+        if (i < 1) break;
+        const al = (1 - k / span) * 0.5;
+        const r0 = rows[0];
+        ctx.strokeStyle = rgba(C.red, al);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(xOf(i - 2), seriesY(r0, L.a.v[i - 2] ?? L.a.v[i]));
+        ctx.lineTo(xOf(i), seriesY(r0, L.a.v[i]));
+        ctx.stroke();
+      }
+      ctx.restore();
 
-                {/* Real-time floating telemetry tag next to scrubber */}
-                <rect
-                  x={Math.min(scrubT * 640 + 8, 520)}
-                  y="60"
-                  width="110"
-                  height="34"
-                  fill="#03050A"
-                  stroke="#FF2800"
-                  strokeWidth="1"
-                />
-                <text x={Math.min(scrubT * 640 + 14, 526)} y="74" fill="#F4F6F9" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                  VER {verSpeed} km/h
-                </text>
-                <text x={Math.min(scrubT * 640 + 14, 526)} y="88" fill="#2563EB" fontSize="9" fontFamily="monospace">
-                  ΔNOR +{sectorDelta}s
-                </text>
-              </svg>
-            </div>
-          </div>
-        )}
+      // scrub line
+      const sx = xOf(idx);
+      ctx.save();
+      const g = ctx.createLinearGradient(0, top - 18, 0, h);
+      g.addColorStop(0, rgba(C.alabaster, 0));
+      g.addColorStop(0.15, rgba(C.alabaster, 0.75));
+      g.addColorStop(1, rgba(C.alabaster, 0.15));
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(sx + 0.25, top - 18);
+      ctx.lineTo(sx + 0.25, h - 8);
+      ctx.stroke();
+      ctx.restore();
+      const dots: [number, string][] = [
+        [seriesY(rows[0], L.a.v[idx]), C.red],
+        [seriesY(rows[0], L.b.v[idx]), C.cobalt],
+        [seriesY(rows[1], L.a.thr[idx]), C.silver],
+        [seriesY(rows[2], L.a.brk[idx]), C.red],
+        [seriesY(rows[3], L.delta[idx]), C.silver],
+      ];
+      for (const [y, col] of dots) {
+        glow(ctx, sx, y, 10, col, 0.55);
+        ctx.fillStyle = C.alabaster;
+        ctx.beginPath();
+        ctx.arc(sx, y, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      const tagX = sx + 8 > w - 120 ? sx - 8 : sx + 8;
+      const align: CanvasTextAlign = sx + 8 > w - 120 ? 'right' : 'left';
+      label(ctx, `A ${kmh(L.a.v[idx])}`, tagX, rows[0].y0 + 12, C.red, 10, align);
+      label(ctx, `B ${kmh(L.b.v[idx])}`, tagX, rows[0].y0 + 25, C.cobalt, 10, align);
 
-        {/* TAB 2: Sector Delta Map (Full 2D Grand Prix Circuit Track SVG) */}
-        {activeTab === 'sectors' && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center p-3 sm:p-4">
-            <svg viewBox="0 0 640 320" className="w-full h-full max-h-[420px] overflow-visible">
-              {/* Circuit Grid Coordinate Pattern */}
-              <defs>
-                <pattern id="apexisTrackGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <line x1="0" y1="0" x2="20" y2="0" stroke="rgba(37, 99, 235, 0.05)" strokeWidth="0.5" />
-                  <line x1="0" y1="0" x2="0" y2="20" stroke="rgba(37, 99, 235, 0.05)" strokeWidth="0.5" />
-                </pattern>
-              </defs>
-              <rect width="640" height="320" fill="url(#apexisTrackGrid)" />
+      label(ctx, 'simulated lap · car A vs car B', w - 18, 14, C.titanium, 9, 'right');
 
-              {/* F1 Circuit Track Geometry divided into 3 Sectors */}
-              {/* Sector 1: Reddish-Orange (#FF2800) */}
-              <path
-                d="M 120 70 L 460 70 C 530 70, 560 110, 560 150"
-                fill="none"
-                stroke="#FF2800"
-                strokeWidth="10"
-                strokeLinecap="round"
-              />
-              {/* Sector 2: Electric Cobalt (#2563EB) */}
-              <path
-                d="M 560 150 C 560 210, 480 250, 400 230 C 350 215, 330 250, 270 250"
-                fill="none"
-                stroke="#2563EB"
-                strokeWidth="10"
-                strokeLinecap="round"
-              />
-              {/* Sector 3: Green / Silver (#4CC38A) */}
-              <path
-                d="M 270 250 C 180 250, 100 230, 80 170 C 60 110, 80 70, 120 70"
-                fill="none"
-                stroke="#4CC38A"
-                strokeWidth="10"
-                strokeLinecap="round"
-              />
+      return `S${sec + 1} · ${((idx * L.ds) / 1000).toFixed(2)} km · A ${kmh(L.a.v[idx])} · B ${kmh(L.b.v[idx])} km/h · gap ${signed(L.delta[idx])} s`;
+    },
+  };
+}
 
-              {/* Track Centerline Guide */}
-              <path
-                d="M 120 70 L 460 70 C 530 70, 560 110, 560 150 C 560 210, 480 250, 400 230 C 350 215, 330 250, 270 250 C 180 250, 100 230, 80 170 C 60 110, 80 70, 120 70"
-                fill="none"
-                stroke="#F4F6F9"
-                strokeWidth="1.2"
-                strokeDasharray="4 4"
-                opacity="0.8"
-              />
+/* ---------- 2. track map with sector deltas ---------- */
 
-              {/* Sector 1 Callout */}
-              <g transform="translate(280, 45)">
-                <rect x="-80" y="-12" width="160" height="24" fill="#03050A" stroke="#FF2800" strokeWidth="1" />
-                <text x="0" y="4" fill="#FF2800" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="middle">
-                  S1: SPEED TRAP 324.8 km/h (-0.112s)
-                </text>
-              </g>
+function createTrackScene(): PlateScene {
+  const L = lap();
+  const map = { ox: 0, oy: 0, k: 1 };
+  const fit = (f: StageFrame) => {
+    // circuit spans x 0.10–0.90, y 0.11–0.87 in control space
+    const pad = 44;
+    map.k = Math.min((f.width - pad * 2) / 0.8, (f.height - pad * 2 - 16) / 0.76);
+    map.ox = f.width / 2 - 0.5 * map.k;
+    map.oy = f.height / 2 - 0.49 * map.k - 4;
+  };
+  const px = (i: number) => map.ox + L.x[i] * map.k;
+  const py = (i: number) => map.oy + L.y[i] * map.k;
+  // d(gap)/ds: where car B loses (+) or gains (−) time
+  const rate = new Float32Array(N);
+  let maxRate = 0;
+  for (let i = 0; i < N; i++) {
+    rate[i] = L.delta[(i + 1) % N] - L.delta[i] + (i === N - 1 ? L.b.lap - L.a.lap : 0);
+    maxRate = Math.max(maxRate, Math.abs(rate[i]));
+  }
+  const trail: number[] = [];
 
-              {/* Sector 2 Callout */}
-              <g transform="translate(480, 275)">
-                <rect x="-80" y="-12" width="160" height="24" fill="#03050A" stroke="#2563EB" strokeWidth="1" />
-                <text x="0" y="4" fill="#2563EB" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="middle">
-                  S2: CHICANE 118.4 km/h (+0.045s)
-                </text>
-              </g>
+  return {
+    idle(f) {
+      fit(f);
+      const i = indexAtTime(L.a, f.time * PLAYBACK);
+      return [px(i), py(i)];
+    },
+    draw(ctx, f) {
+      fit(f);
+      const { width: w, height: h } = f;
+      drawVignette(ctx, w, h);
+      drawGrid(ctx, w, h, 28, 0.04);
+      const intro = easeOutCubic(f.age / 0.9);
+      const reveal = Math.floor(N * intro);
 
-              {/* Sector 3 Callout */}
-              <g transform="translate(150, 280)">
-                <rect x="-80" y="-12" width="160" height="24" fill="#03050A" stroke="#4CC38A" strokeWidth="1" />
-                <text x="0" y="4" fill="#4CC38A" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="middle">
-                  S3: ACCEL 310.2 km/h (-0.081s)
-                </text>
-              </g>
+      // asphalt ribbon
+      ctx.save();
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      for (let i = 0; i <= reveal; i++) {
+        const j = i % N;
+        if (i === 0) ctx.moveTo(px(j), py(j));
+        else ctx.lineTo(px(j), py(j));
+      }
+      ctx.strokeStyle = rgba(C.cobaltDeep, 0.9);
+      ctx.lineWidth = 12;
+      ctx.stroke();
+      ctx.strokeStyle = rgba(C.silver, 0.08);
+      ctx.lineWidth = 13;
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.stroke();
+      ctx.restore();
 
-              {/* Animated / Scrubbed Car Position on Circuit */}
-              {(() => {
-                // Approximate coordinate mapping along the circuit path
-                let cx = 120;
-                let cy = 70;
-                if (scrubT < 0.33) {
-                  const t = scrubT / 0.33;
-                  cx = 120 + t * 440;
-                  cy = 70 + t * 40;
-                } else if (scrubT < 0.66) {
-                  const t = (scrubT - 0.33) / 0.33;
-                  cx = 560 - t * 290;
-                  cy = 150 + t * 100;
-                } else {
-                  const t = (scrubT - 0.66) / 0.34;
-                  cx = 270 - t * 150;
-                  cy = 250 - t * 180;
-                }
-                return (
-                  <g transform={`translate(${cx}, ${cy})`}>
-                    <circle r="9" fill="#FF2800" className="animate-ping opacity-75" />
-                    <circle r="6" fill="#FF2800" stroke="#FFFFFF" strokeWidth="2" />
-                    <text x="12" y="4" fill="#F4F6F9" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                      CAR 01
-                    </text>
-                  </g>
-                );
-              })()}
-            </svg>
-          </div>
-        )}
+      // delta-coloured racing line
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.lineCap = 'round';
+      for (let i = 0; i < reveal; i++) {
+        const j = (i + 1) % N;
+        const r = rate[i] / (maxRate || 1);
+        const col = r >= 0 ? C.red : C.cobalt;
+        ctx.strokeStyle = rgba(col, 0.25 + Math.abs(r) * 0.75);
+        ctx.lineWidth = 1 + Math.abs(r) * 2.2;
+        ctx.beginPath();
+        ctx.moveTo(px(i), py(i));
+        ctx.lineTo(px(j), py(j));
+        ctx.stroke();
+      }
+      ctx.restore();
 
-        {/* TAB 3: Web Worker Frame Budget (Visualized 16.6ms Execution Breakdown SVG) */}
-        {activeTab === 'worker' && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center p-3 sm:p-4">
-            <svg viewBox="0 0 640 320" className="w-full h-full max-h-[420px] overflow-visible">
-              {/* Title Header */}
-              <text x="30" y="40" fill="#F4F6F9" fontSize="14" fontFamily="sans-serif" fontWeight="bold">
-                DEDICATED WEB WORKER FRAME BUDGET (16.67ms @ 60 FPS)
-              </text>
-              <text x="30" y="58" fill="#7E8B9B" fontSize="10" fontFamily="monospace">
-                Total Budget: 16.67ms | Parallel Execution: Off-Main-Thread Web Workers | Zero UI Jank
-              </text>
+      // sector gates
+      for (let s = 0; s < 3; s++) {
+        const i = L.sectorIdx[s];
+        const j = (i + 1) % N;
+        const tx = px(j) - px(i);
+        const ty = py(j) - py(i);
+        const len = Math.hypot(tx, ty) || 1;
+        const nx = -ty / len;
+        const ny = tx / len;
+        ctx.save();
+        ctx.strokeStyle = s === 0 ? C.alabaster : rgba(C.silver, 0.7);
+        ctx.lineWidth = s === 0 ? 1.2 : 0.75;
+        ctx.beginPath();
+        ctx.moveTo(px(i) - nx * 10, py(i) - ny * 10);
+        ctx.lineTo(px(i) + nx * 10, py(i) + ny * 10);
+        ctx.stroke();
+        ctx.restore();
+        const lx = px(i) + nx * 24;
+        const ly = py(i) + ny * 24;
+        const d = L.sectorDelta[s];
+        label(ctx, `S${s + 1}`, lx, ly, C.alabaster, 10, 'center');
+        label(ctx, `${signed(d)} s`, lx, ly + 13, d >= 0 ? C.red : C.cobalt, 10, 'center');
+      }
 
-              {/* 16.67ms Total Frame Window Boundary */}
-              <rect x="30" y="80" width="580" height="42" fill="#060A12" stroke="#2563EB" strokeWidth="1" />
+      // cars
+      const tau = f.time * PLAYBACK;
+      const ia = indexAtTime(L.a, tau);
+      const ib = indexAtTime(L.b, tau);
+      trail.push(ia);
+      if (trail.length > 40) trail.shift();
+      for (let k = 1; k < trail.length; k++) {
+        const i0 = trail[k - 1];
+        const i1 = trail[k];
+        if (Math.abs(i1 - i0) > N / 2) continue;
+        ctx.strokeStyle = rgba(C.red, (k / trail.length) * 0.8);
+        ctx.lineWidth = 2.5 * (k / trail.length);
+        ctx.beginPath();
+        ctx.moveTo(px(i0), py(i0));
+        ctx.lineTo(px(i1), py(i1));
+        ctx.stroke();
+      }
+      for (const [i, col] of [[ib, C.cobalt], [ia, C.red]] as const) {
+        glow(ctx, px(i), py(i), 18, col, 0.7);
+        ctx.fillStyle = C.alabaster;
+        ctx.beginPath();
+        ctx.arc(px(i), py(i), 2.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
-              {/* Segment 1: Physics Engine Worker (5.4ms / 32.4% -> 188px) */}
-              <rect x="30" y="80" width="188" height="42" fill="#2563EB" opacity="0.85" />
-              <text x="40" y="105" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" fontWeight="bold">
-                Kinetic Physics (5.4ms)
-              </text>
+      // cursor snaps to nearest racing-line sample
+      let best = 0;
+      let bestD = Infinity;
+      for (let i = 0; i < N; i += 2) {
+        const d = (px(i) - f.pointer.x) ** 2 + (py(i) - f.pointer.y) ** 2;
+        if (d < bestD) { bestD = d; best = i; }
+      }
+      const near = Math.sqrt(bestD) < 60;
+      if (near && f.pointer.presence > 0.05) {
+        const x = px(best);
+        const y = py(best);
+        ctx.save();
+        ctx.globalAlpha = f.pointer.presence;
+        ctx.strokeStyle = C.alabaster;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.arc(x, y, 7, 0, Math.PI * 2);
+        ctx.stroke();
+        const right = x < w - 130;
+        label(ctx, `A ${kmh(L.a.v[best])}  B ${kmh(L.b.v[best])}`, x + (right ? 12 : -12), y - 6, C.alabaster, 10, right ? 'left' : 'right');
+        label(ctx, `gap ${signed(L.delta[best])} s`, x + (right ? 12 : -12), y + 8, C.silver, 10, right ? 'left' : 'right');
+        ctx.restore();
+      }
 
-              {/* Segment 2: Aerodynamics & Tire Decay (3.8ms / 22.8% -> 132px) */}
-              <rect x="218" y="80" width="132" height="42" fill="#153875" />
-              <text x="228" y="105" fill="#F4F6F9" fontSize="10" fontFamily="sans-serif">
-                Aero &amp; Tires (3.8ms)
-              </text>
+      label(ctx, 'red: car B losing time · blue: car B gaining', 16, h - 14, C.titanium, 9);
+      const i = near ? best : ia;
+      return `S${sectorOf(i, L) + 1} · lap A ${L.a.lap.toFixed(3)} s · B ${L.b.lap.toFixed(3)} s · ${kmh(L.a.v[i])} / ${kmh(L.b.v[i])} km/h`;
+    },
+  };
+}
 
-              {/* Segment 3: Tesseract.js Broadcast OCR (4.6ms / 27.6% -> 160px) */}
-              <rect x="350" y="80" width="160" height="42" fill="#FF2800" opacity="0.9" />
-              <text x="360" y="105" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" fontWeight="bold">
-                Broadcast OCR (4.6ms)
-              </text>
+/* ---------- 3. ring buffer ---------- */
 
-              {/* Segment 4: SQLite WASM Historical Lookups (1.9ms / 11.4% -> 66px) */}
-              <rect x="510" y="80" width="66" height="42" fill="#C8D2E0" />
-              <text x="515" y="105" fill="#03050A" fontSize="9" fontFamily="monospace" fontWeight="bold">
-                SQLite (1.9ms)
-              </text>
+const SLOTS = 256;
+const READ_LAG = 12;
 
-              {/* Main UI Thread Dispatch (Only 0.97ms -> 34px) */}
-              <rect x="576" y="80" width="34" height="42" fill="#4CC38A" />
+function createRingScene(): PlateScene {
+  const L = lap();
+  const speed = new Float32Array(SLOTS);
+  const thr = new Float32Array(SLOTS);
+  const brk = new Float32Array(SLOTS);
+  const seq = new Uint32Array(SLOTS);
+  let written = 0;
+  let acc = 0;
+  let frameMs = 0;
+  const push = (simTime: number) => {
+    const i = indexAtTime(L.a, simTime);
+    const slot = written % SLOTS;
+    speed[slot] = L.a.v[i];
+    thr[slot] = L.a.thr[i];
+    brk[slot] = L.a.brk[i];
+    seq[slot] = written;
+    written++;
+  };
+  // pre-fill a full ring so it wraps immediately
+  for (let k = 0; k < SLOTS; k++) push((k * PLAYBACK) / 60);
+  const geo = { cx: 0, cy: 0, r0: 0, r1: 0 };
 
-              {/* 16.67ms Deadline Line */}
-              <line x1="610" y1="70" x2="610" y2="135" stroke="#FF2800" strokeWidth="2" strokeDasharray="3 3" />
-              <text x="610" y="65" fill="#FF2800" fontSize="10" fontFamily="monospace" textAnchor="end" fontWeight="bold">
-                16.67ms HARD CAP
-              </text>
+  return {
+    idle(f) {
+      const a = f.time * 0.6;
+      return [geo.cx + Math.cos(a) * (geo.r0 + geo.r1) * 0.5, geo.cy + Math.sin(a) * (geo.r0 + geo.r1) * 0.5];
+    },
+    draw(ctx, f) {
+      const { width: w, height: h } = f;
+      drawVignette(ctx, w, h);
+      geo.cx = w / 2;
+      geo.cy = h / 2 + 4;
+      const R = Math.min(w, h) * 0.44;
+      geo.r1 = R;
+      geo.r0 = R * 0.52;
+      const intro = easeOutCubic(f.age / 0.8);
 
-              {/* Main Thread Headroom Visualization */}
-              <rect x="30" y="150" width="580" height="32" fill="#060A12" stroke="rgba(200, 210, 224, 0.15)" />
-              <rect x="30" y="150" width="34" height="32" fill="#4CC38A" />
-              <text x="40" y="171" fill="#03050A" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                0.97ms
-              </text>
-              <text x="80" y="171" fill="#7E8B9B" fontSize="11" fontFamily="sans-serif">
-                Main Thread Render Dispatch (15.70ms Idle Headroom — 94.2% Free)
-              </text>
+      // 60 Hz producer, frame-rate independent
+      if (f.dt > 0) {
+        acc += f.dt;
+        while (acc >= 1 / 60) {
+          acc -= 1 / 60;
+          push(((written) * PLAYBACK) / 60);
+        }
+        frameMs = frameMs ? lerp(frameMs, f.dt * 1000, 0.08) : f.dt * 1000;
+      }
 
-              {/* Comparative Feature Matrix */}
-              <line x1="30" y1="205" x2="610" y2="205" stroke="rgba(37, 99, 235, 0.25)" />
-              <g transform="translate(30, 230)">
-                <text x="0" y="0" fill="#7E8B9B" fontSize="10" fontFamily="monospace">OFF-THREAD WORKER:</text>
-                <text x="0" y="18" fill="#F4F6F9" fontSize="12" fontFamily="sans-serif" fontWeight="bold">60.0 FPS Locked</text>
-                <text x="0" y="34" fill="#4CC38A" fontSize="10" fontFamily="monospace">0 Dropped Frames</text>
-              </g>
+      const head = (written - 1) % SLOTS;
+      const ang = (slot: number) => -Math.PI / 2 + (slot / SLOTS) * Math.PI * 2;
 
-              <g transform="translate(230, 230)">
-                <text x="0" y="0" fill="#7E8B9B" fontSize="10" fontFamily="monospace">HISTORICAL ARCHIVE:</text>
-                <text x="0" y="18" fill="#F4F6F9" fontSize="12" fontFamily="sans-serif" fontWeight="bold">1950–Present F1</text>
-                <text x="0" y="34" fill="#4CC38A" fontSize="10" fontFamily="monospace">&lt; 12ms Query Latency</text>
-              </g>
+      // guide rings
+      ctx.save();
+      ctx.lineWidth = 0.5;
+      for (const [r, a] of [[geo.r0, 0.25], [geo.r1, 0.12], [geo.r0 - 10, 0.1]] as const) {
+        ctx.strokeStyle = rgba(C.silver, a);
+        ctx.beginPath();
+        ctx.arc(geo.cx, geo.cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
 
-              <g transform="translate(430, 230)">
-                <text x="0" y="0" fill="#7E8B9B" fontSize="10" fontFamily="monospace">VIDEO STREAM OCR:</text>
-                <text x="0" y="18" fill="#F4F6F9" fontSize="12" fontFamily="sans-serif" fontWeight="bold">Tesseract.js WASM</text>
-                <text x="0" y="34" fill="#FF2800" fontSize="10" fontFamily="monospace">Zero Thread Jitter</text>
-              </g>
-            </svg>
-          </div>
-        )}
-      </div>
+      // pointer -> slot
+      const pa = Math.atan2(f.pointer.y - geo.cy, f.pointer.x - geo.cx);
+      const pr = Math.hypot(f.pointer.x - geo.cx, f.pointer.y - geo.cy);
+      let hoverSlot = Math.round((((pa + Math.PI / 2) / (Math.PI * 2)) % 1 + 1) % 1 * SLOTS) % SLOTS;
+      const onRing = pr > geo.r0 * 0.7 && pr < geo.r1 * 1.15;
+      if (!onRing && f.pointer.active) hoverSlot = -1;
 
-      {/* ROW 3: HTML Telemetry footer (outside drawing canvas; never overlaying or clipping artwork) */}
-      <div className="pt-3 border-t border-[#2563EB]/20 w-full min-w-0 text-xs font-mono">
-        {/* Real-time Telemetry Metrics Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pb-3 border-b border-[#2563EB]/15 text-[#7E8B9B]">
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">Active Sector</span>
-            <span className="text-sm font-bold text-[#FF2800]">Sector 0{currentSector}</span>
-          </div>
+      // slots
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      for (let s = 0; s < SLOTS; s++) {
+        const age = (head - s + SLOTS) % SLOTS; // 0 = newest
+        const recency = 1 - age / SLOTS;
+        const a = ang(s);
+        const len = (speed[s] / 95) * (geo.r1 - geo.r0) * intro;
+        const cos = Math.cos(a);
+        const sin = Math.sin(a);
+        const [r, g, b] = ramp([C.titanium, C.cobalt, C.silver, C.red], recency ** 1.5);
+        const al = 0.18 + recency * 0.72;
+        ctx.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${s === hoverSlot ? 1 : al})`;
+        ctx.lineWidth = s === hoverSlot ? 2 : 1.1;
+        ctx.beginPath();
+        ctx.moveTo(geo.cx + cos * geo.r0, geo.cy + sin * geo.r0);
+        ctx.lineTo(geo.cx + cos * (geo.r0 + len), geo.cy + sin * (geo.r0 + len));
+        ctx.stroke();
+        // inner channel: brake (red) / throttle (silver) ticks
+        const inner = geo.r0 - 10;
+        const v = brk[s] > 0.02 ? brk[s] : thr[s];
+        ctx.strokeStyle = rgba(brk[s] > 0.02 ? C.red : C.silver, (0.15 + recency * 0.6) * v);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(geo.cx + cos * (inner - 8 * v), geo.cy + sin * (inner - 8 * v));
+        ctx.lineTo(geo.cx + cos * inner, geo.cy + sin * inner);
+        ctx.stroke();
+      }
+      ctx.restore();
 
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">VER Speed</span>
-            <span className="text-sm font-bold text-[#F4F6F9]">{verSpeed} km/h</span>
-          </div>
+      // heads
+      const drawHead = (slot: number, col: string, txt: string, out: number) => {
+        const a = ang(slot);
+        const x0 = geo.cx + Math.cos(a) * (geo.r0 - 22);
+        const y0 = geo.cy + Math.sin(a) * (geo.r0 - 22);
+        const x1 = geo.cx + Math.cos(a) * (geo.r1 + out);
+        const y1 = geo.cy + Math.sin(a) * (geo.r1 + out);
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        phosphor(ctx, col, 0.75, 0.12);
+        glow(ctx, x1, y1, 10, col, 0.6);
+        const lx = geo.cx + Math.cos(a) * (geo.r1 + out + 12);
+        const ly = geo.cy + Math.sin(a) * (geo.r1 + out + 12);
+        label(ctx, txt, lx, ly + 3, col, 10, Math.cos(a) >= 0 ? 'left' : 'right');
+      };
+      drawHead((head + 1) % SLOTS, C.red, 'write', 6);
+      drawHead((head - READ_LAG + SLOTS) % SLOTS, C.cobalt, 'read', 0);
 
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">NOR Lap Delta</span>
-            <span className="text-sm font-bold text-[#2563EB]">+{sectorDelta}s</span>
-          </div>
+      // centre readout
+      const big = Math.max(18, Math.min(30, geo.r0 * 0.28));
+      ctx.font = `${big}px "Geist Mono", ui-monospace, monospace`;
+      ctx.fillStyle = C.alabaster;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(String(written).padStart(6, '0'), geo.cx, geo.cy + big * 0.1);
+      label(ctx, 'samples written', geo.cx, geo.cy + big * 0.1 + 16, C.titanium, 10, 'center');
+      label(ctx, `${SLOTS} slots · 60 Hz producer`, geo.cx, geo.cy - big * 0.9, C.titanium, 9, 'center');
 
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">Worker Budget</span>
-            <span className="text-sm font-bold text-[#4CC38A]">16.6ms Locked (60 FPS)</span>
-          </div>
-        </div>
+      const s = hoverSlot >= 0 ? hoverSlot : head;
+      const frame = frameMs ? `${frameMs.toFixed(1)} ms frame` : 'paused';
+      return `slot ${String(s).padStart(3, '0')} · seq ${seq[s]} · ${kmh(speed[s])} km/h · thr ${Math.round(thr[s] * 100)}% · brk ${Math.round(brk[s] * 100)}% · ${frame}`;
+    },
+  };
+}
 
-        {/* Throttle & Brake Bar Indicators */}
-        <div className="grid grid-cols-2 gap-6 pt-2">
-          <div>
-            <div className="flex justify-between text-[10px] font-mono mb-1">
-              <span className="text-[#7E8B9B]">THROTTLE TELEMETRY</span>
-              <span className="text-[#4CC38A] font-bold">{Math.round(throttleVal * 100)}%</span>
-            </div>
-            <div className="w-full h-1.5 bg-[#060A12] overflow-hidden">
-              <div
-                className="h-full bg-[#4CC38A] transition-all duration-75"
-                style={{ width: `${throttleVal * 100}%` }}
-              />
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between text-[10px] font-mono mb-1">
-              <span className="text-[#7E8B9B]">BRAKE PRESSURE</span>
-              <span className="text-[#FF2800] font-bold">{Math.round(brakeVal * 100)}%</span>
-            </div>
-            <div className="w-full h-1.5 bg-[#060A12] overflow-hidden">
-              <div
-                className="h-full bg-[#FF2800] transition-all duration-75"
-                style={{ width: `${brakeVal * 100}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+export const apexisPlate: PlateDefinition = {
+  modes: [
+    { id: 'scope', label: 'Oscilloscope', description: 'Simulated two-car lap: speed, throttle, brake and gap traces across sectors 1 to 3. The cursor scrubs along the lap.' },
+    { id: 'track', label: 'Sector map', description: 'Circuit map coloured by where car B gains or loses time, with sector deltas and both cars running in real time.' },
+    { id: 'ring', label: 'Ring buffer', description: 'A 256-slot telemetry ring buffer filled at 60 Hz, showing write and read heads. Hovering a slot reads its sample.' },
+  ],
+  createScene(modeId) {
+    if (modeId === 'track') return createTrackScene();
+    if (modeId === 'ring') return createRingScene();
+    return createScopeScene();
+  },
 };
 
-export default PlateApexis;
+export default apexisPlate;

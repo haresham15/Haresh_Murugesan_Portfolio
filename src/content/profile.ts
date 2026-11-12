@@ -87,7 +87,7 @@ export const profile: Profile = {
     },
   ],
   contacts: {
-    email: 'haresham15@gmail.com',
+    email: 'haresham2006@gmail.com',
     github: 'https://github.com/haresham15',
     linkedin: 'https://www.linkedin.com/in/haresh-murugesan-4173412a1/',
     resumeUrl: '/resume.pdf',

@@ -69,7 +69,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     {
       id: 'action-copy-email',
       title: 'Copy Email Address',
-      subtitle: 'haresh.murugesan@gmail.com',
+      subtitle: 'haresham2006@gmail.com',
       category: 'Action',
       action: async () => {
         try {

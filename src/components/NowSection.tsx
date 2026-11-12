@@ -1,93 +1,73 @@
 import React from 'react';
-import { ThemeSection } from './ThemeSection';
+import { ThemeSection, Reveal } from './ThemeSection';
+
+const SIDE_NOTES = [
+  {
+    label: 'Research inquiry',
+    labelColor: 'text-[#2563EB]',
+    title: 'Spatial tissue coordinate modeling & TILs',
+    body: 'Investigating spatial graph algorithms for cellular micro-environment modeling at Ohio State, segmenting tumor-infiltrating lymphocytes (TILs) beyond traditional pixel grids.',
+    tag: 'Digital pathology · Spatial tissue graphs',
+  },
+  {
+    label: 'Current reading',
+    labelColor: 'text-[#C8D2E0]',
+    title: 'Distributed systems & low-latency consensus',
+    body: 'Studying Raft log compaction, lock-free ring buffers, and edge database replication strategies for disconnected mobile clients.',
+    tag: 'Distributed systems architecture',
+  },
+];
 
 export const NowSection: React.FC = () => {
   return (
     <ThemeSection
       id="now"
       theme="obsidian"
-      aria-label="Current focus and editorial field log"
-      className="border-b border-[#18458B]/20 flex flex-col justify-between"
+      aria-label="Now"
+      className="border-b border-[#18458B]/20 py-24 lg:py-36"
     >
-      <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
-        {/* Section Intro (Unboxed & De-Vibecoded) */}
-        <div className="pb-8 border-b border-[#18458B]/20">
-          <div className="space-y-3 max-w-3xl">
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
-              Field Notes.
-            </h2>
-            <p className="text-base sm:text-xl font-sans text-[#7E8B9B] leading-relaxed">
-              Active engineering focus, research investigations, and personal inquiry in Columbus, OH.
+      <div className="w-full flex flex-col">
+        <Reveal className="pb-12 sm:pb-16 border-b border-[#C8D2E0]/10">
+          <h2 className="text-5xl sm:text-7xl lg:text-8xl font-serif font-normal text-[#F4F6F9] leading-[0.95] tracking-[-0.02em]">
+            Now
+          </h2>
+          <p className="mt-6 max-w-[58ch] text-base sm:text-lg font-sans text-[#C8D2E0]/85 leading-relaxed">
+            Field notes from Columbus, OH: what is on the bench, what is under the microscope, and what is on the desk.
+          </p>
+        </Reveal>
+
+        {/* Asymmetric dispatch: a wide lead story, two narrow side notes */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0 pt-12 sm:pt-16">
+          <Reveal className="lg:col-span-7 lg:pr-16 lg:border-r border-[#C8D2E0]/10">
+            <p className="font-mono text-xs text-[#FF2800]">Active build</p>
+            <h3 className="mt-5 font-serif text-3xl sm:text-4xl lg:text-5xl text-[#F4F6F9] leading-[1.08] tracking-[-0.01em] max-w-[20ch]">
+              High-concurrency Web Worker simulation runtimes.
+            </h3>
+            <p className="mt-6 max-w-[60ch] font-sans text-base sm:text-lg text-[#C8D2E0]/80 leading-relaxed">
+              Architecting multi-threaded browser simulation engines with offscreen HTML5 Canvas contexts and
+              SharedArrayBuffer channels. The focus is deterministic 60 fps physics that holds its frame time inside
+              a sub-16 ms budget regardless of what the main thread is doing.
             </p>
+            <dl className="mt-10 pt-5 border-t border-[#C8D2E0]/10 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 font-mono text-xs">
+              <dt className="text-[#7E8B9B]">Target</dt>
+              <dd className="text-[#F4F6F9]">Sub-16 ms deterministic frame budget on client runtimes</dd>
+            </dl>
+          </Reveal>
+
+          <div className="lg:col-span-5 lg:pl-16 flex flex-col">
+            {SIDE_NOTES.map((n, i) => (
+              <Reveal
+                key={n.title}
+                delay={0.08 + i * 0.06}
+                className={`${i > 0 ? 'mt-10 pt-10 border-t border-[#C8D2E0]/10' : 'lg:pt-1'}`}
+              >
+                <p className={`font-mono text-xs ${n.labelColor}`}>{n.label}</p>
+                <h4 className="mt-4 font-serif text-2xl sm:text-[28px] text-[#F4F6F9] leading-snug">{n.title}</h4>
+                <p className="mt-3 max-w-[52ch] font-sans text-sm sm:text-base text-[#7E8B9B] leading-relaxed">{n.body}</p>
+                <p className="mt-4 font-mono text-[11px] text-[#C8D2E0]/80">{n.tag}</p>
+              </Reveal>
+            ))}
           </div>
-        </div>
-
-        {/* 12-Col Asymmetric Spread: 7 Cols Primary Build / 5 Cols Research & Inquiry (Unboxed) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-          
-          {/* Primary Build (7 Cols, Unboxed) */}
-          <div className="lg:col-span-7 p-4 sm:p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-[#18458B]/20 flex flex-col justify-between space-y-6 sm:space-y-8 relative">
-            <div className="space-y-6">
-              <div className="text-xs font-mono text-[#FF2800] font-semibold uppercase tracking-wider">
-                Active Production Build
-              </div>
-
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#F4F6F9] leading-snug">
-                High-concurrency Web Worker simulation runtimes.
-              </h3>
-
-              <p className="text-base sm:text-lg font-sans text-[#7E8B9B] leading-relaxed">
-                Architecting multi-threaded browser simulation engines with offscreen HTML5 Canvas contexts and SharedArrayBuffer channels. Focusing on deterministic 60fps physics execution that locks frame times strictly within a sub-16ms budget regardless of main-thread UI operations.
-              </p>
-            </div>
-
-            <div className="pt-6 border-t border-[#18458B]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
-              <span className="text-[#7E8B9B]">Benchmark Target:</span>
-              <span className="text-[#FF2800] font-medium">Sub-16ms deterministic frame budget verified on client runtimes</span>
-            </div>
-          </div>
-
-          {/* Research & Exploration (5 Cols, Unboxed with Hairline Rules) */}
-          <div className="lg:col-span-5 flex flex-col justify-between divide-y divide-[#18458B]/20">
-            
-            {/* Research Module */}
-            <div className="pb-8 space-y-4 flex-1 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="text-xs font-mono tracking-wider text-[#2563EB] font-semibold uppercase">
-                  Research Inquiry
-                </div>
-                <h4 className="text-xl sm:text-2xl font-serif text-[#F4F6F9]">
-                  Spatial tissue coordinate modeling &amp; TILs
-                </h4>
-                <p className="text-sm font-sans text-[#7E8B9B] leading-relaxed">
-                  Investigating spatial graph algorithms for cellular micro-environment modeling at Ohio State, segmenting tumor-infiltrating lymphocytes (TILs) beyond traditional pixel grids.
-                </p>
-              </div>
-              <div className="text-xs font-mono text-[#C8D2E0] pt-2">
-                Digital Pathology &amp; Spatial Tissue Graphs
-              </div>
-            </div>
-
-            {/* Reading & Media Module */}
-            <div className="pt-8 space-y-4 flex-1 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="text-xs font-mono tracking-wider text-[#C8D2E0] font-semibold uppercase">
-                  Current Reading
-                </div>
-                <h4 className="text-xl sm:text-2xl font-serif text-[#F4F6F9]">
-                  Distributed Systems &amp; Low-Latency Consensus
-                </h4>
-                <p className="text-sm font-sans text-[#7E8B9B] leading-relaxed">
-                  Studying Raft log compaction, lock-free ring buffers, and edge database replication strategies for disconnected mobile clients.
-                </p>
-              </div>
-              <div className="text-xs font-mono text-[#C8D2E0] pt-2">
-                Distributed Systems Architecture
-              </div>
-            </div>
-
-          </div>
-
         </div>
       </div>
     </ThemeSection>

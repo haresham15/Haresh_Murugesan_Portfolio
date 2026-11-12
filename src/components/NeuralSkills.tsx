@@ -1,182 +1,206 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ThemeSection } from './ThemeSection';
-import { GridCrosshair } from './ui/EditorialPrimitives';
+import { ThemeSection, Reveal } from './ThemeSection';
+import { skillDomains, type SkillDomain, type SkillItem } from '../content/skills';
+import { getProjectBySlug } from '../content/projects';
 
-export interface SkillCategory {
-  id: string;
-  number: string;
-  title: string;
-  description: string;
-  items: {
-    name: string;
-    proof: string;
-    proofLink?: string;
-    metric?: string;
-  }[];
+interface ProvenProject {
+  slug: string;
+  name: string;
+  href: string;
 }
 
-export const skillCategories: SkillCategory[] = [
-  {
-    id: 'languages-core',
-    number: '01',
-    title: 'Languages & Core Engineering',
-    description: 'Foundations in algorithmic complexity, pointer arithmetic, object-oriented contracts, and strict type-level invariants.',
-    items: [
-      { name: 'Python (Async / Scientific)', proof: 'FastAPI XAI tensor pipelines & OpenCV', proofLink: '/projects/healios', metric: '8.09ms Grad-CAM' },
-      { name: 'TypeScript / JavaScript', proof: 'Deterministic multi-car race simulation', proofLink: '/projects/apexis', metric: '60 FPS Web Workers' },
-      { name: 'C / C++ Foundations', proof: 'Memory management & CS50 computation', proofLink: '/projects/cs50-ai-projects' },
-      { name: 'Java (OOP & Invariants)', proof: 'Software 2 data structure contracts & testing', proofLink: '/projects/software-2-projects' },
-      { name: 'R Statistical Analysis', proof: 'ASA DataFest demographic regression & spatial analysis', proofLink: '/projects/routerx-careline-hub' },
-    ],
-  },
-  {
-    id: 'ai-ml-vision',
-    number: '02',
-    title: 'AI / Machine Learning / Computer Vision',
-    description: 'Explainable AI saliency, medical image segmentation, stereoscopic point-clouds, and spatial heuristic models.',
-    items: [
-      { name: 'Grad-CAM Explainable Vision (XAI)', proof: 'NumPy vectorized saliency heatmaps', proofLink: '/projects/healios', metric: '8.09ms latency' },
-      { name: 'PyTorch & TensorFlow', proof: 'Histology tissue classification & clinical CV', proofLink: '/projects/cv-allergy-wheal' },
-      { name: 'OpenCV & Color Morphology', proof: 'HSV wound bed granulation & edge filters', proofLink: '/projects/healios', metric: '2.00ms execution' },
-      { name: 'Vector Search & pgvector RAG', proof: 'Air-gapped semantic emotional memory', proofLink: '/projects/tempo', metric: '100% offline' },
-      { name: 'Browser ML (Tesseract / TF.js)', proof: 'In-browser broadcast OCR worker', proofLink: '/projects/apexis', metric: 'Zero server lag' },
-    ],
-  },
-  {
-    id: 'systems-performance',
-    number: '03',
-    title: 'Systems & Performance',
-    description: 'Concurrent background execution, frame-budgeted client runtimes, and resilient system boundaries.',
-    items: [
-      { name: 'Web Workers & Multithreading', proof: 'Dedicated simulator.worker.ts compute loop', proofLink: '/projects/apexis', metric: '16.6ms budget' },
-      { name: 'HTML5 Canvas & Offscreen Contexts', proof: 'Client-side Laplacian blur rejection gate', proofLink: '/projects/healios', metric: '<35ms preflight' },
-      { name: 'C4 Architecture System Modeling', proof: 'Enterprise data ingestion topologies at CAS', proofLink: '/#experience' },
-      { name: 'State Machines & Crash Journaling', proof: 'Tempo IPC queue & deterministic triage', proofLink: '/projects/tempo' },
-    ],
-  },
-  {
-    id: 'backend-cloud',
-    number: '04',
-    title: 'Distributed Cloud & Microservices',
-    description: 'Trunk-based CI/CD deployment, serverless AWS architectures, and sub-millisecond retrieval.',
-    items: [
-      { name: 'AWS Lambda, DynamoDB & S3', proof: '12 serverless research ingestion pipelines at CAS', proofLink: '/#experience', metric: '<1s query speed' },
-      { name: 'FastAPI & Pydantic Contracts', proof: 'Strict type validation & Swagger schemas', proofLink: '/projects/healios' },
-      { name: 'PostgreSQL & pgvector', proof: 'IVFFlat cosine similarity vector queries', proofLink: '/projects/tamiltrove', metric: '94.2% Hit@5' },
-      { name: 'Next.js & React Server Components', proof: 'Production portfolio & client state machines', proofLink: '/' },
-    ],
-  },
-  {
-    id: 'data-engineering',
-    number: '05',
-    title: 'Data Engineering & Visualization',
-    description: 'Geospatial transit optimization, connected-vehicle telematics, and interactive 3D telemetry rendering.',
-    items: [
-      { name: 'Geospatial OSRM & GTFS Routing', proof: 'RouteRx healthcare transit desert engine', proofLink: '/projects/routerx-careline-hub', metric: '<15ms matrix' },
-      { name: 'Pandas, NumPy & Scikit-Learn', proof: 'Honda 99P Labs telematics & NYC housing AI', proofLink: '/projects/nyc-housing-market-ai', metric: '1,000+ models' },
-      { name: 'Three.js & WebGL Shaders', proof: 'LiDAR elevation mesh & volumetric aperture', proofLink: '/#hero' },
-      { name: 'Spatial Isochrone Buffering', proof: '1st Place ASA DataFest 2026 external data model', proofLink: '/projects/routerx-careline-hub' },
-    ],
-  },
-];
+/** Highlight source: a whole domain, or a single skill inside it. */
+type Focus = { domain: string; skill?: string } | null;
+
+const shortTitle = (title: string) => title.split(' — ')[0].replace(/\s*\(.*\)$/, '');
+
+const slugsOf = (skills: SkillItem[]) => {
+  const set = new Set<string>();
+  skills.forEach((s) => s.provenBy.forEach((p) => p.slug && set.add(p.slug)));
+  return set;
+};
 
 export const NeuralSkills: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState<string>('languages-core');
+  const [hover, setHover] = useState<Focus>(null);
+  const [pinned, setPinned] = useState<Focus>(null);
+  const focus = hover ?? pinned;
+
+  // Project index derived from content: every project that proves at least one skill.
+  const projects = useMemo<ProvenProject[]>(() => {
+    const seen = new Map<string, ProvenProject>();
+    skillDomains.forEach((d) =>
+      d.skills.forEach((s) =>
+        s.provenBy.forEach((p) => {
+          if (!p.slug || seen.has(p.slug)) return;
+          const project = getProjectBySlug(p.slug);
+          seen.set(p.slug, {
+            slug: p.slug,
+            name: project ? shortTitle(project.title) : shortTitle(p.title),
+            href: project ? `/projects/${project.slug}` : p.href,
+          });
+        }),
+      ),
+    );
+    return Array.from(seen.values());
+  }, []);
+
+  const lit = useMemo(() => {
+    if (!focus) return null;
+    const domain = skillDomains.find((d) => d.id === focus.domain);
+    if (!domain) return null;
+    const skills = focus.skill ? domain.skills.filter((s) => s.name === focus.skill) : domain.skills;
+    return slugsOf(skills);
+  }, [focus]);
+
+  const focusLabel = (() => {
+    if (!focus) return 'Hover a domain or skill to trace where it was used.';
+    const domain = skillDomains.find((d) => d.id === focus.domain);
+    return focus.skill ?? domain?.title ?? '';
+  })();
+
+  const togglePin = (d: SkillDomain) =>
+    setPinned((p) => (p && p.domain === d.id && !p.skill ? null : { domain: d.id }));
 
   return (
     <ThemeSection
       id="skills"
       theme="obsidian"
-      aria-label="Technical capabilities and systems competencies"
-      className="border-b border-[#18458B]/20 flex flex-col justify-between"
+      aria-label="Technical index"
+      className="border-b border-[#18458B]/20 py-24 lg:py-36"
     >
-      <div className="w-full flex flex-col my-auto space-y-12 sm:space-y-16">
-        {/* Section Intro (Unboxed & De-Vibecoded) */}
-        <div className="pb-8 border-b border-[#18458B]/20">
-          <div className="space-y-3 max-w-3xl">
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
-              Technical Index.
-            </h2>
-            <p className="text-base sm:text-xl font-sans text-[#7E8B9B] leading-relaxed">
-              Five structured engineering domains backed by real production deliverables, client-side benchmarks, and collegiate research.
-            </p>
-          </div>
-        </div>
+      <div className="w-full flex flex-col">
+        <Reveal className="pb-12 sm:pb-16 border-b border-[#C8D2E0]/10">
+          <h2 className="text-5xl sm:text-7xl lg:text-8xl font-serif font-normal text-[#F4F6F9] leading-[0.95] tracking-[-0.02em]">
+            Technical Index
+          </h2>
+          <p className="mt-6 max-w-[58ch] text-base sm:text-lg font-sans text-[#C8D2E0]/85 leading-relaxed">
+            Five domains. Every skill points at the shipped project or role that proves it, so nothing here is a
+            self-rating.
+          </p>
+        </Reveal>
 
-        {/* Category Selector Strip */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 border-b border-[#18458B]/20 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
-          {skillCategories.map((cat) => {
-            const isActive = activeCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`min-h-[44px] px-3.5 sm:px-4 py-2 text-xs font-mono transition-colors whitespace-nowrap cursor-pointer select-none rounded-[2px] flex items-center gap-2 ${
-                  isActive
-                    ? 'bg-[#FF2800] text-[#03050A] font-semibold shadow-[0_0_12px_rgba(255,40,0,0.35)]'
-                    : 'bg-[#060A12] text-[#7E8B9B] hover:text-[#F4F6F9] hover:bg-[#0B1E40]/40 border border-[#18458B]/20'
-                }`}
-              >
-                <span className={`text-[10px] ${isActive ? 'text-[#03050A]/70' : 'text-[#2563EB]'}`}>{cat.number}</span>
-                <span>{cat.title}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Active Domain Deep-Dive Table */}
-        {skillCategories
-          .filter((cat) => cat.id === activeCategory)
-          .map((cat) => (
-            <div key={cat.id} className="space-y-8">
-              <div className="max-w-2xl space-y-2">
-                <p className="text-[16px] font-sans text-[#F4F6F9] leading-relaxed">
-                  {cat.description}
-                </p>
-              </div>
-
-              {/* Structured Swiss Shared-Wall Table */}
-              <div className="border border-[#18458B]/25 divide-y divide-[#18458B]/15 bg-[#060A12]/90 backdrop-blur-sm rounded-[2px] overflow-hidden relative shadow-2xl">
-                <GridCrosshair className="absolute top-2 left-2 opacity-30 text-[#2563EB]" />
-                <GridCrosshair className="absolute top-2 right-2 opacity-30 text-[#2563EB]" />
-
-                <div className="hidden sm:grid grid-cols-12 gap-4 py-3.5 px-6 text-[11px] font-mono text-[#C8D2E0] uppercase tracking-wider bg-[#0B1E40]/30 border-b border-[#18458B]/25">
-                  <div className="col-span-5">ENGINEERING CAPABILITY</div>
-                  <div className="col-span-5">VERIFIED PROOF &amp; ARTIFACT</div>
-                  <div className="col-span-2 text-right">BENCHMARK</div>
-                </div>
-
-                {cat.items.map((item, idx) => (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pt-4">
+          {/* Domains */}
+          <ol className="lg:col-span-8" onMouseLeave={() => setHover(null)}>
+            {skillDomains.map((d, i) => {
+              const domainActive = focus?.domain === d.id;
+              const dimmed = focus && !domainActive;
+              return (
+                <Reveal
+                  as="li"
+                  key={d.id}
+                  delay={i * 0.05}
+                  y={18}
+                  className="border-b border-[#C8D2E0]/10"
+                >
                   <div
-                    key={idx}
-                    className="p-5 sm:px-6 sm:py-4 flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-4 items-start sm:items-center hover:bg-[#0B1E40]/25 transition-colors duration-180"
+                    className={`grid grid-cols-[2.5rem_1fr] sm:grid-cols-[3.5rem_1fr] gap-x-2 py-8 sm:py-10 transition-opacity duration-500 ${
+                      dimmed ? 'opacity-45' : 'opacity-100'
+                    }`}
                   >
-                    <div className="sm:col-span-5 font-serif text-[16px] text-[#F4F6F9]">
-                      {item.name}
-                    </div>
-
-                    <div className="sm:col-span-5 text-xs font-mono text-[#7E8B9B]">
-                      {item.proofLink ? (
-                        <Link
-                          href={item.proofLink}
-                          className="text-[#2563EB] hover:text-[#FF2800] transition-colors underline underline-offset-4"
-                        >
-                          {item.proof} ↗
-                        </Link>
-                      ) : (
-                        <span>{item.proof}</span>
-                      )}
-                    </div>
-
-                    <div className="sm:col-span-2 sm:text-right text-xs font-mono text-[#FF2800]">
-                      {item.metric && <span>{item.metric}</span>}
-                    </div>
+                  <span
+                    className={`font-mono text-xs pt-2 tabular-nums transition-colors duration-300 ${
+                      domainActive ? 'text-[#FF2800]' : 'text-[#7E8B9B]'
+                    }`}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div>
+                    <h3 className="font-serif text-2xl sm:text-3xl lg:text-4xl text-[#F4F6F9] leading-tight tracking-[-0.01em]">
+                    <button
+                      type="button"
+                      onMouseEnter={() => setHover({ domain: d.id })}
+                      onFocus={() => setHover({ domain: d.id })}
+                      onBlur={() => setHover(null)}
+                      onClick={() => togglePin(d)}
+                      aria-pressed={pinned?.domain === d.id && !pinned.skill}
+                      className="text-left cursor-pointer outline-none focus-visible:underline decoration-[#FF2800] underline-offset-8"
+                    >
+                      {d.title}
+                    </button>
+                    </h3>
+                    <p className="mt-3 max-w-[60ch] font-sans text-sm sm:text-base text-[#7E8B9B] leading-relaxed">
+                      {d.description}
+                    </p>
+                    <ul className="mt-5 flex flex-wrap items-baseline gap-y-2 font-mono text-xs leading-relaxed">
+                      {d.skills.map((s, k) => {
+                        const skillActive = focus?.domain === d.id && focus.skill === s.name;
+                        return (
+                          <li key={s.name} className="flex items-baseline">
+                            {k > 0 && (
+                              <span aria-hidden="true" className="px-2.5 text-[#7E8B9B]/60">
+                                ·
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onMouseEnter={() => setHover({ domain: d.id, skill: s.name })}
+                              onFocus={() => setHover({ domain: d.id, skill: s.name })}
+                              onBlur={() => setHover(null)}
+                              onClick={() =>
+                                setPinned((p) => (p?.skill === s.name ? null : { domain: d.id, skill: s.name }))
+                              }
+                              aria-pressed={pinned?.skill === s.name}
+                              className={`text-left cursor-pointer outline-none transition-colors duration-200 focus-visible:text-[#F4F6F9] ${
+                                skillActive ? 'text-[#FF2800]' : 'text-[#C8D2E0] hover:text-[#F4F6F9]'
+                              }`}
+                            >
+                              {s.name}
+                              {s.highlight && <span className="text-[#7E8B9B]"> ({s.highlight})</span>}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
-                ))}
-              </div>
+                  </div>
+                </Reveal>
+              );
+            })}
+          </ol>
+
+          {/* Cross-highlighted project index */}
+          <aside className="lg:col-span-4" aria-label="Projects that prove these skills">
+            <div className="lg:sticky lg:top-28 pt-8 sm:pt-10">
+              <h3 className="font-mono text-xs text-[#7E8B9B]">Proven in</h3>
+              <p className="mt-3 min-h-[3em] font-serif italic text-lg text-[#C8D2E0] leading-snug" aria-live="polite">
+                {focusLabel}
+              </p>
+              <ul className="mt-6 border-t border-[#C8D2E0]/10">
+                {projects.map((p) => {
+                  const on = lit?.has(p.slug) ?? false;
+                  const off = lit !== null && !on;
+                  return (
+                    <li key={p.slug} className="border-b border-[#C8D2E0]/10">
+                      <Link
+                        href={p.href}
+                        className={`group relative flex items-center justify-between gap-4 py-3 min-h-[44px] font-sans text-sm transition-[color,opacity] duration-300 ${
+                          on ? 'text-[#F4F6F9]' : off ? 'text-[#7E8B9B] opacity-40' : 'text-[#C8D2E0]'
+                        } hover:text-[#F4F6F9] hover:opacity-100`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 h-px bg-[#FF2800] transition-[width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                          style={{ width: on ? 14 : 0 }}
+                        />
+                        <span
+                          className="transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                          style={{ transform: on ? 'translateX(22px)' : 'none' }}
+                        >
+                          {p.name}
+                        </span>
+                        <span aria-hidden="true" className="font-mono text-xs text-[#7E8B9B] group-hover:text-[#FF2800] transition-colors">
+                          →
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-          ))}
+          </aside>
+        </div>
       </div>
     </ThemeSection>
   );

@@ -1,284 +1,205 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useSpring } from 'framer-motion';
-import { ThemeSection } from './ThemeSection';
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { ThemeSection, Reveal } from './ThemeSection';
+import { useMotionPreference } from './MotionPreference';
 
-const MotionDiv = motion.div as any;
-
-interface CurvyMilestone {
+interface Milestone {
   id: string;
   year: string;
   phase: string;
   title: string;
   reflection: string;
-  tag: string;
-  detail: string;
-  link?: string;
-  side: 'left' | 'right';
-  curvePercent: number;
+  detail: string[];
+  link: { href: string; label: string };
 }
 
-const CURVY_MILESTONES: CurvyMilestone[] = [
+/** Facts and years follow src/content (experience.ts, projects.ts, evidence.ts). */
+const MILESTONES: Milestone[] = [
   {
     id: 'm-2023',
     year: '2023',
-    phase: '01 · Origin & Technical Inquiry',
-    title: 'Syntinuum Launch & Systems Journalism',
+    phase: 'Origin',
+    title: 'A podcast as a way of asking better questions',
     reflection:
-      'Founded an engineering podcast to investigate the gap between textbook algorithms and live production fires. Interviewed founders across healthcare, aerospace, and software, generating 100K+ impressions and building a discipline of technical inquiry.',
-    tag: 'Technical Journalism · Audio Engineering',
-    detail: '10+ Founder Dialogues · 100K+ Impressions',
-    link: '#podcast',
-    side: 'left',
-    curvePercent: 12,
+      'Started the show that became Syntinuum (formerly Adapt: Implementing Innovations) to ask founders, researchers and executives how ideas survive contact with production.',
+    detail: ['Long-form technical dialogues', '100K+ combined impressions'],
+    link: { href: '#podcast', label: 'Listen to Syntinuum' },
   },
   {
     id: 'm-2024',
     year: '2024',
-    phase: '02 · Computational Modeling',
-    title: 'Recursive Graph Schemas & Philocracy',
+    phase: 'Systems Thinking',
+    title: 'Contracts, invariants and data structures',
     reflection:
-      'Directed engineering architecture for the Philocracy deliberation platform. Designed cycle-free recursive graph schemas in TypeScript to model complex philosophical premises with mathematical rigor, guaranteeing zero dependency deadlock in debate trees.',
-    tag: 'Domain Modeling · TypeScript Schemas',
-    detail: 'Recursive Argument Trees · Next.js Engine',
-    link: '#projects',
-    side: 'right',
-    curvePercent: 38,
+      'Ohio State’s Software 1 and 2 sequence: Java object-oriented design under formal contracts, then custom collections, memory management and recursive tree invariants verified with JUnit.',
+    detail: ['Java', 'JUnit', 'Formal contracts'],
+    link: { href: '/projects/software-2-projects', label: 'Software 2 projects' },
   },
   {
     id: 'm-2025',
     year: '2025',
-    phase: '03 · Competitive Pressure & Telematics',
-    title: 'DataFest Champion & Connected Mobility',
+    phase: 'Applied Modeling',
+    title: 'Models that had to hold up under judging',
     reflection:
-      'Won 1st Place at ASA DataFest for predictive external data modeling under an intense 48-hour competitive deadline. Joined Honda 99P Labs as an Innovation Analyst, analyzing 1,000+ vehicle telemetry models to evaluate urban route efficiency and EV battery depletion.',
-    tag: 'Spatial Telematics · Statistical Data',
-    detail: '1st Place ASA DataFest · Honda 99P Labs',
-    link: '#achievements',
-    side: 'left',
-    curvePercent: 64,
+      '1st Place for Best Use of External Data at ASA DataFest 2025, a 48-hour hackathon against 40+ collegiate teams. Built Philocracy’s recursive argument trees and implemented classical AI algorithms from first principles for CS50 AI.',
+    detail: ['ASA DataFest 2025', 'Philocracy', 'CS50 AI'],
+    link: { href: '#achievements', label: 'See the recognition' },
   },
   {
     id: 'm-2026',
     year: '2026',
-    phase: '04 · Deterministic Hardware & Vision',
-    title: 'Clinical Computer Vision & Deterministic Physics',
+    phase: 'High-Performance Engineering',
+    title: 'Latency budgets, worker threads and clinical vision',
     reflection:
-      'Shipped Healios V2 uniting 3D LiDAR point-clouds with an 8.09ms vectorized Grad-CAM tensor pipeline. Built Apexis locking 60 FPS deterministic multi-car simulation in dedicated Web Workers with zero main-thread lag. Defended 1st Place at ASA DataFest 2026 with RouteRx.',
-    tag: 'Computer Vision · Web Workers · C4 Architecture',
-    detail: 'Healios V2 · Apexis · Tempo · RouteRx',
-    link: '#projects',
-    side: 'right',
-    curvePercent: 90,
+      'Shipped Healios V2 with an 8.09 ms Grad-CAM saliency pipeline and Apexis with a 60 fps off-main-thread race simulation. Won DataFest again with RouteRx, joined Honda 99P Labs as an Innovation Analyst, and interned at CAS on serverless AWS.',
+    detail: ['Healios V2', 'Apexis', 'RouteRx', 'CAS', 'Honda 99P Labs'],
+    link: { href: '#projects', label: 'Explore the projects' },
   },
 ];
 
 export const HistorySection: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const pathRef = useRef<SVGPathElement>(null);
-  const [activeMilestoneId, setActiveMilestoneId] = useState<string>('m-2026');
-  const [beadPos, setBeadPos] = useState<{ x: number; y: number }>({ x: 720, y: 50 });
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const nodeRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const nodeFractions = useRef<number[]>([]);
+  const [litCount, setLitCount] = useState(0);
+  const { isReduced } = useMotionPreference();
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start 0.85', 'end 0.25'],
-  });
+  // Progress reaches the tip of the line exactly at 60% of the viewport height.
+  const { scrollYProgress } = useScroll({ target: timelineRef, offset: ['start 0.6', 'end 0.6'] });
+  const drawn = useSpring(scrollYProgress, { stiffness: 110, damping: 26, mass: 0.4, restDelta: 0.0005 });
+  const beadTop = useTransform(drawn, (p) => `${Math.min(1, Math.max(0, p)) * 100}%`);
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 24,
-    mass: 0.35,
-  });
-
-  // Track glowing bead along the central datum path
+  // Node positions are measured, never hardcoded, so they stay aligned on resize.
   useEffect(() => {
-    return smoothProgress.on('change', (latest) => {
-      const path = pathRef.current;
-      if (!path) return;
-      const totalLen = path.getTotalLength();
-      const currentLen = Math.max(0, Math.min(totalLen, latest * totalLen));
-      const pt = path.getPointAtLength(currentLen);
-      setBeadPos({ x: pt.x, y: pt.y });
-
-      const progressPercent = latest * 100;
-      let closest = CURVY_MILESTONES[0];
-      let minDiff = 999;
-      CURVY_MILESTONES.forEach((m) => {
-        const diff = Math.abs(m.curvePercent - progressPercent);
-        if (diff < minDiff) {
-          minDiff = diff;
-          closest = m;
-        }
+    const el = timelineRef.current;
+    if (!el) return;
+    const measure = () => {
+      const box = el.getBoundingClientRect();
+      if (box.height <= 0) return;
+      nodeFractions.current = nodeRefs.current.map((n) => {
+        if (!n) return 1;
+        const r = n.getBoundingClientRect();
+        return (r.top + r.height / 2 - box.top) / box.height;
       });
-      setActiveMilestoneId(closest.id);
-    });
-  }, [smoothProgress]);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const update = (p: number) => {
+      const count = nodeFractions.current.filter((f) => p >= f - 0.002).length;
+      setLitCount((c) => (c === count ? c : count));
+    };
+    update(isReduced ? 1 : drawn.get());
+    if (isReduced) return;
+    return drawn.on('change', update);
+  }, [drawn, isReduced]);
 
   return (
     <ThemeSection
       id="history"
       theme="obsidian"
-      carbonType="forged"
-      carbonOpacity={0.28}
-      aria-label="Trajectory and formative milestones"
-      className="border-b border-[#18458B]/20 flex flex-col justify-between py-16 sm:py-24 lg:py-36"
+      aria-label="Milestones"
+      className="border-b border-[#18458B]/20 py-24 lg:py-36"
     >
-      <div ref={containerRef} className="w-full relative my-auto space-y-10 sm:space-y-16">
-        
-        {/* Section Intro (Clean Editorial Heading) */}
-        <div className="pb-8 border-b border-[#18458B]/20">
-          <div className="space-y-3 max-w-3xl">
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal text-[#F4F6F9] leading-tight tracking-tight">
-              Trajectory.
-            </h2>
-            <p className="text-base sm:text-xl font-sans text-[#7E8B9B] leading-relaxed">
-              A winding, non-linear progression of technical breakthroughs, collegiate leadership, and competitive hackathon victories.
-            </p>
+      <div className="w-full flex flex-col">
+        <Reveal className="pb-12 sm:pb-16 border-b border-[#C8D2E0]/10">
+          <h2 className="text-5xl sm:text-7xl lg:text-8xl font-serif font-normal text-[#F4F6F9] leading-[0.95] tracking-[-0.02em]">
+            Milestones
+          </h2>
+          <p className="mt-6 max-w-[58ch] text-base sm:text-lg font-sans text-[#C8D2E0]/85 leading-relaxed">
+            Four years, each with a different question: how to ask, how to structure, how to model, and how to make
+            it fast.
+          </p>
+        </Reveal>
+
+        <div ref={timelineRef} className="relative mt-16 sm:mt-20">
+          {/* Datum line: faint track, scroll-drawn stroke, travelling bead */}
+          <div aria-hidden="true" className="absolute top-0 bottom-0 left-[7px] lg:left-1/2 w-px -translate-x-1/2 pointer-events-none">
+            <div className="absolute inset-0 bg-[#C8D2E0]/10" />
+            <motion.div
+              className="absolute inset-0 origin-top bg-gradient-to-b from-[#FF2800] via-[#C8D2E0] to-[#2563EB]"
+              style={{ scaleY: isReduced ? 1 : drawn }}
+            />
+            {!isReduced && (
+              <motion.span
+                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-[9px] h-[9px] rounded-full bg-[#F4F6F9] shadow-[0_0_0_3px_rgba(255,40,0,0.35),0_0_18px_rgba(255,40,0,0.6)]"
+                style={{ top: beadTop }}
+              />
+            )}
           </div>
-        </div>
 
-        {/* =====================================================================
-            CENTRAL DATUM LINE (Does not cross text cards)
-            ===================================================================== */}
-        <div className="relative w-full">
-          
-          {/* Central Datum Line Spine across Viewport (Stays in center gutter; does not cross text) */}
-          <svg
-            viewBox="0 0 1440 2000"
-            className="hidden lg:block w-full h-full absolute inset-0 pointer-events-none overflow-visible"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient id="datumSpineGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#FF2800" stopOpacity="0.85" />
-                <stop offset="33%" stopColor="#C8D2E0" stopOpacity="0.95" />
-                <stop offset="66%" stopColor="#2563EB" stopOpacity="0.85" />
-                <stop offset="100%" stopColor="#FF2800" stopOpacity="1" />
-              </linearGradient>
-            </defs>
-
-            {/* Inactive Central Datum Guideline (Strictly in center corridor X = 720) */}
-            <path
-              d="M 720 50 C 735 300, 705 500, 720 700 C 735 950, 705 1100, 720 1200 C 735 1450, 705 1600, 720 1700 L 720 1950"
-              fill="none"
-              stroke="rgba(24, 69, 139, 0.25)"
-              strokeWidth="6"
-              strokeLinecap="round"
-            />
-
-            {/* Precision Datum Nodes at Milestones */}
-            {[
-              { y: 220 },
-              { y: 720 },
-              { y: 1220 },
-              { y: 1720 },
-            ].map((node, idx) => (
-              <g key={idx} transform={`translate(720, ${node.y})`}>
-                <line x1="-20" y1="0" x2="20" y2="0" stroke="#FF2800" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
-                <circle cx="0" cy="0" r="10" fill="#03050A" stroke="#C8D2E0" strokeWidth="1.5" />
-                <circle cx="0" cy="0" r="3" fill="#FF2800" />
-              </g>
-            ))}
-
-            {/* Active Glowing Datum Path */}
-            <path
-              ref={pathRef}
-              d="M 720 50 C 735 300, 705 500, 720 700 C 735 950, 705 1100, 720 1200 C 735 1450, 705 1600, 720 1700 L 720 1950"
-              fill="none"
-              stroke="url(#datumSpineGlow)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-
-            {/* Traveling Chronological Datum Bead */}
-            <circle
-              cx={beadPos.x}
-              cy={beadPos.y}
-              r="10"
-              fill="#FF2800"
-              className="animate-ping"
-              opacity="0.65"
-            />
-            <circle
-              cx={beadPos.x}
-              cy={beadPos.y}
-              r="5"
-              fill="#F4F6F9"
-              stroke="#FF2800"
-              strokeWidth="2.5"
-            />
-          </svg>
-
-          {/* =====================================================================
-              UNBOXED STAGGERED EDITORIAL CHRONOLOGY (4 Canonical Entries)
-              ===================================================================== */}
-          <div className="relative z-10 space-y-16 sm:space-y-24 lg:space-y-36 pt-6 sm:pt-12 pb-12 sm:pb-20">
-            {CURVY_MILESTONES.map((m) => {
-              const isSelected = activeMilestoneId === m.id;
-              const isLeft = m.side === 'left';
-
+          <ol className="relative">
+            {MILESTONES.map((m, i) => {
+              const isLeft = i % 2 === 0;
+              const lit = i < litCount;
               return (
-                <div
+                <li
                   key={m.id}
                   id={m.id}
-                  className={`w-full flex ${isLeft ? 'justify-start' : 'justify-end'}`}
+                  className={`relative grid grid-cols-1 lg:grid-cols-2 lg:gap-32 ${i > 0 ? 'mt-20 sm:mt-24 lg:-mt-16' : ''}`}
                 >
-                  <MotionDiv
-                    initial={{ opacity: 0, x: isLeft ? -30 : 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.25 }}
-                    transition={{ duration: 0.45 }}
-                    className={`w-full lg:w-[44%] max-w-xl transition-all duration-300 pb-6 border-b border-[#18458B]/25 ${
-                      isLeft ? 'lg:pr-8 text-left' : 'lg:pl-8 text-left'
-                    }`}
+                  {/* Node sits on the datum, aligned to the numeral */}
+                  <span
+                    ref={(el) => {
+                      nodeRefs.current[i] = el;
+                    }}
+                    aria-hidden="true"
+                    className="absolute top-[30px] left-[7px] lg:left-1/2 -translate-x-1/2 -translate-y-1/2 w-[15px] h-[15px] rounded-full border bg-[#03050A] transition-[border-color,box-shadow] duration-500"
+                    style={{
+                      borderColor: lit ? '#FF2800' : 'rgba(200,210,224,0.35)',
+                      boxShadow: lit ? '0 0 0 4px rgba(255,40,0,0.12)' : 'none',
+                    }}
                   >
-                    {/* Oversized 64px Serif Year Numeral & Phase Row */}
-                    <div className="flex flex-wrap items-baseline justify-between gap-2 pb-3 mb-4 border-b border-[#18458B]/20 text-xs font-mono">
-                      <div className="flex items-baseline gap-3">
-                        <span className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-[#FF2800] animate-pulse' : 'bg-[#7E8B9B]'}`} />
-                        <span className="font-serif text-5xl sm:text-6xl text-[#F4F6F9] font-normal leading-none">
+                    <motion.span
+                      className="absolute inset-[4px] rounded-full bg-[#FF2800]"
+                      initial={false}
+                      animate={{ scale: lit ? 1 : 0 }}
+                      transition={isReduced ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 22 }}
+                    />
+                  </span>
+
+                  <Reveal
+                    y={isReduced ? 0 : 32}
+                    className={`pl-10 lg:pl-0 ${isLeft ? 'lg:col-start-1 lg:text-right' : 'lg:col-start-2'}`}
+                  >
+                    <article className={`max-w-[34rem] ${isLeft ? 'lg:ml-auto' : ''}`}>
+                      <div className={`flex items-baseline gap-4 ${isLeft ? 'lg:flex-row-reverse' : ''}`}>
+                        <span
+                          className="font-serif text-[64px] leading-none tracking-[-0.03em] tabular-nums transition-colors duration-500"
+                          style={{ color: lit ? '#F4F6F9' : '#7E8B9B' }}
+                        >
                           {m.year}
                         </span>
+                        <span className="font-mono text-xs text-[#FF2800]">{m.phase}</span>
                       </div>
-                      <span className="text-[#FF2800] font-semibold tracking-wider uppercase text-[11px]">
-                        {m.phase}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-xl sm:text-2xl font-serif text-[#F4F6F9] mb-3 leading-snug">
-                      {m.title}
-                    </h3>
-
-                    {/* Reflection */}
-                    <p className="text-sm sm:text-base font-sans text-[#7E8B9B] leading-relaxed mb-6">
-                      {m.reflection}
-                    </p>
-
-                    {/* Bottom Specs */}
-                    <div className="pt-4 border-t border-[#18458B]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
-                      <span className="text-[#C8D2E0]">{m.detail}</span>
-                      {m.link && (
-                        <Link
-                          href={m.link}
-                          className="min-h-[44px] flex items-center text-[#FF2800] hover:text-[#C8D2E0] transition-colors gap-1 font-semibold uppercase"
-                        >
-                          <span>Explore System Link</span>
-                          <span>→</span>
-                        </Link>
-                      )}
-                    </div>
-                  </MotionDiv>
-                </div>
+                      <h3 className="mt-6 font-serif text-2xl sm:text-3xl text-[#F4F6F9] leading-snug tracking-[-0.01em]">
+                        {m.title}
+                      </h3>
+                      <p className="mt-4 font-sans text-sm sm:text-base text-[#C8D2E0]/80 leading-relaxed">{m.reflection}</p>
+                      <p className="mt-5 font-mono text-xs text-[#7E8B9B] leading-relaxed">{m.detail.join(' · ')}</p>
+                      <Link
+                        href={m.link.href}
+                        className="mt-3 min-h-[44px] inline-flex items-center gap-2 font-mono text-xs text-[#FF2800] hover:text-[#F4F6F9] transition-colors"
+                      >
+                        <span className="border-b border-current pb-0.5">{m.link.label}</span>
+                        <span aria-hidden="true">→</span>
+                      </Link>
+                    </article>
+                  </Reveal>
+                </li>
               );
             })}
-          </div>
-
+          </ol>
         </div>
-
       </div>
     </ThemeSection>
   );
 };
 
 export default HistorySection;
+

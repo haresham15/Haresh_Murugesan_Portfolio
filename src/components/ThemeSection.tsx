@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useInView } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
+import { useMotionPreference } from './MotionPreference';
 
 export type ChromaticTheme =
   | 'obsidian'
@@ -122,6 +123,9 @@ export const ThemeSection: React.FC<ThemeSectionProps> = ({
   minHeight = '',
   pyPadding = '',
   forceDark = false,
+  // Legacy styling props; consumed here so they never reach the <section> DOM node.
+  carbonType: _carbonType,
+  carbonOpacity: _carbonOpacity,
   ...rest
 }) => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -161,6 +165,39 @@ export const ThemeSection: React.FC<ThemeSectionProps> = ({
         {children}
       </div>
     </section>
+  );
+};
+
+/**
+ * Scroll reveal shared by the lower home sections: fires once via IntersectionObserver
+ * (framer-motion whileInView) and settles on a critically damped spring.
+ */
+export const REVEAL_SPRING = { type: 'spring' as const, stiffness: 120, damping: 22, mass: 0.9 };
+
+export interface RevealProps {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  y?: number;
+  as?: 'div' | 'li' | 'article';
+}
+
+export const Reveal: React.FC<RevealProps> = ({ children, className, delay = 0, y = 28, as = 'div' }) => {
+  const { isReduced } = useMotionPreference();
+  const Tag = (as === 'li' ? motion.li : as === 'article' ? motion.article : motion.div) as typeof motion.div;
+  if (isReduced) {
+    return <Tag className={className}>{children}</Tag>;
+  }
+  return (
+    <Tag
+      className={className}
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ ...REVEAL_SPRING, delay }}
+    >
+      {children}
+    </Tag>
   );
 };
 

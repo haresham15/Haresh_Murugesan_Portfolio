@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, type RefObject } from 'react';
 
 export interface CanvasStage {
   width: number;
@@ -8,7 +8,17 @@ export interface CanvasStage {
   deltaTime: number;
 }
 
-export type CanvasStageDraw = (ctx: CanvasRenderingContext2D, stage: CanvasStage) => void;
+/**
+ * Draw in CSS pixels. Return `false` to let the loop sleep until the next
+ * `invalidate()` (resize, visibility change, or an explicit call); any other
+ * return value keeps animating while `animate` is true.
+ */
+export type CanvasStageDraw = (ctx: CanvasRenderingContext2D, stage: CanvasStage) => void | boolean;
+
+export interface CanvasStageHandle {
+  /** Schedule a frame (wakes a sleeping or non-animated stage). */
+  invalidate: () => void;
+}
 
 /** Draw in CSS pixels. The observed element must have a CSS-defined size. */
 export function useCanvasStage(
@@ -19,9 +29,9 @@ export function useCanvasStage(
     animate?: boolean;
     enabled?: boolean;
     /** WebGL owns its context; pass null for draw and render here. */
-    onFrame?: (stage: CanvasStage) => void;
+    onFrame?: (stage: CanvasStage) => void | boolean;
   } = {},
-) {
+): CanvasStageHandle {
   const drawRef = useRef(draw);
   const frameRef = useRef(onFrame);
   const invalidateRef = useRef<() => void>(() => {});
@@ -69,14 +79,16 @@ export function useCanvasStage(
       previous = now;
       elapsed += deltaTime;
       const stage = { width, height, dpr, time: elapsed, deltaTime };
+      let keepGoing = true;
       if (ctx) {
         ctx.save();
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        drawRef.current?.(ctx, stage);
+        if (drawRef.current?.(ctx, stage) === false) keepGoing = false;
         ctx.restore();
       }
-      frameRef.current?.(stage);
-      if (animate) frame = requestAnimationFrame(tick);
+      if (frameRef.current?.(stage) === false) keepGoing = false;
+      if (animate && keepGoing) frame = requestAnimationFrame(tick);
+      else previous = 0;
     };
     const invalidate = () => {
       if (canDraw() && !frame) frame = requestAnimationFrame(tick);
@@ -86,9 +98,9 @@ export function useCanvasStage(
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
     const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
+      visible = entry.isIntersecting && entry.intersectionRatio >= 0.02;
       visibility();
-    });
+    }, { threshold: 0.02 });
     observer?.observe(container);
     document.addEventListener('visibilitychange', visibility);
     window.addEventListener('resize', resize);
@@ -103,4 +115,7 @@ export function useCanvasStage(
       invalidateRef.current = () => {};
     };
   }, [containerRef, canvasRef, animate, enabled]);
+
+  const invalidate = useCallback(() => invalidateRef.current(), []);
+  return { invalidate };
 }

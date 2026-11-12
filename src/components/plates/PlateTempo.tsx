@@ -1,404 +1,549 @@
-import React, { useState } from 'react';
+import {
+  C, bez, clamp, drawGrid, drawVignette, easeInOutCubic, easeOutCubic, glow, label, phosphor, ramp, rgba, rng,
+  type PlateDefinition, type PlateScene, type StageFrame,
+} from './stageKit';
 
-export type TempoTab = 'buffer' | 'statemachine' | 'security';
+/* ============================================================
+ * Tempo: drafts pass a deterministic safety gate, get triaged by
+ * priority, and settle in a zero-destination ring buffer (nothing
+ * leaves). Timings are slowed for display; the measured gate
+ * latency (0.20 ms) is quoted in the deck, not simulated here.
+ * ============================================================ */
 
-interface BufferSlot {
+type Priority = 0 | 1 | 2; // high, medium, low
+interface Draft {
   id: number;
-  label: string;
-  category: 'crisis' | 'burnout' | 'normal' | 'empty';
-  timestamp: string;
+  crisis: boolean;
+  pri: Priority;
+  phase: 'approach' | 'queued' | 'routed' | 'stored' | 'support';
+  x: number;
+  y: number;
+  t: number; // phase progress 0..1
+  born: number;
+  slot: number;
 }
 
-const INITIAL_SLOTS: BufferSlot[] = [
-  { id: 0, label: 'PR Review Terseness Alert', category: 'burnout', timestamp: '14:22:01' },
-  { id: 1, label: 'Client Delivery Email Draft', category: 'normal', timestamp: '14:22:03' },
-  { id: 2, label: 'Acute Stress Intercept', category: 'crisis', timestamp: '14:22:05' },
-  { id: 3, label: 'Sprint Planning Summary', category: 'normal', timestamp: '14:22:08' },
-  { id: 4, label: 'Unread Feedback Freeze', category: 'burnout', timestamp: '14:22:11' },
-  { id: 5, label: 'Empty Slot', category: 'empty', timestamp: '--:--:--' },
-  { id: 6, label: 'Empty Slot', category: 'empty', timestamp: '--:--:--' },
-  { id: 7, label: 'Empty Slot', category: 'empty', timestamp: '--:--:--' },
-  { id: 8, label: 'Empty Slot', category: 'empty', timestamp: '--:--:--' },
-  { id: 9, label: 'Empty Slot', category: 'empty', timestamp: '--:--:--' },
-  { id: 10, label: 'Empty Slot', category: 'empty', timestamp: '--:--:--' },
-  { id: 11, label: 'Empty Slot', category: 'empty', timestamp: '--:--:--' },
-];
+const SLOTS = 16;
+const SERVICE_S = 0.16;
+const PRI_COLORS = [C.red, C.silver, C.cobalt] as const;
+const PRI_NAMES = ['high', 'medium', 'low'] as const;
 
-export const PlateTempo: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TempoTab>('buffer');
-  const [slots, setSlots] = useState<BufferSlot[]>(INITIAL_SLOTS);
-  const [headIndex, setHeadIndex] = useState<number>(4);
-  const [isInjecting, setIsInjecting] = useState<boolean>(false);
-  const [simState, setSimState] = useState<number>(1); // 1: Intercept, 2: Triage, 3: Classify, 4: Persist, 5: Dispatch
-  const [auditVerified, setAuditVerified] = useState<boolean>(true);
-
-  const handleSimulatePacket = () => {
-    setIsInjecting(true);
-    const samplePackets: { label: string; category: 'crisis' | 'burnout' | 'normal' }[] = [
-      { label: 'High Priority Production Slack Trigger', category: 'crisis' },
-      { label: 'Weekly Status Report Draft', category: 'normal' },
-      { label: 'Cognitive Fatigue Intercept', category: 'burnout' },
-    ];
-
-    let nextHead = headIndex;
-    samplePackets.forEach((pkt, i) => {
-      setTimeout(() => {
-        nextHead = (nextHead + 1) % slots.length;
-        setHeadIndex(nextHead);
-        setSlots((prev) => {
-          const updated = [...prev];
-          const nowTime = new Date().toTimeString().slice(0, 8);
-          updated[nextHead] = {
-            id: nextHead,
-            label: pkt.label,
-            category: pkt.category,
-            timestamp: nowTime,
-          };
-          return updated;
-        });
-
-        if (i === samplePackets.length - 1) {
-          setIsInjecting(false);
-        }
-      }, (i + 1) * 260);
+function createGateScene(): PlateScene {
+  const rand = rng(7);
+  const drafts: Draft[] = [];
+  const ring: (Draft | null)[] = Array(SLOTS).fill(null);
+  let head = 0;
+  let nextId = 1;
+  let spawnAcc = 0;
+  let serviceAcc = 0;
+  let passed = 0;
+  let intercepted = 0;
+  let pendingBurst = 0;
+  let burstAcc = 0;
+  const geo = { gx: 0, gy: 0, rx: 0, ry: 0, rr: 0, sinkX: 0, sinkY: 0, w: 0, h: 0 };
+  const layout = (f: StageFrame) => {
+    geo.w = f.width;
+    geo.h = f.height;
+    geo.gx = f.width * 0.36;
+    geo.gy = f.height * 0.46;
+    geo.rr = Math.min(f.width * 0.2, f.height * 0.3);
+    geo.rx = f.width - geo.rr - Math.max(28, f.width * 0.06);
+    geo.ry = f.height * 0.46;
+    geo.sinkX = f.width * 0.5;
+    geo.sinkY = f.height - 34;
+  };
+  const spawn = (now: number) => {
+    const crisis = rand() < 0.07;
+    const r = rand();
+    drafts.push({
+      id: nextId++, crisis, pri: (r < 0.25 ? 0 : r < 0.65 ? 1 : 2) as Priority,
+      phase: 'approach', x: -10, y: geo.gy + (rand() - 0.5) * geo.h * 0.5, t: 0, born: now, slot: -1,
     });
   };
-
-  const handleTriggerFSM = (targetState: number) => {
-    setSimState(targetState);
+  const slotPos = (s: number, r = geo.rr) => {
+    const a = -Math.PI / 2 + (s / SLOTS) * Math.PI * 2;
+    return [geo.rx + Math.cos(a) * r, geo.ry + Math.sin(a) * r] as const;
   };
+  // pre-seed a full ring so the buffer reads as already in use
+  for (let s = 0; s < SLOTS; s++) {
+    ring[s] = { id: nextId++, crisis: false, pri: (s % 3) as Priority, phase: 'stored', x: 0, y: 0, t: 1, born: -1, slot: s };
+  }
+  passed = SLOTS;
 
-  return (
-    <div className="w-full flex flex-col justify-between select-none">
-      {/* ROW 1: HTML Controls (clean underline mode tabs, toggles) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#2563EB]/20 text-xs font-mono">
-        {/* Left: Mode Underline Tabs */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          {(
-            [
-              { id: 'buffer', label: 'Encrypted Ring Buffer' },
-              { id: 'statemachine', label: 'Triage State Machine' },
-              { id: 'security', label: 'Air-Gapped Privacy' },
-            ] as const
-          ).map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              aria-pressed={activeTab === tab.id}
-              className={`min-h-[36px] flex items-center pb-1 transition-colors cursor-pointer text-xs font-mono tracking-wider ${
-                activeTab === tab.id
-                  ? 'text-[#F4F6F9] border-b-2 border-[#FF2800] font-semibold'
-                  : 'text-[#7E8B9B] hover:text-[#C8D2E0] border-b-2 border-transparent'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+  return {
+    idle(f) {
+      layout(f);
+      const a = f.time * 0.5;
+      const [x, y] = slotPos(Math.floor(((a / (Math.PI * 2)) % 1) * SLOTS));
+      return [x, y];
+    },
+    action(id) {
+      if (id === 'burst') pendingBurst += 18;
+    },
+    draw(ctx, f) {
+      layout(f);
+      const { width: w, height: h, dt, time } = f;
+      drawVignette(ctx, w, h, geo.rx, geo.ry);
+      drawGrid(ctx, w, h, 28, 0.035);
+      const intro = easeOutCubic(f.age / 0.8);
 
-        {/* Right: Contextual HTML Controls */}
-        <div className="flex flex-wrap items-center gap-2">
-          {activeTab === 'buffer' && (
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={handleSimulatePacket}
-                disabled={isInjecting}
-                className="min-h-[32px] px-3 py-1 bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] font-bold rounded-[2px] transition-colors cursor-pointer text-[11px] disabled:opacity-50 flex items-center"
-              >
-                {isInjecting ? 'Injecting...' : '▶ Inject Packet'}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSlots(INITIAL_SLOTS);
-                  setHeadIndex(4);
-                }}
-                className="min-h-[32px] px-2.5 py-1 bg-[#0B1E40] hover:bg-[#153875] text-[#7E8B9B] hover:text-[#F4F6F9] rounded-[2px] transition-colors cursor-pointer text-[11px] flex items-center"
-              >
-                Reset
-              </button>
-            </div>
-          )}
+      if (f.reduced && pendingBurst > 0) {
+        // no animation: settle the burst immediately
+        for (; pendingBurst > 0; pendingBurst--) {
+          const crisis = rand() < 0.07;
+          if (crisis) { intercepted++; continue; }
+          const r = rand();
+          ring[head] = { id: nextId++, crisis, pri: (r < 0.25 ? 0 : r < 0.65 ? 1 : 2) as Priority, phase: 'stored', x: 0, y: 0, t: 1, born: time, slot: head };
+          head = (head + 1) % SLOTS;
+          passed++;
+        }
+      }
 
-          {activeTab === 'statemachine' && (
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-              <span className="text-[#7E8B9B] mr-1">Simulate:</span>
-              <button
-                type="button"
-                onClick={() => handleTriggerFSM(1)}
-                className="min-h-[32px] px-2.5 py-1 bg-[#FF2800] text-[#F4F6F9] rounded-[2px] cursor-pointer font-bold flex items-center"
-              >
-                Crisis Intercept
-              </button>
-              <button
-                type="button"
-                onClick={() => handleTriggerFSM(2)}
-                className="min-h-[32px] px-2.5 py-1 bg-[#2563EB] text-[#F4F6F9] rounded-[2px] cursor-pointer flex items-center"
-              >
-                Triage Cooldown
-              </button>
-            </div>
-          )}
+      spawnAcc += dt;
+      if (spawnAcc > 0.85) { spawnAcc = 0; spawn(time); }
+      if (pendingBurst > 0) {
+        burstAcc += dt;
+        while (burstAcc > 0.035 && pendingBurst > 0) { burstAcc -= 0.035; pendingBurst--; spawn(time); }
+      }
 
-          {activeTab === 'security' && (
-            <button
-              type="button"
-              onClick={() => setAuditVerified(true)}
-              className="min-h-[32px] px-2.5 py-1 bg-[#0B1E40] text-[#4CC38A] border border-[#4CC38A]/30 rounded-[2px] cursor-pointer text-[11px] font-bold flex items-center"
-            >
-              ✓ 0.0 KB Leak Audit Verified
-            </button>
-          )}
-        </div>
-      </div>
+      // queue at the gate
+      const queue = drafts.filter((d) => d.phase === 'queued' || d.phase === 'approach');
+      const queued = drafts.filter((d) => d.phase === 'queued');
+      serviceAcc += dt;
+      if (serviceAcc >= SERVICE_S) {
+        serviceAcc = 0;
+        const next = queued.find((d) => Math.abs(d.x - (geo.gx - 18)) < 6);
+        if (next) {
+          next.phase = next.crisis ? 'support' : 'routed';
+          next.t = 0;
+          if (next.crisis) intercepted++;
+          else {
+            next.slot = head;
+            head = (head + 1) % SLOTS;
+            passed++;
+          }
+        }
+      }
 
-      {/* ROW 2: Flexible canvas/drawing container (min-height: 0, height ~460px on desktop) */}
-      <div className="relative w-full min-h-0 h-[280px] sm:h-[360px] lg:h-[460px] flex items-center justify-center my-3 overflow-hidden bg-[#03050A]/80 border border-[#2563EB]/15">
-        {/* TAB 1: 12-Slot Circular Orbital Ring Buffer SVG */}
-        {activeTab === 'buffer' && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center p-3 sm:p-4">
-            <svg viewBox="0 0 540 320" className="w-full h-full max-h-[420px] overflow-visible">
-              <defs>
-                <radialGradient id="tempoCoreGlow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#2563EB" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#03050A" stopOpacity="0.0" />
-                </radialGradient>
-              </defs>
+      // lanes: gate -> ring slot, eased Bezier per priority
+      const laneY = (p: Priority) => geo.gy + (p - 1) * Math.min(56, h * 0.13);
+      ctx.save();
+      ctx.lineWidth = 0.5;
+      for (const p of [0, 1, 2] as Priority[]) {
+        ctx.strokeStyle = rgba(PRI_COLORS[p], 0.35 * intro);
+        ctx.beginPath();
+        ctx.moveTo(geo.gx + 16, geo.gy);
+        ctx.bezierCurveTo(geo.gx + 70, laneY(p), geo.rx - geo.rr - 70, laneY(p), geo.rx - geo.rr - 8, geo.ry);
+        ctx.stroke();
+        label(ctx, PRI_NAMES[p], geo.gx + 72, laneY(p) - 5, rgba(PRI_COLORS[p], 0.8), 9);
+      }
+      ctx.setLineDash([2, 4]);
+      ctx.strokeStyle = rgba(C.crimson, 0.4 * intro);
+      ctx.beginPath();
+      ctx.moveTo(geo.gx, geo.gy + 16);
+      ctx.bezierCurveTo(geo.gx, geo.sinkY - 10, geo.sinkX - 60, geo.sinkY, geo.sinkX - 8, geo.sinkY);
+      ctx.stroke();
+      ctx.restore();
+      label(ctx, 'crisis resources', geo.sinkX, geo.sinkY + 4, C.crimson, 10);
 
-              {/* Central Cryptographic AES-256 Vault Core */}
-              <circle cx="270" cy="160" r="48" fill="url(#tempoCoreGlow)" stroke="#2563EB" strokeWidth="1.5" />
-              <text x="270" y="154" fill="#F4F6F9" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="middle">
-                AES-256
-              </text>
-              <text x="270" y="170" fill="#7E8B9B" fontSize="8" fontFamily="monospace" textAnchor="middle">
-                LOCAL VAULT
-              </text>
+      // inbound guide
+      ctx.save();
+      const g = ctx.createLinearGradient(0, 0, geo.gx, 0);
+      g.addColorStop(0, rgba(C.silver, 0));
+      g.addColorStop(1, rgba(C.silver, 0.25));
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(0, geo.gy);
+      ctx.lineTo(geo.gx - 16, geo.gy);
+      ctx.stroke();
+      ctx.restore();
 
-              {/* 12 Concentric Orbital Ring Guidelines */}
-              <circle cx="270" cy="160" r="115" fill="none" stroke="rgba(37, 99, 235, 0.2)" strokeWidth="1" strokeDasharray="3 3" />
+      // move drafts
+      let qIndex = 0;
+      for (const d of drafts) {
+        if (d.phase === 'approach' || d.phase === 'queued') {
+          const qx = geo.gx - 18 - qIndex * 7;
+          qIndex++;
+          const k = 1 - Math.exp(-dt * 8);
+          d.x += (qx - d.x) * k;
+          d.y += (geo.gy - d.y) * k;
+          if (Math.abs(d.x - qx) < 4) d.phase = 'queued';
+        } else if (d.phase === 'routed') {
+          d.t = Math.min(1, d.t + dt / 1.1);
+          const e = easeInOutCubic(d.t);
+          const [sx, sy] = slotPos(d.slot, geo.rr);
+          const ly = laneY(d.pri);
+          if (e < 0.75) {
+            const u = e / 0.75;
+            d.x = bez(geo.gx + 16, geo.gx + 70, geo.rx - geo.rr - 70, geo.rx - geo.rr - 8, u);
+            d.y = bez(geo.gy, ly, ly, geo.ry, u);
+          } else {
+            const u = (e - 0.75) / 0.25;
+            const ax = geo.rx - geo.rr - 8;
+            d.x = ax + (sx - ax) * u;
+            d.y = geo.ry + (sy - geo.ry) * u;
+          }
+          if (d.t >= 1) { d.phase = 'stored'; ring[d.slot] = d; }
+        } else if (d.phase === 'support') {
+          d.t = Math.min(1, d.t + dt / 1.2);
+          const e = easeInOutCubic(d.t);
+          d.x = bez(geo.gx, geo.gx, geo.sinkX - 60, geo.sinkX - 8, e);
+          d.y = bez(geo.gy + 16, geo.sinkY - 10, geo.sinkY, geo.sinkY, e);
+        }
+      }
+      for (let i = drafts.length - 1; i >= 0; i--) {
+        const d = drafts[i];
+        if (d.phase === 'stored' || (d.phase === 'support' && d.t >= 1)) drafts.splice(i, 1);
+      }
 
-              {/* 12 Slots arranged radially at 30° increments */}
-              {slots.map((slot, i) => {
-                const angle = (i * 30 - 90) * (Math.PI / 180);
-                const radius = 115;
-                const sx = 270 + radius * Math.cos(angle);
-                const sy = 160 + radius * Math.sin(angle);
-                const isHead = slot.id === headIndex;
+      // ring buffer
+      const hoverSlot = (() => {
+        const a = Math.atan2(f.pointer.y - geo.ry, f.pointer.x - geo.rx);
+        const r = Math.hypot(f.pointer.x - geo.rx, f.pointer.y - geo.ry);
+        if (r < geo.rr * 0.6 || r > geo.rr * 1.35) return -1;
+        return Math.round((((a + Math.PI / 2) / (Math.PI * 2)) % 1 + 1) % 1 * SLOTS) % SLOTS;
+      })();
+      ctx.save();
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = rgba(C.silver, 0.2);
+      ctx.beginPath();
+      ctx.arc(geo.rx, geo.ry, geo.rr * 1.18, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(geo.rx, geo.ry, geo.rr * 0.78, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      for (let s = 0; s < SLOTS; s++) {
+        const a0 = -Math.PI / 2 + ((s - 0.42) / SLOTS) * Math.PI * 2;
+        const a1 = -Math.PI / 2 + ((s + 0.42) / SLOTS) * Math.PI * 2;
+        const item = ring[s];
+        const age = (head - 1 - s + SLOTS) % SLOTS;
+        const fresh = item && item.born >= 0 ? clamp(1 - (time - item.born - 1) / 3, 0, 1) : 0;
+        ctx.beginPath();
+        ctx.arc(geo.rx, geo.ry, geo.rr * 1.14, a0, a1);
+        ctx.arc(geo.rx, geo.ry, geo.rr * 0.82, a1, a0, true);
+        ctx.closePath();
+        if (item) {
+          const col = PRI_COLORS[item.pri];
+          const gr = ctx.createRadialGradient(geo.rx, geo.ry, geo.rr * 0.8, geo.rx, geo.ry, geo.rr * 1.16);
+          const alpha = (0.18 + (1 - age / SLOTS) * 0.42 + fresh * 0.3) * intro;
+          gr.addColorStop(0, rgba(col, alpha * 0.4));
+          gr.addColorStop(1, rgba(col, alpha));
+          ctx.fillStyle = gr;
+          ctx.fill();
+        }
+        ctx.lineWidth = s === hoverSlot ? 1 : 0.5;
+        ctx.strokeStyle = s === hoverSlot ? C.alabaster : rgba(C.silver, 0.3);
+        ctx.stroke();
+        if (fresh > 0 && item) {
+          const [fx, fy] = slotPos(s, geo.rr * 0.98);
+          glow(ctx, fx, fy, 22, PRI_COLORS[item.pri], fresh * 0.6);
+        }
+      }
+      // write head
+      const [hx, hy] = slotPos(head - 0.5, geo.rr * 1.3);
+      const [hx0, hy0] = slotPos(head - 0.5, geo.rr * 0.7);
+      ctx.beginPath();
+      ctx.moveTo(hx0, hy0);
+      ctx.lineTo(hx, hy);
+      phosphor(ctx, C.red, 0.75, 0.12);
+      label(ctx, 'zero-destination buffer', geo.rx, geo.ry - 4, C.silver, 10, 'center');
+      label(ctx, 'no outbound path', geo.rx, geo.ry + 11, C.titanium, 9, 'center');
 
-                let strokeCol = 'rgba(200, 210, 224, 0.3)';
-                let fillCol = '#060A12';
-                if (slot.category === 'crisis') {
-                  strokeCol = '#FF2800';
-                  fillCol = isHead ? '#FF2800' : 'rgba(255, 40, 0, 0.25)';
-                } else if (slot.category === 'burnout') {
-                  strokeCol = '#2563EB';
-                  fillCol = isHead ? '#2563EB' : 'rgba(37, 99, 235, 0.25)';
-                } else if (slot.category === 'normal') {
-                  strokeCol = '#C8D2E0';
-                  fillCol = isHead ? '#C8D2E0' : 'rgba(200, 210, 224, 0.15)';
-                } else {
-                  strokeCol = 'rgba(37, 99, 235, 0.15)';
-                  fillCol = '#03050A';
-                }
+      // gate (diamond)
+      const busy = queued.length > 0 ? 1 : 0;
+      glow(ctx, geo.gx, geo.gy, 34 + queue.length * 1.5, busy ? C.red : C.cobalt, 0.35 + Math.min(0.4, queue.length * 0.03));
+      ctx.save();
+      ctx.translate(geo.gx, geo.gy);
+      ctx.rotate(Math.PI / 4);
+      const gs = 20;
+      const gg = ctx.createLinearGradient(-gs, -gs, gs, gs);
+      gg.addColorStop(0, rgba(C.cobaltMid, 0.9));
+      gg.addColorStop(1, rgba(C.midnight, 0.9));
+      ctx.fillStyle = gg;
+      ctx.fillRect(-gs / 2, -gs / 2, gs, gs);
+      ctx.lineWidth = 0.75;
+      ctx.strokeStyle = C.alabaster;
+      ctx.strokeRect(-gs / 2, -gs / 2, gs, gs);
+      ctx.restore();
+      label(ctx, 'safety gate', geo.gx, geo.gy - 24, C.alabaster, 10, 'center');
+      label(ctx, `queue ${queue.length}`, geo.gx, geo.gy + 32, queue.length > 4 ? C.red : C.titanium, 9, 'center');
 
-                return (
-                  <g key={slot.id}>
-                    {/* Radial Connector from Center */}
-                    <line x1="270" y1="160" x2={sx} y2={sy} stroke={isHead ? '#FF2800' : 'rgba(37, 99, 235, 0.15)'} strokeWidth={isHead ? 1.5 : 0.8} />
+      // drafts
+      for (const d of drafts) {
+        const col = d.phase === 'support' ? C.crimson : d.phase === 'routed' ? PRI_COLORS[d.pri] : C.alabaster;
+        glow(ctx, d.x, d.y, 8, col, 0.45);
+        ctx.fillStyle = col;
+        ctx.fillRect(d.x - 1.5, d.y - 1.5, 3, 3);
+      }
+      label(ctx, 'drafts in', 14, geo.gy - 10, C.titanium, 9);
 
-                    {/* Slot Orbital Node */}
-                    {isHead && (
-                      <circle cx={sx} cy={sy} r="18" fill="none" stroke="#FF2800" strokeWidth="1" className="animate-ping" />
-                    )}
-                    <circle
-                      cx={sx}
-                      cy={sy}
-                      r={isHead ? 13 : 9}
-                      fill={fillCol}
-                      stroke={isHead ? '#FFFFFF' : strokeCol}
-                      strokeWidth={isHead ? 2 : 1}
-                    />
-                    <text
-                      x={sx}
-                      y={sy + 3}
-                      fill={isHead ? '#03050A' : '#F4F6F9'}
-                      fontSize="8"
-                      fontFamily="monospace"
-                      fontWeight="bold"
-                      textAnchor="middle"
-                    >
-                      {slot.id < 10 ? `0${slot.id}` : slot.id}
-                    </text>
-                  </g>
-                );
-              })}
+      const hs = hoverSlot >= 0 ? hoverSlot : (head - 1 + SLOTS) % SLOTS;
+      const it = ring[hs];
+      return `queue ${queue.length} · stored ${passed} · intercepted ${intercepted} · slot ${String(hs).padStart(2, '0')} ${it ? PRI_NAMES[it.pri] : 'empty'} · head ${String(head).padStart(2, '0')}`;
+    },
+  };
+}
 
-              {/* Active HEAD Callout Box */}
-              <g transform="translate(20, 255)">
-                <rect width="500" height="45" fill="#03050A" stroke="#FF2800" strokeWidth="1" />
-                <text x="15" y="18" fill="#FF2800" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                  ACTIVE BUFFER HEAD: SLOT {headIndex < 10 ? `0${headIndex}` : headIndex} ◀
-                </text>
-                <text x="15" y="34" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif">
-                  Payload: &quot;{slots[headIndex]?.label}&quot; — Category: {slots[headIndex]?.category.toUpperCase()} ({slots[headIndex]?.timestamp})
-                </text>
-              </g>
-            </svg>
-          </div>
-        )}
+/* ---------- 2. active-passive failover state machine ---------- */
 
-        {/* TAB 2: Triage State Machine FSM Architecture SVG */}
-        {activeTab === 'statemachine' && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center p-3 sm:p-4">
-            <svg viewBox="0 0 600 320" className="w-full h-full max-h-[420px] overflow-visible">
-              <text x="20" y="30" fill="#F4F6F9" fontSize="13" fontFamily="sans-serif" fontWeight="bold">
-                DETERMINISTIC COGNITIVE TRIAGE FINITE STATE MACHINE (FSM)
-              </text>
-              <text x="20" y="46" fill="#7E8B9B" fontSize="9" fontFamily="monospace">
-                0.20ms Regex Circuit Breaker Intercept &rarr; Zero-Impulse Cooldown &rarr; Encrypted Persistence
-              </text>
+interface Token { path: number[]; seg: number; t: number; col: string }
 
-              {/* Connecting Transition Splines */}
-              <path d="M 100 140 L 220 140" stroke={simState >= 2 ? '#2563EB' : 'rgba(37, 99, 235, 0.25)'} strokeWidth="2" />
-              <path d="M 220 140 L 340 140" stroke={simState >= 3 ? '#2563EB' : 'rgba(37, 99, 235, 0.25)'} strokeWidth="2" />
-              <path d="M 340 140 L 460 140" stroke={simState >= 4 ? '#4CC38A' : 'rgba(37, 99, 235, 0.25)'} strokeWidth="2" />
+function createFailoverScene(): PlateScene {
+  // states from the Tempo C4 model
+  const states = [
+    { name: 'Draft', x: 0.08, y: 0.5 },
+    { name: 'Safety gate', x: 0.27, y: 0.5 },
+    { name: 'Crisis resources', x: 0.27, y: 0.86 },
+    { name: 'pgvector recall', x: 0.47, y: 0.5 },
+    { name: 'Primary · DeepSeek V3', x: 0.68, y: 0.3 },
+    { name: 'Zod self-correct', x: 0.68, y: 0.08 },
+    { name: 'Fallback · Gemini', x: 0.68, y: 0.74 },
+    { name: 'Reframe ready', x: 0.9, y: 0.5 },
+  ];
+  const edges: [number, number, string][] = [
+    [0, 1, ''], [1, 2, 'crisis match'], [1, 3, 'clear'], [3, 4, ''], [4, 5, 'schema error'], [5, 4, 'retry once'],
+    [4, 6, 'timeout > 1,200 ms'], [4, 7, 'valid JSON'], [6, 7, ''],
+  ];
+  const rand = rng(11);
+  const tokens: Token[] = [];
+  const counts = new Array(states.length).fill(0);
+  let acc = 0;
+  let pending = 0;
+  const route = (): Token => {
+    const r = rand();
+    if (r < 0.06) return { path: [0, 1, 2], seg: 0, t: 0, col: C.crimson };
+    const r2 = rand();
+    if (r2 < 0.16) return { path: [0, 1, 3, 4, 5, 4, 7], seg: 0, t: 0, col: C.silver };
+    if (r2 < 0.3) return { path: [0, 1, 3, 4, 6, 7], seg: 0, t: 0, col: C.cobalt };
+    return { path: [0, 1, 3, 4, 7], seg: 0, t: 0, col: C.red };
+  };
+  const pos = (f: StageFrame, i: number) => {
+    const padX = 60;
+    return [padX + states[i].x * (f.width - padX * 2) + (i === 0 ? -10 : 0), 34 + states[i].y * (f.height - 84)] as const;
+  };
+  const ctrl = (f: StageFrame, a: number, b: number) => {
+    const [x0, y0] = pos(f, a);
+    const [x1, y1] = pos(f, b);
+    const back = a === 5 && b === 4;
+    const bend = back ? 36 : a === 4 && b === 5 ? -36 : 0;
+    return [x0, y0, (x0 + x1) / 2 + bend, (y0 + y1) / 2, x1, y1] as const;
+  };
+  const quad = (p0: number, p1: number, p2: number, t: number) => (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
+  // prewarm: 40 earlier requests so the counters read as a running system
+  for (let i = 0; i < 40; i++) route().path.forEach((s) => counts[s]++);
 
-              {/* State 1: Intercept */}
-              <g transform="translate(50, 95)" onClick={() => setSimState(1)} className="cursor-pointer">
-                <rect width="90" height="90" fill="#060A12" stroke={simState === 1 ? '#FF2800' : '#2563EB'} strokeWidth={simState === 1 ? 2 : 1} />
-                <text x="45" y="24" fill="#FF2800" fontSize="9" fontFamily="monospace" textAnchor="middle" fontWeight="bold">STATE 01</text>
-                <text x="45" y="46" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">INTERCEPT</text>
-                <text x="45" y="66" fill="#7E8B9B" fontSize="8" fontFamily="monospace" textAnchor="middle">0.20ms Regex</text>
-              </g>
+  return {
+    action(id) { if (id === 'burst') pending += 10; },
+    idle(f) {
+      const i = [1, 4, 6, 7][Math.floor(f.time / 2.4) % 4];
+      return pos(f, i) as unknown as [number, number];
+    },
+    draw(ctx, f) {
+      drawVignette(ctx, f.width, f.height);
+      drawGrid(ctx, f.width, f.height, 28, 0.035);
+      const intro = easeOutCubic(f.age / 0.8);
+      acc += f.dt;
+      if (acc > 1.1) { acc = 0; tokens.push(route()); }
+      if (pending > 0 && rand() < 0.35) { pending--; tokens.push(route()); }
+      if (f.reduced && pending > 0) {
+        for (; pending > 0; pending--) { const tk = route(); tk.path.forEach((s) => counts[s]++); }
+      }
 
-              {/* State 2: Triage */}
-              <g transform="translate(175, 95)" onClick={() => setSimState(2)} className="cursor-pointer">
-                <rect width="90" height="90" fill="#060A12" stroke={simState === 2 ? '#2563EB' : 'rgba(37, 99, 235, 0.3)'} strokeWidth={simState === 2 ? 2 : 1} />
-                <text x="45" y="24" fill="#2563EB" fontSize="9" fontFamily="monospace" textAnchor="middle" fontWeight="bold">STATE 02</text>
-                <text x="45" y="46" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">TRIAGE</text>
-                <text x="45" y="66" fill="#7E8B9B" fontSize="8" fontFamily="monospace" textAnchor="middle">Cooldown</text>
-              </g>
+      let hover = -1;
+      let hd = Infinity;
+      states.forEach((_, i) => {
+        const [x, y] = pos(f, i);
+        const d = Math.hypot(x - f.pointer.x, y - f.pointer.y);
+        if (d < hd) { hd = d; hover = i; }
+      });
+      if (hd > 70) hover = -1;
 
-              {/* State 3: Classify */}
-              <g transform="translate(295, 95)" onClick={() => setSimState(3)} className="cursor-pointer">
-                <rect width="90" height="90" fill="#060A12" stroke={simState === 3 ? '#FF4419' : 'rgba(37, 99, 235, 0.3)'} strokeWidth={simState === 3 ? 2 : 1} />
-                <text x="45" y="24" fill="#FF4419" fontSize="9" fontFamily="monospace" textAnchor="middle" fontWeight="bold">STATE 03</text>
-                <text x="45" y="46" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">CLASSIFY</text>
-                <text x="45" y="66" fill="#7E8B9B" fontSize="8" fontFamily="monospace" textAnchor="middle">100% Recall</text>
-              </g>
+      edges.forEach(([a, b, txt]) => {
+        const [x0, y0, cx, cy, x1, y1] = ctrl(f, a, b);
+        const hot = hover === a || hover === b;
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.quadraticCurveTo(cx, cy, x1, y1);
+        if (hot) phosphor(ctx, C.silver, 0.75, 0.1);
+        else {
+          ctx.lineWidth = 0.5;
+          ctx.strokeStyle = rgba(b === 2 ? C.crimson : C.cobalt, 0.55 * intro);
+          ctx.stroke();
+        }
+        // arrowhead at 88%
+        const t = 0.88;
+        const ax = quad(x0, cx, x1, t);
+        const ay = quad(y0, cy, y1, t);
+        const tx = 2 * (1 - t) * (cx - x0) + 2 * t * (x1 - cx);
+        const ty = 2 * (1 - t) * (cy - y0) + 2 * t * (y1 - cy);
+        const l = Math.hypot(tx, ty) || 1;
+        const ux = tx / l;
+        const uy = ty / l;
+        ctx.strokeStyle = rgba(C.silver, hot ? 0.9 : 0.5);
+        ctx.lineWidth = 0.75;
+        ctx.beginPath();
+        ctx.moveTo(ax - ux * 5 - uy * 3, ay - uy * 5 + ux * 3);
+        ctx.lineTo(ax, ay);
+        ctx.lineTo(ax - ux * 5 + uy * 3, ay - uy * 5 - ux * 3);
+        ctx.stroke();
+        if (txt && f.width > 520) label(ctx, txt, quad(x0, cx, x1, 0.5) + 6, quad(y0, cy, y1, 0.5) - 6, hot ? C.silver : C.titanium, 9);
+      });
 
-              {/* State 4: Persist */}
-              <g transform="translate(415, 95)" onClick={() => setSimState(4)} className="cursor-pointer">
-                <rect width="90" height="90" fill="#0B1E40" stroke={simState === 4 ? '#4CC38A' : '#2563EB'} strokeWidth={simState === 4 ? 2 : 1} />
-                <text x="45" y="24" fill="#4CC38A" fontSize="9" fontFamily="monospace" textAnchor="middle" fontWeight="bold">STATE 04</text>
-                <text x="45" y="46" fill="#F4F6F9" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">PERSIST</text>
-                <text x="45" y="66" fill="#4CC38A" fontSize="8" fontFamily="monospace" textAnchor="middle">SQLite AES</text>
-              </g>
+      // tokens
+      for (let i = tokens.length - 1; i >= 0; i--) {
+        const tk = tokens[i];
+        tk.t += f.dt / 0.7;
+        if (tk.t >= 1) {
+          counts[tk.path[tk.seg + 1]]++;
+          tk.seg++;
+          tk.t = 0;
+          if (tk.seg >= tk.path.length - 1) { tokens.splice(i, 1); continue; }
+        }
+        const [x0, y0, cx, cy, x1, y1] = ctrl(f, tk.path[tk.seg], tk.path[tk.seg + 1]);
+        const e = easeInOutCubic(tk.t);
+        const x = quad(x0, cx, x1, e);
+        const y = quad(y0, cy, y1, e);
+        glow(ctx, x, y, 12, tk.col, 0.6);
+        ctx.fillStyle = C.alabaster;
+        ctx.fillRect(x - 1.25, y - 1.25, 2.5, 2.5);
+      }
 
-              {/* Description Footer */}
-              <g transform="translate(50, 240)">
-                <rect width="500" height="42" fill="#03050A" stroke="rgba(37, 99, 235, 0.25)" strokeWidth="1" />
-                <text x="15" y="18" fill="#F4F6F9" fontSize="10" fontFamily="monospace">
-                  ACTIVE RULE: {simState === 1 ? 'REGEX CIRCUIT BREAKER /urgent|critical|sev-1/i' : simState === 2 ? '15-MIN COGNITIVE ISOLATION BUFFER' : simState === 3 ? 'HEURISTIC CLASSIFICATION (CRISIS / BURNOUT)' : 'LOCAL AES-256 ENCRYPTED PERSISTENCE'}
-                </text>
-                <text x="15" y="32" fill="#7E8B9B" fontSize="9" fontFamily="monospace">
-                  Guarantees 0.0 KB network transmission while retaining 100% incident auditability.
-                </text>
-              </g>
-            </svg>
-          </div>
-        )}
+      // states
+      const small = f.width < 520;
+      states.forEach((s, i) => {
+        const [x, y] = pos(f, i);
+        const hot = hover === i;
+        const r = i === 2 ? 5 : 7;
+        glow(ctx, x, y, hot ? 30 : 18, i === 2 ? C.crimson : i === 7 ? C.red : C.cobalt, hot ? 0.55 : 0.3);
+        ctx.fillStyle = C.midnight;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = hot ? 1.2 : 0.75;
+        ctx.strokeStyle = hot ? C.alabaster : rgba(C.silver, 0.7);
+        ctx.stroke();
+        const name = small ? s.name.split(' · ')[0] : s.name;
+        label(ctx, name, x, y + 20, hot ? C.alabaster : C.silver, small ? 9 : 10, 'center');
+        label(ctx, String(counts[i]), x, y - 13, hot ? C.red : C.titanium, 9, 'center');
+      });
 
-        {/* TAB 3: Air-Gapped Privacy Architecture SVG */}
-        {activeTab === 'security' && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center p-3 sm:p-4">
-            <svg viewBox="0 0 600 320" className="w-full h-full max-h-[420px] overflow-visible">
-              <text x="20" y="30" fill="#F4F6F9" fontSize="13" fontFamily="sans-serif" fontWeight="bold">
-                AIR-GAPPED APPLICATION RUNTIME &amp; CRYPTOGRAPHIC BOUNDARY
-              </text>
-              <text x="20" y="46" fill="#7E8B9B" fontSize="9" fontFamily="monospace">
-                Hardware-Level Zero-Telemetry Guarantee | Verified 0.0 KB Egress Ports
-              </text>
+      label(ctx, 'request paths · counts per state', 16, 18, C.titanium, 9);
+      if (hover >= 0) return `${states[hover].name} · ${counts[hover]} visits · primary ${counts[4]} · self-corrected ${counts[5]} · failover ${counts[6]} · intercepted ${counts[2]}`;
+      return `in flight ${tokens.length} · primary ${counts[4]} · self-corrected ${counts[5]} · failover ${counts[6]} · intercepted ${counts[2]}`;
+    },
+  };
+}
 
-              {/* Host OS Boundary Frame */}
-              <rect x="30" y="70" width="540" height="150" fill="#03050A" stroke="#4CC38A" strokeWidth="1.5" strokeDasharray="6 4" />
-              <text x="45" y="90" fill="#4CC38A" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                [STRICT AIR-GAP ISOLATION PERIMETER]
-              </text>
+/* ---------- 3. pgvector cosine recall ---------- */
 
-              {/* Blocked Ports */}
-              <g transform="translate(45, 110)">
-                <rect width="140" height="85" fill="#060A12" stroke="#FF2800" strokeWidth="1" />
-                <text x="10" y="22" fill="#FF2800" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                  ❌ PORT 443 HTTPS
-                </text>
-                <text x="10" y="42" fill="#7E8B9B" fontSize="9" fontFamily="monospace">Outbound Blocked</text>
-                <text x="10" y="62" fill="#FF2800" fontSize="11" fontFamily="monospace" fontWeight="bold">0.0 KB Transmitted</text>
-              </g>
+const DIM = 8;
+function createMemoryScene(): PlateScene {
+  const rand = rng(23);
+  const gauss = () => Math.sqrt(-2 * Math.log(rand() + 1e-9)) * Math.cos(2 * Math.PI * rand());
+  const centers = Array.from({ length: 5 }, () => Array.from({ length: DIM }, gauss));
+  const vecs: number[][] = [];
+  const cluster: number[] = [];
+  for (let i = 0; i < 120; i++) {
+    const c = i % 5;
+    const v = centers[c].map((x) => x + gauss() * 0.55);
+    const n = Math.hypot(...v);
+    vecs.push(v.map((x) => x / n));
+    cluster.push(c);
+  }
+  // 2-D view via two orthonormalised random axes (the view distorts; cosine is computed in 8-D)
+  const ax1 = Array.from({ length: DIM }, gauss);
+  const n1 = Math.hypot(...ax1);
+  for (let k = 0; k < DIM; k++) ax1[k] /= n1;
+  const ax2 = Array.from({ length: DIM }, gauss);
+  const d12 = ax2.reduce((s, x, k) => s + x * ax1[k], 0);
+  for (let k = 0; k < DIM; k++) ax2[k] -= d12 * ax1[k];
+  const n2 = Math.hypot(...ax2);
+  for (let k = 0; k < DIM; k++) ax2[k] /= n2;
+  const P = vecs.map((v) => [v.reduce((s, x, k) => s + x * ax1[k], 0), v.reduce((s, x, k) => s + x * ax2[k], 0)]);
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const [x, y] of P) { minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
+  const cos = (a: number[], b: number[]) => a.reduce((s, x, k) => s + x * b[k], 0);
+  const screen = (f: StageFrame, i: number) => {
+    const pad = 40;
+    const w = f.width - pad * 2;
+    const h = f.height - pad * 2 - 10;
+    return [pad + ((P[i][0] - minX) / (maxX - minX)) * w, pad + 10 + ((P[i][1] - minY) / (maxY - minY)) * h] as const;
+  };
+  const sims = new Float32Array(vecs.length);
+  const shown = new Float32Array(vecs.length);
 
-              {/* Local Storage Core */}
-              <g transform="translate(230, 110)">
-                <rect width="140" height="85" fill="#0B1E40" stroke="#2563EB" strokeWidth="1.5" />
-                <text x="10" y="22" fill="#2563EB" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                  🔒 AES-256 VAULT
-                </text>
-                <text x="10" y="42" fill="#C8D2E0" fontSize="9" fontFamily="monospace">SQLite + WAL Mode</text>
-                <text x="10" y="62" fill="#4CC38A" fontSize="10" fontFamily="monospace">100% Local Encrypted</text>
-              </g>
+  return {
+    idle(f) {
+      const i = (Math.floor(f.time / 2.5) * 37) % vecs.length;
+      return screen(f, i) as unknown as [number, number];
+    },
+    draw(ctx, f) {
+      drawVignette(ctx, f.width, f.height);
+      drawGrid(ctx, f.width, f.height, 32, 0.035);
+      const intro = easeOutCubic(f.age / 0.9);
+      let q = 0;
+      let qd = Infinity;
+      for (let i = 0; i < vecs.length; i++) {
+        const [x, y] = screen(f, i);
+        const d = (x - f.pointer.x) ** 2 + (y - f.pointer.y) ** 2;
+        if (d < qd) { qd = d; q = i; }
+      }
+      for (let i = 0; i < vecs.length; i++) sims[i] = cos(vecs[q], vecs[i]);
+      const order = Array.from(sims.keys()).filter((i) => i !== q).sort((a, b) => sims[b] - sims[a]);
+      const top = order.slice(0, 5);
+      const k = f.reduced ? 1 : 1 - Math.exp(-f.dt * 8);
+      for (let i = 0; i < vecs.length; i++) shown[i] += (sims[i] - shown[i]) * k;
 
-              {/* Memory Sandbox */}
-              <g transform="translate(415, 110)">
-                <rect width="140" height="85" fill="#060A12" stroke="#C8D2E0" strokeWidth="1" />
-                <text x="10" y="22" fill="#C8D2E0" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                  🛡️ IPC SANDBOX
-                </text>
-                <text x="10" y="42" fill="#7E8B9B" fontSize="9" fontFamily="monospace">Electron Context</text>
-                <text x="10" y="62" fill="#2563EB" fontSize="10" fontFamily="monospace">Node Integration: Off</text>
-              </g>
+      const [qx, qy] = screen(f, q);
+      top.forEach((i, rank) => {
+        const [x, y] = screen(f, i);
+        ctx.beginPath();
+        ctx.moveTo(qx, qy);
+        ctx.lineTo(qx + (x - qx) * intro, qy + (y - qy) * intro);
+        phosphor(ctx, C.red, 0.6, 0.06 + (5 - rank) * 0.02);
+        label(ctx, sims[i].toFixed(3), x + 7, y - 6, C.alabaster, 9);
+      });
 
-              {/* Bottom Cryptographic Verification Banner */}
-              <g transform="translate(30, 245)">
-                <rect width="540" height="42" fill="#03050A" stroke="#4CC38A" strokeWidth="1" />
-                <text x="15" y="18" fill="#4CC38A" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                  ✓ AUDIT VERIFIED: ZERO TELEMETRY TRANSMISSION
-                </text>
-                <text x="15" y="32" fill="#7E8B9B" fontSize="9" fontFamily="monospace">
-                  SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 (Empty Egress)
-                </text>
-              </g>
-            </svg>
-          </div>
-        )}
-      </div>
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < vecs.length; i++) {
+        const [x, y] = screen(f, i);
+        const s = clamp((shown[i] + 1) / 2, 0, 1);
+        const [r, g, b] = ramp([C.cobaltDeep, C.cobalt, C.silver, C.red], s ** 2);
+        const rad = 1.4 + s * s * 2.2;
+        ctx.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${(0.35 + s * 0.65) * intro})`;
+        ctx.beginPath();
+        ctx.arc(x, y, rad, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+      glow(ctx, qx, qy, 26, C.red, 0.7);
+      ctx.strokeStyle = C.alabaster;
+      ctx.lineWidth = 0.75;
+      ctx.beginPath();
+      ctx.arc(qx, qy, 6, 0, Math.PI * 2);
+      ctx.stroke();
 
-      {/* ROW 3: HTML Telemetry footer (outside drawing canvas; never overlaying or clipping artwork) */}
-      <div className="pt-3 border-t border-[#2563EB]/20 w-full min-w-0 text-xs font-mono">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-[#7E8B9B]">
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">Ring Buffer Head</span>
-            <span className="text-sm font-bold text-[#FF2800]">Slot {headIndex < 10 ? `0${headIndex}` : headIndex} of 12</span>
-          </div>
+      label(ctx, 'synthetic 8-d embeddings · 2-d projection · cosine computed in 8-d', 16, 18, C.titanium, 9);
+      return `query #${String(q).padStart(3, '0')} · top-5 cosine ${top.map((i) => sims[i].toFixed(2)).join(' / ')}`;
+    },
+  };
+}
 
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">Network Exfiltration</span>
-            <span className="text-sm font-bold text-[#4CC38A]">0.0 KB (Air-Gapped)</span>
-          </div>
-
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">Local Persistence</span>
-            <span className="text-sm font-bold text-[#F4F6F9]">AES-256 SQLite</span>
-          </div>
-
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">Crisis Recall</span>
-            <span className="text-sm font-bold text-[#2563EB]">100% Recall Rate</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+export const tempoPlate: PlateDefinition = {
+  modes: [
+    { id: 'gate', label: 'Triage gate', description: 'Drafts queue at a deterministic safety gate. Crisis matches divert to support; the rest are triaged by priority into a ring buffer with no outbound path.' },
+    { id: 'failover', label: 'Failover', description: 'State machine of a request: safety gate, pgvector recall, primary model, one schema self-correction, and failover to the fallback model on timeout.' },
+    { id: 'memory', label: 'Cosine recall', description: 'Synthetic embedding cloud. The point nearest the cursor is the query and its five nearest neighbours by cosine similarity are linked.' },
+  ],
+  actions: [{ id: 'burst', label: 'Inject burst', modes: ['gate', 'failover'] }],
+  createScene(modeId) {
+    if (modeId === 'failover') return createFailoverScene();
+    if (modeId === 'memory') return createMemoryScene();
+    return createGateScene();
+  },
 };
 
-export default PlateTempo;
+export default tempoPlate;

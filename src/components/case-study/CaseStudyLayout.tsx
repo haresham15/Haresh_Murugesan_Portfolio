@@ -149,12 +149,21 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
           
           {/* CASE STUDY HEADER & BREADCRUMBS */}
           <div className="max-w-[1280px] mx-auto px-4 sm:px-6 mb-10 sm:mb-14">
-            <div className="flex items-center gap-2 text-xs font-mono text-[#7E8B9B] mb-6">
-              <Link href="/" className="hover:text-[#FF2800] transition-colors">Home</Link>
-              <span>/</span>
-              <Link href="/#projects" className="hover:text-[#FF2800] transition-colors">Projects</Link>
-              <span>/</span>
-              <span className="text-[#FF2800] truncate">{project.slug}</span>
+            <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs font-mono text-[#7E8B9B] mb-6">
+              <Link
+                href="/#archive"
+                className="inline-flex items-center gap-2 min-h-[32px] text-[#F4F6F9] hover:text-[#FF2800] transition-colors"
+              >
+                <span aria-hidden="true">←</span>
+                <span>Back to the constellation</span>
+              </Link>
+              <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
+                <Link href="/" className="hover:text-[#FF2800] transition-colors">Home</Link>
+                <span aria-hidden="true">/</span>
+                <Link href="/#projects" className="hover:text-[#FF2800] transition-colors">Projects</Link>
+                <span aria-hidden="true">/</span>
+                <span className="text-[#FF2800] truncate" aria-current="page">{project.slug}</span>
+              </nav>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -316,37 +325,37 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                     {caseStudy.decisions && caseStudy.decisions.map((dec: EngineeringTradeoff, idx: number) => (
                       <div
                         key={idx}
-                        className="p-4 sm:p-5 md:p-6 rounded-[2px] bg-[#03050A] border border-[#18458B]/20 flex flex-col gap-4"
+                        className="pt-5 border-t border-[#C8D2E0]/10 first:pt-0 first:border-t-0 flex flex-col gap-4"
                       >
                         <h3 className="text-base sm:text-lg font-serif font-bold text-[#F4F6F9] tracking-tight">
                           Decision {idx + 1}: {dec.title}
                         </h3>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs font-sans">
-                          <div className="p-3 sm:p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
-                            <span className="text-[#10B981] font-mono font-semibold uppercase tracking-wider block mb-1">
-                              Option Chosen
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-xs font-sans">
+                          <div className="pl-0 sm:pr-2">
+                            <span className="text-[#C8D2E0] font-mono font-semibold block mb-1">
+                              Option chosen
                             </span>
                             <p className="text-[#F4F6F9] leading-relaxed">{dec.optionChosen}</p>
                           </div>
 
-                          <div className="p-3 sm:p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
-                            <span className="text-[#F87171] font-mono font-semibold uppercase tracking-wider block mb-1">
-                              Alternative Rejected
+                          <div className="pl-0 sm:pr-2">
+                            <span className="text-[#7E8B9B] font-mono font-semibold block mb-1">
+                              Alternative rejected
                             </span>
                             <p className="text-[#7E8B9B] leading-relaxed">{dec.alternativeRejected}</p>
                           </div>
 
-                          <div className="p-3 sm:p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
-                            <span className="text-[#FF2800] font-mono font-semibold uppercase tracking-wider block mb-1">
-                              Cost Accepted
+                          <div className="pl-0 sm:pr-2">
+                            <span className="text-[#FF4419] font-mono font-semibold block mb-1">
+                              Cost accepted
                             </span>
                             <p className="text-[#F4F6F9] leading-relaxed">{dec.costAccepted}</p>
                           </div>
 
-                          <div className="p-3 sm:p-3.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/15">
-                            <span className="text-[#2563EB] font-mono font-semibold uppercase tracking-wider block mb-1">
-                              Measured Impact
+                          <div className="pl-0 sm:pr-2">
+                            <span className="text-[#2563EB] font-mono font-semibold block mb-1">
+                              Measured impact
                             </span>
                             <p className="text-[#F4F6F9] leading-relaxed font-medium">{dec.measuredResult}</p>
                           </div>

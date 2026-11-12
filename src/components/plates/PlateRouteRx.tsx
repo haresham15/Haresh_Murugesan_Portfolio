@@ -1,462 +1,696 @@
-import React, { useState } from 'react';
+import {
+  C, clamp, drawGrid, drawVignette, easeOutCubic, fbm, glow, hash2, isoSegments, label, phosphor, rgba, smoothstep,
+  strokeSegments, type PlateDefinition, type PlateScene, type StageFrame,
+} from './stageKit';
 
-export type RouteRxTab = 'isochrones' | 'deserts' | 'matrix';
+/* ============================================================
+ * Synthetic city model. Generic geography, not a real map.
+ * The block count (141) and desert count (43 within an 800 m
+ * walk radius) mirror the RouteRx case study; positions are invented.
+ * ============================================================ */
 
-interface ClinicHub {
-  id: string;
-  name: string;
-  x: number;
-  y: number;
-  type: 'hospital' | 'community';
-  catchment5m: string;
-  catchment15m: string;
-  catchment30m: string;
+const ASPECT = 1.5;
+const MAP_H = 1 / ASPECT;
+const NX = 16;
+const NY = 11;
+const LOCAL_SPEED = 1 / 55; // map-widths per minute
+const ARTERIAL_SPEED = 1 / 22;
+const ACCESS_SPEED = 1 / 90;
+const RX = 96;
+const RY = 64;
+const LEVELS = [5, 15, 30] as const;
+
+interface Edge { a: number; b: number; len: number; art: boolean }
+interface City {
+  nx: Float32Array;
+  ny: Float32Array;
+  edges: Edge[];
+  adj: { to: number; w: number }[][];
+  clinics: { node: number; name: string }[];
+  nodeTime: Float32Array;
+  raster: Float32Array;
+  rasterNearest: Uint8Array;
+  iso: { level: number; segs: Float32Array }[];
+  bands: HTMLCanvasElement | null;
+  stops: [number, number][];
+  lines: number[][];
+  blocks: { x: number; y: number; d: number; desert: boolean; tvi: number; clinic: number; stop: number }[];
+  metresPerUnit: number;
+  clusters: { x: number; y: number; node: number; size: number }[];
 }
 
-const CLINIC_HUBS: ClinicHub[] = [
-  {
-    id: 'stormont',
-    name: 'Stormont Vail Regional Hospital',
-    x: 270,
-    y: 135,
-    type: 'hospital',
-    catchment5m: '8,420',
-    catchment15m: '42,600',
-    catchment30m: '118,500',
-  },
-  {
-    id: 'va',
-    name: 'Colmery-O’Neil VA Medical Center',
-    x: 150,
-    y: 95,
-    type: 'hospital',
-    catchment5m: '4,180',
-    catchment15m: '28,400',
-    catchment30m: '86,200',
-  },
-  {
-    id: 'shawnee-east',
-    name: 'East Topeka Health Clinic',
-    x: 420,
-    y: 175,
-    type: 'community',
-    catchment5m: '6,890',
-    catchment15m: '31,500',
-    catchment30m: '74,100',
-  },
-];
+const nodeId = (i: number, j: number) => j * NX + i;
 
-export const PlateRouteRx: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<RouteRxTab>('isochrones');
-  const [selectedHub, setSelectedHub] = useState<string>('stormont');
-  const [desertFilter, setDesertFilter] = useState<'all' | 'acute' | 'shuttle'>('all');
-  const [matrixRunning, setMatrixRunning] = useState<boolean>(false);
-  const [matrixStep, setMatrixStep] = useState<number>(141);
+function dijkstra(adj: { to: number; w: number }[][], sources: number[]) {
+  const n = adj.length;
+  const dist = new Float32Array(n).fill(Infinity);
+  const prev = new Int32Array(n).fill(-1);
+  const src = new Int32Array(n).fill(-1);
+  const done = new Uint8Array(n);
+  sources.forEach((s, k) => { dist[s] = 0; src[s] = k; });
+  for (let it = 0; it < n; it++) {
+    let u = -1;
+    let best = Infinity;
+    for (let i = 0; i < n; i++) if (!done[i] && dist[i] < best) { best = dist[i]; u = i; }
+    if (u < 0) break;
+    done[u] = 1;
+    for (const { to, w } of adj[u]) {
+      const nd = dist[u] + w;
+      if (nd < dist[to]) { dist[to] = nd; prev[to] = u; src[to] = src[u]; }
+    }
+  }
+  return { dist, prev, src };
+}
 
-  const currentHub = CLINIC_HUBS.find((h) => h.id === selectedHub) || CLINIC_HUBS[0];
-
-  const handleRunMatrixBenchmark = () => {
-    setMatrixRunning(true);
-    setMatrixStep(0);
-    const interval = setInterval(() => {
-      setMatrixStep((prev) => {
-        if (prev >= 141) {
-          clearInterval(interval);
-          setMatrixRunning(false);
-          return 141;
-        }
-        return prev + 18;
-      });
-    }, 45);
+let cityCache: City | null = null;
+function city(): City {
+  if (cityCache) return cityCache;
+  const nx = new Float32Array(NX * NY);
+  const ny = new Float32Array(NX * NY);
+  for (let j = 0; j < NY; j++) {
+    for (let i = 0; i < NX; i++) {
+      const k = nodeId(i, j);
+      nx[k] = (i + 0.5 + (hash2(i, j + 40) - 0.5) * 0.45) / NX;
+      ny[k] = ((j + 0.5 + (hash2(i + 70, j) - 0.5) * 0.45) / NY) * MAP_H;
+    }
+  }
+  const isArtRow = (j: number) => j === 5;
+  const isArtCol = (i: number) => i === 7;
+  const edges: Edge[] = [];
+  const add = (a: number, b: number, art: boolean) => {
+    edges.push({ a, b, art, len: Math.hypot(nx[a] - nx[b], ny[a] - ny[b]) });
   };
+  for (let j = 0; j < NY; j++) {
+    for (let i = 0; i < NX; i++) {
+      if (i < NX - 1) {
+        const art = isArtRow(j);
+        if (art || hash2(i * 3, j * 7) > 0.12) add(nodeId(i, j), nodeId(i + 1, j), art);
+      }
+      if (j < NY - 1) {
+        const art = isArtCol(i);
+        if (art || hash2(i * 5 + 1, j * 11) > 0.12) add(nodeId(i, j), nodeId(i, j + 1), art);
+      }
+    }
+  }
+  // diagonal arterial
+  for (let s = 0; s < 9; s++) add(nodeId(2 + s, 1 + s), nodeId(3 + s, 2 + s), true);
 
-  return (
-    <div className="w-full flex flex-col justify-between select-none">
-      {/* ROW 1: HTML Controls (clean underline mode tabs, toggles) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#2563EB]/20 text-xs font-mono">
-        {/* Left: Mode Underline Tabs */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          {(
-            [
-              { id: 'isochrones', label: 'Catchment Isochrones' },
-              { id: 'deserts', label: 'Transit Deserts' },
-              { id: 'matrix', label: 'OSRM Routing Matrix' },
-            ] as const
-          ).map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              aria-pressed={activeTab === tab.id}
-              className={`min-h-[36px] flex items-center pb-1 transition-colors cursor-pointer text-xs font-mono tracking-wider ${
-                activeTab === tab.id
-                  ? 'text-[#F4F6F9] border-b-2 border-[#FF2800] font-semibold'
-                  : 'text-[#7E8B9B] hover:text-[#C8D2E0] border-b-2 border-transparent'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+  const adj: { to: number; w: number }[][] = Array.from({ length: NX * NY }, () => []);
+  for (const e of edges) {
+    const w = e.len / (e.art ? ARTERIAL_SPEED : LOCAL_SPEED);
+    adj[e.a].push({ to: e.b, w });
+    adj[e.b].push({ to: e.a, w });
+  }
+  const clinics = [
+    { node: nodeId(7, 5), name: 'Hospital' },
+    { node: nodeId(3, 2), name: 'Clinic A' },
+    { node: nodeId(12, 8), name: 'Clinic B' },
+  ];
+  const { dist: nodeTime, src } = dijkstra(adj, clinics.map((c) => c.node));
 
-        {/* Right: Contextual HTML Controls */}
-        <div className="flex flex-wrap items-center gap-2">
-          {activeTab === 'isochrones' && (
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-              <span className="text-[#7E8B9B] mr-1">Hub:</span>
-              {CLINIC_HUBS.map((hub) => (
-                <button
-                  key={hub.id}
-                  type="button"
-                  onClick={() => setSelectedHub(hub.id)}
-                  className={`min-h-[32px] px-2.5 py-1 rounded-[2px] transition-colors cursor-pointer flex items-center ${
-                    hub.id === selectedHub
-                      ? 'bg-[#FF2800] text-[#F4F6F9] font-bold'
-                      : 'bg-[#0B1E40]/60 text-[#7E8B9B] hover:text-[#F4F6F9]'
-                  }`}
-                >
-                  {hub.name.split(' ')[0]}
-                </button>
-              ))}
-            </div>
-          )}
+  // travel-time raster: drive on the network, then access off-network
+  const raster = new Float32Array(RX * RY);
+  const rasterNearest = new Uint8Array(RX * RY);
+  for (let j = 0; j < RY; j++) {
+    for (let i = 0; i < RX; i++) {
+      const x = (i / (RX - 1));
+      const y = (j / (RY - 1)) * MAP_H;
+      let best = Infinity;
+      let who = 0;
+      for (let k = 0; k < nx.length; k++) {
+        if (!Number.isFinite(nodeTime[k])) continue;
+        const t = nodeTime[k] + Math.hypot(nx[k] - x, ny[k] - y) / ACCESS_SPEED;
+        if (t < best) { best = t; who = src[k]; }
+      }
+      raster[j * RX + i] = best;
+      rasterNearest[j * RX + i] = who;
+    }
+  }
+  const iso = LEVELS.map((level) => ({ level, segs: isoSegments(raster, RX, RY, level) }));
 
-          {activeTab === 'deserts' && (
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-              <span className="text-[#7E8B9B] mr-1">Layer:</span>
-              <button
-                type="button"
-                onClick={() => setDesertFilter('all')}
-                className={`min-h-[32px] px-2.5 py-1 rounded-[2px] transition-colors cursor-pointer flex items-center ${
-                  desertFilter === 'all'
-                    ? 'bg-[#2563EB] text-[#F4F6F9] font-bold'
-                    : 'bg-[#0B1E40]/60 text-[#7E8B9B] hover:text-[#F4F6F9]'
-                }`}
-              >
-                141 Tracts
-              </button>
-              <button
-                type="button"
-                onClick={() => setDesertFilter('acute')}
-                className={`min-h-[32px] px-2.5 py-1 rounded-[2px] transition-colors cursor-pointer flex items-center ${
-                  desertFilter === 'acute'
-                    ? 'bg-[#FF2800] text-[#F4F6F9] font-bold'
-                    : 'bg-[#0B1E40]/60 text-[#7E8B9B] hover:text-[#F4F6F9]'
-                }`}
-              >
-                Acute Deserts (SVI&gt;0.75)
-              </button>
-              <button
-                type="button"
-                onClick={() => setDesertFilter('shuttle')}
-                className={`min-h-[32px] px-2.5 py-1 rounded-[2px] transition-colors cursor-pointer flex items-center ${
-                  desertFilter === 'shuttle'
-                    ? 'bg-[#4CC38A] text-[#03050A] font-bold'
-                    : 'bg-[#0B1E40]/60 text-[#7E8B9B] hover:text-[#F4F6F9]'
-                }`}
-              >
-                Shuttles (-32%)
-              </button>
-            </div>
-          )}
+  // bus lines and stops
+  const lineNodes = [
+    Array.from({ length: NX }, (_, i) => nodeId(i, 5)),
+    Array.from({ length: NY }, (_, j) => nodeId(7, j)),
+    Array.from({ length: 10 }, (_, i) => nodeId(i + 3, 2)),
+  ];
+  const lines = lineNodes;
+  const stops: [number, number][] = [];
+  lineNodes.forEach((ln) => ln.forEach((k, idx) => { if (idx % 2 === 0) stops.push([nx[k], ny[k]]); }));
 
-          {activeTab === 'matrix' && (
-            <button
-              type="button"
-              onClick={handleRunMatrixBenchmark}
-              disabled={matrixRunning}
-              className="min-h-[36px] px-3 py-1.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#F4F6F9] font-semibold rounded-[2px] transition-colors cursor-pointer text-[11px] disabled:opacity-50 flex items-center"
-            >
-              {matrixRunning ? 'Calculating Matrix...' : '▶ Recalculate Matrix (<15ms)'}
-            </button>
-          )}
-        </div>
-      </div>
+  // 141 blocks on a jittered 13x11 lattice minus two corners
+  const blocks: City['blocks'] = [];
+  for (let r = 0; r < 11; r++) {
+    for (let c = 0; c < 13; c++) {
+      if ((r === 0 && c === 0) || (r === 10 && c === 12)) continue;
+      const x = (c + 0.5 + (hash2(c + 200, r) - 0.5) * 0.6) / 13;
+      const y = ((r + 0.5 + (hash2(c, r + 300) - 0.5) * 0.6) / 11) * MAP_H;
+      let d = Infinity;
+      let stop = 0;
+      stops.forEach(([sx, sy], si) => {
+        const dd = Math.hypot(sx - x, sy - y);
+        if (dd < d) { d = dd; stop = si; }
+      });
+      const ri = clamp(Math.round(x * (RX - 1)), 0, RX - 1);
+      const rj = clamp(Math.round((y / MAP_H) * (RY - 1)), 0, RY - 1);
+      blocks.push({ x, y, d, desert: false, tvi: fbm(x * 5 + 2, y * 5 + 9, 3), clinic: rasterNearest[rj * RX + ri], stop });
+    }
+  }
+  const sorted = blocks.map((b) => b.d).sort((a, b) => b - a);
+  const threshold = (sorted[42] + sorted[43]) / 2;
+  blocks.forEach((b) => { b.desert = b.d > threshold; });
+  const metresPerUnit = 800 / threshold;
 
-      {/* ROW 2: Flexible canvas/drawing container (min-height: 0, height ~460px on desktop) */}
-      <div className="relative w-full min-h-0 h-[280px] sm:h-[360px] lg:h-[460px] flex items-center justify-center my-3 overflow-hidden bg-[#03050A]/80 border border-[#2563EB]/15">
-        {/* TAB 1: Spatial Catchment Isochrones Map SVG */}
-        {activeTab === 'isochrones' && (
-          <div className="relative w-full h-full flex items-center justify-center p-3 sm:p-4">
-            <svg viewBox="0 0 580 300" className="w-full h-full max-h-[420px] overflow-visible">
-              <defs>
-                <pattern id="streetGridRx" width="24" height="24" patternUnits="userSpaceOnUse">
-                  <line x1="0" y1="0" x2="24" y2="0" stroke="rgba(37, 99, 235, 0.06)" strokeWidth="0.5" />
-                  <line x1="0" y1="0" x2="0" y2="24" stroke="rgba(37, 99, 235, 0.06)" strokeWidth="0.5" />
-                </pattern>
-              </defs>
+  // DBSCAN over desert blocks
+  const deserts = blocks.filter((b) => b.desert);
+  const eps = 0.11;
+  const minPts = 3;
+  const labels = new Int32Array(deserts.length).fill(-2); // -2 unvisited, -1 noise
+  let cluster = 0;
+  const region = (p: number) => deserts.map((_, q) => q).filter((q) => Math.hypot(deserts[q].x - deserts[p].x, deserts[q].y - deserts[p].y) <= eps);
+  for (let p = 0; p < deserts.length; p++) {
+    if (labels[p] !== -2) continue;
+    const nb = region(p);
+    if (nb.length < minPts) { labels[p] = -1; continue; }
+    labels[p] = cluster;
+    const queue = nb.filter((q) => q !== p);
+    while (queue.length) {
+      const q = queue.shift()!;
+      if (labels[q] === -1) labels[q] = cluster;
+      if (labels[q] !== -2) continue;
+      labels[q] = cluster;
+      const nq = region(q);
+      if (nq.length >= minPts) queue.push(...nq);
+    }
+    cluster++;
+  }
+  const clusters: City['clusters'] = [];
+  for (let c = 0; c < cluster; c++) {
+    const pts = deserts.filter((_, i) => labels[i] === c);
+    const x = pts.reduce((s, b) => s + b.x, 0) / pts.length;
+    const y = pts.reduce((s, b) => s + b.y, 0) / pts.length;
+    let node = 0;
+    let bd = Infinity;
+    for (let k = 0; k < nx.length; k++) {
+      const d = Math.hypot(nx[k] - x, ny[k] - y);
+      if (d < bd) { bd = d; node = k; }
+    }
+    clusters.push({ x, y, node, size: pts.length });
+  }
 
-              <rect width="580" height="300" fill="url(#streetGridRx)" />
+  cityCache = { nx, ny, edges, adj, clinics, nodeTime, raster, rasterNearest, iso, bands: null, stops, lines, blocks, metresPerUnit, clusters };
+  return cityCache;
+}
 
-              {/* Kansas River Waterway Ribbon */}
-              <path
-                d="M 20 60 Q 140 80 250 55 T 440 65 T 560 50"
-                stroke="#0B1E40"
-                strokeWidth="10"
-                strokeLinecap="round"
-                fill="none"
-              />
+function bandsImage(c: City): HTMLCanvasElement {
+  if (c.bands) return c.bands;
+  const cv = document.createElement('canvas');
+  cv.width = RX;
+  cv.height = RY;
+  const ctx = cv.getContext('2d');
+  if (ctx) {
+    const img = ctx.createImageData(RX, RY);
+    const red = [255, 40, 0];
+    const silver = [200, 210, 224];
+    const cobalt = [37, 99, 235];
+    for (let k = 0; k < RX * RY; k++) {
+      const t = c.raster[k];
+      const b5 = 1 - smoothstep(4.2, 5.8, t);
+      const b15 = 1 - smoothstep(14, 16, t);
+      const b30 = 1 - smoothstep(28.5, 31.5, t);
+      const col = b5 > 0.5 ? red : b15 > 0.5 ? silver : cobalt;
+      const a = b5 * 0.2 + b15 * 0.07 + b30 * 0.1;
+      img.data[k * 4] = col[0];
+      img.data[k * 4 + 1] = col[1];
+      img.data[k * 4 + 2] = col[2];
+      img.data[k * 4 + 3] = Math.round(a * 255);
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+  c.bands = cv;
+  return cv;
+}
 
-              {/* Major Highway Arterials (US-75 & I-70) */}
-              <path d="M 40 135 L 540 135" stroke="rgba(200, 210, 224, 0.15)" strokeWidth="1.5" />
-              <path d="M 270 20 L 270 280" stroke="rgba(200, 210, 224, 0.15)" strokeWidth="1.5" />
-              <path d="M 120 40 L 480 260" stroke="rgba(37, 99, 235, 0.18)" strokeWidth="1.2" strokeDasharray="4 4" />
+/* ---------- shared map frame ---------- */
 
-              {/* 30-Minute Catchment Polygon (Machined Silver) */}
-              <path
-                d={`M ${currentHub.x} ${currentHub.y - 95} C ${currentHub.x + 110} ${currentHub.y - 85}, ${currentHub.x + 145} ${currentHub.y + 55}, ${currentHub.x + 55} ${currentHub.y + 105} C ${currentHub.x - 75} ${currentHub.y + 110}, ${currentHub.x - 135} ${currentHub.y + 35}, ${currentHub.x - 105} ${currentHub.y - 75} Z`}
-                fill="rgba(200, 210, 224, 0.08)"
-                stroke="#C8D2E0"
-                strokeWidth="1"
-                strokeDasharray="4 4"
-              />
+function mapFrame(f: StageFrame) {
+  const padX = 18;
+  const padTop = 30;
+  const padBottom = 26;
+  const w = Math.min(f.width - padX * 2, (f.height - padTop - padBottom) * ASPECT);
+  const h = w / ASPECT;
+  const ox = (f.width - w) / 2;
+  const oy = padTop + (f.height - padTop - padBottom - h) / 2;
+  return { ox, oy, k: w, w, h };
+}
+type MapFrame = ReturnType<typeof mapFrame>;
 
-              {/* 15-Minute Catchment Polygon (Electric Cobalt) */}
-              <path
-                d={`M ${currentHub.x} ${currentHub.y - 65} C ${currentHub.x + 75} ${currentHub.y - 55}, ${currentHub.x + 95} ${currentHub.y + 35}, ${currentHub.x + 35} ${currentHub.y + 70} C ${currentHub.x - 55} ${currentHub.y + 75}, ${currentHub.x - 90} ${currentHub.y + 20}, ${currentHub.x - 70} ${currentHub.y - 55} Z`}
-                fill="rgba(37, 99, 235, 0.16)"
-                stroke="#2563EB"
-                strokeWidth="1.8"
-              />
+function drawRoads(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, alpha: number) {
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 0.5;
+  ctx.strokeStyle = rgba(C.silver, 0.16 * alpha);
+  ctx.beginPath();
+  for (const e of c.edges) {
+    if (e.art) continue;
+    ctx.moveTo(m.ox + c.nx[e.a] * m.k, m.oy + c.ny[e.a] * m.k);
+    ctx.lineTo(m.ox + c.nx[e.b] * m.k, m.oy + c.ny[e.b] * m.k);
+  }
+  ctx.stroke();
+  ctx.lineWidth = 1.4;
+  ctx.strokeStyle = rgba(C.silver, 0.28 * alpha);
+  ctx.beginPath();
+  for (const e of c.edges) {
+    if (!e.art) continue;
+    ctx.moveTo(m.ox + c.nx[e.a] * m.k, m.oy + c.ny[e.a] * m.k);
+    ctx.lineTo(m.ox + c.nx[e.b] * m.k, m.oy + c.ny[e.b] * m.k);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
 
-              {/* 5-Minute Catchment Polygon (Pulsing Reddish-Orange) */}
-              <path
-                d={`M ${currentHub.x} ${currentHub.y - 32} C ${currentHub.x + 40} ${currentHub.y - 25}, ${currentHub.x + 52} ${currentHub.y + 18}, ${currentHub.x + 18} ${currentHub.y + 35} C ${currentHub.x - 30} ${currentHub.y + 38}, ${currentHub.x - 48} ${currentHub.y + 10}, ${currentHub.x - 35} ${currentHub.y - 25} Z`}
-                fill="rgba(255, 40, 0, 0.28)"
-                stroke="#FF2800"
-                strokeWidth="2.2"
-                className="animate-pulse"
-              />
+function drawClinics(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, time: number, hot: number) {
+  c.clinics.forEach((cl, i) => {
+    const x = m.ox + c.nx[cl.node] * m.k;
+    const y = m.oy + c.ny[cl.node] * m.k;
+    const pulse = (time * 0.6 + i * 0.33) % 1;
+    ctx.save();
+    ctx.strokeStyle = rgba(C.red, (1 - pulse) * 0.7);
+    ctx.lineWidth = 0.75;
+    ctx.beginPath();
+    ctx.arc(x, y, 4 + pulse * 22, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+    glow(ctx, x, y, i === hot ? 26 : 16, C.red, i === hot ? 0.8 : 0.55);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.PI / 4);
+    ctx.fillStyle = C.alabaster;
+    const s = i === 0 ? 4.5 : 3.5;
+    ctx.fillRect(-s / 2, -s / 2, s, s);
+    ctx.restore();
+    label(ctx, cl.name, x + 9, y - 8, i === hot ? C.alabaster : C.silver, 10);
+  });
+}
 
-              {/* Animated Transit Routing Vectors Streaming In */}
-              <path
-                d={`M 80 200 Q ${currentHub.x - 60} 200 ${currentHub.x} ${currentHub.y}`}
-                stroke="#FF2800"
-                strokeWidth="1.8"
-                strokeDasharray="6 4"
-                fill="none"
-              />
-              <path
-                d={`M 500 80 Q ${currentHub.x + 70} 80 ${currentHub.x} ${currentHub.y}`}
-                stroke="#2563EB"
-                strokeWidth="1.8"
-                strokeDasharray="6 4"
-                fill="none"
-              />
+function sampleRaster(c: City, u: number, v: number) {
+  const i = clamp(u, 0, 1) * (RX - 1);
+  const j = clamp(v / MAP_H, 0, 1) * (RY - 1);
+  const i0 = Math.min(RX - 2, Math.floor(i));
+  const j0 = Math.min(RY - 2, Math.floor(j));
+  const fx = i - i0;
+  const fy = j - j0;
+  const r = c.raster;
+  const t =
+    r[j0 * RX + i0] * (1 - fx) * (1 - fy) + r[j0 * RX + i0 + 1] * fx * (1 - fy) +
+    r[(j0 + 1) * RX + i0] * (1 - fx) * fy + r[(j0 + 1) * RX + i0 + 1] * fx * fy;
+  return { t, clinic: c.rasterNearest[Math.round(j) * RX + Math.round(i)] };
+}
 
-              {/* Clinic Hub Nodes */}
-              {CLINIC_HUBS.map((hub) => {
-                const isSelected = hub.id === selectedHub;
-                return (
-                  <g
-                    key={hub.id}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={hub.name}
-                    aria-pressed={isSelected}
-                    onClick={() => setSelectedHub(hub.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setSelectedHub(hub.id);
-                      }
-                    }}
-                    className="cursor-pointer"
-                  >
-                    {isSelected && (
-                      <circle cx={hub.x} cy={hub.y} r="14" fill="none" stroke="#FF2800" strokeWidth="1" className="animate-ping" />
-                    )}
-                    <circle
-                      cx={hub.x}
-                      cy={hub.y}
-                      r={isSelected ? 9 : 6}
-                      fill={isSelected ? '#FF2800' : '#0B1E40'}
-                      stroke={isSelected ? '#F4F6F9' : '#2563EB'}
-                      strokeWidth={isSelected ? '2' : '1.5'}
-                    />
-                    <text
-                      x={hub.x}
-                      y={hub.y + 20}
-                      fill={isSelected ? '#F4F6F9' : '#7E8B9B'}
-                      fontSize="10"
-                      fontFamily="monospace"
-                      fontWeight={isSelected ? 'bold' : 'normal'}
-                      textAnchor="middle"
-                    >
-                      {hub.name.split(' ')[0]}
-                    </text>
-                  </g>
-                );
-              })}
+function drawDemandVectors(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, time: number, alpha: number) {
+  ctx.save();
+  ctx.lineWidth = 0.75;
+  for (const b of c.blocks) {
+    if (!b.desert) continue;
+    const cl = c.clinics[b.clinic];
+    const x0 = m.ox + b.x * m.k;
+    const y0 = m.oy + b.y * m.k;
+    const tx = m.ox + c.nx[cl.node] * m.k;
+    const ty = m.oy + c.ny[cl.node] * m.k;
+    const d = Math.hypot(tx - x0, ty - y0) || 1;
+    const len = Math.min(d * 0.45, 10 + b.tvi * 34);
+    const ux = (tx - x0) / d;
+    const uy = (ty - y0) / d;
+    const g = ctx.createLinearGradient(x0, y0, x0 + ux * len, y0 + uy * len);
+    g.addColorStop(0, rgba(C.red, 0));
+    g.addColorStop(1, rgba(C.red, 0.85 * alpha));
+    ctx.strokeStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x0 + ux * len, y0 + uy * len);
+    ctx.stroke();
+    // flowing bead
+    const p = (time * 0.5 + b.tvi * 3) % 1;
+    ctx.fillStyle = rgba(C.alabaster, (1 - p) * 0.8 * alpha);
+    ctx.fillRect(x0 + ux * len * p - 0.75, y0 + uy * len * p - 0.75, 1.5, 1.5);
+    // arrow head
+    const hx = x0 + ux * len;
+    const hy = y0 + uy * len;
+    ctx.strokeStyle = rgba(C.red, 0.85 * alpha);
+    ctx.beginPath();
+    ctx.moveTo(hx - ux * 4 - uy * 2.5, hy - uy * 4 + ux * 2.5);
+    ctx.lineTo(hx, hy);
+    ctx.lineTo(hx - ux * 4 + uy * 2.5, hy - uy * 4 - ux * 2.5);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
 
-              {/* Isochrone Legend */}
-              <g transform="translate(20, 240)">
-                <rect width="180" height="48" fill="#03050A" stroke="rgba(37, 99, 235, 0.25)" strokeWidth="1" />
-                <circle cx="16" cy="16" r="4" fill="#FF2800" />
-                <text x="28" y="19" fill="#F4F6F9" fontSize="9" fontFamily="monospace">5-Min Isochrone (Walk/Transit)</text>
-                <circle cx="16" cy="32" r="4" fill="#2563EB" />
-                <text x="28" y="35" fill="#C8D2E0" fontSize="9" fontFamily="monospace">15-Min &amp; 30-Min Catchment</text>
-              </g>
-            </svg>
-          </div>
-        )}
+/* ---------- 1. isochrones ---------- */
 
-        {/* TAB 2: Transit Deserts (Census Tract Choropleth & Micro-Transit Shuttles) */}
-        {activeTab === 'deserts' && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center p-3 sm:p-4">
-            <svg viewBox="0 0 580 300" className="w-full h-full max-h-[420px] overflow-visible">
-              <text x="20" y="30" fill="#F4F6F9" fontSize="13" fontFamily="sans-serif" fontWeight="bold">
-                SHAWNEE COUNTY TRANSIT DESERT CHOROPLETH (141 CENSUS TRACTS)
-              </text>
-              <text x="20" y="46" fill="#7E8B9B" fontSize="9" fontFamily="monospace">
-                Synthesizing CDC Social Vulnerability Index (SVI) with Topeka Metro Timetables
-              </text>
+function createIsoScene(): PlateScene {
+  const c = city();
+  return {
+    idle(f) {
+      const m = mapFrame(f);
+      const a = f.time * 0.3;
+      return [m.ox + m.w * (0.5 + Math.cos(a) * 0.3), m.oy + m.h * (0.5 + Math.sin(a * 1.3) * 0.32)];
+    },
+    draw(ctx, f) {
+      const m = mapFrame(f);
+      drawVignette(ctx, f.width, f.height);
+      drawGrid(ctx, f.width, f.height, 32, 0.035);
+      const intro = easeOutCubic(f.age / 1.1);
 
-              {/* 141 Census Blocks Lattice Representation */}
-              <g transform="translate(40, 60)">
-                {Array.from({ length: 48 }).map((_, i) => {
-                  const col = i % 8;
-                  const row = Math.floor(i / 8);
-                  const isAcute = [5, 12, 13, 20, 21, 28, 29, 36].includes(i);
-                  const isModerate = [4, 11, 19, 27, 35, 43, 44].includes(i);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(m.ox, m.oy, m.w, m.h);
+      ctx.clip();
+      ctx.imageSmoothingEnabled = true;
+      ctx.globalAlpha = intro;
+      ctx.drawImage(bandsImage(c), m.ox, m.oy, m.w, m.h);
+      ctx.globalAlpha = 1;
+      drawRoads(ctx, c, m, 0.8);
 
-                  let fillColor = '#0B1E40';
-                  let strokeColor = 'rgba(37, 99, 235, 0.2)';
-                  if (isAcute) {
-                    fillColor = desertFilter === 'shuttle' ? '#153875' : '#FF2800';
-                    strokeColor = '#FF4419';
-                  } else if (isModerate) {
-                    fillColor = '#153875';
-                    strokeColor = '#2563EB';
-                  }
+      const sx = m.w / (RX - 1);
+      const sy = m.h / (RY - 1);
+      // travelling wavefront from all clinics
+      const front = ((f.time * 7) % 38) * intro;
+      if (front > 0.5) {
+        const segs = isoSegments(c.raster, RX, RY, front);
+        ctx.lineWidth = 0.75;
+        ctx.strokeStyle = rgba(C.alabaster, 0.45 * (1 - front / 38));
+        strokeSegments(ctx, segs, sx, sy, m.ox, m.oy);
+      }
+      // the three isochrones, breathing as the wavefront passes
+      const cols = [C.red, C.silver, C.cobalt];
+      c.iso.forEach(({ level, segs }, i) => {
+        const near = 1 - smoothstep(0, 3, Math.abs(front - level));
+        ctx.lineWidth = 0.75 + near * 1.2;
+        ctx.strokeStyle = rgba(cols[i], (0.55 + near * 0.45) * intro);
+        strokeSegments(ctx, segs, sx, sy, m.ox, m.oy);
+      });
+      ctx.restore();
 
-                  return (
-                    <rect
-                      key={i}
-                      x={col * 62}
-                      y={row * 32}
-                      width="58"
-                      height="28"
-                      fill={fillColor}
-                      stroke={strokeColor}
-                      strokeWidth="1"
-                      opacity={desertFilter === 'acute' && !isAcute ? 0.2 : 0.85}
-                    />
-                  );
-                })}
+      drawDemandVectors(ctx, c, m, f.time, 0.55 * intro);
 
-                {/* Proposed Micro-Transit Shuttle Routing Lines */}
-                {(desertFilter === 'all' || desertFilter === 'shuttle') && (
-                  <path
-                    d="M 320 40 C 370 100, 390 120, 440 80 C 470 50, 480 140, 380 150"
-                    fill="none"
-                    stroke="#4CC38A"
-                    strokeWidth="2.5"
-                    strokeDasharray="6 3"
-                    className="animate-pulse"
-                  />
-                )}
-              </g>
+      const u = (f.pointer.x - m.ox) / m.k;
+      const v = (f.pointer.y - m.oy) / m.k;
+      const inside = u >= 0 && u <= 1 && v >= 0 && v <= MAP_H;
+      const s = sampleRaster(c, u, v);
+      drawClinics(ctx, c, m, f.time, inside ? s.clinic : -1);
 
-              {/* Desert Metrics Summary Banner */}
-              <g transform="translate(40, 245)">
-                <rect width="500" height="42" fill="#03050A" stroke="#FF2800" strokeWidth="1" />
-                <text x="15" y="18" fill="#FF2800" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                  28 ACUTE CENSUS TRACTS IDENTIFIED
-                </text>
-                <text x="15" y="33" fill="#C8D2E0" fontSize="10" fontFamily="sans-serif">
-                  14,200 vulnerable residents (&gt;45min transit). Micro-transit routes reduce travel time by 32.4%.
-                </text>
-                <text x="485" y="26" fill="#4CC38A" fontSize="10" fontFamily="monospace" fontWeight="bold" textAnchor="end">
-                  1ST PLACE DATASET
-                </text>
-              </g>
-            </svg>
-          </div>
-        )}
+      if (inside) {
+        const cl = c.clinics[s.clinic];
+        const cx = m.ox + c.nx[cl.node] * m.k;
+        const cy = m.oy + c.ny[cl.node] * m.k;
+        ctx.save();
+        ctx.setLineDash([2, 3]);
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = rgba(C.alabaster, 0.6);
+        ctx.beginPath();
+        ctx.moveTo(f.pointer.x, f.pointer.y);
+        ctx.lineTo(cx, cy);
+        ctx.stroke();
+        ctx.restore();
+        ctx.strokeStyle = C.alabaster;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.arc(f.pointer.x, f.pointer.y, 5, 0, Math.PI * 2);
+        ctx.stroke();
+        const right = f.pointer.x < f.width - 110;
+        label(ctx, `${s.t.toFixed(1)} min`, f.pointer.x + (right ? 10 : -10), f.pointer.y + 14, C.alabaster, 10, right ? 'left' : 'right');
+      }
 
-        {/* TAB 3: OSRM Routing Matrix Graph SVG */}
-        {activeTab === 'matrix' && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center p-3 sm:p-4">
-            <svg viewBox="0 0 580 300" className="w-full h-full max-h-[420px] overflow-visible">
-              <text x="20" y="30" fill="#F4F6F9" fontSize="13" fontFamily="sans-serif" fontWeight="bold">
-                OSRM DISTANCE &amp; DURATION MATRIX (<span className="text-[#4CC38A]">&lt; 15ms</span>)
-              </text>
-              <text x="20" y="46" fill="#7E8B9B" fontSize="9" fontFamily="monospace">
-                Contraction Hierarchies Graph across 141 Census Centroids &amp; 3 Hospital Hubs
-              </text>
+      // legend drawn in the top margin
+      let lx = m.ox;
+      LEVELS.forEach((lv, i) => {
+        ctx.fillStyle = cols[i];
+        ctx.fillRect(lx, 14, 10, 1.5);
+        label(ctx, `${lv} min`, lx + 14, 18, C.silver, 10);
+        lx += 66;
+      });
+      label(ctx, 'synthetic network · generic sites', m.ox + m.w, 18, C.titanium, 9, 'right');
 
-              {/* Visualized Routing Graph Network */}
-              <g transform="translate(30, 65)">
-                {/* Network Edges */}
-                <path d="M 50 40 L 160 80 L 260 50 L 370 90 L 480 40" stroke="rgba(37, 99, 235, 0.4)" strokeWidth="1.5" />
-                <path d="M 50 140 L 160 80 L 260 150 L 370 90 L 480 140" stroke="rgba(37, 99, 235, 0.4)" strokeWidth="1.5" />
-                <path d="M 160 80 L 260 80 L 370 90" stroke="#FF2800" strokeWidth="2" strokeDasharray="4 2" />
+      if (!inside) return 'isochrones 5 · 15 · 30 min';
+      const band = s.t <= 5 ? 'inside 5 min' : s.t <= 15 ? 'inside 15 min' : s.t <= 30 ? 'inside 30 min' : 'beyond 30 min';
+      return `${s.t.toFixed(1)} min to ${c.clinics[s.clinic].name} · ${band}`;
+    },
+  };
+}
 
-                {/* Network Nodes */}
-                {[
-                  { x: 50, y: 40, label: 'Tract 12' },
-                  { x: 160, y: 80, label: 'Stormont Hub' },
-                  { x: 260, y: 50, label: 'Tract 44' },
-                  { x: 370, y: 90, label: 'East Clinic' },
-                  { x: 480, y: 40, label: 'Tract 89' },
-                  { x: 50, y: 140, label: 'VA Center' },
-                  { x: 260, y: 150, label: 'Tract 105' },
-                  { x: 480, y: 140, label: 'Tract 141' },
-                ].map((node, i) => (
-                  <g key={i}>
-                    <circle cx={node.x} cy={node.y} r="7" fill={i === 1 || i === 3 || i === 5 ? '#FF2800' : '#2563EB'} />
-                    <text x={node.x} y={node.y - 12} fill="#F4F6F9" fontSize="9" fontFamily="monospace" textAnchor="middle">
-                      {node.label}
-                    </text>
-                  </g>
-                ))}
-              </g>
+/* ---------- 2. transit deserts ---------- */
 
-              {/* Progress & Latency Readout Banner */}
-              <g transform="translate(30, 240)">
-                <rect width="520" height="42" fill="#03050A" stroke="#2563EB" strokeWidth="1" />
-                <text x="15" y="18" fill="#F4F6F9" fontSize="10" fontFamily="monospace">
-                  CALCULATED MATRIX CELLS: <span className="text-[#FF2800] font-bold">{matrixStep} / 141 Pairs</span>
-                </text>
-                <text x="15" y="32" fill="#7E8B9B" fontSize="9" fontFamily="monospace">
-                  Algorithm: Contraction Hierarchies (Dijkstra) | Network: OpenStreetMap Road Graph
-                </text>
-                <text x="505" y="25" fill="#4CC38A" fontSize="11" fontFamily="monospace" fontWeight="bold" textAnchor="end">
-                  14.2ms Verified
-                </text>
-              </g>
-            </svg>
-          </div>
-        )}
-      </div>
+function createDesertScene(): PlateScene {
+  const c = city();
+  return {
+    idle(f) {
+      const m = mapFrame(f);
+      const ds = c.blocks.filter((b) => b.desert);
+      const b = ds[Math.floor(f.time / 2.2) % ds.length];
+      return [m.ox + b.x * m.k, m.oy + b.y * m.k];
+    },
+    draw(ctx, f) {
+      const m = mapFrame(f);
+      drawVignette(ctx, f.width, f.height);
+      drawGrid(ctx, f.width, f.height, 32, 0.035);
+      const intro = easeOutCubic(f.age / 1.0);
+      drawRoads(ctx, c, m, 0.6);
 
-      {/* ROW 3: HTML Telemetry footer (outside drawing canvas; never overlaying or clipping artwork) */}
-      <div className="pt-3 border-t border-[#2563EB]/20 w-full min-w-0 text-xs font-mono">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-[#7E8B9B]">
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">Active Clinic Hub</span>
-            <span className="text-sm font-bold text-[#FF2800] truncate block">{currentHub.name.split(' ')[0]} Hub</span>
-          </div>
+      // 800 m walk catchments around stops
+      const r800 = (800 / c.metresPerUnit) * m.k;
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      for (const [sx, sy] of c.stops) {
+        const x = m.ox + sx * m.k;
+        const y = m.oy + sy * m.k;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r800 * intro);
+        g.addColorStop(0, rgba(C.cobalt, 0.12));
+        g.addColorStop(0.92, rgba(C.cobalt, 0.05));
+        g.addColorStop(1, rgba(C.cobalt, 0));
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, r800 * intro, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
 
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">5-Min Catchment</span>
-            <span className="text-sm font-bold text-[#F4F6F9]">{currentHub.catchment5m} Residents</span>
-          </div>
+      // bus lines
+      ctx.save();
+      for (const ln of c.lines) {
+        ctx.beginPath();
+        ln.forEach((k, i) => {
+          const x = m.ox + c.nx[k] * m.k;
+          const y = m.oy + c.ny[k] * m.k;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        phosphor(ctx, C.cobalt, 1, 0.1);
+      }
+      ctx.restore();
+      for (const [sx, sy] of c.stops) {
+        ctx.fillStyle = C.alabaster;
+        ctx.fillRect(m.ox + sx * m.k - 1.5, m.oy + sy * m.k - 1.5, 3, 3);
+      }
 
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">OSRM Query Matrix</span>
-            <span className="text-sm font-bold text-[#4CC38A]">&lt; 15 ms Latency</span>
-          </div>
+      drawDemandVectors(ctx, c, m, f.time, intro);
 
-          <div>
-            <span className="text-[10px] block uppercase tracking-wider">Award / Honor</span>
-            <span className="text-sm font-bold text-[#2563EB]">1st Place ASA DataFest</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+      // blocks
+      let hover = -1;
+      let hd = Infinity;
+      c.blocks.forEach((b, i) => {
+        const x = m.ox + b.x * m.k;
+        const y = m.oy + b.y * m.k;
+        const d = Math.hypot(x - f.pointer.x, y - f.pointer.y);
+        if (d < hd) { hd = d; hover = i; }
+      });
+      if (hd > 40) hover = -1;
+      c.blocks.forEach((b, i) => {
+        const x = m.ox + b.x * m.k;
+        const y = m.oy + b.y * m.k;
+        const appear = clamp(intro * 1.6 - (b.x + b.y) * 0.5, 0, 1);
+        if (b.desert) {
+          glow(ctx, x, y, 9, C.red, 0.35 * appear);
+          ctx.strokeStyle = rgba(C.red, appear);
+          ctx.lineWidth = i === hover ? 1.2 : 0.75;
+          const s = i === hover ? 8 : 5;
+          ctx.strokeRect(x - s / 2, y - s / 2, s, s);
+        } else {
+          ctx.fillStyle = rgba(C.silver, 0.45 * appear);
+          ctx.fillRect(x - 1, y - 1, 2, 2);
+        }
+      });
+
+      drawClinics(ctx, c, m, f.time, -1);
+
+      let readout = '43 of 141 blocks beyond 800 m of a stop';
+      if (hover >= 0) {
+        const b = c.blocks[hover];
+        const x = m.ox + b.x * m.k;
+        const y = m.oy + b.y * m.k;
+        const [sx, sy] = c.stops[b.stop];
+        const stx = m.ox + sx * m.k;
+        const sty = m.oy + sy * m.k;
+        ctx.save();
+        ctx.setLineDash([2, 3]);
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = rgba(C.alabaster, 0.75);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(stx, sty);
+        ctx.stroke();
+        ctx.restore();
+        const metres = Math.round(b.d * c.metresPerUnit);
+        const right = x < f.width - 120;
+        label(ctx, `${metres.toLocaleString('en-US')} m`, x + (right ? 10 : -10), y - 8, b.desert ? C.red : C.silver, 10, right ? 'left' : 'right');
+        readout = `block ${String(hover + 1).padStart(3, '0')} · nearest stop ${metres.toLocaleString('en-US')} m · ${b.desert ? 'transit desert' : 'served'}`;
+      }
+
+      let lx = m.ox;
+      const legend: [string, string][] = [[C.red, 'desert block'], [C.silver, 'served block'], [C.cobalt, 'bus line · 800 m walk']];
+      for (const [col, txt] of legend) {
+        ctx.fillStyle = col;
+        ctx.fillRect(lx, 13, 6, 6);
+        label(ctx, txt, lx + 11, 19, C.silver, 10);
+        lx += ctx.measureText(txt).width + 30;
+      }
+      return readout;
+    },
+  };
+}
+
+/* ---------- 3. live routing ---------- */
+
+function createRouteScene(): PlateScene {
+  const c = city();
+  const hospital = c.clinics[0].node;
+  const tree = dijkstra(c.adj, [hospital]);
+  const pathTo = (node: number) => {
+    const out: number[] = [];
+    for (let k = node; k >= 0; k = tree.prev[k]) out.push(k);
+    return out.reverse();
+  };
+  let target = -1;
+  let path: number[] = [];
+  let pathLen = 0;
+  let changedAt = 0;
+
+  return {
+    idle(f) {
+      const m = mapFrame(f);
+      if (!c.clusters.length) return [f.width / 2, f.height / 2];
+      const cl = c.clusters[Math.floor(f.time / 3) % c.clusters.length];
+      return [m.ox + c.nx[cl.node] * m.k, m.oy + c.ny[cl.node] * m.k];
+    },
+    draw(ctx, f) {
+      const m = mapFrame(f);
+      drawVignette(ctx, f.width, f.height);
+      drawGrid(ctx, f.width, f.height, 32, 0.035);
+      drawRoads(ctx, c, m, 1);
+      const intro = easeOutCubic(f.age / 0.8);
+
+      // nearest road node to the damped cursor
+      let best = 0;
+      let bd = Infinity;
+      for (let k = 0; k < c.nx.length; k++) {
+        const d = (m.ox + c.nx[k] * m.k - f.pointer.x) ** 2 + (m.oy + c.ny[k] * m.k - f.pointer.y) ** 2;
+        if (d < bd && Number.isFinite(tree.dist[k])) { bd = d; best = k; }
+      }
+      if (best !== target) {
+        target = best;
+        path = pathTo(best);
+        pathLen = 0;
+        for (let i = 1; i < path.length; i++) pathLen += Math.hypot(c.nx[path[i]] - c.nx[path[i - 1]], c.ny[path[i]] - c.ny[path[i - 1]]);
+        changedAt = f.time;
+      }
+
+      // pickup clusters
+      c.clusters.forEach((cl, i) => {
+        const x = m.ox + cl.x * m.k;
+        const y = m.oy + cl.y * m.k;
+        const r = (6 + cl.size * 2.2) * intro;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+        g.addColorStop(0, rgba(C.red, 0.22));
+        g.addColorStop(1, rgba(C.red, 0));
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = rgba(C.red, 0.7);
+        ctx.stroke();
+        const px = m.ox + c.nx[cl.node] * m.k;
+        const py = m.oy + c.ny[cl.node] * m.k;
+        ctx.fillStyle = C.red;
+        ctx.fillRect(px - 2, py - 2, 4, 4);
+        label(ctx, `pickup ${i + 1}`, px + 7, py + 12, C.silver, 9);
+      });
+
+      // route draw-on after each change
+      const grow = f.reduced ? 1 : easeOutCubic((f.time - changedAt) / 0.5);
+      const pts = path.map((k) => [m.ox + c.nx[k] * m.k, m.oy + c.ny[k] * m.k] as const);
+      const seg: number[] = [0];
+      for (let i = 1; i < pts.length; i++) seg.push(seg[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+      const total = seg[seg.length - 1] || 1;
+      const at = (d: number): [number, number] => {
+        let i = 1;
+        while (i < seg.length - 1 && seg[i] < d) i++;
+        const t = clamp((d - seg[i - 1]) / ((seg[i] - seg[i - 1]) || 1), 0, 1);
+        return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * t, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * t];
+      };
+      if (pts.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (let i = 1; i < pts.length; i++) {
+          if (seg[i] > total * grow) {
+            const [x, y] = at(total * grow);
+            ctx.lineTo(x, y);
+            break;
+          }
+          ctx.lineTo(pts[i][0], pts[i][1]);
+        }
+        phosphor(ctx, C.red, 1.4, 0.16);
+        // shuttle shuttles out and back: bi-directional
+        if (grow >= 1) {
+          const cyc = (f.time * 0.22) % 2;
+          const d = (cyc < 1 ? cyc : 2 - cyc) * total;
+          const [sx, sy] = at(d);
+          glow(ctx, sx, sy, 16, C.alabaster, 0.6);
+          ctx.fillStyle = C.alabaster;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 2.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      drawClinics(ctx, c, m, f.time, 0);
+      const tx = m.ox + c.nx[target] * m.k;
+      const ty = m.oy + c.ny[target] * m.k;
+      ctx.strokeStyle = C.alabaster;
+      ctx.lineWidth = 0.75;
+      ctx.beginPath();
+      ctx.arc(tx, ty, 6, 0, Math.PI * 2);
+      ctx.stroke();
+
+      label(ctx, 'shortest path from the hospital · move to set a pickup', m.ox, 18, C.titanium, 10);
+      const minutes = tree.dist[target];
+      const km = (pathLen * c.metresPerUnit) / 1000;
+      return `route ${Math.max(0, path.length - 1)} segments · ${km.toFixed(1)} km · ${minutes.toFixed(1)} min one way · ${c.clusters.length} pickup clusters`;
+    },
+  };
+}
+
+export const routeRxPlate: PlateDefinition = {
+  modes: [
+    { id: 'iso', label: 'Isochrones', description: 'Synthetic street network with 5, 15 and 30 minute travel-time isochrones around three generic clinics, plus demand vectors from transit-desert blocks.' },
+    { id: 'deserts', label: 'Transit deserts', description: '141 synthetic census blocks; the 43 farthest from any bus stop fall outside an 800 metre walk and are marked as deserts.' },
+    { id: 'route', label: 'Routing', description: 'Shortest-path shuttle routing from the hospital to a pickup point chosen by the cursor, with DBSCAN pickup clusters.' },
+  ],
+  createScene(modeId) {
+    if (modeId === 'deserts') return createDesertScene();
+    if (modeId === 'route') return createRouteScene();
+    return createIsoScene();
+  },
 };
 
-export default PlateRouteRx;
+export default routeRxPlate;

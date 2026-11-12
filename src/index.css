@@ -11,10 +11,25 @@
   --cobalt-bright: #2563EB;        /* Electric cobalt highlight for shockwaves & active vectors */
   --accent-red-orange: #FF2800;    /* Primary sharp reddish-orange (Rosso/McLaren) */
   --accent-crimson-glow: #FF4419;  /* Incandescent reddish-orange glow */
+  --accent-crimson: var(--accent-crimson-glow);
   --metal-silver: #C8D2E0;         /* Machined metallic silver */
   --metal-chrome: #E6ECF5;         /* High-luster silver specular highlight */
   --metal-titanium: #7E8B9B;       /* Brushed titanium secondary text/lines */
+  --metal-gunmetal: #475569;       /* Chamfer shadow on machined parts */
   --text-alabaster: #F4F6F9;       /* Primary editorial serif headline color */
+
+  /* Semantic text tier */
+  --text-primary: var(--text-alabaster);
+  --text-secondary: var(--metal-silver);
+  --text-muted: var(--metal-titanium);
+
+  /* Motion tier: spring-like decelerations, never linear */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --duration-fast: 180ms;
+  --duration-base: 320ms;
+  --duration-slow: 650ms;
 
   --bg-canvas: #03050A;
   --bg-surface: #060A12;
@@ -71,6 +86,16 @@ body {
   width: 100%;
   max-width: 100%;
   overflow-x: clip;
+}
+
+main {
+  overflow-x: clip;
+}
+
+/* The forged carbon layer sits at z -10. Isolating its parent keeps it above that
+   parent's own opaque background (a z-auto positioned wrapper would otherwise paint over it). */
+:has(> [data-forged-carbon]) {
+  isolation: isolate;
 }
 
 .font-raleway {
@@ -186,11 +211,11 @@ h1, h2, h3, h4, h5, h6 {
   left: 1rem;
   z-index: 100;
   background-color: var(--color-accent);
-  color: #060608;
+  color: var(--bg-midnight);
   font-weight: 600;
   padding: 0.5rem 1rem;
   border-radius: 2px;
-  border-top: 1px solid #FFE9AE;
+  border-top: 1px solid var(--metal-chrome);
   transition: top 0.15s ease;
 }
 .skip-to-content:focus {
@@ -210,8 +235,22 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Keyboard focus rings */
 a:focus-visible, button:focus-visible, input:focus-visible {
-  outline: 2px solid #E85D04;
+  outline: 2px solid var(--accent-red-orange);
   outline-offset: 3px;
+}
+
+/* Wheel nav: motion-blur disc over the fastest part of the 650ms spin */
+@keyframes wheel-spin-blur {
+  0% { opacity: 0; }
+  7% { opacity: 0.82; }
+  38% { opacity: 0.5; }
+  70% { opacity: 0; }
+  100% { opacity: 0; }
+}
+.wheel-spin-blur {
+  opacity: 0;
+  pointer-events: none;
+  animation: wheel-spin-blur 650ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Reduced Motion Mode Support */

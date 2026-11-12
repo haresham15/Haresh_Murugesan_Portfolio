@@ -24,9 +24,11 @@ module.exports = {
         'cobalt-bright': '#2563EB',
         'accent-red-orange': '#FF2800',
         'accent-crimson-glow': '#FF4419',
+        'accent-crimson': '#FF4419',
         'metal-silver': '#C8D2E0',
         'metal-chrome': '#E6ECF5',
         'metal-titanium': '#7E8B9B',
+        'metal-gunmetal': '#475569',
         'text-alabaster': '#F4F6F9',
 
         // Master Editorial V2 Color Palette
@@ -102,6 +104,11 @@ module.exports = {
         'editorial': '1280px',
         'reading': '760px',
         'content': '1280px',
+      },
+      transitionTimingFunction: {
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'out-quint': 'cubic-bezier(0.22, 1, 0.36, 1)',
+        'in-out-quart': 'cubic-bezier(0.76, 0, 0.24, 1)',
       },
       borderRadius: {
         DEFAULT: '2px',

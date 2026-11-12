@@ -2,72 +2,69 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-// Dynamic import with SSR disabled for high-performance canvas engine
-const AsciiDnaLightbulbCanvas = dynamic(
-  () => import('./AsciiDnaLightbulbCanvas'),
-  {
-    ssr: false,
-    loading: () => (
-      <div
-        className="absolute inset-0 w-full h-full bg-[#03050A] pointer-events-none"
-        style={{
-          backgroundImage:
-            'radial-gradient(ellipse at 71% 38%, rgba(37, 99, 235, 0.22) 0%, transparent 65%), radial-gradient(ellipse at 25% 42%, rgba(255, 40, 0, 0.14) 0%, transparent 60%)',
-        }}
-      />
-    ),
-  }
-);
+// The canvas measures every [data-hero-protect] rect in this section and keeps
+// the plume, streamlines and background clear of them.
+const AsciiDnaLightbulbCanvas = dynamic(() => import('./AsciiDnaLightbulbCanvas'), {
+  ssr: false,
+  loading: () => (
+    <div
+      className="absolute inset-0 w-full h-full bg-[#03050A] pointer-events-none"
+      style={{
+        backgroundImage:
+          'radial-gradient(ellipse at 71% 38%, rgba(37, 99, 235, 0.18) 0%, transparent 60%)',
+      }}
+    />
+  ),
+});
+
+const SPRING = 'ease-[cubic-bezier(0.34,1.56,0.64,1)]';
 
 export const BentoHero: React.FC = () => {
   return (
     <section
       id="hero"
-      className="relative w-full h-dvh overflow-hidden flex items-center m-0 p-0 select-none bg-[#03050A]"
-      aria-label="Ballistic 45° ASCII DNA-Lightbulb Stage and Introduction"
+      className="relative w-full h-dvh min-h-[700px] overflow-hidden flex items-end md:items-center px-6 md:px-16 lg:px-24 select-none bg-[#03050A]"
+      aria-label="Introduction"
     >
-      {/* 1. Full-Bleed 100% x 100dvh Concept D Hybrid Wind-Tunnel & 45° ASCII Lightbulb Canvas */}
       <div className="absolute inset-0 w-full h-full z-[1] pointer-events-none">
         <AsciiDnaLightbulbCanvas />
       </div>
 
-      {/* 2. Left-Side Editorial Column (Centered Vertically with >48px clearance above bottom) */}
-      <div className="relative z-[10] pl-5 sm:pl-8 md:pl-16 lg:pl-24 pr-5 sm:pr-8 max-w-[780px] w-full flex flex-col justify-center my-auto pointer-events-none pt-8 pb-16 md:pb-20">
-        
-        {/* Recruiter Context Eyebrow (Degrees & Institutions) */}
-        <div className="mb-3 sm:mb-5 text-[11px] sm:text-xs font-mono tracking-widest uppercase font-semibold flex flex-wrap items-center gap-x-2.5 gap-y-1 pointer-events-auto">
-          <span className="text-[#FF2800]">THE OHIO STATE UNIVERSITY</span>
-          <span className="text-[#7E8B9B]">·</span>
-          <span className="text-[#C8D2E0]">B.S. CSE (AI SPECIALIZATION)</span>
-        </div>
+      <div className="relative z-20 w-full max-w-[680px] flex flex-col pb-20 md:pb-0 pointer-events-none">
+        <p className="mb-4 sm:mb-6 text-[11px] sm:text-xs font-mono tracking-widest uppercase font-semibold flex flex-wrap items-center gap-x-2.5 gap-y-1 pointer-events-auto">
+          <span data-hero-protect className="text-[#FF2800]">The Ohio State University</span>
+          <span className="text-[#7E8B9B]" aria-hidden="true">·</span>
+          <span data-hero-protect className="text-[#C8D2E0]">B.S. CSE (AI Specialization)</span>
+        </p>
 
-        {/* Headline Block */}
-        <div id="hero-headline-block" className="pointer-events-auto">
-          <h1 className="leading-[1.02] sm:leading-[0.96] tracking-[-0.035em]">
-            <span className="block font-serif font-normal text-[#F4F6F9] text-[clamp(2.35rem,5.6vw,6.75rem)] drop-shadow-[0_8px_32px_rgba(3,5,10,0.95)]">
-              Curious about intelligence.
-            </span>
-            <span className="block font-serif italic font-normal text-[clamp(2.35rem,5.6vw,6.75rem)] mt-1.5 md:mt-2 md:pl-8 bg-gradient-to-r from-[#C8D2E0] via-[#F4F6F9] to-[#C8D2E0] bg-clip-text text-transparent drop-shadow-[0_12px_40px_rgba(3,5,10,0.98)]">
+        <h1 className="font-serif font-normal text-[clamp(3.4rem,6vw,6.5rem)] leading-[0.95] tracking-[-0.035em] pointer-events-auto">
+          <span className="block text-[#F4F6F9]">
+            <span data-hero-protect>Curious about intelligence.</span>
+          </span>
+          <span className="block italic mt-2 md:pl-6">
+            <span
+              data-hero-protect
+              className="pr-[0.08em] bg-gradient-to-r from-[#F4F6F9] via-[#C8D2E0] to-[#FF2800] bg-clip-text text-transparent"
+            >
               Obsessed with making it work.
             </span>
-          </h1>
-        </div>
+          </span>
+        </h1>
 
-        {/* Lead Sentence */}
-        <div id="hero-subcopy-block" className="mt-5 sm:mt-6 md:mt-8 max-w-[46ch] pointer-events-auto">
-          <p className="text-[15px] sm:text-[18px] md:text-[20px] text-[#C8D2E0] font-sans leading-relaxed font-normal">
+        <p className="mt-6 max-w-[45ch] text-[18px] leading-relaxed text-[#C8D2E0]/85 font-sans pointer-events-auto">
+          <span data-hero-protect>
             Building high-speed computational systems where machine intelligence meets physical reality.
-          </p>
-        </div>
+          </span>
+        </p>
 
-        {/* Primary Recruiter CTA Row */}
-        <div className="mt-6 md:mt-8 pointer-events-auto flex flex-wrap items-center gap-3 sm:gap-6">
+        <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-5 pointer-events-auto">
           <Link
             href="/#projects"
-            className="group inline-flex items-center gap-2.5 bg-[#FF2800] text-[#F4F6F9] hover:bg-[#FF4419] px-6 sm:px-7 py-3 sm:py-3.5 text-xs sm:text-sm font-mono tracking-wider uppercase transition-transform duration-200 hover:translate-x-1 rounded-[2px] font-semibold shadow-[0_0_24px_rgba(255,40,0,0.38)]"
+            data-hero-protect
+            className={`group inline-flex items-center gap-2.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#F4F6F9] px-7 py-3.5 font-mono text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] shadow-[0_0_24px_rgba(255,40,0,0.32)] transition-[background-color,transform] duration-500 ${SPRING} hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF4419]`}
           >
             <span>Explore Work</span>
-            <span className="text-base group-hover:translate-x-1 transition-transform duration-200">
+            <span aria-hidden="true" className={`transition-transform duration-500 ${SPRING} group-hover:translate-x-1`}>
               →
             </span>
           </Link>
@@ -76,28 +73,28 @@ export const BentoHero: React.FC = () => {
             href="/Haresh_Murugesan_Resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-xs font-mono text-[#F4F6F9] hover:text-[#FF2800] bg-[#060A12] border border-[#18458B]/40 hover:border-[#FF2800]/50 px-5 py-3 rounded-[2px] transition-colors uppercase tracking-wider font-semibold"
+            data-hero-protect
+            className="inline-flex items-center gap-2 text-xs font-mono text-[#F4F6F9] hover:text-[#FF4419] bg-[#060A12] border border-[#153875] hover:border-[#FF2800]/60 px-5 py-3.5 rounded-[2px] transition-colors duration-300 uppercase tracking-[0.16em] font-semibold"
           >
             <span>Résumé (PDF)</span>
-            <span className="text-[#FF2800]">↗</span>
+            <span aria-hidden="true" className="text-[#FF2800]">↗</span>
           </a>
 
           <Link
             href="/projects"
-            className="hidden md:inline-flex items-center gap-2 text-xs font-mono text-[#7E8B9B] hover:text-[#F4F6F9] transition-colors py-2 uppercase tracking-wider"
+            data-hero-protect
+            className="hidden md:inline-flex items-center gap-2 text-xs font-mono text-[#7E8B9B] hover:text-[#F4F6F9] transition-colors duration-300 py-2 uppercase tracking-[0.16em]"
           >
             <span>Browse 18 Systems</span>
-            <span className="text-[#FF2800]">↓</span>
+            <span aria-hidden="true" className="text-[#FF2800]">↓</span>
           </Link>
         </div>
-
       </div>
 
-      {/* 3. Bottom Hairline Datum & Coordinate Reticle */}
       <div className="absolute bottom-4 left-6 md:left-12 right-6 md:right-12 z-[10] flex items-center justify-between text-[11px] font-mono text-[#7E8B9B]/70 pointer-events-none">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FF2800] animate-pulse" />
-          <span>40.00° N, 83.03° W · COLUMBUS, OH</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#FF2800] motion-safe:animate-pulse" />
+          <span>40.00° N, 83.03° W · Columbus, OH</span>
         </div>
       </div>
     </section>

@@ -1,142 +1,154 @@
-import React, { useState } from 'react';
-import { ThemeSection } from './ThemeSection';
+import React, { useEffect, useRef, useState } from 'react';
+import { ThemeSection, Reveal } from './ThemeSection';
+import { useMotionPreference } from './MotionPreference';
+import { profile } from '@/content/profile';
+
+const SOCIAL = [
+  { label: 'GitHub', href: profile.contacts.github },
+  { label: 'LinkedIn', href: profile.contacts.linkedin },
+  { label: 'Spotify', href: 'https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98' },
+  { label: 'YouTube', href: 'https://www.youtube.com/@syntinuum' },
+];
+
+/** Clipboard API first; falls back to a hidden textarea + execCommand for older or insecure contexts. */
+const copyText = async (text: string): Promise<boolean> => {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // fall through to the legacy path
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
+};
 
 export const ContactFooter: React.FC = () => {
-  const [copied, setCopied] = useState<boolean>(false);
-  const email = 'haresh.murugesan@gmail.com';
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const timer = useRef<number | undefined>(undefined);
+  const { isReduced } = useMotionPreference();
+  const email = profile.contacts.email;
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const handleCopyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(email);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2400);
-    } catch {
-      window.prompt('Copy email address:', email);
-    }
+    const ok = await copyText(email);
+    setCopyState(ok ? 'copied' : 'failed');
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setCopyState('idle'), 2400);
   };
 
-  const scrollToTop = () => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: isReduced ? 'auto' : 'smooth' });
 
   return (
-    <footer id="contact" className="relative w-full text-[#F4F6F9]" aria-label="Contact and colophon">
-      <ThemeSection
-        id="contact-section"
-        theme="obsidian"
-        className="flex flex-col justify-between"
-      >
-        <div className="w-full flex flex-col my-auto space-y-16 sm:space-y-24">
-          
-          {/* Expansive Statement Composition (Unboxed & De-Vibecoded) */}
-          <div className="max-w-4xl space-y-6">
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-serif text-[#F4F6F9] leading-[1.08] tracking-tight">
-              Have an interesting problem?{' '}
-              <span className="italic text-[#FF2800]">
-                Let’s talk about how I can help.
-              </span>
+    <footer id="contact" className="relative w-full text-[#F4F6F9]" aria-label="Contact">
+      <ThemeSection id="contact-section" theme="obsidian" className="pt-24 lg:pt-36 pb-10">
+        <div className="w-full flex flex-col">
+          <Reveal className="max-w-[18ch] sm:max-w-none">
+            <h2 className="font-serif font-normal text-[#F4F6F9] text-5xl sm:text-7xl lg:text-8xl xl:text-[8.5rem] leading-[0.98] tracking-[-0.03em]">
+              Have an interesting problem?
+              <span className="block italic text-[#FF2800]">Let’s talk.</span>
             </h2>
+          </Reveal>
 
-            <p className="text-lg sm:text-xl font-sans text-[#7E8B9B] max-w-2xl leading-relaxed">
-              Based in Columbus, OH — actively interviewing for Summer 2027 Software Engineering, AI/ML, and High-Performance Systems roles. Open to hybrid or relocation opportunities.
+          <Reveal delay={0.06} className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
+            <p className="lg:col-span-6 max-w-[52ch] text-base sm:text-lg font-sans text-[#C8D2E0]/85 leading-relaxed">
+              Based in {profile.education.location}. {profile.availability.status} for{' '}
+              {profile.availability.targetSeason} {profile.availability.seeking.toLowerCase()}.
             </p>
-          </div>
 
-          {/* 3-Tier Action Hierarchy */}
-          <div className="space-y-10 border-t border-[#18458B]/20 pt-12 sm:pt-16">
-            
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 max-w-3xl">
-              {/* Primary Action: Direct Email */}
+            <div className="lg:col-span-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 font-mono text-xs">
               <a
                 href={`mailto:${email}`}
-                className="min-h-[48px] bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono text-xs font-semibold px-6 sm:px-8 py-4 sm:py-5 rounded-[2px] flex items-center justify-between sm:justify-center gap-3 transition-colors select-none group shadow-[0_0_24px_rgba(255,40,0,0.35)]"
+                className="group min-h-[52px] bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] font-semibold px-7 rounded-[2px] inline-flex items-center justify-between sm:justify-center gap-3 transition-colors"
               >
                 <span>Send Direct Email</span>
-                <span className="text-base group-hover:translate-x-1.5 transition-transform duration-200">→</span>
+                <span aria-hidden="true" className="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1">
+                  →
+                </span>
               </a>
-
-              {/* Secondary Action: Copy Email */}
               <button
+                type="button"
                 onClick={handleCopyEmail}
-                type="button"
-                className="min-h-[48px] bg-[#060A12] hover:bg-[#0B1E40] text-[#F4F6F9] border border-[#18458B]/30 rounded-[2px] font-mono text-xs px-6 py-4 sm:py-5 flex items-center justify-between sm:justify-center gap-3 transition-colors cursor-pointer select-none"
+                className="min-h-[52px] px-6 rounded-[2px] border border-[#C8D2E0]/20 hover:border-[#C8D2E0]/50 text-[#F4F6F9] inline-flex items-center justify-between sm:justify-center gap-3 transition-colors cursor-pointer"
               >
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${copied ? 'bg-[#10B981]' : 'bg-[#FF2800]'}`} />
-                  <span>{copied ? 'Copied to Clipboard' : 'Copy Email Address'}</span>
-                </div>
-                <span className="text-[#7E8B9B]">{copied ? '✓' : '⧉'}</span>
+                <span className="relative inline-grid">
+                  {(['idle', 'copied', 'failed'] as const).map((state) => (
+                    <span
+                      key={state}
+                      aria-hidden={copyState !== state}
+                      style={{ gridArea: '1 / 1' }}
+                      className={`transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                        copyState === state ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                      } ${state === 'copied' ? 'text-[#FF2800]' : ''}`}
+                    >
+                      {state === 'idle' ? 'Copy Email' : state === 'copied' ? 'Copied ✓' : 'Copy failed, address below'}
+                    </span>
+                  ))}
+                </span>
+                <span className="sr-only" aria-live="polite">
+                  {copyState === 'copied' ? 'Email address copied' : copyState === 'failed' ? `Copy failed. The address is ${email}` : ''}
+                </span>
               </button>
-
-              {/* Tertiary Action: Résumé */}
               <a
-                href="/Haresh_Murugesan_Resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="min-h-[48px] bg-[#060A12] hover:bg-[#0B1E40] text-[#F4F6F9] border border-[#18458B]/30 rounded-[2px] font-mono text-xs px-6 py-4 sm:py-5 flex items-center justify-between sm:justify-center gap-2 transition-colors select-none font-medium"
+                href={profile.contacts.resumeUrl}
+                download={profile.contacts.resumeDownloadName}
+                className="min-h-[52px] px-6 rounded-[2px] border border-[#C8D2E0]/20 hover:border-[#C8D2E0]/50 text-[#F4F6F9] inline-flex items-center justify-between sm:justify-center gap-3 transition-colors"
               >
-                <span>Download Résumé</span>
-                <span className="text-[#C8D2E0]">↗</span>
+                <span>Résumé</span>
+                <span aria-hidden="true" className="text-[#7E8B9B]">↓</span>
               </a>
             </div>
+          </Reveal>
 
-            {/* Social Links & Back to Top */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-6 text-xs font-mono text-[#7E8B9B] border-t border-[#18458B]/20">
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                <a
-                  href="https://github.com/haresham15"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="min-h-[36px] flex items-center hover:text-[#F4F6F9] transition-colors"
-                >
-                  GitHub ↗
-                </a>
-                <a
-                  href="https://linkedin.com/in/haresh-murugesan"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="min-h-[36px] flex items-center hover:text-[#F4F6F9] transition-colors"
-                >
-                  LinkedIn ↗
-                </a>
-                <a
-                  href="https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="min-h-[36px] flex items-center hover:text-[#F4F6F9] transition-colors"
-                >
-                  Spotify ↗
-                </a>
-                <a
-                  href="https://www.youtube.com/@syntinuum"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="min-h-[36px] flex items-center hover:text-[#F4F6F9] transition-colors"
-                >
-                  YouTube ↗
-                </a>
-              </div>
+          <a
+            href={`mailto:${email}`}
+            className="mt-10 self-start font-mono text-xs sm:text-sm text-[#7E8B9B] hover:text-[#F4F6F9] transition-colors break-all"
+          >
+            {email}
+          </a>
 
-              <button
-                onClick={scrollToTop}
-                type="button"
-                className="min-h-[36px] hover:text-[#FF2800] transition-colors flex items-center gap-2 text-left sm:text-right cursor-pointer"
-              >
-                <span>Return to Summit [TOP]</span>
-                <span>↑</span>
-              </button>
-            </div>
-
-            {/* Minimalist Colophon */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-[#64748B] pt-4">
-              <span>© {new Date().getFullYear()} HARESH MURUGESAN · ALL RIGHTS RESERVED</span>
-              <span>DESIGNED &amp; BUILT IN COLUMBUS, OH · NEXT.JS &amp; THREE.JS</span>
-            </div>
-
+          {/* Footer */}
+          <div className="mt-20 sm:mt-28 pt-6 border-t border-[#C8D2E0]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 font-mono text-xs text-[#7E8B9B]">
+            <ul className="flex flex-wrap items-center gap-x-6 gap-y-1">
+              {SOCIAL.map((s) => (
+                <li key={s.label}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="min-h-[44px] inline-flex items-center gap-1 hover:text-[#F4F6F9] transition-colors"
+                  >
+                    {s.label} <span aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              onClick={scrollToTop}
+              className="min-h-[44px] self-start sm:self-auto inline-flex items-center gap-2 hover:text-[#FF2800] transition-colors cursor-pointer"
+            >
+              Back to top <span aria-hidden="true">↑</span>
+            </button>
           </div>
-
+          <div className="mt-4 flex flex-col sm:flex-row justify-between gap-2 font-mono text-[11px] text-[#7E8B9B]/80">
+            <span>© {new Date().getFullYear()} {profile.name}</span>
+            <span>Designed and built in {profile.education.location} · Next.js</span>
+          </div>
         </div>
       </ThemeSection>
     </footer>

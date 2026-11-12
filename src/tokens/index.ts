@@ -4,7 +4,25 @@
  * Palette: Midnight Obsidian #03050A | Surface #060A12 | Cobalt Deep #0B1E40 | Alabaster #F4F6F9 | Accent Red-Orange #FF2800
  */
 
+/** Primitive palette. Mirrors the :root custom properties in src/index.css. */
+export const palette = {
+  bgMidnight: '#03050A',
+  bgObsidian: '#060A12',
+  cobaltDeep: '#0B1E40',
+  cobaltMid: '#153875',
+  cobaltBright: '#2563EB',
+  accentRedOrange: '#FF2800',
+  accentCrimson: '#FF4419',
+  accentCrimsonGlow: '#FF4419',
+  metalSilver: '#C8D2E0',
+  metalChrome: '#E6ECF5',
+  metalTitanium: '#7E8B9B',
+  metalGunmetal: '#475569',
+  textAlabaster: '#F4F6F9',
+} as const;
+
 export const tokens = {
+  palette,
   colors: {
     canvas: '#03050A',
     surface: '#060A12',
