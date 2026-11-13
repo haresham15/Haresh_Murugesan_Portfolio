@@ -48,3 +48,5 @@ next-env.d.ts
 /.v7/phase1/*_shutter.png
 /.v7/phase1/exp_*.png
 /.v7/after/
+/.v7/phase3/s1/
+/.v7/phase3/s2/

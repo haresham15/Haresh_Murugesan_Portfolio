@@ -42,7 +42,7 @@ const MILESTONES: Milestone[] = [
     phase: 'Applied Modeling',
     title: 'Models that had to hold up under judging',
     reflection:
-      '1st Place for Best Use of External Data at ASA DataFest 2025, a 48-hour hackathon against 40+ collegiate teams. Built Philocracy’s recursive argument trees and implemented classical AI algorithms from first principles for CS50 AI.',
+      'Won Best Use of External Data at ASA DataFest 2025, a 48-hour hackathon against 40+ collegiate teams. Built Philocracy’s recursive argument trees and implemented classical AI algorithms from first principles for CS50 AI.',
     detail: ['ASA DataFest 2025', 'Philocracy', 'CS50 AI'],
     link: { href: '#achievements', label: 'See the recognition' },
   },
@@ -52,7 +52,7 @@ const MILESTONES: Milestone[] = [
     phase: 'High-Performance Engineering',
     title: 'Latency budgets, worker threads and clinical vision',
     reflection:
-      'Shipped Healios V2 with an 8.09 ms Grad-CAM saliency pipeline and Apexis with a 60 fps off-main-thread race simulation. Won DataFest again with RouteRx, joined Honda 99P Labs as an Innovation Analyst, and interned at CAS on serverless AWS.',
+      'Shipped the Grad-CAM saliency pipeline in Healios V2 and the off-main-thread race simulation in Apexis. Won DataFest again with RouteRx, joined Honda 99P Labs as an Innovation Analyst, and interned at CAS on serverless AWS.',
     detail: ['Healios V2', 'Apexis', 'RouteRx', 'CAS', 'Honda 99P Labs'],
     link: { href: '#projects', label: 'Explore the projects' },
   },
@@ -108,7 +108,7 @@ export const HistorySection: React.FC = () => {
     >
       <div className="w-full flex flex-col">
         <Reveal className="pb-12 sm:pb-16 border-b border-[#C8D2E0]/10">
-          <h2 className="text-5xl sm:text-7xl lg:text-8xl font-serif font-normal text-[#F4F6F9] leading-[0.95] tracking-[-0.02em]">
+          <h2 className="text-[length:var(--display-size)] font-serif font-normal text-[#F4F6F9] leading-[0.95] tracking-[-0.02em]">
             Milestones
           </h2>
           <p className="mt-6 max-w-[58ch] text-base sm:text-lg font-sans text-[#C8D2E0]/85 leading-relaxed">

@@ -1,21 +1,23 @@
-import React from 'react';
+import dynamic from 'next/dynamic';
 import Header from './components/Header';
 import BentoHero from './components/BentoHero';
-import ProjectLab from './components/ProjectLab';
 import HomeCodeGraph from './components/HomeCodeGraph';
 import ScrollyExperience from './components/ScrollyExperience';
-import PodcastSection from './components/PodcastSection';
-import NeuralSkills from './components/NeuralSkills';
-import AchievementsGallery from './components/AchievementsGallery';
 import AboutSection from './components/AboutSection';
 import HistorySection from './components/HistorySection';
-import NowSection from './components/NowSection';
 import ContactFooter from './components/ContactFooter';
+import WorksSection from './v7/works';
 import { MotionPreferenceProvider } from './components/MotionPreference';
 import { ChromaticThemeProvider } from './components/ThemeSection';
 import CarbonField from './v7/carbon/CarbonField';
 import CursorDot from './v7/cursor/CursorDot';
 import { MaterialSection, Seam } from './v7/seams/Region';
+
+// Below the fold: split into their own chunks (still prerendered).
+const SyntinuumSection = dynamic(() => import('./v7/syntinuum'));
+const ToolWallSection = dynamic(() => import('./v7/tool-wall'));
+const RecognitionSection = dynamic(() => import('./v7/recognition'));
+const NowSection = dynamic(() => import('./v7/now'));
 
 function App() {
   return (
@@ -31,17 +33,17 @@ function App() {
           <main id="main-content" className="relative z-10 w-full overflow-x-clip bg-transparent">
             <MaterialSection material="dark" name="hero"><BentoHero /></MaterialSection>
             <Seam kind="shutter" from="dark" to="light" />
-            <MaterialSection material="light" name="works"><ProjectLab /></MaterialSection>
+            <MaterialSection material="light" name="works"><WorksSection /></MaterialSection>
             <Seam kind="horizon" from="light" to="dark" />
             <MaterialSection material="dark" name="constellation"><HomeCodeGraph /></MaterialSection>
             <Seam kind="turn-in" from="dark" to="light" />
             <MaterialSection material="light" name="experience"><ScrollyExperience /></MaterialSection>
             <Seam kind="turn-out" from="light" to="dark" />
-            <MaterialSection material="dark" name="syntinuum"><PodcastSection /></MaterialSection>
+            <MaterialSection material="dark" name="syntinuum"><SyntinuumSection /></MaterialSection>
             <Seam kind="baseline" from="dark" to="light" />
-            <MaterialSection material="light" name="index"><NeuralSkills /></MaterialSection>
+            <MaterialSection material="light" name="index"><ToolWallSection /></MaterialSection>
             <Seam kind="iris-open" from="light" to="dark" />
-            <MaterialSection material="dark" name="recognition"><AchievementsGallery /></MaterialSection>
+            <MaterialSection material="dark" name="recognition"><RecognitionSection /></MaterialSection>
             <Seam kind="horizon" from="dark" to="light" />
             <MaterialSection material="light" name="about"><AboutSection /></MaterialSection>
             <MaterialSection material="light" name="milestones"><HistorySection /></MaterialSection>

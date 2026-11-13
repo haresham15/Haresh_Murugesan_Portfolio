@@ -232,12 +232,33 @@ html.v7-cursor *:not(input):not(textarea):not(select):not([contenteditable="true
   transition: opacity var(--material-fade) ease;
 }
 .v7-cursor-dot[data-visible="false"] { opacity: 0; }
-.v7-cursor-dot > span {
-  display: block;
-  width: 100%;
-  height: 100%;
+.v7-cursor-dot { color: var(--on-ink); }
+.v7-cursor-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  opacity: 0;
+  transition: opacity 120ms ease, transform 160ms cubic-bezier(0.16, 1, 0.3, 1), color var(--material-fade) ease;
+}
+.v7-cursor-default {
+  width: 10px;
+  height: 10px;
   border-radius: 9999px;
-  background-color: var(--on-ink);
+  background-color: currentColor;
+}
+.v7-cursor-hairline {
+  width: 1px;
+  height: 28px;
+  background-color: currentColor;
+}
+.v7-cursor-dot[data-shape=""] .v7-cursor-default,
+.v7-cursor-dot[data-shape="rotate"] .v7-cursor-rotate,
+.v7-cursor-dot[data-shape="hairline"] .v7-cursor-hairline,
+.v7-cursor-dot[data-shape="grab"] .v7-cursor-grab,
+.v7-cursor-dot[data-shape="focus"] .v7-cursor-focus {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 /* CarbonField sits at z -10; isolating its parent keeps it above that parent's background */
@@ -251,4 +272,11 @@ html.v7-cursor *:not(input):not(textarea):not(select):not([contenteditable="true
 }
 [data-rim][data-on="light"] > * {
   filter: drop-shadow(0 1px 1px rgba(5, 8, 17, 0.22)) drop-shadow(0 2px 4px rgba(5, 8, 17, 0.12));
+}
+
+/* Body type by material: one weight step heavier and slightly tighter on the weave.
+   :where() keeps specificity at zero so explicit weight/tracking classes still win. */
+[data-material] :where(p, li, dd, dt, figcaption, blockquote) {
+  font-weight: var(--mat-body-weight);
+  letter-spacing: var(--mat-tracking);
 }

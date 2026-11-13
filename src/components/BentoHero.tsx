@@ -91,12 +91,6 @@ export const BentoHero: React.FC = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-4 left-6 md:left-12 right-6 md:right-12 z-[10] flex items-center justify-between text-[11px] font-mono text-[#7E8B9B]/70 pointer-events-none">
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FF2800] motion-safe:animate-pulse" />
-          <span>40.00° N, 83.03° W · Columbus, OH</span>
-        </div>
-      </div>
     </section>
   );
 };

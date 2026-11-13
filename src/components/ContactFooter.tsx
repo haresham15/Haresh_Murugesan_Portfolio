@@ -58,7 +58,7 @@ export const ContactFooter: React.FC = () => {
       <ThemeSection id="contact-section" theme="obsidian" className="pt-24 lg:pt-36 pb-10">
         <div className="w-full flex flex-col">
           <Reveal className="max-w-[18ch] sm:max-w-none">
-            <h2 className="font-serif font-normal text-[#F4F6F9] text-5xl sm:text-7xl lg:text-8xl xl:text-[8.5rem] leading-[0.98] tracking-[-0.03em]">
+            <h2 className="font-serif font-normal text-[#F4F6F9] text-[length:var(--display-size)] leading-[0.98] tracking-[-0.03em]">
               Have an interesting problem?
               <span className="block italic text-[#FF2800]">Let’s talk.</span>
             </h2>
@@ -145,9 +145,8 @@ export const ContactFooter: React.FC = () => {
               Back to top <span aria-hidden="true">↑</span>
             </button>
           </div>
-          <div className="mt-4 flex flex-col sm:flex-row justify-between gap-2 font-mono text-[11px] text-[#7E8B9B]/80">
+          <div className="mt-4 flex flex-col sm:flex-row justify-between gap-2 font-mono text-[12px] text-[#7E8B9B]/80">
             <span>© {new Date().getFullYear()} {profile.name}</span>
-            <span>Designed and built in {profile.education.location} · Next.js</span>
           </div>
         </div>
       </ThemeSection>

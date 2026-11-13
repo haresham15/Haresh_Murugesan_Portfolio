@@ -428,12 +428,6 @@ function makeNode(partial: Pick<GNode, 'kind' | 'id' | 'label' | 'sub' | 'r' | '
   };
 }
 
-function shortenHighlight(text: string, max: number): string {
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max);
-  const space = cut.lastIndexOf(' ');
-  return `${cut.slice(0, space > 10 ? space : max).replace(/[\s&·,—-]+$/, '')}…`;
-}
 
 function createSim(): Sim {
   const nodes: GNode[] = [];
@@ -446,7 +440,7 @@ function createSim(): Sim {
   });
   PROJECTS.forEach((p) => {
     const di = DOMAINS.findIndex((d) => d.id === p.domainId);
-    nodes.push(makeNode({ kind: 2, id: p.slug, label: p.short, sub: shortenHighlight(p.highlight, 28), r: 4.5, tint: DOMAINS[di].tint, ring: DOMAINS[di].ring, parent: ANCHORS.length + di, domainIndex: di, bx: p.x, by: p.y }));
+    nodes.push(makeNode({ kind: 2, id: p.slug, label: p.short, sub: '', r: 4.5, tint: DOMAINS[di].tint, ring: DOMAINS[di].ring, parent: ANCHORS.length + di, domainIndex: di, bx: p.x, by: p.y }));
   });
 
   const edges: GEdge[] = [];
@@ -1557,7 +1551,7 @@ export const HomeCodeGraph: React.FC = () => {
       <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-10 pb-6 border-b border-[#C8D2E0]/10">
           <div className="space-y-3 max-w-[560px]">
-            <h2 id="codegraph-title" className="text-3xl sm:text-5xl lg:text-6xl font-serif text-[#F4F6F9] leading-tight tracking-tight">
+            <h2 id="codegraph-title" className="text-[length:var(--display-size)] font-serif text-[#F4F6F9] leading-tight tracking-tight">
               Systems Constellation.
             </h2>
             <p className="text-sm sm:text-[15px] font-sans text-[#C8D2E0]/75 leading-relaxed">
@@ -1568,9 +1562,6 @@ export const HomeCodeGraph: React.FC = () => {
 
           <div className="flex flex-col gap-3 w-full lg:w-auto lg:min-w-[420px] lg:max-w-[520px]">
             <label className="relative flex items-center gap-2 border-b border-[#C8D2E0]/20 focus-within:border-[#FF2800] transition-colors pb-1.5">
-              <span className="font-mono text-xs text-[#FF2800] shrink-0" aria-hidden="true">
-                cos θ
-              </span>
               <span className="sr-only">Search projects by idea</span>
               <input
                 type="search"
@@ -1594,7 +1585,7 @@ export const HomeCodeGraph: React.FC = () => {
               )}
             </label>
 
-            <div role="group" aria-label="Filter by domain" className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 font-mono text-[11.5px]">
+            <div role="group" aria-label="Filter by domain" className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 font-mono text-[12px]">
               {FILTERS.map((f, i) => {
                 const active = activeFilter === f.id && !hasQuery;
                 return (
@@ -1698,16 +1689,15 @@ export const HomeCodeGraph: React.FC = () => {
             <div className="rounded-[2px] border border-[#C8D2E0]/15 bg-[#03050A]/90 backdrop-blur-md px-4 py-3.5 shadow-[0_18px_48px_rgba(0,0,0,0.55)]">
               <div className="flex items-baseline justify-between gap-3">
                 <h3 className="font-serif text-[17px] leading-tight text-[#F4F6F9]">{lensProject.name}</h3>
-                <span className="font-mono text-[11px] text-[#7E8B9B] shrink-0">
+                <span className="font-mono text-[12px] text-[#7E8B9B] shrink-0">
                   {lensMatch ? <span className="text-[#FF2800]">{lensMatch.sim.toFixed(2)} SIM</span> : lensProject.year}
                 </span>
               </div>
               {lensProject.subtitle && (
                 <p className="mt-0.5 font-sans text-[11.5px] leading-snug text-[#C8D2E0]/65">{lensProject.subtitle}</p>
               )}
-              <p className="mt-2 font-mono text-[11.5px] leading-snug text-[#FF2800]">{lensProject.highlight}</p>
               <p className="mt-1.5 font-sans text-[12.5px] leading-snug text-[#C8D2E0]/90 line-clamp-2">{lensProject.summary}</p>
-              <p className="mt-2 font-mono text-[10.5px] text-[#7E8B9B] truncate">{lensProject.stack}</p>
+              <p className="mt-2 font-mono text-[12px] text-[#7E8B9B] truncate">{lensProject.stack}</p>
               {touchSlug === lensProject.slug ? (
                 <button
                   type="button"
@@ -1720,7 +1710,7 @@ export const HomeCodeGraph: React.FC = () => {
                   </span>
                 </button>
               ) : (
-                <p className="mt-2.5 font-mono text-[11px] text-[#F4F6F9]">
+                <p className="mt-2.5 font-mono text-[12px] text-[#F4F6F9]">
                   Click to open case study <span className="text-[#FF2800]">↗</span>
                 </p>
               )}
@@ -1746,14 +1736,11 @@ export const HomeCodeGraph: React.FC = () => {
         </nav>
       </div>
 
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="pt-4 border-t border-[#C8D2E0]/10 font-mono text-[11px] text-[#7E8B9B]">
-          <span className="hidden [@media(hover:hover)]:inline">
-            Sweep across a line to pluck it · Click a domain to zoom in · Esc zooms out · Tab walks every project
-          </span>
-          <span className="[@media(hover:hover)]:hidden">Tap a node to preview it, then open the case study</span>
-        </p>
-      </div>
+      {/* Interaction hints are for assistive tech only (V7: no visible how-to text). */}
+      <p className="sr-only-v7">
+        Sweep across a line to pluck it. Click a domain to zoom in; Escape zooms out. Tab walks every project.
+        On touch, tap a node to preview it, then open the case study.
+      </p>
     </section>
   );
 };

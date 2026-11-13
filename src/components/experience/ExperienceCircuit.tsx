@@ -786,8 +786,9 @@ const CircuitStage: React.FC = () => {
           style={{
             width: lay ? lay.vw + lay.M * 0.3 + 40 : '100%',
             backgroundImage:
-              'radial-gradient(ellipse 38% 48% at 22% 58%, rgba(21,56,117,0.20), transparent 70%), radial-gradient(ellipse 30% 42% at 74% 38%, rgba(11,30,64,0.32), transparent 70%), linear-gradient(rgba(126,139,155,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(126,139,155,0.045) 1px, transparent 1px)',
-            backgroundSize: '100% 100%, 100% 100%, 64px 64px, 64px 64px',
+              // Printed track map: a faint ink grid on the weave, no glow.
+              'linear-gradient(rgba(5,8,17,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(5,8,17,0.05) 1px, transparent 1px)',
+            backgroundSize: '64px 64px, 64px 64px',
           }}
         />
 
@@ -809,25 +810,24 @@ const CircuitStage: React.FC = () => {
               >
                 <defs>
                   <linearGradient id="expBarrier" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={lay.H}>
-                    <stop offset="0" stopColor="#E6ECF5" stopOpacity="0.78" />
-                    <stop offset="0.5" stopColor="#C8D2E0" stopOpacity="0.5" />
-                    <stop offset="1" stopColor="#7E8B9B" stopOpacity="0.42" />
+                    <stop offset="0" stopColor="#050811" stopOpacity="0.92" />
+                    <stop offset="1" stopColor="#050811" stopOpacity="0.92" />
                   </linearGradient>
                   <linearGradient id="expHalo" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={lay.W} y2="0">
-                    <stop offset="0" stopColor="#153875" stopOpacity="0.55" />
-                    <stop offset="0.5" stopColor="#0B1E40" stopOpacity="0.7" />
-                    <stop offset="1" stopColor="#153875" stopOpacity="0.55" />
+                    <stop offset="0" stopColor="#153875" stopOpacity="0.05" />
+                    <stop offset="1" stopColor="#153875" stopOpacity="0.05" />
                   </linearGradient>
                 </defs>
                 <path d={lay.d} fill="none" stroke="url(#expHalo)" strokeWidth={74 * scale} strokeLinejoin="round" />
                 <path d={lay.d} fill="none" stroke="url(#expBarrier)" strokeWidth={62 * scale} strokeLinejoin="round" />
-                <path d={lay.d} fill="none" stroke="#04070E" strokeWidth={56 * scale} strokeLinejoin="round" />
-                <path d={lay.d} fill="none" stroke="rgba(11,30,64,0.55)" strokeWidth={40 * scale} strokeLinejoin="round" />
-                <path d={lay.d} fill="none" stroke="#04070E" strokeWidth={30 * scale} strokeLinejoin="round" />
+                {/* Ink kerbs, paper surface, cobalt lane lines: the circuit as a printed map */}
+                <path d={lay.d} fill="none" stroke="#F4F6F9" strokeWidth={56 * scale} strokeLinejoin="round" />
+                <path d={lay.d} fill="none" stroke="rgba(21,56,117,0.10)" strokeWidth={40 * scale} strokeLinejoin="round" />
+                <path d={lay.d} fill="none" stroke="#F4F6F9" strokeWidth={30 * scale} strokeLinejoin="round" />
                 <path
                   d={lay.d}
                   fill="none"
-                  stroke="rgba(200,210,224,0.14)"
+                  stroke="rgba(5,8,17,0.40)"
                   strokeWidth={1}
                   strokeDasharray="14 18"
                 />
@@ -847,7 +847,7 @@ const CircuitStage: React.FC = () => {
                         curbRefs.current[ci * 2 + 1] = el;
                       }}
                       fill="none"
-                      stroke="#E6ECF5"
+                      stroke="#050811"
                       strokeWidth={8 * scale}
                       strokeDasharray={`${11 * scale} ${11 * scale}`}
                       strokeDashoffset={11 * scale}
@@ -1012,7 +1012,7 @@ const CircuitStage: React.FC = () => {
           <div className="h-px w-full bg-[#153875]/40">
             <div ref={progressRef} className="h-px w-full origin-left bg-[#FF2800]" style={{ transform: 'scaleX(0)' }} />
           </div>
-          <div className="px-6 sm:px-12 md:px-16 py-3 md:py-4 flex items-center justify-between gap-4 bg-gradient-to-t from-[#03050A] via-[#03050A]/85 to-transparent">
+          <div className="px-6 sm:px-12 md:px-16 py-3 md:py-4 flex items-center justify-between gap-4 bg-gradient-to-t from-[#F4F6F9] via-[rgba(244,246,249,0.85)] to-transparent">
             <nav aria-label="Experience sectors" className="flex items-center gap-1 sm:gap-2 text-xs font-mono">
               {STATIONS.map((st, idx) => {
                 const isActive = activeSector === idx;

@@ -21,7 +21,7 @@ export const nowSubjects: NowSubject[] = [
     title: 'High-concurrency Web Worker simulation runtimes.',
     detail: [
       'Multi-threaded browser simulation engines on offscreen canvas and SharedArrayBuffer channels.',
-      'Deterministic 60 fps physics inside a sub-16 ms frame budget, whatever the main thread is doing.',
+      'Deterministic physics inside a sub-16 ms frame budget, whatever the main thread is doing.',
     ],
   },
   {

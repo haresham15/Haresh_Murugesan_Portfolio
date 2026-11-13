@@ -1,26 +1,20 @@
 import React, { useMemo, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useSpring, useMotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ThemeSection, Reveal } from './ThemeSection';
 import { useMotionPreference } from './MotionPreference';
 import { profile } from '../content/profile';
-import { experiences } from '../content/experience';
 import { getEvidence } from '../content/evidence';
 
 const MotionDiv = motion.div;
 
 const CHAMFER = 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%)';
 
-const research = experiences.find((e) => e.id === 'osu-pathology-research');
-const saliency = getEvidence('healios-xai-saliency');
 const aws = getEvidence('cas-aws-scale');
-const sim = getEvidence('apexis-60fps-sim');
 
 const ANCHORS = [
-  { value: saliency?.value ?? '8.09 ms', label: 'Grad-CAM saliency pipeline', source: 'Healios V2', href: '/projects/healios' },
   { value: aws?.value.replace(' Internal Use Cases', '') ?? '12', label: 'AWS use cases shipped', source: 'Chemical Abstracts Service', href: '/#experience' },
-  { value: sim?.value ?? '60 fps', label: 'Off-main-thread race simulation', source: 'Apexis', href: '/projects/apexis' },
 ];
 
 /* ---------------------------------------------------------------------------
@@ -69,86 +63,76 @@ const buildTile = (): Nucleus[] => {
   return out;
 };
 
+/** Ink and heat on paper: the figure sits directly on the weave, no field, no frame. */
 const PathologyFigure: React.FC = () => {
   const nuclei = useMemo(() => buildTile(), []);
   return (
-    <svg viewBox="0 0 360 320" className="w-full h-auto block" role="img" aria-label="Illustrative schematic of segmented cell nuclei under a saliency overlay">
+    <svg viewBox="0 0 360 320" className="w-full h-auto block overflow-visible" role="img" aria-label="Illustrative schematic of segmented cell nuclei under a saliency overlay">
       <defs>
         <radialGradient id="about-heat-a" cx="150" cy="120" r="110" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#FF2800" stopOpacity="0.38" />
-          <stop offset="0.5" stopColor="#FF4419" stopOpacity="0.12" />
+          <stop offset="0" stopColor="#FF2800" stopOpacity="0.30" />
+          <stop offset="0.5" stopColor="#FF4419" stopOpacity="0.10" />
           <stop offset="1" stopColor="#FF2800" stopOpacity="0" />
         </radialGradient>
         <radialGradient id="about-heat-b" cx="250" cy="230" r="90" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#FF2800" stopOpacity="0.3" />
+          <stop offset="0" stopColor="#FF2800" stopOpacity="0.24" />
           <stop offset="1" stopColor="#FF2800" stopOpacity="0" />
         </radialGradient>
-        <linearGradient id="about-field" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#0B1E40" />
-          <stop offset="1" stopColor="#03050A" />
-        </linearGradient>
         <pattern id="about-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-          <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#C8D2E0" strokeOpacity="0.06" strokeWidth="0.5" />
+          <path d="M 24 0 L 0 0 0 24" fill="none" stroke="var(--mat-ink)" strokeOpacity="0.08" strokeWidth="0.5" />
         </pattern>
+        {/* Edges fade in the drawing itself, so the figure ends where its marks end */}
+        <radialGradient id="about-fade" cx="0.5" cy="0.5" r="0.62">
+          <stop offset="0.6" stopColor="#fff" stopOpacity="1" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <mask id="about-fade-mask">
+          <rect width="360" height="320" fill="url(#about-fade)" />
+        </mask>
       </defs>
-      <rect width="360" height="320" fill="url(#about-field)" />
-      <rect width="360" height="320" fill="url(#about-grid)" />
-      <rect width="360" height="320" fill="url(#about-heat-a)" />
-      <rect width="360" height="320" fill="url(#about-heat-b)" />
-      {nuclei.map((n, i) => (
-        <g key={i} transform={`rotate(${n.rot.toFixed(1)} ${n.x.toFixed(1)} ${n.y.toFixed(1)})`}>
-          <ellipse
-            cx={n.x}
-            cy={n.y}
-            rx={n.rx}
-            ry={n.ry}
-            fill="#2563EB"
-            fillOpacity={0.18 + n.heat * 0.3}
-            stroke="#C8D2E0"
-            strokeOpacity={0.35}
-            strokeWidth={0.6}
-          />
-          {n.segmented && (
+      <g mask="url(#about-fade-mask)">
+        <rect width="360" height="320" fill="url(#about-grid)" />
+        <rect width="360" height="320" fill="url(#about-heat-a)" />
+        <rect width="360" height="320" fill="url(#about-heat-b)" />
+        {nuclei.map((n, i) => (
+          <g key={i} transform={`rotate(${n.rot.toFixed(1)} ${n.x.toFixed(1)} ${n.y.toFixed(1)})`}>
             <ellipse
               cx={n.x}
               cy={n.y}
-              rx={n.rx + 3.5}
-              ry={n.ry + 3.5}
-              fill="none"
-              stroke="#FF2800"
-              strokeWidth={0.9}
-              strokeDasharray="2.5 2"
+              rx={n.rx}
+              ry={n.ry}
+              fill="#153875"
+              fillOpacity={0.10 + n.heat * 0.22}
+              stroke="var(--mat-ink)"
+              strokeOpacity={0.55}
+              strokeWidth={0.6}
             />
-          )}
-        </g>
-      ))}
-      <rect x="0.5" y="0.5" width="359" height="319" fill="none" stroke="#C8D2E0" strokeOpacity="0.18" />
+            {n.segmented && (
+              <ellipse
+                cx={n.x}
+                cy={n.y}
+                rx={n.rx + 3.5}
+                ry={n.ry + 3.5}
+                fill="none"
+                stroke="#FF2800"
+                strokeWidth={0.9}
+                strokeDasharray="2.5 2"
+              />
+            )}
+          </g>
+        ))}
+      </g>
     </svg>
   );
 };
 
 export const AboutSection: React.FC = () => {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
   const { isReduced } = useMotionPreference();
 
-  // Spring-damped ±4deg portrait tilt
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const rotateX = useSpring(mouseY, { stiffness: 160, damping: 20, mass: 0.6 });
-  const rotateY = useSpring(mouseX, { stiffness: 160, damping: 20, mass: 0.6 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current || isReduced) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const ox = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-    const oy = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
-    mouseX.set(ox * 4);
-    mouseY.set(-oy * 4);
-  };
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
+  // Portrait parallax: 6% of its height across the time it is on screen.
+  const { scrollYProgress } = useScroll({ target: portraitRef, offset: ['start end', 'end start'] });
+  const parallaxY = useTransform(scrollYProgress, [0, 1], isReduced ? ['0%', '0%'] : ['-3%', '3%']);
 
   const scrollToAnchor = (anchorId: string) => (e: React.MouseEvent) => {
     const el = document.getElementById(anchorId);
@@ -162,79 +146,61 @@ export const AboutSection: React.FC = () => {
       id="about"
       theme="obsidian"
       aria-label="About"
-      className="border-b border-[#18458B]/20 py-24 lg:py-36"
+      className="py-24 lg:py-36"
     >
       <div className="w-full flex flex-col">
         {/* 40 / 60 spread */}
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-12 lg:gap-20 items-center">
           <Reveal className="relative">
-            <MotionDiv
-              ref={cardRef}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              style={{ rotateX, rotateY, transformPerspective: 1000 }}
-              className="relative w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[460px] mx-auto lg:mx-0 select-none group"
-            >
-              <div className="relative aspect-[4/5]">
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 translate-x-2 translate-y-2 border border-[#FF2800]/40 pointer-events-none transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-3 group-hover:translate-y-3"
-                  style={{ clipPath: CHAMFER }}
-                />
-                <div
-                  className="relative w-full h-full bg-[#060A12] overflow-hidden shadow-[0_24px_60px_rgba(3,5,10,0.85)]"
-                  style={{ clipPath: CHAMFER }}
-                >
+            <div ref={portraitRef} className="relative w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[460px] mx-auto lg:mx-0 select-none">
+              <div className="relative aspect-[4/5] overflow-hidden" style={{ clipPath: CHAMFER }}>
+                <MotionDiv className="absolute -inset-y-[4%] inset-x-0" style={{ y: parallaxY }}>
                   <Image
                     src="/profile.jpeg"
                     alt={`Portrait of ${profile.name}`}
                     fill
                     sizes="(max-width: 1024px) 80vw, 460px"
-                    className="object-cover object-top grayscale contrast-[1.08] group-hover:grayscale-0 group-hover:scale-[1.03] transition-[filter,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                    className="object-cover object-top grayscale contrast-[1.08]"
                   />
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-0 bg-gradient-to-tr from-[#0B1E40]/40 via-transparent to-transparent pointer-events-none"
-                  />
-                </div>
+                </MotionDiv>
               </div>
-              <p className="mt-5 font-mono text-[11px] leading-relaxed text-[#7E8B9B]">
-                <span className="text-[#F4F6F9]">{profile.name}</span> · {profile.education.location} ·{' '}
+              <p className="mt-5 font-mono text-[12px] leading-relaxed text-[var(--mat-muted)]">
+                <span className="text-[var(--mat-ink)]">{profile.name}</span> · {profile.education.location} ·{' '}
                 {profile.education.degree}, {profile.education.university}
               </p>
-            </MotionDiv>
+            </div>
           </Reveal>
 
           <Reveal delay={0.08} className="max-w-[640px]">
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-normal text-[#F4F6F9] leading-[1.06] tracking-[-0.02em]">
-              I build software where <span className="italic text-[#FF2800]">computational speed</span> meets
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-normal text-[var(--mat-ink)] leading-[1.06] tracking-[-0.02em]">
+              I build software where <span className="italic text-[var(--mat-accent-mark)]">computational speed</span> meets
               real-world physical and human systems.
             </h2>
-            <p className="mt-8 max-w-[60ch] text-base sm:text-lg font-sans text-[#C8D2E0]/85 leading-relaxed">
+            <p className="mt-8 max-w-[60ch] text-base sm:text-lg font-sans text-[var(--mat-body)] leading-relaxed [font-weight:var(--mat-body-weight)] [letter-spacing:var(--mat-tracking)]">
               My work sits between deterministic data pipelines, explainable deep learning and low-latency client
               architecture: the pieces that keep clinicians, analysts and operators in control of what the
               software is doing.
             </p>
-            <p className="mt-5 max-w-[60ch] text-base font-sans text-[#7E8B9B] leading-relaxed">
+            <p className="mt-5 max-w-[60ch] text-base font-sans text-[var(--mat-muted)] leading-relaxed [font-weight:var(--mat-body-weight)]">
               {profile.education.degree} at {profile.education.university}, expected {profile.education.expectedGraduation}.
               Seeking {profile.availability.targetSeason} {profile.availability.seeking.toLowerCase()}.
             </p>
 
-            <ul className="mt-10 border-t border-[#C8D2E0]/10">
+            <ul className="mt-10 border-t border-[var(--mat-rule)]">
               {ANCHORS.map((a) => (
-                <li key={a.label} className="border-b border-[#C8D2E0]/10">
+                <li key={a.label} className="border-b border-[var(--mat-rule)]">
                   <a
                     href={a.href}
                     onClick={a.href.startsWith('/#') ? scrollToAnchor(a.href.slice(2)) : undefined}
                     className="group grid grid-cols-[6.5rem_1fr_auto] sm:grid-cols-[8rem_1fr_auto] items-baseline gap-4 py-4 min-h-[44px]"
                   >
-                    <span className="font-serif text-2xl sm:text-3xl text-[#F4F6F9] tracking-tight tabular-nums">{a.value}</span>
-                    <span className="font-sans text-sm text-[#C8D2E0] leading-snug">
-                      {a.label} <span className="text-[#7E8B9B]">· {a.source}</span>
+                    <span className="font-serif text-2xl sm:text-3xl text-[var(--mat-ink)] tracking-tight tabular-nums">{a.value}</span>
+                    <span className="font-sans text-sm text-[var(--mat-body)] leading-snug [font-weight:var(--mat-body-weight)]">
+                      {a.label} <span className="text-[var(--mat-muted)]">· {a.source}</span>
                     </span>
                     <span
                       aria-hidden="true"
-                      className="font-mono text-xs text-[#7E8B9B] group-hover:text-[#FF2800] group-hover:translate-x-1 transition-[color,transform] duration-300"
+                      className="font-sans text-sm text-[var(--mat-muted)] group-hover:text-[var(--mat-accent-text)] group-hover:translate-x-1 transition-[color,transform] duration-300"
                     >
                       →
                     </span>
@@ -243,18 +209,18 @@ export const AboutSection: React.FC = () => {
               ))}
             </ul>
 
-            <div className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 font-mono text-xs">
+            <div className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 font-sans text-sm">
               <a
                 href="#experience"
                 onClick={scrollToAnchor('experience')}
                 className="px-6 py-3.5 min-h-[44px] bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] font-semibold rounded-[2px] transition-colors inline-flex items-center justify-center gap-2"
               >
-                <span>Follow the experience</span>
-                <span aria-hidden="true">↓</span>
+                <span>See the experience</span>
+                <span aria-hidden="true">↑</span>
               </a>
               <Link
                 href="/about"
-                className="min-h-[44px] inline-flex items-center justify-center sm:justify-start gap-2 text-[#C8D2E0] hover:text-[#F4F6F9] transition-colors"
+                className="min-h-[44px] inline-flex items-center justify-center sm:justify-start gap-2 text-[var(--mat-ink)] hover:text-[var(--mat-accent-text)] transition-colors"
               >
                 <span className="border-b border-current pb-0.5">Full profile</span>
                 <span aria-hidden="true">→</span>
@@ -263,56 +229,34 @@ export const AboutSection: React.FC = () => {
           </Reveal>
         </div>
 
-        {/* Standalone research artifact plate: 112px below the spread */}
-        <Reveal className="mt-28 pt-12 border-t border-[#C8D2E0]/10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-            <figure className="lg:col-span-5">
-              <PathologyFigure />
-              <figcaption className="mt-3 font-mono text-[11px] text-[#7E8B9B] leading-relaxed">
-                Fig. 01 · Illustrative schematic of nucleus segmentation under a saliency overlay. Not patient data.
-              </figcaption>
-            </figure>
+        {/* Research figure. The role and its bullets live in Experience (entry 02); only the figure stays here. */}
+        <Reveal className="mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+          <figure className="lg:col-span-5">
+            <PathologyFigure />
+            <figcaption className="mt-3 font-sans text-sm text-[var(--mat-muted)] leading-relaxed [font-weight:var(--mat-body-weight)]">
+              Illustrative schematic of nucleus segmentation under a saliency overlay. Not patient data.
+            </figcaption>
+          </figure>
 
-            <div className="lg:col-span-7">
-              <p className="font-mono text-xs text-[#FF2800]">
-                {research?.company ?? 'The Ohio State University'} · {research?.period ?? 'Summer 2026 – Present'}
-              </p>
-              <h3 className="mt-4 font-serif text-3xl sm:text-4xl lg:text-5xl text-[#F4F6F9] leading-[1.08] tracking-[-0.01em]">
-                Digital pathology, made explainable.
-              </h3>
-              <p className="mt-4 font-sans text-sm text-[#7E8B9B]">
-                {research?.role ?? 'Undergraduate AI/ML Researcher'} · {research?.teamOrDivision ?? 'Digital Pathology AI/ML Research'}
-              </p>
-
-              <ol className="mt-8 border-t border-[#C8D2E0]/10">
-                {(research?.bullets ?? []).map((b, i) => (
-                  <li key={i} className="grid grid-cols-[2rem_1fr] gap-3 py-4 border-b border-[#C8D2E0]/10">
-                    <span className="font-mono text-[11px] text-[#2563EB] pt-1 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-                    <span className="max-w-[62ch] font-sans text-sm sm:text-base text-[#C8D2E0]/85 leading-relaxed">{b}</span>
-                  </li>
-                ))}
-              </ol>
-
-              <p className="mt-6 font-mono text-xs text-[#7E8B9B] leading-relaxed">
-                {(research?.skillsDemonstrated ?? []).slice(0, 5).join(' · ')}
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs">
-                <Link
-                  href="/projects/cv-allergy-wheal"
-                  className="min-h-[44px] inline-flex items-center gap-2 text-[#FF2800] hover:text-[#F4F6F9] transition-colors"
-                >
-                  <span className="border-b border-current pb-0.5">Related: wheal quantification pipeline</span>
-                  <span aria-hidden="true">→</span>
-                </Link>
-                <Link
-                  href="/projects/healios"
-                  className="min-h-[44px] inline-flex items-center gap-2 text-[#C8D2E0] hover:text-[#F4F6F9] transition-colors"
-                >
-                  <span className="border-b border-current pb-0.5">Grad-CAM saliency in Healios V2</span>
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </div>
+          <div className="lg:col-span-7">
+            <h3 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[var(--mat-ink)] leading-[1.08] tracking-[-0.01em]">
+              Digital pathology, made explainable.
+            </h3>
+            <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 font-sans text-sm [font-weight:var(--mat-body-weight)]">
+              <Link
+                href="/projects/cv-allergy-wheal"
+                className="min-h-[44px] inline-flex items-center gap-2 text-[var(--mat-accent-text)] hover:text-[var(--mat-ink)] transition-colors"
+              >
+                <span className="border-b border-current pb-0.5">Related: wheal quantification pipeline</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+              <Link
+                href="/projects/healios"
+                className="min-h-[44px] inline-flex items-center gap-2 text-[var(--mat-body)] hover:text-[var(--mat-ink)] transition-colors"
+              >
+                <span className="border-b border-current pb-0.5">Grad-CAM saliency in Healios V2</span>
+                <span aria-hidden="true">→</span>
+              </Link>
             </div>
           </div>
         </Reveal>
