@@ -57,7 +57,7 @@ export function useCanvasStage(
       const rect = container.getBoundingClientRect();
       width = rect.width;
       height = rect.height;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const pixelWidth = Math.max(1, Math.floor(width * dpr));
       const pixelHeight = Math.max(1, Math.floor(height * dpr));
       if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
@@ -67,7 +67,7 @@ export function useCanvasStage(
     // canvases animate in one frame (src/v7/runtime/scheduler.ts).
     const tick = ({ dt }: FrameInfo): boolean => {
       if (width <= 0 || height <= 0) return false;
-      if (dpr !== Math.min(window.devicePixelRatio || 1, 2)) syncSize();
+      if (dpr !== Math.min(window.devicePixelRatio || 1, 1.5)) syncSize();
       const deltaTime = dt;
       elapsed += deltaTime;
       const stage = { width, height, dpr, time: elapsed, deltaTime };

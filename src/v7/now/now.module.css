@@ -1,0 +1,102 @@
+/* Now focus pull. Rules: .claude/skills/v7-materials + v7-motion. */
+
+/* Three stacked copies per subject. Blur is static per copy; only opacity changes. */
+.copy {
+  grid-area: 1 / 1;
+  will-change: opacity;
+}
+.blur6 { filter: blur(6px); }
+.blur12 { filter: blur(12px); }
+
+/* Four corner ticks, never a rectangle */
+.ticks {
+  position: absolute;
+  inset: -14px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.tick {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transform: translate(var(--dx), var(--dy));
+  transition: transform 120ms ease;
+}
+.tick::before,
+.tick::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 0 solid var(--mat-ink);
+}
+.tick::after {
+  border-color: var(--mat-accent-mark);
+  opacity: 0;
+}
+.tl { left: 0; top: 0; --dx: -20px; --dy: -20px; }
+.tr { right: 0; top: 0; --dx: 20px; --dy: -20px; }
+.bl { left: 0; bottom: 0; --dx: -20px; --dy: 20px; }
+.br { right: 0; bottom: 0; --dx: 20px; --dy: 20px; }
+.tl::before, .tl::after { border-top-width: 1.5px; border-left-width: 1.5px; }
+.tr::before, .tr::after { border-top-width: 1.5px; border-right-width: 1.5px; }
+.bl::before, .bl::after { border-bottom-width: 1.5px; border-left-width: 1.5px; }
+.br::before, .br::after { border-bottom-width: 1.5px; border-right-width: 1.5px; }
+
+/* Detail lines: hidden until the subject is sharp */
+.details {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+/* Focus confirmed: ticks contract in 350 ms, then pulse once in #FF2800 */
+.subject[data-lock="true"] .ticks {
+  opacity: 1;
+  transition: opacity 160ms ease;
+}
+.subject[data-lock="true"] .tick {
+  transform: translate(0, 0);
+  transition: transform 350ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.subject[data-lock="true"] .tick::after {
+  animation: confirm 420ms ease-out 350ms 1 both;
+}
+.subject[data-lock="true"] .details {
+  opacity: 1;
+  transform: none;
+  transition: opacity 420ms ease 200ms, transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1) 200ms;
+}
+
+@keyframes confirm {
+  0% { opacity: 0; }
+  22% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Reduced motion: no contraction, no pulse, no travel; opacity crossfades only (via .rm-crossfade) */
+.reduced .copy { transition: opacity 200ms ease; }
+.reduced .tick,
+.reduced .subject[data-lock="true"] .tick { transform: none; }
+.reduced .subject[data-lock="true"] .tick::after { animation: none; }
+.reduced .details,
+.reduced .subject[data-lock="true"] .details { transform: none; transition: opacity 200ms ease; }
+
+/* The lens ring: the drag surface and the keyboard slider */
+.ring {
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.focusArc {
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+.ring:focus-visible .focusArc { opacity: 1; }
+
+.subjectButton:focus-visible {
+  outline: 1px solid var(--mat-cobalt);
+  outline-offset: 22px;
+}
+.subjectButton:focus:not(:focus-visible) { outline: none; }

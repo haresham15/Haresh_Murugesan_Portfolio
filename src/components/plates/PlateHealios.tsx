@@ -1,7 +1,7 @@
 import { getProjectBySlug } from '../../content/projects';
 import {
-  C, MONO, bez, clamp, drawGrid, drawVignette, easeOutCubic, fbm, glow, hexRgb, isoSegments, label, phosphor, ramp,
-  rgba, smoothstep, strokeSegments, type PlateDefinition, type PlateScene, type StageFrame,
+  DARK_PALETTE, cornerTicks, MONO, bez, clamp, drawGrid, drawVignette, easeOutCubic, fbm, glow, hexRgb, isoSegments, label, phosphor, ramp,
+  rgba, smoothstep, strokeSegments, type PlateDefinition, type PlateScene, type PlatePalette, type StageFrame,
 } from './stageKit';
 
 /* ============================================================
@@ -68,7 +68,7 @@ function cloud(): CloudData {
   return cloudCache;
 }
 
-const DEPTH_STOPS = [C.cobalt, C.silver, C.silver, C.crimson, C.red] as const;
+const depthStops = (P: PlatePalette) => [P.cobalt, P.silver, P.silver, P.crimson, P.red] as const;
 
 function createDepthScene(): PlateScene {
   const data = cloud();
@@ -91,9 +91,10 @@ function createDepthScene(): PlateScene {
   return {
     idle: (f) => [f.width / 2 + Math.sin(f.time * 0.45) * Math.min(f.width, f.height) * 0.3, f.height * 0.45],
     draw(ctx, f) {
+      const P = f.palette;
       const { width: w, height: h } = f;
-      drawVignette(ctx, w, h, w / 2, h * 0.42);
-      drawGrid(ctx, w, h, 32, 0.045);
+      drawVignette(ctx, P, w, h, w / 2, h * 0.42);
+      drawGrid(ctx, P, w, h, 32, 0.045);
 
       const plotH = Math.max(64, h * 0.2);
       view.cx = w / 2;
@@ -121,7 +122,7 @@ function createDepthScene(): PlateScene {
       const R = EXTENT * A;
       for (const { level, segs } of data.iso) {
         const t = -level / DMAX;
-        const [r, g, b] = ramp(DEPTH_STOPS, 0.15 + t * 0.85);
+        const [r, g, b] = ramp(depthStops(P), 0.15 + t * 0.85);
         ctx.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${0.35 * intro})`;
         ctx.beginPath();
         for (let q = 0; q < segs.length; q += 4) {
@@ -136,7 +137,7 @@ function createDepthScene(): PlateScene {
 
       // point cloud: additive, batched by depth bucket and fog band
       ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = P.add;
       const c = Math.cos(view.theta);
       const s = Math.sin(view.theta);
       for (let fog = 0; fog < 3; fog++) {
@@ -153,7 +154,7 @@ function createDepthScene(): PlateScene {
             any = true;
           }
           if (!any) continue;
-          const [r, g, b] = ramp(DEPTH_STOPS, bk / 7);
+          const [r, g, b] = ramp(depthStops(P), bk / 7);
           ctx.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${(0.32 + fog * 0.24) * intro})`;
           ctx.fill();
         }
@@ -187,22 +188,22 @@ function createDepthScene(): PlateScene {
           if (i === 0) ctx.moveTo(tmp[0], tmp[1]);
           else ctx.lineTo(tmp[0], tmp[1]);
         }
-        phosphor(ctx, C.red, 1, 0.14 * f.pointer.presence + 0.08);
+        phosphor(ctx, P, P.red, 1, 0.14 * f.pointer.presence + 0.08);
         // slice plane trace
         project(sliceView * c - R * s, -sliceView * s - R * c, 0, p0);
         project(sliceView * c + R * s, -sliceView * s + R * c, 0, p1);
         ctx.save();
         ctx.setLineDash([3, 4]);
         ctx.lineWidth = 0.5;
-        ctx.strokeStyle = rgba(C.silver, 0.45);
+        ctx.strokeStyle = rgba(P.silver, 0.45);
         ctx.beginPath();
         ctx.moveTo(p0[0], p0[1]);
         ctx.lineTo(p1[0], p1[1]);
         ctx.stroke();
         ctx.restore();
         project(sliceView * c + floorT * s, -sliceView * s + floorT * c, floor, tmp);
-        glow(ctx, tmp[0], tmp[1], 18, C.red, 0.55);
-        ctx.fillStyle = C.alabaster;
+        glow(ctx, P, tmp[0], tmp[1], 18, P.red, 0.55);
+        ctx.fillStyle = P.alabaster;
         ctx.beginPath();
         ctx.arc(tmp[0], tmp[1], 2, 0, Math.PI * 2);
         ctx.fill();
@@ -215,7 +216,7 @@ function createDepthScene(): PlateScene {
       const py1 = h - 14;
       ctx.save();
       ctx.lineWidth = 0.5;
-      ctx.strokeStyle = rgba(C.silver, 0.12);
+      ctx.strokeStyle = rgba(P.silver, 0.12);
       ctx.beginPath();
       ctx.moveTo(px0, py0 - 4);
       ctx.lineTo(px1, py0 - 4);
@@ -227,17 +228,17 @@ function createDepthScene(): PlateScene {
       // depth ticks
       for (let z = 0; z >= -DMAX; z -= 2) {
         const y = mapY(z);
-        ctx.strokeStyle = rgba(C.cobalt, z === 0 ? 0.35 : 0.14);
+        ctx.strokeStyle = rgba(P.cobalt, z === 0 ? 0.35 : 0.14);
         ctx.beginPath();
         ctx.moveTo(px0, y);
         ctx.lineTo(px1, y);
         ctx.stroke();
-        label(ctx, `${z === 0 ? ' 0' : z} mm`, px0, y - 3, C.titanium, 9);
+        label(ctx, `${z === 0 ? ' 0' : z} mm`, px0, y - 3, P.titanium, 9);
       }
       if (half > 0) {
         const grad = ctx.createLinearGradient(0, mapY(0), 0, mapY(-DMAX));
-        grad.addColorStop(0, rgba(C.cobalt, 0.0));
-        grad.addColorStop(1, rgba(C.red, 0.28));
+        grad.addColorStop(0, rgba(P.cobalt, 0.0));
+        grad.addColorStop(1, rgba(P.red, 0.28));
         ctx.beginPath();
         ctx.moveTo(mapX(prof[0]), mapY(0));
         for (let i = 0; i < prof.length; i += 2) ctx.lineTo(mapX(prof[i]), mapY(Math.min(0, prof[i + 1])));
@@ -252,16 +253,15 @@ function createDepthScene(): PlateScene {
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        phosphor(ctx, C.silver, 0.75, 0.1);
+        phosphor(ctx, P, P.silver, 0.75, 0.1);
         const fx = mapX(floorT);
         const fy = mapY(floor);
-        glow(ctx, fx, fy, 14, C.red, 0.6);
-        label(ctx, `${floor.toFixed(2)} mm`, Math.min(fx + 8, px1 - 60), fy + 12, C.alabaster, 10);
+        glow(ctx, P, fx, fy, 14, P.red, 0.6);
+        label(ctx, `${floor.toFixed(2)} mm`, Math.min(fx + 8, px1 - 60), fy + 12, P.alabaster, 10);
       }
       ctx.restore();
 
-      label(ctx, 'synthetic wound surface · model units', 16, 22, C.titanium, 10);
-      label(ctx, 'move to slice', w - 16, 22, rgba(C.silver, 0.55 + 0.45 * (1 - f.pointer.presence)), 10, 'right');
+      label(ctx, 'synthetic wound surface · model units', 16, 22, P.titanium, 10);
 
       const open = openTo > openFrom ? (openTo - openFrom).toFixed(1) : '0.0';
       return `slice ${sliceView >= 0 ? '+' : ''}${sliceView.toFixed(1)} mm · floor ${floor.toFixed(2)} mm · open ${open} mm`;
@@ -285,9 +285,10 @@ interface SaliencyData {
   peak: [number, number, number];
 }
 
-let salCache: SaliencyData | null = null;
-function saliency(): SaliencyData {
-  if (salCache) return salCache;
+const salCache = new Map<PlatePalette, SaliencyData>();
+function saliency(P: PlatePalette): SaliencyData {
+  const hit = salCache.get(P);
+  if (hit) return hit;
   const field = new Float32Array(GW * GH);
   const blobs = [
     { x: 0.44, y: 0.46, sx: 0.11, sy: 0.08, a: 1.0, rot: 0.5 },
@@ -352,8 +353,9 @@ function saliency(): SaliencyData {
     return cv;
   };
 
-  const skin = hexRgb(C.titanium);
-  const bed = hexRgb(C.crimson);
+  const skin = hexRgb(P.titanium);
+  const bed = hexRgb(P.crimson);
+  const ink = hexRgb(P.alabaster);
   const tissue = make((u, v) => {
     const dx = (u - 0.48) / 0.3;
     const dy = (v - 0.53) / 0.22;
@@ -361,20 +363,29 @@ function saliency(): SaliencyData {
     const inBed = 1 - smoothstep(0.85, 1.05, re);
     const tex = fbm(u * 26, v * 26, 4);
     const pores = fbm(u * 60 + 4, v * 60, 2);
+    if (P.paper) {
+      // Ink wash on paper: density, not light. The figure fades to nothing at its own edge.
+      const edge = smoothstep(0, 0.12, Math.min(u, v, 1 - u, 1 - v));
+      const d = ((1 - inBed) * (0.05 + tex * 0.16 + pores * 0.05) + inBed * (0.14 + tex * 0.26)) * edge;
+      const r = ink[0] * (1 - inBed) + bed[0] * inBed * 0.55 + ink[0] * inBed * 0.45;
+      const g = ink[1] * (1 - inBed) + bed[1] * inBed * 0.55 + ink[1] * inBed * 0.45;
+      const b = ink[2] * (1 - inBed) + bed[2] * inBed * 0.55 + ink[2] * inBed * 0.45;
+      return [r, g, b, Math.round(255 * d)];
+    }
     const lum = 0.1 + tex * 0.16 + pores * 0.05;
     const r = skin[0] * lum * (1 - inBed) + bed[0] * (0.16 + tex * 0.32) * inBed;
     const g = skin[1] * lum * (1 - inBed) + bed[1] * (0.1 + tex * 0.2) * inBed;
     const b = skin[2] * lum * (1 - inBed) + bed[2] * (0.1 + tex * 0.18) * inBed;
     return [r, g, b, 255];
   });
-  const HEAT = [C.midnight, C.cobaltDeep, C.cobalt, C.silver, C.crimson, C.red] as const;
   const heat = make((_u, _v, s) => {
-    const [r, g, b] = ramp(HEAT, s);
+    const [r, g, b] = ramp(P.heatRamp, s);
     return [r, g, b, Math.round(255 * smoothstep(0.06, 0.38, s))];
   });
   const iso = [0.2, 0.4, 0.6, 0.8].map((level) => ({ level, segs: isoSegments(field, GW, GH, level) }));
-  salCache = { field, tissue, heat, iso, peak };
-  return salCache;
+  const data = { field, tissue, heat, iso, peak };
+  salCache.set(P, data);
+  return data;
 }
 
 function sampleField(field: Float32Array, u: number, v: number): number {
@@ -393,8 +404,8 @@ function sampleField(field: Float32Array, u: number, v: number): number {
   );
 }
 
-function createSaliencyScene(): PlateScene {
-  const data = saliency();
+function createSaliencyScene(P: PlatePalette): PlateScene {
+  const data = saliency(P);
   const rect = { x: 0, y: 0, w: 1, h: 1 };
   const fit = (f: StageFrame) => {
     const pad = 20;
@@ -418,10 +429,11 @@ function createSaliencyScene(): PlateScene {
       ];
     },
     draw(ctx, f) {
+      const P = f.palette;
       fit(f);
       const { x, y, w, h } = rect;
       const intro = easeOutCubic(f.age / 0.8);
-      drawVignette(ctx, f.width, f.height);
+      drawVignette(ctx, P, f.width, f.height);
 
       ctx.save();
       ctx.imageSmoothingEnabled = true;
@@ -442,7 +454,7 @@ function createSaliencyScene(): PlateScene {
       ctx.clip();
       ctx.globalAlpha = 0.92;
       ctx.drawImage(data.heat, x, y, w, h);
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = P.add;
       ctx.globalAlpha = 0.25;
       ctx.drawImage(data.heat, x, y, w, h);
       ctx.restore();
@@ -455,7 +467,7 @@ function createSaliencyScene(): PlateScene {
       const sxs = w / (GW - 1);
       const sys = h / (GH - 1);
       for (const { level, segs } of data.iso) {
-        const [r, g, b] = ramp([C.cobalt, C.silver, C.crimson, C.red], (level - 0.2) / 0.6);
+        const [r, g, b] = ramp([P.cobalt, P.silver, P.crimson, P.red], (level - 0.2) / 0.6);
         ctx.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${0.75 * intro})`;
         ctx.lineWidth = level >= 0.8 ? 1 : 0.5;
         ctx.setLineDash(level === 0.2 ? [3, 3] : []);
@@ -466,11 +478,11 @@ function createSaliencyScene(): PlateScene {
       // lens rim
       ctx.save();
       ctx.lineWidth = 0.5;
-      ctx.strokeStyle = rgba(C.alabaster, 0.7);
+      ctx.strokeStyle = rgba(P.alabaster, 0.7);
       ctx.beginPath();
       ctx.arc(lx, ly, lr * intro, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.strokeStyle = rgba(C.red, 0.35);
+      ctx.strokeStyle = rgba(P.red, 0.35);
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(lx, ly, lr * intro + 2, 0, Math.PI * 2);
@@ -480,9 +492,9 @@ function createSaliencyScene(): PlateScene {
       // peak crosshair
       const pkx = x + data.peak[0] * w;
       const pky = y + data.peak[1] * h;
-      glow(ctx, pkx, pky, 22, C.red, 0.5 * intro);
+      glow(ctx, P, pkx, pky, 22, P.red, 0.5 * intro);
       ctx.save();
-      ctx.strokeStyle = C.alabaster;
+      ctx.strokeStyle = P.alabaster;
       ctx.lineWidth = 0.5;
       ctx.beginPath();
       ctx.moveTo(pkx - 9, pky); ctx.lineTo(pkx - 3, pky);
@@ -491,15 +503,19 @@ function createSaliencyScene(): PlateScene {
       ctx.moveTo(pkx, pky + 3); ctx.lineTo(pkx, pky + 9);
       ctx.stroke();
       ctx.restore();
-      label(ctx, 'peak 1.000', pkx + 12, pky - 8, C.alabaster, 10);
+      label(ctx, 'peak 1.000', pkx + 12, pky - 8, P.alabaster, 10);
 
-      // frame
-      ctx.save();
-      ctx.strokeStyle = rgba(C.silver, 0.18);
-      ctx.lineWidth = 0.5;
-      ctx.strokeRect(x + 0.25, y + 0.25, w - 0.5, h - 0.5);
-      ctx.restore();
-      label(ctx, 'grad-cam activation over tissue bed · illustrative input', x, y - 8, C.titanium, 10);
+      // frame: corner ticks on paper, a hairline on carbon
+      if (P.paper) {
+        cornerTicks(ctx, rgba(P.silver, 0.5), x, y, w, h);
+      } else {
+        ctx.save();
+        ctx.strokeStyle = rgba(P.silver, 0.18);
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(x + 0.25, y + 0.25, w - 0.5, h - 0.5);
+        ctx.restore();
+      }
+      label(ctx, 'grad-cam activation over tissue bed · illustrative input', x, y - 8, P.titanium, 10);
 
       // colour bar
       const bx = x + w + 18;
@@ -507,21 +523,21 @@ function createSaliencyScene(): PlateScene {
       const by1 = y + h;
       const steps = 48;
       for (let i = 0; i < steps; i++) {
-        const [r, g, b] = ramp([C.midnight, C.cobaltDeep, C.cobalt, C.silver, C.crimson, C.red], 1 - i / steps);
+        const [r, g, b] = ramp(P.heatRamp, 1 - i / steps);
         ctx.fillStyle = `rgb(${r | 0},${g | 0},${b | 0})`;
         ctx.fillRect(bx, by0 + ((by1 - by0) * i) / steps, 6, (by1 - by0) / steps + 0.5);
       }
       const a = sampleField(data.field, (f.pointer.x - x) / w, (f.pointer.y - y) / h);
       const ay = by1 - a * (by1 - by0);
-      ctx.fillStyle = C.alabaster;
+      ctx.fillStyle = P.alabaster;
       ctx.beginPath();
       ctx.moveTo(bx - 2, ay);
       ctx.lineTo(bx - 7, ay - 4);
       ctx.lineTo(bx - 7, ay + 4);
       ctx.closePath();
       ctx.fill();
-      label(ctx, '1.0', bx + 10, by0 + 8, C.titanium, 9);
-      label(ctx, '0.0', bx + 10, by1, C.titanium, 9);
+      label(ctx, '1.0', bx + 10, by0 + 8, P.titanium, 9);
+      label(ctx, '0.0', bx + 10, by1, P.titanium, 9);
 
       return `activation ${a.toFixed(3)} at cursor · isolines 0.2 / 0.4 / 0.6 / 0.8`;
     },
@@ -582,9 +598,10 @@ function createPipelineScene(): PlateScene {
       return [nd.x + nd.w / 2, nd.y + nd.h / 2];
     },
     draw(ctx, f) {
+      const P = f.palette;
       layout(f);
-      drawVignette(ctx, f.width, f.height);
-      drawGrid(ctx, f.width, f.height, 24, 0.04);
+      drawVignette(ctx, P, f.width, f.height);
+      drawGrid(ctx, P, f.width, f.height, 24, 0.04);
       const intro = easeOutCubic(f.age / 0.9);
       const px = f.pointer.x;
       const py = f.pointer.y;
@@ -611,10 +628,10 @@ function createPipelineScene(): PlateScene {
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        if (hot) phosphor(ctx, C.red, 0.9, 0.12);
+        if (hot) phosphor(ctx, P, P.red, 0.9, 0.12);
         else {
           ctx.lineWidth = 0.5;
-          ctx.strokeStyle = rgba(C.cobalt, 0.6);
+          ctx.strokeStyle = rgba(P.cobalt, 0.6);
           ctx.stroke();
         }
         // packets with trailing samples
@@ -627,12 +644,12 @@ function createPipelineScene(): PlateScene {
               const x = bez(x0, x0 + dx, x3 - dx, x3, t);
               const y = bez(y0, y0, y3, y3, t);
               const al = (1 - tr / 7) * (hot ? 0.95 : 0.6);
-              ctx.fillStyle = rgba(hot ? C.red : C.silver, al);
+              ctx.fillStyle = rgba(hot ? P.red : P.silver, al);
               ctx.fillRect(x - 1, y - 1, 2, 2);
             }
             const x = bez(x0, x0 + dx, x3 - dx, x3, head);
             const y = bez(y0, y0, y3, y3, head);
-            glow(ctx, x, y, hot ? 12 : 8, hot ? C.red : C.cobalt, hot ? 0.6 : 0.35);
+            glow(ctx, P, x, y, hot ? 12 : 8, hot ? P.red : P.cobalt, hot ? 0.6 : 0.35);
           }
         }
       });
@@ -646,21 +663,21 @@ function createPipelineScene(): PlateScene {
         ctx.save();
         ctx.globalAlpha = appear;
         const g = ctx.createLinearGradient(nd.x, nd.y, nd.x, nd.y + nd.h);
-        g.addColorStop(0, rgba(isHot ? C.cobaltMid : C.cobaltDeep, isHot ? 0.55 : 0.4));
-        g.addColorStop(1, rgba(C.midnight, 0.6));
+        g.addColorStop(0, rgba(isHot ? P.cobaltMid : P.cobaltDeep, isHot ? 0.55 : 0.4));
+        g.addColorStop(1, rgba(P.midnight, 0.6));
         ctx.fillStyle = g;
-        ctx.fillRect(nd.x, nd.y, nd.w, nd.h);
+        if (!P.paper) ctx.fillRect(nd.x, nd.y, nd.w, nd.h);
         ctx.lineWidth = isHot ? 1 : 0.5;
-        ctx.strokeStyle = isHot ? C.red : rgba(C.silver, 0.35);
+        ctx.strokeStyle = isHot ? P.red : rgba(P.silver, 0.35);
         ctx.strokeRect(nd.x + 0.25, nd.y + 0.25, nd.w - 0.5, nd.h - 0.5);
-        if (isHot) glow(ctx, nd.x + nd.w / 2, nd.y + nd.h / 2, nd.w * 0.6, C.red, 0.12);
+        if (isHot) glow(ctx, P, nd.x + nd.w / 2, nd.y + nd.h / 2, nd.w * 0.6, P.red, 0.12);
         ctx.font = `${small ? 10 : 11.5}px ${MONO}`;
-        ctx.fillStyle = C.alabaster;
+        ctx.fillStyle = P.alabaster;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'alphabetic';
         ctx.fillText(fitText(ctx, nd.label, nd.w - 16), nd.x + 8, nd.y + (small ? 17 : 19));
         ctx.font = `${small ? 9 : 10}px ${MONO}`;
-        ctx.fillStyle = isHot ? C.silver : C.titanium;
+        ctx.fillStyle = isHot ? P.silver : P.titanium;
         ctx.fillText(fitText(ctx, nd.sub, nd.w - 16), nd.x + 8, nd.y + (small ? 31 : 35));
         ctx.restore();
       });
@@ -669,15 +686,15 @@ function createPipelineScene(): PlateScene {
       if (hovered) {
         ctx.save();
         ctx.lineWidth = 0.5;
-        ctx.strokeStyle = rgba(C.silver, 0.12);
+        ctx.strokeStyle = rgba(P.silver, 0.12);
         ctx.beginPath();
         ctx.moveTo(20, f.height - 58);
         ctx.lineTo(f.width - 20, f.height - 58);
         ctx.stroke();
         ctx.restore();
-        label(ctx, hovered.label, 20, f.height - 38, C.red, 11);
+        label(ctx, hovered.label, 20, f.height - 38, P.heatText, 11);
         ctx.font = `${small ? 10 : 11}px ${MONO}`;
-        ctx.fillStyle = C.silver;
+        ctx.fillStyle = P.silver;
         ctx.textAlign = 'left';
         ctx.fillText(fitText(ctx, hovered.desc, f.width - 40), 20, f.height - 20);
       }
@@ -696,8 +713,8 @@ export const healiosPlate: PlateDefinition = {
     { id: 'saliency', label: 'Grad-CAM', description: 'Grad-CAM saliency heatmap with isocontours. A lens follows the cursor and reads the activation under it.' },
     { id: 'pipeline', label: 'Pipeline', description: 'The Healios container diagram: patient app, FastAPI gateway, Grad-CAM engine, tissue analyzer, protocol retrieval and EHR store.' },
   ],
-  createScene(modeId) {
-    if (modeId === 'saliency') return createSaliencyScene();
+  createScene(modeId, palette = DARK_PALETTE) {
+    if (modeId === 'saliency') return createSaliencyScene(palette);
     if (modeId === 'pipeline') return createPipelineScene();
     return createDepthScene();
   },

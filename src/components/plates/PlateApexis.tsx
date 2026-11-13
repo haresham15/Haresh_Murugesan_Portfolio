@@ -1,6 +1,6 @@
 import {
-  C, clamp, drawGrid, drawVignette, easeOutCubic, glow, label, lerp, phosphor, ramp, rgba,
-  type PlateDefinition, type PlateScene, type StageFrame,
+  clamp, drawGrid, drawVignette, easeOutCubic, glow, label, lerp, phosphor, ramp, rgba,
+  type PlateDefinition, type PlateScene, type PlatePalette, type StageFrame,
 } from './stageKit';
 
 /* ============================================================
@@ -199,9 +199,10 @@ function createScopeScene(): PlateScene {
       return [xOf(indexAtTime(L.a, f.time * PLAYBACK)), f.height * 0.5];
     },
     draw(ctx, f) {
+      const P = f.palette;
       geo(f);
       const { width: w, height: h } = f;
-      drawVignette(ctx, w, h);
+      drawVignette(ctx, P, w, h);
       const intro = easeOutCubic(f.age / 0.7);
       const top = 34;
       const avail = h - top - 12;
@@ -235,8 +236,8 @@ function createScopeScene(): PlateScene {
         const x1 = xOf(i1);
         if (s === sec) {
           const g = ctx.createLinearGradient(0, top, 0, h);
-          g.addColorStop(0, rgba(C.cobalt, 0.09));
-          g.addColorStop(1, rgba(C.cobalt, 0.0));
+          g.addColorStop(0, rgba(P.cobalt, 0.09));
+          g.addColorStop(1, rgba(P.cobalt, 0.0));
           ctx.fillStyle = g;
           ctx.fillRect(x0, top - 18, x1 - x0, h - top + 18);
         }
@@ -244,7 +245,7 @@ function createScopeScene(): PlateScene {
           ctx.save();
           ctx.setLineDash([2, 4]);
           ctx.lineWidth = 0.5;
-          ctx.strokeStyle = rgba(C.silver, 0.3);
+          ctx.strokeStyle = rgba(P.silver, 0.3);
           ctx.beginPath();
           ctx.moveTo(x0 + 0.25, top - 18);
           ctx.lineTo(x0 + 0.25, h - 10);
@@ -252,8 +253,8 @@ function createScopeScene(): PlateScene {
           ctx.restore();
         }
         const d = L.sectorDelta[s];
-        label(ctx, `S${s + 1}`, x0 + 6, top - 8, s === sec ? C.alabaster : C.titanium, 10);
-        label(ctx, `${signed(d)} s`, x0 + 26, top - 8, d >= 0 ? C.red : C.cobalt, 10);
+        label(ctx, `S${s + 1}`, x0 + 6, top - 8, s === sec ? P.alabaster : P.titanium, 10);
+        label(ctx, `${signed(d)} s`, x0 + 26, top - 8, d >= 0 ? P.heatText : P.cobalt, 10);
       }
 
       const seriesY = (r: (typeof rows)[number], v: number) => r.y1 - ((v - r.lo) / (r.hi - r.lo)) * (r.y1 - r.y0);
@@ -267,14 +268,14 @@ function createScopeScene(): PlateScene {
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        phosphor(ctx, color, core, halo);
+        phosphor(ctx, P, color, core, halo);
       };
 
       rows.forEach((r, ri) => {
         // channel frame + gridlines
         ctx.save();
         ctx.lineWidth = 0.5;
-        ctx.strokeStyle = rgba(C.silver, 0.1);
+        ctx.strokeStyle = rgba(P.silver, 0.1);
         ctx.beginPath();
         ctx.moveTo(box.x0, r.y1 + 0.25);
         ctx.lineTo(box.x1, r.y1 + 0.25);
@@ -293,16 +294,16 @@ function createScopeScene(): PlateScene {
         ctx.stroke();
         ctx.restore();
         const name = ['speed', 'throttle', 'brake', 'gap'][ri];
-        label(ctx, name, 8, r.y0 + 10, C.titanium, 9);
+        label(ctx, name, 8, r.y0 + 10, P.titanium, 9);
         if (r.key === 'speed') {
-          for (const kv of [100, 200, 300]) label(ctx, String(kv), box.x0 - 6, seriesY(r, kv / 3.6) + 3, rgba(C.titanium, 0.8), 9, 'right');
+          for (const kv of [100, 200, 300]) label(ctx, String(kv), box.x0 - 6, seriesY(r, kv / 3.6) + 3, rgba(P.titanium, 0.8), 9, 'right');
         }
 
         if (r.key === 'speed') {
           // area under car A for depth
           const g = ctx.createLinearGradient(0, r.y0, 0, r.y1);
-          g.addColorStop(0, rgba(C.red, 0.16));
-          g.addColorStop(1, rgba(C.red, 0));
+          g.addColorStop(0, rgba(P.red, 0.16));
+          g.addColorStop(1, rgba(P.red, 0));
           ctx.beginPath();
           ctx.moveTo(xOf(0), r.y1);
           for (let i = 0; i <= reveal; i++) ctx.lineTo(xOf(i), seriesY(r, L.a.v[i]));
@@ -310,14 +311,14 @@ function createScopeScene(): PlateScene {
           ctx.closePath();
           ctx.fillStyle = g;
           ctx.fill();
-          trace(r, L.b.v, 1, C.cobalt, 0.75, 0.1);
-          trace(r, L.a.v, 1, C.red, 1, 0.12);
+          trace(r, L.b.v, 1, P.cobalt, 0.75, 0.1);
+          trace(r, L.a.v, 1, P.red, 1, 0.12);
         } else if (r.key === 'thr') {
-          trace(r, L.b.thr, 1, C.cobalt, 0.5, 0.06);
-          trace(r, L.a.thr, 1, C.silver, 0.75, 0.08);
+          trace(r, L.b.thr, 1, P.cobalt, 0.5, 0.06);
+          trace(r, L.a.thr, 1, P.silver, 0.75, 0.08);
         } else if (r.key === 'brk') {
-          trace(r, L.b.brk, 1, C.cobalt, 0.5, 0.06);
-          trace(r, L.a.brk, 1, C.red, 0.75, 0.1);
+          trace(r, L.b.brk, 1, P.cobalt, 0.5, 0.06);
+          trace(r, L.a.brk, 1, P.red, 0.75, 0.1);
         } else {
           // gap: fill red where car B is behind, cobalt where ahead
           const zero = seriesY(r, 0);
@@ -330,23 +331,23 @@ function createScopeScene(): PlateScene {
             }
             ctx.lineTo(xOf(reveal), zero);
             ctx.closePath();
-            ctx.fillStyle = rgba(sign > 0 ? C.red : C.cobalt, 0.22);
+            ctx.fillStyle = rgba(sign > 0 ? P.red : P.cobalt, 0.22);
             ctx.fill();
           }
-          trace(r, L.delta, 1, C.silver, 0.5, 0.06);
+          trace(r, L.delta, 1, P.silver, 0.5, 0.06);
         }
       });
 
       // persistence sweep: bright window behind the playhead
       const span = 70;
       ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = P.add;
       for (let k = 0; k < span; k += 2) {
         const i = idx - k;
         if (i < 1) break;
         const al = (1 - k / span) * 0.5;
         const r0 = rows[0];
-        ctx.strokeStyle = rgba(C.red, al);
+        ctx.strokeStyle = rgba(P.red, al);
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(xOf(i - 2), seriesY(r0, L.a.v[i - 2] ?? L.a.v[i]));
@@ -359,9 +360,9 @@ function createScopeScene(): PlateScene {
       const sx = xOf(idx);
       ctx.save();
       const g = ctx.createLinearGradient(0, top - 18, 0, h);
-      g.addColorStop(0, rgba(C.alabaster, 0));
-      g.addColorStop(0.15, rgba(C.alabaster, 0.75));
-      g.addColorStop(1, rgba(C.alabaster, 0.15));
+      g.addColorStop(0, rgba(P.alabaster, 0));
+      g.addColorStop(0.15, rgba(P.alabaster, 0.75));
+      g.addColorStop(1, rgba(P.alabaster, 0.15));
       ctx.strokeStyle = g;
       ctx.lineWidth = 0.5;
       ctx.beginPath();
@@ -370,25 +371,25 @@ function createScopeScene(): PlateScene {
       ctx.stroke();
       ctx.restore();
       const dots: [number, string][] = [
-        [seriesY(rows[0], L.a.v[idx]), C.red],
-        [seriesY(rows[0], L.b.v[idx]), C.cobalt],
-        [seriesY(rows[1], L.a.thr[idx]), C.silver],
-        [seriesY(rows[2], L.a.brk[idx]), C.red],
-        [seriesY(rows[3], L.delta[idx]), C.silver],
+        [seriesY(rows[0], L.a.v[idx]), P.red],
+        [seriesY(rows[0], L.b.v[idx]), P.cobalt],
+        [seriesY(rows[1], L.a.thr[idx]), P.silver],
+        [seriesY(rows[2], L.a.brk[idx]), P.red],
+        [seriesY(rows[3], L.delta[idx]), P.silver],
       ];
       for (const [y, col] of dots) {
-        glow(ctx, sx, y, 10, col, 0.55);
-        ctx.fillStyle = C.alabaster;
+        glow(ctx, P, sx, y, 10, col, 0.55);
+        ctx.fillStyle = P.alabaster;
         ctx.beginPath();
         ctx.arc(sx, y, 1.6, 0, Math.PI * 2);
         ctx.fill();
       }
       const tagX = sx + 8 > w - 120 ? sx - 8 : sx + 8;
       const align: CanvasTextAlign = sx + 8 > w - 120 ? 'right' : 'left';
-      label(ctx, `A ${kmh(L.a.v[idx])}`, tagX, rows[0].y0 + 12, C.red, 10, align);
-      label(ctx, `B ${kmh(L.b.v[idx])}`, tagX, rows[0].y0 + 25, C.cobalt, 10, align);
+      label(ctx, `A ${kmh(L.a.v[idx])}`, tagX, rows[0].y0 + 12, P.heatText, 10, align);
+      label(ctx, `B ${kmh(L.b.v[idx])}`, tagX, rows[0].y0 + 25, P.cobalt, 10, align);
 
-      label(ctx, 'simulated lap · car A vs car B', w - 18, 14, C.titanium, 9, 'right');
+      label(ctx, 'simulated lap · car A vs car B', w - 18, 14, P.titanium, 9, 'right');
 
       return `S${sec + 1} · ${((idx * L.ds) / 1000).toFixed(2)} km · A ${kmh(L.a.v[idx])} · B ${kmh(L.b.v[idx])} km/h · gap ${signed(L.delta[idx])} s`;
     },
@@ -425,10 +426,11 @@ function createTrackScene(): PlateScene {
       return [px(i), py(i)];
     },
     draw(ctx, f) {
+      const P = f.palette;
       fit(f);
       const { width: w, height: h } = f;
-      drawVignette(ctx, w, h);
-      drawGrid(ctx, w, h, 28, 0.04);
+      drawVignette(ctx, P, w, h);
+      drawGrid(ctx, P, w, h, 28, 0.04);
       const intro = easeOutCubic(f.age / 0.9);
       const reveal = Math.floor(N * intro);
 
@@ -442,10 +444,10 @@ function createTrackScene(): PlateScene {
         if (i === 0) ctx.moveTo(px(j), py(j));
         else ctx.lineTo(px(j), py(j));
       }
-      ctx.strokeStyle = rgba(C.cobaltDeep, 0.9);
+      ctx.strokeStyle = rgba(P.cobaltDeep, 0.9);
       ctx.lineWidth = 12;
       ctx.stroke();
-      ctx.strokeStyle = rgba(C.silver, 0.08);
+      ctx.strokeStyle = rgba(P.silver, 0.08);
       ctx.lineWidth = 13;
       ctx.globalCompositeOperation = 'destination-over';
       ctx.stroke();
@@ -453,12 +455,12 @@ function createTrackScene(): PlateScene {
 
       // delta-coloured racing line
       ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = P.add;
       ctx.lineCap = 'round';
       for (let i = 0; i < reveal; i++) {
         const j = (i + 1) % N;
         const r = rate[i] / (maxRate || 1);
-        const col = r >= 0 ? C.red : C.cobalt;
+        const col = r >= 0 ? P.red : P.cobalt;
         ctx.strokeStyle = rgba(col, 0.25 + Math.abs(r) * 0.75);
         ctx.lineWidth = 1 + Math.abs(r) * 2.2;
         ctx.beginPath();
@@ -478,7 +480,7 @@ function createTrackScene(): PlateScene {
         const nx = -ty / len;
         const ny = tx / len;
         ctx.save();
-        ctx.strokeStyle = s === 0 ? C.alabaster : rgba(C.silver, 0.7);
+        ctx.strokeStyle = s === 0 ? P.alabaster : rgba(P.silver, 0.7);
         ctx.lineWidth = s === 0 ? 1.2 : 0.75;
         ctx.beginPath();
         ctx.moveTo(px(i) - nx * 10, py(i) - ny * 10);
@@ -488,8 +490,8 @@ function createTrackScene(): PlateScene {
         const lx = px(i) + nx * 24;
         const ly = py(i) + ny * 24;
         const d = L.sectorDelta[s];
-        label(ctx, `S${s + 1}`, lx, ly, C.alabaster, 10, 'center');
-        label(ctx, `${signed(d)} s`, lx, ly + 13, d >= 0 ? C.red : C.cobalt, 10, 'center');
+        label(ctx, `S${s + 1}`, lx, ly, P.alabaster, 10, 'center');
+        label(ctx, `${signed(d)} s`, lx, ly + 13, d >= 0 ? P.heatText : P.cobalt, 10, 'center');
       }
 
       // cars
@@ -502,16 +504,16 @@ function createTrackScene(): PlateScene {
         const i0 = trail[k - 1];
         const i1 = trail[k];
         if (Math.abs(i1 - i0) > N / 2) continue;
-        ctx.strokeStyle = rgba(C.red, (k / trail.length) * 0.8);
+        ctx.strokeStyle = rgba(P.red, (k / trail.length) * 0.8);
         ctx.lineWidth = 2.5 * (k / trail.length);
         ctx.beginPath();
         ctx.moveTo(px(i0), py(i0));
         ctx.lineTo(px(i1), py(i1));
         ctx.stroke();
       }
-      for (const [i, col] of [[ib, C.cobalt], [ia, C.red]] as const) {
-        glow(ctx, px(i), py(i), 18, col, 0.7);
-        ctx.fillStyle = C.alabaster;
+      for (const [i, col] of [[ib, P.cobalt], [ia, P.red]] as const) {
+        glow(ctx, P, px(i), py(i), 18, col, 0.7);
+        ctx.fillStyle = P.alabaster;
         ctx.beginPath();
         ctx.arc(px(i), py(i), 2.6, 0, Math.PI * 2);
         ctx.fill();
@@ -530,18 +532,18 @@ function createTrackScene(): PlateScene {
         const y = py(best);
         ctx.save();
         ctx.globalAlpha = f.pointer.presence;
-        ctx.strokeStyle = C.alabaster;
+        ctx.strokeStyle = P.alabaster;
         ctx.lineWidth = 0.5;
         ctx.beginPath();
         ctx.arc(x, y, 7, 0, Math.PI * 2);
         ctx.stroke();
         const right = x < w - 130;
-        label(ctx, `A ${kmh(L.a.v[best])}  B ${kmh(L.b.v[best])}`, x + (right ? 12 : -12), y - 6, C.alabaster, 10, right ? 'left' : 'right');
-        label(ctx, `gap ${signed(L.delta[best])} s`, x + (right ? 12 : -12), y + 8, C.silver, 10, right ? 'left' : 'right');
+        label(ctx, `A ${kmh(L.a.v[best])}  B ${kmh(L.b.v[best])}`, x + (right ? 12 : -12), y - 6, P.alabaster, 10, right ? 'left' : 'right');
+        label(ctx, `gap ${signed(L.delta[best])} s`, x + (right ? 12 : -12), y + 8, P.silver, 10, right ? 'left' : 'right');
         ctx.restore();
       }
 
-      label(ctx, 'red: car B losing time · blue: car B gaining', 16, h - 14, C.titanium, 9);
+      label(ctx, 'red: car B losing time · blue: car B gaining', 16, h - 14, P.titanium, 9);
       const i = near ? best : ia;
       return `S${sectorOf(i, L) + 1} · lap A ${L.a.lap.toFixed(3)} s · B ${L.b.lap.toFixed(3)} s · ${kmh(L.a.v[i])} / ${kmh(L.b.v[i])} km/h`;
     },
@@ -581,8 +583,9 @@ function createRingScene(): PlateScene {
       return [geo.cx + Math.cos(a) * (geo.r0 + geo.r1) * 0.5, geo.cy + Math.sin(a) * (geo.r0 + geo.r1) * 0.5];
     },
     draw(ctx, f) {
+      const P = f.palette;
       const { width: w, height: h } = f;
-      drawVignette(ctx, w, h);
+      drawVignette(ctx, P, w, h);
       geo.cx = w / 2;
       geo.cy = h / 2 + 4;
       const R = Math.min(w, h) * 0.44;
@@ -607,7 +610,7 @@ function createRingScene(): PlateScene {
       ctx.save();
       ctx.lineWidth = 0.5;
       for (const [r, a] of [[geo.r0, 0.25], [geo.r1, 0.12], [geo.r0 - 10, 0.1]] as const) {
-        ctx.strokeStyle = rgba(C.silver, a);
+        ctx.strokeStyle = rgba(P.silver, a);
         ctx.beginPath();
         ctx.arc(geo.cx, geo.cy, r, 0, Math.PI * 2);
         ctx.stroke();
@@ -623,7 +626,7 @@ function createRingScene(): PlateScene {
 
       // slots
       ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = P.add;
       for (let s = 0; s < SLOTS; s++) {
         const age = (head - s + SLOTS) % SLOTS; // 0 = newest
         const recency = 1 - age / SLOTS;
@@ -631,7 +634,7 @@ function createRingScene(): PlateScene {
         const len = (speed[s] / 95) * (geo.r1 - geo.r0) * intro;
         const cos = Math.cos(a);
         const sin = Math.sin(a);
-        const [r, g, b] = ramp([C.titanium, C.cobalt, C.silver, C.red], recency ** 1.5);
+        const [r, g, b] = ramp([P.titanium, P.cobalt, P.silver, P.red], recency ** 1.5);
         const al = 0.18 + recency * 0.72;
         ctx.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${s === hoverSlot ? 1 : al})`;
         ctx.lineWidth = s === hoverSlot ? 2 : 1.1;
@@ -642,7 +645,7 @@ function createRingScene(): PlateScene {
         // inner channel: brake (red) / throttle (silver) ticks
         const inner = geo.r0 - 10;
         const v = brk[s] > 0.02 ? brk[s] : thr[s];
-        ctx.strokeStyle = rgba(brk[s] > 0.02 ? C.red : C.silver, (0.15 + recency * 0.6) * v);
+        ctx.strokeStyle = rgba(brk[s] > 0.02 ? P.red : P.silver, (0.15 + recency * 0.6) * v);
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(geo.cx + cos * (inner - 8 * v), geo.cy + sin * (inner - 8 * v));
@@ -661,24 +664,24 @@ function createRingScene(): PlateScene {
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(x1, y1);
-        phosphor(ctx, col, 0.75, 0.12);
-        glow(ctx, x1, y1, 10, col, 0.6);
+        phosphor(ctx, P, col, 0.75, 0.12);
+        glow(ctx, P, x1, y1, 10, col, 0.6);
         const lx = geo.cx + Math.cos(a) * (geo.r1 + out + 12);
         const ly = geo.cy + Math.sin(a) * (geo.r1 + out + 12);
-        label(ctx, txt, lx, ly + 3, col, 10, Math.cos(a) >= 0 ? 'left' : 'right');
+        label(ctx, txt, lx, ly + 3, col === P.red ? P.heatText : col, 10, Math.cos(a) >= 0 ? 'left' : 'right');
       };
-      drawHead((head + 1) % SLOTS, C.red, 'write', 6);
-      drawHead((head - READ_LAG + SLOTS) % SLOTS, C.cobalt, 'read', 0);
+      drawHead((head + 1) % SLOTS, P.red, 'write', 6);
+      drawHead((head - READ_LAG + SLOTS) % SLOTS, P.cobalt, 'read', 0);
 
       // centre readout
       const big = Math.max(18, Math.min(30, geo.r0 * 0.28));
       ctx.font = `${big}px "Geist Mono", ui-monospace, monospace`;
-      ctx.fillStyle = C.alabaster;
+      ctx.fillStyle = P.alabaster;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'alphabetic';
       ctx.fillText(String(written).padStart(6, '0'), geo.cx, geo.cy + big * 0.1);
-      label(ctx, 'samples written', geo.cx, geo.cy + big * 0.1 + 16, C.titanium, 10, 'center');
-      label(ctx, `${SLOTS} slots · 60 Hz producer`, geo.cx, geo.cy - big * 0.9, C.titanium, 9, 'center');
+      label(ctx, 'samples written', geo.cx, geo.cy + big * 0.1 + 16, P.titanium, 10, 'center');
+      label(ctx, `${SLOTS} slots · 60 Hz producer`, geo.cx, geo.cy - big * 0.9, P.titanium, 9, 'center');
 
       const s = hoverSlot >= 0 ? hoverSlot : head;
       const frame = frameMs ? `${frameMs.toFixed(1)} ms frame` : 'paused';

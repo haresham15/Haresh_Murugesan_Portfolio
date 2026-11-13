@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useCanvasStage, type CanvasStage } from '../../hooks/useCanvasStage';
-import { C, easeInOutCubic, type PlateDefinition, type PlateScene, type StageFrame, type StagePointer } from './stageKit';
+import {
+  C, DARK_PALETTE, easeInOutCubic, type PlateDefinition, type PlatePalette, type PlateScene, type StageFrame, type StagePointer,
+} from './stageKit';
 
 interface PlateStageProps {
   definition: PlateDefinition;
@@ -8,13 +10,22 @@ interface PlateStageProps {
   systemKey: string;
   modeId: string;
   reduced: boolean;
-  panelId: string;
-  labelledBy: string;
+  panelId?: string;
+  labelledBy?: string;
   /** strip targets, written directly each frame to avoid React renders */
-  coordsRef: React.RefObject<HTMLSpanElement | null>;
-  readoutRef: React.RefObject<HTMLSpanElement | null>;
+  coordsRef?: React.RefObject<HTMLSpanElement | null>;
+  readoutRef?: React.RefObject<HTMLSpanElement | null>;
   /** filled by the stage so the mode bar can trigger scene actions */
-  actionRef: React.MutableRefObject<((id: string) => void) | null>;
+  actionRef?: React.MutableRefObject<((id: string) => void) | null>;
+  /** Colour roles. Defaults to carbon; pass LIGHT_PALETTE on the weave (no backdrop is painted then). */
+  palette?: PlatePalette;
+  /** False stops the loop after one frame. Turning it back on replays the scene's intro. */
+  active?: boolean;
+  /** Multiplies the intro clock, so 1.8 plays a 0.9 s draw-on in 0.5 s. */
+  introRate?: number;
+  /** Replaces the default tabpanel role, e.g. when the panel semantics live elsewhere. */
+  role?: string;
+  className?: string;
 }
 
 const FADE_SECONDS = 0.42;
@@ -31,6 +42,11 @@ export const PlateStage: React.FC<PlateStageProps> = ({
   coordsRef,
   readoutRef,
   actionRef,
+  palette = DARK_PALETTE,
+  active = true,
+  introRate = 1,
+  role = 'tabpanel',
+  className = '',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,6 +56,7 @@ export const PlateStage: React.FC<PlateStageProps> = ({
   const pointer = useRef<StagePointer>({ x: -1, y: -1, tx: -1, ty: -1, vx: 0, vy: 0, active: false, presence: 0 });
   const lastText = useRef({ coords: '', readout: '' });
   const frameRef = useRef<StageFrame | null>(null);
+  const restartRef = useRef(false);
   // Under reduced motion the loop is not running; bump this to request one redraw.
   const [redrawToken, setRedrawToken] = useState(0);
 
@@ -67,20 +84,25 @@ export const PlateStage: React.FC<PlateStageProps> = ({
             snapRef.current = { canvas: snap, start: now };
           }
         }
-        sceneRef.current = { key, scene: definition.createScene(modeId), born: now };
-        actionRef.current = (id: string) => sceneRef.current?.scene.action?.(id);
+        sceneRef.current = { key, scene: definition.createScene(modeId, palette), born: now };
+        if (actionRef) actionRef.current = (id: string) => sceneRef.current?.scene.action?.(id);
+      } else if (restartRef.current) {
+        sceneRef.current.born = now;
       }
+      restartRef.current = false;
       const { scene, born } = sceneRef.current;
 
       const p = pointer.current;
       const frame: StageFrame = {
         width: stage.width,
         height: stage.height,
-        age: now - born,
+        // The clock is frozen under reduced motion, so show every scene fully drawn.
+        age: reduced ? 10 : (now - born) * introRate,
         time: now,
         dt,
         pointer: p,
         reduced,
+        palette,
       };
       frameRef.current = frame;
 
@@ -131,23 +153,28 @@ export const PlateStage: React.FC<PlateStageProps> = ({
       const coords = p.active
         ? `x ${String(Math.round(p.x)).padStart(4, '0')} · y ${String(Math.round(p.y)).padStart(4, '0')}`
         : 'cursor idle';
-      if (coords !== lastText.current.coords && coordsRef.current) {
+      if (coords !== lastText.current.coords && coordsRef?.current) {
         coordsRef.current.textContent = coords;
         lastText.current.coords = coords;
       }
-      if (readout !== lastText.current.readout && readoutRef.current) {
+      if (readout !== lastText.current.readout && readoutRef?.current) {
         readoutRef.current.textContent = readout;
         lastText.current.readout = readout;
       }
     },
     // redrawToken is intentionally a dependency: a new draw identity invalidates the stage.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [key, definition, modeId, reduced, redrawToken, coordsRef, readoutRef, actionRef],
+    [key, definition, modeId, reduced, redrawToken, coordsRef, readoutRef, actionRef, palette, introRate],
   );
 
-  useCanvasStage(containerRef, canvasRef, draw, { animate: !reduced });
+  useCanvasStage(containerRef, canvasRef, draw, { animate: !reduced && active });
 
-  useEffect(() => () => { actionRef.current = null; }, [actionRef]);
+  // Coming back into view as the active plate replays the draw-on.
+  useEffect(() => {
+    if (active) restartRef.current = true;
+  }, [active]);
+
+  useEffect(() => () => { if (actionRef) actionRef.current = null; }, [actionRef]);
 
   const requestRedraw = useCallback(() => {
     if (reduced) setRedrawToken((n) => n + 1);
@@ -166,10 +193,13 @@ export const PlateStage: React.FC<PlateStageProps> = ({
     <div
       ref={containerRef}
       id={panelId}
-      role="tabpanel"
+      role={role}
       aria-labelledby={labelledBy}
-      className="relative flex-1 min-h-0 w-full overflow-hidden cursor-crosshair"
-      style={{ touchAction: 'pan-y', background: `radial-gradient(120% 90% at 50% 45%, ${C.obsidian} 0%, ${C.midnight} 70%)` }}
+      className={`relative flex-1 min-h-0 w-full overflow-hidden cursor-crosshair ${className}`}
+      style={{
+        touchAction: 'pan-y',
+        background: palette.paper ? undefined : `radial-gradient(120% 90% at 50% 45%, ${C.obsidian} 0%, ${C.midnight} 70%)`,
+      }}
       onPointerMove={setTarget}
       onPointerEnter={setTarget}
       onPointerDown={(e) => {

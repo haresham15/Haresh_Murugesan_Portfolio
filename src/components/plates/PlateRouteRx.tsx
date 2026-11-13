@@ -1,6 +1,6 @@
 import {
-  C, clamp, drawGrid, drawVignette, easeOutCubic, fbm, glow, hash2, isoSegments, label, phosphor, rgba, smoothstep,
-  strokeSegments, type PlateDefinition, type PlateScene, type StageFrame,
+  clamp, hexRgb, drawGrid, drawVignette, easeOutCubic, fbm, glow, hash2, isoSegments, label, phosphor, rgba, smoothstep,
+  strokeSegments, type PlateDefinition, type PlateScene, type PlatePalette, type StageFrame,
 } from './stageKit';
 
 /* ============================================================
@@ -31,7 +31,7 @@ interface City {
   raster: Float32Array;
   rasterNearest: Uint8Array;
   iso: { level: number; segs: Float32Array }[];
-  bands: HTMLCanvasElement | null;
+  bands: Map<PlatePalette, HTMLCanvasElement>;
   stops: [number, number][];
   lines: number[][];
   blocks: { x: number; y: number; d: number; desert: boolean; tvi: number; clinic: number; stop: number }[];
@@ -198,21 +198,22 @@ function city(): City {
     clusters.push({ x, y, node, size: pts.length });
   }
 
-  cityCache = { nx, ny, edges, adj, clinics, nodeTime, raster, rasterNearest, iso, bands: null, stops, lines, blocks, metresPerUnit, clusters };
+  cityCache = { nx, ny, edges, adj, clinics, nodeTime, raster, rasterNearest, iso, bands: new Map(), stops, lines, blocks, metresPerUnit, clusters };
   return cityCache;
 }
 
-function bandsImage(c: City): HTMLCanvasElement {
-  if (c.bands) return c.bands;
+function bandsImage(c: City, P: PlatePalette): HTMLCanvasElement {
+  const hit = c.bands.get(P);
+  if (hit) return hit;
   const cv = document.createElement('canvas');
   cv.width = RX;
   cv.height = RY;
   const ctx = cv.getContext('2d');
   if (ctx) {
     const img = ctx.createImageData(RX, RY);
-    const red = [255, 40, 0];
-    const silver = [200, 210, 224];
-    const cobalt = [37, 99, 235];
+    const red = hexRgb(P.red);
+    const silver = hexRgb(P.paper ? P.titanium : P.silver);
+    const cobalt = hexRgb(P.cobalt);
     for (let k = 0; k < RX * RY; k++) {
       const t = c.raster[k];
       const b5 = 1 - smoothstep(4.2, 5.8, t);
@@ -227,7 +228,7 @@ function bandsImage(c: City): HTMLCanvasElement {
     }
     ctx.putImageData(img, 0, 0);
   }
-  c.bands = cv;
+  c.bands.set(P, cv);
   return cv;
 }
 
@@ -245,11 +246,11 @@ function mapFrame(f: StageFrame) {
 }
 type MapFrame = ReturnType<typeof mapFrame>;
 
-function drawRoads(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, alpha: number) {
+function drawRoads(ctx: CanvasRenderingContext2D, P: PlatePalette, c: City, m: MapFrame, alpha: number) {
   ctx.save();
   ctx.lineCap = 'round';
   ctx.lineWidth = 0.5;
-  ctx.strokeStyle = rgba(C.silver, 0.16 * alpha);
+  ctx.strokeStyle = rgba(P.silver, 0.16 * alpha);
   ctx.beginPath();
   for (const e of c.edges) {
     if (e.art) continue;
@@ -258,7 +259,7 @@ function drawRoads(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, alpha: n
   }
   ctx.stroke();
   ctx.lineWidth = 1.4;
-  ctx.strokeStyle = rgba(C.silver, 0.28 * alpha);
+  ctx.strokeStyle = rgba(P.silver, 0.28 * alpha);
   ctx.beginPath();
   for (const e of c.edges) {
     if (!e.art) continue;
@@ -269,27 +270,27 @@ function drawRoads(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, alpha: n
   ctx.restore();
 }
 
-function drawClinics(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, time: number, hot: number) {
+function drawClinics(ctx: CanvasRenderingContext2D, P: PlatePalette, c: City, m: MapFrame, time: number, hot: number) {
   c.clinics.forEach((cl, i) => {
     const x = m.ox + c.nx[cl.node] * m.k;
     const y = m.oy + c.ny[cl.node] * m.k;
     const pulse = (time * 0.6 + i * 0.33) % 1;
     ctx.save();
-    ctx.strokeStyle = rgba(C.red, (1 - pulse) * 0.7);
+    ctx.strokeStyle = rgba(P.red, (1 - pulse) * 0.7);
     ctx.lineWidth = 0.75;
     ctx.beginPath();
     ctx.arc(x, y, 4 + pulse * 22, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
-    glow(ctx, x, y, i === hot ? 26 : 16, C.red, i === hot ? 0.8 : 0.55);
+    glow(ctx, P, x, y, i === hot ? 26 : 16, P.red, i === hot ? 0.8 : 0.55);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(Math.PI / 4);
-    ctx.fillStyle = C.alabaster;
+    ctx.fillStyle = P.alabaster;
     const s = i === 0 ? 4.5 : 3.5;
     ctx.fillRect(-s / 2, -s / 2, s, s);
     ctx.restore();
-    label(ctx, cl.name, x + 9, y - 8, i === hot ? C.alabaster : C.silver, 10);
+    label(ctx, cl.name, x + 9, y - 8, i === hot ? P.alabaster : P.silver, 10);
   });
 }
 
@@ -307,7 +308,7 @@ function sampleRaster(c: City, u: number, v: number) {
   return { t, clinic: c.rasterNearest[Math.round(j) * RX + Math.round(i)] };
 }
 
-function drawDemandVectors(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, time: number, alpha: number) {
+function drawDemandVectors(ctx: CanvasRenderingContext2D, P: PlatePalette, c: City, m: MapFrame, time: number, alpha: number) {
   ctx.save();
   ctx.lineWidth = 0.75;
   for (const b of c.blocks) {
@@ -322,8 +323,8 @@ function drawDemandVectors(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, 
     const ux = (tx - x0) / d;
     const uy = (ty - y0) / d;
     const g = ctx.createLinearGradient(x0, y0, x0 + ux * len, y0 + uy * len);
-    g.addColorStop(0, rgba(C.red, 0));
-    g.addColorStop(1, rgba(C.red, 0.85 * alpha));
+    g.addColorStop(0, rgba(P.red, 0));
+    g.addColorStop(1, rgba(P.red, 0.85 * alpha));
     ctx.strokeStyle = g;
     ctx.beginPath();
     ctx.moveTo(x0, y0);
@@ -331,12 +332,12 @@ function drawDemandVectors(ctx: CanvasRenderingContext2D, c: City, m: MapFrame, 
     ctx.stroke();
     // flowing bead
     const p = (time * 0.5 + b.tvi * 3) % 1;
-    ctx.fillStyle = rgba(C.alabaster, (1 - p) * 0.8 * alpha);
+    ctx.fillStyle = rgba(P.alabaster, (1 - p) * 0.8 * alpha);
     ctx.fillRect(x0 + ux * len * p - 0.75, y0 + uy * len * p - 0.75, 1.5, 1.5);
     // arrow head
     const hx = x0 + ux * len;
     const hy = y0 + uy * len;
-    ctx.strokeStyle = rgba(C.red, 0.85 * alpha);
+    ctx.strokeStyle = rgba(P.red, 0.85 * alpha);
     ctx.beginPath();
     ctx.moveTo(hx - ux * 4 - uy * 2.5, hy - uy * 4 + ux * 2.5);
     ctx.lineTo(hx, hy);
@@ -357,9 +358,10 @@ function createIsoScene(): PlateScene {
       return [m.ox + m.w * (0.5 + Math.cos(a) * 0.3), m.oy + m.h * (0.5 + Math.sin(a * 1.3) * 0.32)];
     },
     draw(ctx, f) {
+      const P = f.palette;
       const m = mapFrame(f);
-      drawVignette(ctx, f.width, f.height);
-      drawGrid(ctx, f.width, f.height, 32, 0.035);
+      drawVignette(ctx, P, f.width, f.height);
+      drawGrid(ctx, P, f.width, f.height, 32, 0.035);
       const intro = easeOutCubic(f.age / 1.1);
 
       ctx.save();
@@ -368,9 +370,9 @@ function createIsoScene(): PlateScene {
       ctx.clip();
       ctx.imageSmoothingEnabled = true;
       ctx.globalAlpha = intro;
-      ctx.drawImage(bandsImage(c), m.ox, m.oy, m.w, m.h);
+      ctx.drawImage(bandsImage(c, P), m.ox, m.oy, m.w, m.h);
       ctx.globalAlpha = 1;
-      drawRoads(ctx, c, m, 0.8);
+      drawRoads(ctx, P, c, m, 0.8);
 
       const sx = m.w / (RX - 1);
       const sy = m.h / (RY - 1);
@@ -379,11 +381,11 @@ function createIsoScene(): PlateScene {
       if (front > 0.5) {
         const segs = isoSegments(c.raster, RX, RY, front);
         ctx.lineWidth = 0.75;
-        ctx.strokeStyle = rgba(C.alabaster, 0.45 * (1 - front / 38));
+        ctx.strokeStyle = rgba(P.alabaster, 0.45 * (1 - front / 38));
         strokeSegments(ctx, segs, sx, sy, m.ox, m.oy);
       }
       // the three isochrones, breathing as the wavefront passes
-      const cols = [C.red, C.silver, C.cobalt];
+      const cols = [P.red, P.silver, P.cobalt];
       c.iso.forEach(({ level, segs }, i) => {
         const near = 1 - smoothstep(0, 3, Math.abs(front - level));
         ctx.lineWidth = 0.75 + near * 1.2;
@@ -392,13 +394,13 @@ function createIsoScene(): PlateScene {
       });
       ctx.restore();
 
-      drawDemandVectors(ctx, c, m, f.time, 0.55 * intro);
+      drawDemandVectors(ctx, P, c, m, f.time, 0.55 * intro);
 
       const u = (f.pointer.x - m.ox) / m.k;
       const v = (f.pointer.y - m.oy) / m.k;
       const inside = u >= 0 && u <= 1 && v >= 0 && v <= MAP_H;
       const s = sampleRaster(c, u, v);
-      drawClinics(ctx, c, m, f.time, inside ? s.clinic : -1);
+      drawClinics(ctx, P, c, m, f.time, inside ? s.clinic : -1);
 
       if (inside) {
         const cl = c.clinics[s.clinic];
@@ -407,19 +409,19 @@ function createIsoScene(): PlateScene {
         ctx.save();
         ctx.setLineDash([2, 3]);
         ctx.lineWidth = 0.5;
-        ctx.strokeStyle = rgba(C.alabaster, 0.6);
+        ctx.strokeStyle = rgba(P.alabaster, 0.6);
         ctx.beginPath();
         ctx.moveTo(f.pointer.x, f.pointer.y);
         ctx.lineTo(cx, cy);
         ctx.stroke();
         ctx.restore();
-        ctx.strokeStyle = C.alabaster;
+        ctx.strokeStyle = P.alabaster;
         ctx.lineWidth = 0.5;
         ctx.beginPath();
         ctx.arc(f.pointer.x, f.pointer.y, 5, 0, Math.PI * 2);
         ctx.stroke();
         const right = f.pointer.x < f.width - 110;
-        label(ctx, `${s.t.toFixed(1)} min`, f.pointer.x + (right ? 10 : -10), f.pointer.y + 14, C.alabaster, 10, right ? 'left' : 'right');
+        label(ctx, `${s.t.toFixed(1)} min`, f.pointer.x + (right ? 10 : -10), f.pointer.y + 14, P.alabaster, 10, right ? 'left' : 'right');
       }
 
       // legend drawn in the top margin
@@ -427,10 +429,10 @@ function createIsoScene(): PlateScene {
       LEVELS.forEach((lv, i) => {
         ctx.fillStyle = cols[i];
         ctx.fillRect(lx, 14, 10, 1.5);
-        label(ctx, `${lv} min`, lx + 14, 18, C.silver, 10);
+        label(ctx, `${lv} min`, lx + 14, 18, P.silver, 10);
         lx += 66;
       });
-      label(ctx, 'synthetic network · generic sites', m.ox + m.w, 18, C.titanium, 9, 'right');
+      label(ctx, 'synthetic network · generic sites', m.ox + m.w, 18, P.titanium, 9, 'right');
 
       if (!inside) return 'isochrones 5 · 15 · 30 min';
       const band = s.t <= 5 ? 'inside 5 min' : s.t <= 15 ? 'inside 15 min' : s.t <= 30 ? 'inside 30 min' : 'beyond 30 min';
@@ -451,23 +453,24 @@ function createDesertScene(): PlateScene {
       return [m.ox + b.x * m.k, m.oy + b.y * m.k];
     },
     draw(ctx, f) {
+      const P = f.palette;
       const m = mapFrame(f);
-      drawVignette(ctx, f.width, f.height);
-      drawGrid(ctx, f.width, f.height, 32, 0.035);
+      drawVignette(ctx, P, f.width, f.height);
+      drawGrid(ctx, P, f.width, f.height, 32, 0.035);
       const intro = easeOutCubic(f.age / 1.0);
-      drawRoads(ctx, c, m, 0.6);
+      drawRoads(ctx, P, c, m, 0.6);
 
       // 800 m walk catchments around stops
       const r800 = (800 / c.metresPerUnit) * m.k;
       ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = P.add;
       for (const [sx, sy] of c.stops) {
         const x = m.ox + sx * m.k;
         const y = m.oy + sy * m.k;
         const g = ctx.createRadialGradient(x, y, 0, x, y, r800 * intro);
-        g.addColorStop(0, rgba(C.cobalt, 0.12));
-        g.addColorStop(0.92, rgba(C.cobalt, 0.05));
-        g.addColorStop(1, rgba(C.cobalt, 0));
+        g.addColorStop(0, rgba(P.cobalt, 0.12));
+        g.addColorStop(0.92, rgba(P.cobalt, 0.05));
+        g.addColorStop(1, rgba(P.cobalt, 0));
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(x, y, r800 * intro, 0, Math.PI * 2);
@@ -485,15 +488,15 @@ function createDesertScene(): PlateScene {
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         });
-        phosphor(ctx, C.cobalt, 1, 0.1);
+        phosphor(ctx, P, P.cobalt, 1, 0.1);
       }
       ctx.restore();
       for (const [sx, sy] of c.stops) {
-        ctx.fillStyle = C.alabaster;
+        ctx.fillStyle = P.alabaster;
         ctx.fillRect(m.ox + sx * m.k - 1.5, m.oy + sy * m.k - 1.5, 3, 3);
       }
 
-      drawDemandVectors(ctx, c, m, f.time, intro);
+      drawDemandVectors(ctx, P, c, m, f.time, intro);
 
       // blocks
       let hover = -1;
@@ -510,18 +513,18 @@ function createDesertScene(): PlateScene {
         const y = m.oy + b.y * m.k;
         const appear = clamp(intro * 1.6 - (b.x + b.y) * 0.5, 0, 1);
         if (b.desert) {
-          glow(ctx, x, y, 9, C.red, 0.35 * appear);
-          ctx.strokeStyle = rgba(C.red, appear);
+          glow(ctx, P, x, y, 9, P.red, 0.35 * appear);
+          ctx.strokeStyle = rgba(P.red, appear);
           ctx.lineWidth = i === hover ? 1.2 : 0.75;
           const s = i === hover ? 8 : 5;
           ctx.strokeRect(x - s / 2, y - s / 2, s, s);
         } else {
-          ctx.fillStyle = rgba(C.silver, 0.45 * appear);
+          ctx.fillStyle = rgba(P.silver, 0.45 * appear);
           ctx.fillRect(x - 1, y - 1, 2, 2);
         }
       });
 
-      drawClinics(ctx, c, m, f.time, -1);
+      drawClinics(ctx, P, c, m, f.time, -1);
 
       let readout = '43 of 141 blocks beyond 800 m of a stop';
       if (hover >= 0) {
@@ -534,7 +537,7 @@ function createDesertScene(): PlateScene {
         ctx.save();
         ctx.setLineDash([2, 3]);
         ctx.lineWidth = 0.5;
-        ctx.strokeStyle = rgba(C.alabaster, 0.75);
+        ctx.strokeStyle = rgba(P.alabaster, 0.75);
         ctx.beginPath();
         ctx.moveTo(x, y);
         ctx.lineTo(stx, sty);
@@ -542,16 +545,16 @@ function createDesertScene(): PlateScene {
         ctx.restore();
         const metres = Math.round(b.d * c.metresPerUnit);
         const right = x < f.width - 120;
-        label(ctx, `${metres.toLocaleString('en-US')} m`, x + (right ? 10 : -10), y - 8, b.desert ? C.red : C.silver, 10, right ? 'left' : 'right');
+        label(ctx, `${metres.toLocaleString('en-US')} m`, x + (right ? 10 : -10), y - 8, b.desert ? P.heatText : P.silver, 10, right ? 'left' : 'right');
         readout = `block ${String(hover + 1).padStart(3, '0')} · nearest stop ${metres.toLocaleString('en-US')} m · ${b.desert ? 'transit desert' : 'served'}`;
       }
 
       let lx = m.ox;
-      const legend: [string, string][] = [[C.red, 'desert block'], [C.silver, 'served block'], [C.cobalt, 'bus line · 800 m walk']];
+      const legend: [string, string][] = [[P.red, 'desert block'], [P.silver, 'served block'], [P.cobalt, 'bus line · 800 m walk']];
       for (const [col, txt] of legend) {
         ctx.fillStyle = col;
         ctx.fillRect(lx, 13, 6, 6);
-        label(ctx, txt, lx + 11, 19, C.silver, 10);
+        label(ctx, txt, lx + 11, 19, P.silver, 10);
         lx += ctx.measureText(txt).width + 30;
       }
       return readout;
@@ -583,10 +586,11 @@ function createRouteScene(): PlateScene {
       return [m.ox + c.nx[cl.node] * m.k, m.oy + c.ny[cl.node] * m.k];
     },
     draw(ctx, f) {
+      const P = f.palette;
       const m = mapFrame(f);
-      drawVignette(ctx, f.width, f.height);
-      drawGrid(ctx, f.width, f.height, 32, 0.035);
-      drawRoads(ctx, c, m, 1);
+      drawVignette(ctx, P, f.width, f.height);
+      drawGrid(ctx, P, f.width, f.height, 32, 0.035);
+      drawRoads(ctx, P, c, m, 1);
       const intro = easeOutCubic(f.age / 0.8);
 
       // nearest road node to the damped cursor
@@ -610,20 +614,20 @@ function createRouteScene(): PlateScene {
         const y = m.oy + cl.y * m.k;
         const r = (6 + cl.size * 2.2) * intro;
         const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-        g.addColorStop(0, rgba(C.red, 0.22));
-        g.addColorStop(1, rgba(C.red, 0));
+        g.addColorStop(0, rgba(P.red, 0.22));
+        g.addColorStop(1, rgba(P.red, 0));
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
         ctx.lineWidth = 0.5;
-        ctx.strokeStyle = rgba(C.red, 0.7);
+        ctx.strokeStyle = rgba(P.red, 0.7);
         ctx.stroke();
         const px = m.ox + c.nx[cl.node] * m.k;
         const py = m.oy + c.ny[cl.node] * m.k;
-        ctx.fillStyle = C.red;
+        ctx.fillStyle = P.red;
         ctx.fillRect(px - 2, py - 2, 4, 4);
-        label(ctx, `pickup ${i + 1}`, px + 7, py + 12, C.silver, 9);
+        label(ctx, `pickup ${i + 1}`, px + 7, py + 12, P.silver, 9);
       });
 
       // route draw-on after each change
@@ -649,30 +653,30 @@ function createRouteScene(): PlateScene {
           }
           ctx.lineTo(pts[i][0], pts[i][1]);
         }
-        phosphor(ctx, C.red, 1.4, 0.16);
+        phosphor(ctx, P, P.red, 1.4, 0.16);
         // shuttle shuttles out and back: bi-directional
         if (grow >= 1) {
           const cyc = (f.time * 0.22) % 2;
           const d = (cyc < 1 ? cyc : 2 - cyc) * total;
           const [sx, sy] = at(d);
-          glow(ctx, sx, sy, 16, C.alabaster, 0.6);
-          ctx.fillStyle = C.alabaster;
+          glow(ctx, P, sx, sy, 16, P.alabaster, 0.6);
+          ctx.fillStyle = P.alabaster;
           ctx.beginPath();
           ctx.arc(sx, sy, 2.4, 0, Math.PI * 2);
           ctx.fill();
         }
       }
 
-      drawClinics(ctx, c, m, f.time, 0);
+      drawClinics(ctx, P, c, m, f.time, 0);
       const tx = m.ox + c.nx[target] * m.k;
       const ty = m.oy + c.ny[target] * m.k;
-      ctx.strokeStyle = C.alabaster;
+      ctx.strokeStyle = P.alabaster;
       ctx.lineWidth = 0.75;
       ctx.beginPath();
       ctx.arc(tx, ty, 6, 0, Math.PI * 2);
       ctx.stroke();
 
-      label(ctx, 'shortest path from the hospital · move to set a pickup', m.ox, 18, C.titanium, 10);
+      label(ctx, 'shortest path from the hospital', m.ox, 18, P.titanium, 10);
       const minutes = tree.dist[target];
       const km = (pathLen * c.metresPerUnit) / 1000;
       return `route ${Math.max(0, path.length - 1)} segments · ${km.toFixed(1)} km · ${minutes.toFixed(1)} min one way · ${c.clusters.length} pickup clusters`;

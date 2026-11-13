@@ -786,9 +786,11 @@ export interface AsciiDnaLightbulbCanvasProps {
    * centred in a transparent container; size it with the parent (about 96px in Syntinuum).
    */
   variant?: 'hero' | 'embedded';
+  /** Stop animating (the canvas keeps its last frame and sleeps). */
+  paused?: boolean;
 }
 
-export const AsciiDnaLightbulbCanvas: React.FC<AsciiDnaLightbulbCanvasProps> = ({ variant = 'hero' }) => {
+export const AsciiDnaLightbulbCanvas: React.FC<AsciiDnaLightbulbCanvasProps> = ({ variant = 'hero', paused = false }) => {
   const { isReduced } = useMotionPreference();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -834,7 +836,7 @@ export const AsciiDnaLightbulbCanvas: React.FC<AsciiDnaLightbulbCanvasProps> = (
     [isReduced, layoutVersion, variant],
   );
 
-  useCanvasStage(containerRef, canvasRef, draw, { animate: !isReduced });
+  useCanvasStage(containerRef, canvasRef, draw, { animate: !isReduced && !paused });
 
   return (
     <div ref={containerRef} className="absolute inset-0">

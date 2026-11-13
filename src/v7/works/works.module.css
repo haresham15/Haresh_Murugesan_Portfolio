@@ -1,0 +1,198 @@
+/* Selected Works layout. Colours come from the --mat-* tokens; the section paints no background. */
+
+.section {
+  position: relative;
+}
+
+/* Four stops of 70vh under one 100svh sticky stage. Reduced motion drops this class. */
+.pinned {
+  height: calc(100svh + 280vh);
+}
+
+.stage {
+  --R: min(46vh, 34vw);
+  --gutter: clamp(32px, 4vw, 64px);
+  --col: min(380px, 27vw);
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+}
+
+.pinned .stage {
+  position: sticky;
+  top: 0;
+}
+
+/* Centre on the left viewport edge at the stage's vertical middle: exactly half on screen. */
+.wheel {
+  position: absolute;
+  left: calc(-1 * var(--R));
+  top: calc(50% - var(--R));
+  width: calc(2 * var(--R));
+  height: calc(2 * var(--R));
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rotor {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+}
+
+.fill,
+.overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.overlay {
+  pointer-events: none;
+}
+
+.tab {
+  cursor: pointer;
+}
+
+/* Rim lip: machined silver, 6px wide, at the inner edge of the tab ring (r = 60 of 100). */
+.lip {
+  position: absolute;
+  inset: 20%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 12deg,
+    #e6ecf5,
+    #7e8b9b 11%,
+    #c8d2e0 24%,
+    #475569 37%,
+    #e6ecf5 50%,
+    #7e8b9b 61%,
+    #c8d2e0 74%,
+    #475569 87%,
+    #e6ecf5
+  );
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));
+  mask: radial-gradient(closest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));
+}
+
+/* Hub: the nav trigger's rim (lip at r ≈ 46 of its 100-unit box) scaled by 56/46, so the
+   lip sits at r = 56 of the wheel's 100: box side 121.7 of 200 units, centred. */
+.hub {
+  position: absolute;
+  inset: 19.565%;
+  width: 60.87%;
+  height: 60.87%;
+  pointer-events: none;
+}
+
+.spec {
+  transition: opacity 240ms linear;
+}
+
+/* Details column, right of the wheel */
+.details {
+  position: absolute;
+  left: calc(var(--R) + var(--gutter));
+  top: max(96px, calc(50% - 17rem));
+  width: var(--col);
+}
+
+.column {
+  position: relative;
+}
+
+.ghost {
+  position: absolute;
+  inset: 0 0 auto 0;
+  pointer-events: none;
+}
+
+/* Live blueprint: from the details column to the right viewport edge, no frame. */
+.plate {
+  position: absolute;
+  left: calc(var(--R) + var(--gutter) * 2 + var(--col));
+  right: 0;
+  top: 12%;
+  bottom: 10%;
+}
+
+.plateLayer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progress {
+  position: absolute;
+  right: 16px;
+  top: 30%;
+  height: 40%;
+  width: 1px;
+  background: var(--mat-rule);
+}
+
+.progressFill {
+  position: absolute;
+  inset: 0;
+  background: var(--mat-accent-mark);
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+}
+
+/* Tablet: details above the blueprint, both right of the wheel. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .stage {
+    --col: calc(100vw - var(--R) - var(--gutter) * 2);
+  }
+  .details {
+    top: 88px;
+  }
+  .plate {
+    left: calc(var(--R) + var(--gutter));
+    top: 54%;
+    bottom: 4%;
+  }
+  .wide {
+    display: none;
+  }
+}
+
+/* Phone: the wheel moves to the bottom edge, top half showing; the drag axis is horizontal. */
+@media (max-width: 767px) {
+  .stage {
+    --R: min(50vw, 28vh);
+    min-height: 520px;
+  }
+  .wheel {
+    left: calc(50% - var(--R));
+    top: calc(100% - var(--R));
+    touch-action: pan-y;
+  }
+  .details {
+    left: 16px;
+    right: 16px;
+    top: 72px;
+    width: auto;
+  }
+  .plate {
+    left: 0;
+    right: 0;
+    top: 46%;
+    bottom: calc(var(--R) + 12px);
+  }
+  .wide {
+    display: none;
+  }
+  .progress {
+    right: 8px;
+  }
+}

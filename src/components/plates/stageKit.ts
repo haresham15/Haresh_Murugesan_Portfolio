@@ -19,6 +19,60 @@ export const C = {
 
 export const MONO = '"Geist Mono", "JetBrains Mono", ui-monospace, monospace';
 
+/**
+ * Colour roles for a plate. The keys mirror C so a scene reads the same role on either
+ * material: on paper `alabaster` (the brightest mark on carbon) becomes ink, `midnight`
+ * (the ground) becomes the weave, and additive light becomes multiplied ink.
+ */
+export interface PlatePalette {
+  midnight: string;
+  obsidian: string;
+  cobaltDeep: string;
+  cobaltMid: string;
+  cobalt: string;
+  red: string;
+  crimson: string;
+  silver: string;
+  chrome: string;
+  titanium: string;
+  alabaster: string;
+  /** Small text that would be red on carbon. #FF2800 fails contrast under 24px on the weave. */
+  heatText: string;
+  /** Low-to-high ramp for heatmaps and colour bars. */
+  heatRamp: readonly string[];
+  /** How glows and overlapping marks combine: light on carbon, ink on paper. */
+  add: GlobalCompositeOperation;
+  /** True on the light weave: no vignettes, no fills behind the figure. */
+  paper: boolean;
+}
+
+export const DARK_PALETTE: PlatePalette = {
+  ...C,
+  heatText: C.red,
+  heatRamp: [C.midnight, C.cobaltDeep, C.cobalt, C.silver, C.crimson, C.red],
+  add: 'lighter',
+  paper: false,
+};
+
+/** Ink and heat on paper, like a journal figure. Values are the light-material tokens. */
+export const LIGHT_PALETTE: PlatePalette = {
+  midnight: '#F4F6F9', // --weave-base
+  obsidian: '#EAEFF5', // --weave-gap
+  cobaltDeep: '#CBD5E1', // --weave-shadow
+  cobaltMid: '#0B1E40', // --cobalt-deep
+  cobalt: '#153875', // --cobalt-mid, the light accent
+  red: C.red,
+  crimson: C.crimson,
+  silver: '#050811', // --ink
+  chrome: '#050811',
+  titanium: '#475569', // --titanium-ink
+  alabaster: '#050811',
+  heatText: '#050811',
+  heatRamp: ['#F4F6F9', '#CBD5E1', '#153875', C.crimson, C.red],
+  add: 'multiply',
+  paper: true,
+};
+
 const rgbCache = new Map<string, [number, number, number]>();
 export function hexRgb(hex: string): [number, number, number] {
   let v = rgbCache.get(hex);
@@ -167,11 +221,19 @@ export function strokeSegments(
 
 /* ---------- drawing helpers ---------- */
 
-/** Hairline blueprint grid aligned to device pixels. */
-export function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number, step: number, alpha = 0.06) {
+/** Hairline blueprint grid aligned to device pixels. On paper it fades out toward the edges. */
+export function drawGrid(ctx: CanvasRenderingContext2D, P: PlatePalette, w: number, h: number, step: number, alpha = 0.06) {
   ctx.save();
   ctx.lineWidth = 0.5;
-  ctx.strokeStyle = rgba(C.cobalt, alpha);
+  if (P.paper) {
+    const r = Math.hypot(w, h) * 0.5;
+    const g = ctx.createRadialGradient(w / 2, h / 2, r * 0.2, w / 2, h / 2, r);
+    g.addColorStop(0, rgba(P.cobalt, alpha * 1.6));
+    g.addColorStop(1, rgba(P.cobalt, 0));
+    ctx.strokeStyle = g;
+  } else {
+    ctx.strokeStyle = rgba(P.cobalt, alpha);
+  }
   ctx.beginPath();
   for (let x = step; x < w; x += step) {
     ctx.moveTo(Math.round(x) + 0.25, 0);
@@ -185,22 +247,24 @@ export function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number, st
   ctx.restore();
 }
 
-/** Soft radial vignette so the stage reads as depth rather than a flat fill. */
-export function drawVignette(ctx: CanvasRenderingContext2D, w: number, h: number, cx = w / 2, cy = h / 2) {
+/** Soft radial vignette so the stage reads as depth rather than a flat fill. None on paper. */
+export function drawVignette(ctx: CanvasRenderingContext2D, P: PlatePalette, w: number, h: number, cx = w / 2, cy = h / 2) {
+  if (P.paper) return;
   const r = Math.hypot(w, h) * 0.62;
   const g = ctx.createRadialGradient(cx, cy, r * 0.1, cx, cy, r);
-  g.addColorStop(0, rgba(C.cobaltDeep, 0.28));
-  g.addColorStop(0.55, rgba(C.cobaltDeep, 0.08));
-  g.addColorStop(1, rgba(C.midnight, 0));
+  g.addColorStop(0, rgba(P.cobaltDeep, 0.28));
+  g.addColorStop(0.55, rgba(P.cobaltDeep, 0.08));
+  g.addColorStop(1, rgba(P.midnight, 0));
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, w, h);
 }
 
-/** Additive radial glow. Caller sets nothing; composite is restored. */
-export function glow(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string, a: number) {
+/** Radial glow: additive light on carbon, a multiplied stain on paper. Composite is restored. */
+export function glow(ctx: CanvasRenderingContext2D, P: PlatePalette, x: number, y: number, r: number, color: string, a: number) {
   if (a <= 0.002 || r <= 0) return;
+  if (P.paper) a *= 0.55;
   const prev = ctx.globalCompositeOperation;
-  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalCompositeOperation = P.add;
   const g = ctx.createRadialGradient(x, y, 0, x, y, r);
   g.addColorStop(0, rgba(color, a));
   g.addColorStop(0.4, rgba(color, a * 0.35));
@@ -210,12 +274,13 @@ export function glow(ctx: CanvasRenderingContext2D, x: number, y: number, r: num
   ctx.globalCompositeOperation = prev;
 }
 
-/** Phosphor stroke: wide additive halo + crisp core. Path must already be built. */
-export function phosphor(ctx: CanvasRenderingContext2D, color: string, core = 1, halo = 0.16) {
+/** Phosphor stroke: wide halo + crisp core (ink bleed on paper). Path must already be built. */
+export function phosphor(ctx: CanvasRenderingContext2D, P: PlatePalette, color: string, core = 1, halo = 0.16) {
   ctx.save();
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
-  ctx.globalCompositeOperation = 'lighter';
+  ctx.globalCompositeOperation = P.add;
+  if (P.paper) halo *= 0.6;
   ctx.strokeStyle = rgba(color, halo);
   ctx.lineWidth = core * 5;
   ctx.stroke();
@@ -244,6 +309,21 @@ export function label(
   ctx.textAlign = align;
   ctx.textBaseline = baseline;
   ctx.fillText(text, x, y);
+}
+
+/** Four corner ticks: the boundary of a figure without drawing a box around it. */
+export function cornerTicks(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, w: number, h: number, len = 8) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 0.75;
+  ctx.beginPath();
+  for (const [cx, cy, dx, dy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
+    ctx.moveTo(cx + dx * len, cy);
+    ctx.lineTo(cx, cy);
+    ctx.lineTo(cx, cy + dy * len);
+  }
+  ctx.stroke();
+  ctx.restore();
 }
 
 /** Cubic Bezier point. */
@@ -279,6 +359,8 @@ export interface StageFrame {
   dt: number;
   pointer: StagePointer;
   reduced: boolean;
+  /** Colour roles for the material the plate sits on. */
+  palette: PlatePalette;
 }
 
 export interface PlateScene {
@@ -300,5 +382,6 @@ export interface PlateMode {
 export interface PlateDefinition {
   modes: PlateMode[];
   actions?: { id: string; label: string; modes?: string[] }[];
-  createScene(modeId: string): PlateScene;
+  /** `palette` is only needed by scenes that bake bitmaps; frames carry it too. */
+  createScene(modeId: string, palette?: PlatePalette): PlateScene;
 }

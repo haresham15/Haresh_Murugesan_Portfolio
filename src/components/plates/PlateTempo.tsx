@@ -1,6 +1,6 @@
 import {
-  C, bez, clamp, drawGrid, drawVignette, easeInOutCubic, easeOutCubic, glow, label, phosphor, ramp, rgba, rng,
-  type PlateDefinition, type PlateScene, type StageFrame,
+  bez, clamp, drawGrid, drawVignette, easeInOutCubic, easeOutCubic, glow, label, phosphor, ramp, rgba, rng,
+  type PlateDefinition, type PlateScene, type PlatePalette, type StageFrame,
 } from './stageKit';
 
 /* ============================================================
@@ -25,7 +25,7 @@ interface Draft {
 
 const SLOTS = 16;
 const SERVICE_S = 0.16;
-const PRI_COLORS = [C.red, C.silver, C.cobalt] as const;
+const priColors = (P: PlatePalette) => [P.red, P.silver, P.cobalt] as const;
 const PRI_NAMES = ['high', 'medium', 'low'] as const;
 
 function createGateScene(): PlateScene {
@@ -81,10 +81,11 @@ function createGateScene(): PlateScene {
       if (id === 'burst') pendingBurst += 18;
     },
     draw(ctx, f) {
+      const P = f.palette;
       layout(f);
       const { width: w, height: h, dt, time } = f;
-      drawVignette(ctx, w, h, geo.rx, geo.ry);
-      drawGrid(ctx, w, h, 28, 0.035);
+      drawVignette(ctx, P, w, h, geo.rx, geo.ry);
+      drawGrid(ctx, P, w, h, 28, 0.035);
       const intro = easeOutCubic(f.age / 0.8);
 
       if (f.reduced && pendingBurst > 0) {
@@ -130,27 +131,27 @@ function createGateScene(): PlateScene {
       ctx.save();
       ctx.lineWidth = 0.5;
       for (const p of [0, 1, 2] as Priority[]) {
-        ctx.strokeStyle = rgba(PRI_COLORS[p], 0.35 * intro);
+        ctx.strokeStyle = rgba(priColors(P)[p], 0.35 * intro);
         ctx.beginPath();
         ctx.moveTo(geo.gx + 16, geo.gy);
         ctx.bezierCurveTo(geo.gx + 70, laneY(p), geo.rx - geo.rr - 70, laneY(p), geo.rx - geo.rr - 8, geo.ry);
         ctx.stroke();
-        label(ctx, PRI_NAMES[p], geo.gx + 72, laneY(p) - 5, rgba(PRI_COLORS[p], 0.8), 9);
+        label(ctx, PRI_NAMES[p], geo.gx + 72, laneY(p) - 5, P.paper ? (p === 0 ? P.heatText : priColors(P)[p]) : rgba(priColors(P)[p], 0.8), 9);
       }
       ctx.setLineDash([2, 4]);
-      ctx.strokeStyle = rgba(C.crimson, 0.4 * intro);
+      ctx.strokeStyle = rgba(P.crimson, 0.4 * intro);
       ctx.beginPath();
       ctx.moveTo(geo.gx, geo.gy + 16);
       ctx.bezierCurveTo(geo.gx, geo.sinkY - 10, geo.sinkX - 60, geo.sinkY, geo.sinkX - 8, geo.sinkY);
       ctx.stroke();
       ctx.restore();
-      label(ctx, 'crisis resources', geo.sinkX, geo.sinkY + 4, C.crimson, 10);
+      label(ctx, 'crisis resources', geo.sinkX, geo.sinkY + 4, P.paper ? P.heatText : P.crimson, 10);
 
       // inbound guide
       ctx.save();
       const g = ctx.createLinearGradient(0, 0, geo.gx, 0);
-      g.addColorStop(0, rgba(C.silver, 0));
-      g.addColorStop(1, rgba(C.silver, 0.25));
+      g.addColorStop(0, rgba(P.silver, 0));
+      g.addColorStop(1, rgba(P.silver, 0.25));
       ctx.strokeStyle = g;
       ctx.lineWidth = 0.5;
       ctx.beginPath();
@@ -206,7 +207,7 @@ function createGateScene(): PlateScene {
       })();
       ctx.save();
       ctx.lineWidth = 0.5;
-      ctx.strokeStyle = rgba(C.silver, 0.2);
+      ctx.strokeStyle = rgba(P.silver, 0.2);
       ctx.beginPath();
       ctx.arc(geo.rx, geo.ry, geo.rr * 1.18, 0, Math.PI * 2);
       ctx.stroke();
@@ -225,7 +226,7 @@ function createGateScene(): PlateScene {
         ctx.arc(geo.rx, geo.ry, geo.rr * 0.82, a1, a0, true);
         ctx.closePath();
         if (item) {
-          const col = PRI_COLORS[item.pri];
+          const col = priColors(P)[item.pri];
           const gr = ctx.createRadialGradient(geo.rx, geo.ry, geo.rr * 0.8, geo.rx, geo.ry, geo.rr * 1.16);
           const alpha = (0.18 + (1 - age / SLOTS) * 0.42 + fresh * 0.3) * intro;
           gr.addColorStop(0, rgba(col, alpha * 0.4));
@@ -234,11 +235,11 @@ function createGateScene(): PlateScene {
           ctx.fill();
         }
         ctx.lineWidth = s === hoverSlot ? 1 : 0.5;
-        ctx.strokeStyle = s === hoverSlot ? C.alabaster : rgba(C.silver, 0.3);
+        ctx.strokeStyle = s === hoverSlot ? P.alabaster : rgba(P.silver, 0.3);
         ctx.stroke();
         if (fresh > 0 && item) {
           const [fx, fy] = slotPos(s, geo.rr * 0.98);
-          glow(ctx, fx, fy, 22, PRI_COLORS[item.pri], fresh * 0.6);
+          glow(ctx, P, fx, fy, 22, priColors(P)[item.pri], fresh * 0.6);
         }
       }
       // write head
@@ -247,37 +248,37 @@ function createGateScene(): PlateScene {
       ctx.beginPath();
       ctx.moveTo(hx0, hy0);
       ctx.lineTo(hx, hy);
-      phosphor(ctx, C.red, 0.75, 0.12);
-      label(ctx, 'zero-destination buffer', geo.rx, geo.ry - 4, C.silver, 10, 'center');
-      label(ctx, 'no outbound path', geo.rx, geo.ry + 11, C.titanium, 9, 'center');
+      phosphor(ctx, P, P.red, 0.75, 0.12);
+      label(ctx, 'zero-destination buffer', geo.rx, geo.ry - 4, P.silver, 10, 'center');
+      label(ctx, 'no outbound path', geo.rx, geo.ry + 11, P.titanium, 9, 'center');
 
       // gate (diamond)
       const busy = queued.length > 0 ? 1 : 0;
-      glow(ctx, geo.gx, geo.gy, 34 + queue.length * 1.5, busy ? C.red : C.cobalt, 0.35 + Math.min(0.4, queue.length * 0.03));
+      glow(ctx, P, geo.gx, geo.gy, 34 + queue.length * 1.5, busy ? P.red : P.cobalt, 0.35 + Math.min(0.4, queue.length * 0.03));
       ctx.save();
       ctx.translate(geo.gx, geo.gy);
       ctx.rotate(Math.PI / 4);
       const gs = 20;
       const gg = ctx.createLinearGradient(-gs, -gs, gs, gs);
-      gg.addColorStop(0, rgba(C.cobaltMid, 0.9));
-      gg.addColorStop(1, rgba(C.midnight, 0.9));
+      gg.addColorStop(0, rgba(P.cobaltMid, 0.9));
+      gg.addColorStop(1, rgba(P.midnight, 0.9));
       ctx.fillStyle = gg;
       ctx.fillRect(-gs / 2, -gs / 2, gs, gs);
       ctx.lineWidth = 0.75;
-      ctx.strokeStyle = C.alabaster;
+      ctx.strokeStyle = P.alabaster;
       ctx.strokeRect(-gs / 2, -gs / 2, gs, gs);
       ctx.restore();
-      label(ctx, 'safety gate', geo.gx, geo.gy - 24, C.alabaster, 10, 'center');
-      label(ctx, `queue ${queue.length}`, geo.gx, geo.gy + 32, queue.length > 4 ? C.red : C.titanium, 9, 'center');
+      label(ctx, 'safety gate', geo.gx, geo.gy - 24, P.alabaster, 10, 'center');
+      label(ctx, `queue ${queue.length}`, geo.gx, geo.gy + 32, queue.length > 4 ? P.heatText : P.titanium, 9, 'center');
 
       // drafts
       for (const d of drafts) {
-        const col = d.phase === 'support' ? C.crimson : d.phase === 'routed' ? PRI_COLORS[d.pri] : C.alabaster;
-        glow(ctx, d.x, d.y, 8, col, 0.45);
+        const col = d.phase === 'support' ? P.crimson : d.phase === 'routed' ? priColors(P)[d.pri] : P.alabaster;
+        glow(ctx, P, d.x, d.y, 8, col, 0.45);
         ctx.fillStyle = col;
         ctx.fillRect(d.x - 1.5, d.y - 1.5, 3, 3);
       }
-      label(ctx, 'drafts in', 14, geo.gy - 10, C.titanium, 9);
+      label(ctx, 'drafts in', 14, geo.gy - 10, P.titanium, 9);
 
       const hs = hoverSlot >= 0 ? hoverSlot : (head - 1 + SLOTS) % SLOTS;
       const it = ring[hs];
@@ -288,7 +289,8 @@ function createGateScene(): PlateScene {
 
 /* ---------- 2. active-passive failover state machine ---------- */
 
-interface Token { path: number[]; seg: number; t: number; col: string }
+type Role = 'crimson' | 'silver' | 'cobalt' | 'red';
+interface Token { path: number[]; seg: number; t: number; col: Role }
 
 function createFailoverScene(): PlateScene {
   // states from the Tempo C4 model
@@ -313,11 +315,11 @@ function createFailoverScene(): PlateScene {
   let pending = 0;
   const route = (): Token => {
     const r = rand();
-    if (r < 0.06) return { path: [0, 1, 2], seg: 0, t: 0, col: C.crimson };
+    if (r < 0.06) return { path: [0, 1, 2], seg: 0, t: 0, col: 'crimson' };
     const r2 = rand();
-    if (r2 < 0.16) return { path: [0, 1, 3, 4, 5, 4, 7], seg: 0, t: 0, col: C.silver };
-    if (r2 < 0.3) return { path: [0, 1, 3, 4, 6, 7], seg: 0, t: 0, col: C.cobalt };
-    return { path: [0, 1, 3, 4, 7], seg: 0, t: 0, col: C.red };
+    if (r2 < 0.16) return { path: [0, 1, 3, 4, 5, 4, 7], seg: 0, t: 0, col: 'silver' };
+    if (r2 < 0.3) return { path: [0, 1, 3, 4, 6, 7], seg: 0, t: 0, col: 'cobalt' };
+    return { path: [0, 1, 3, 4, 7], seg: 0, t: 0, col: 'red' };
   };
   const pos = (f: StageFrame, i: number) => {
     const padX = 60;
@@ -341,8 +343,9 @@ function createFailoverScene(): PlateScene {
       return pos(f, i) as unknown as [number, number];
     },
     draw(ctx, f) {
-      drawVignette(ctx, f.width, f.height);
-      drawGrid(ctx, f.width, f.height, 28, 0.035);
+      const P = f.palette;
+      drawVignette(ctx, P, f.width, f.height);
+      drawGrid(ctx, P, f.width, f.height, 28, 0.035);
       const intro = easeOutCubic(f.age / 0.8);
       acc += f.dt;
       if (acc > 1.1) { acc = 0; tokens.push(route()); }
@@ -366,10 +369,10 @@ function createFailoverScene(): PlateScene {
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.quadraticCurveTo(cx, cy, x1, y1);
-        if (hot) phosphor(ctx, C.silver, 0.75, 0.1);
+        if (hot) phosphor(ctx, P, P.silver, 0.75, 0.1);
         else {
           ctx.lineWidth = 0.5;
-          ctx.strokeStyle = rgba(b === 2 ? C.crimson : C.cobalt, 0.55 * intro);
+          ctx.strokeStyle = rgba(b === 2 ? P.crimson : P.cobalt, 0.55 * intro);
           ctx.stroke();
         }
         // arrowhead at 88%
@@ -381,14 +384,14 @@ function createFailoverScene(): PlateScene {
         const l = Math.hypot(tx, ty) || 1;
         const ux = tx / l;
         const uy = ty / l;
-        ctx.strokeStyle = rgba(C.silver, hot ? 0.9 : 0.5);
+        ctx.strokeStyle = rgba(P.silver, hot ? 0.9 : 0.5);
         ctx.lineWidth = 0.75;
         ctx.beginPath();
         ctx.moveTo(ax - ux * 5 - uy * 3, ay - uy * 5 + ux * 3);
         ctx.lineTo(ax, ay);
         ctx.lineTo(ax - ux * 5 + uy * 3, ay - uy * 5 - ux * 3);
         ctx.stroke();
-        if (txt && f.width > 520) label(ctx, txt, quad(x0, cx, x1, 0.5) + 6, quad(y0, cy, y1, 0.5) - 6, hot ? C.silver : C.titanium, 9);
+        if (txt && f.width > 520) label(ctx, txt, quad(x0, cx, x1, 0.5) + 6, quad(y0, cy, y1, 0.5) - 6, hot ? P.silver : P.titanium, 9);
       });
 
       // tokens
@@ -405,8 +408,8 @@ function createFailoverScene(): PlateScene {
         const e = easeInOutCubic(tk.t);
         const x = quad(x0, cx, x1, e);
         const y = quad(y0, cy, y1, e);
-        glow(ctx, x, y, 12, tk.col, 0.6);
-        ctx.fillStyle = C.alabaster;
+        glow(ctx, P, x, y, 12, P[tk.col], 0.6);
+        ctx.fillStyle = P.alabaster;
         ctx.fillRect(x - 1.25, y - 1.25, 2.5, 2.5);
       }
 
@@ -416,20 +419,20 @@ function createFailoverScene(): PlateScene {
         const [x, y] = pos(f, i);
         const hot = hover === i;
         const r = i === 2 ? 5 : 7;
-        glow(ctx, x, y, hot ? 30 : 18, i === 2 ? C.crimson : i === 7 ? C.red : C.cobalt, hot ? 0.55 : 0.3);
-        ctx.fillStyle = C.midnight;
+        glow(ctx, P, x, y, hot ? 30 : 18, i === 2 ? P.crimson : i === 7 ? P.red : P.cobalt, hot ? 0.55 : 0.3);
+        ctx.fillStyle = P.midnight;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
         ctx.lineWidth = hot ? 1.2 : 0.75;
-        ctx.strokeStyle = hot ? C.alabaster : rgba(C.silver, 0.7);
+        ctx.strokeStyle = hot ? P.alabaster : rgba(P.silver, 0.7);
         ctx.stroke();
         const name = small ? s.name.split(' · ')[0] : s.name;
-        label(ctx, name, x, y + 20, hot ? C.alabaster : C.silver, small ? 9 : 10, 'center');
-        label(ctx, String(counts[i]), x, y - 13, hot ? C.red : C.titanium, 9, 'center');
+        label(ctx, name, x, y + 20, hot ? P.alabaster : P.silver, small ? 9 : 10, 'center');
+        label(ctx, String(counts[i]), x, y - 13, hot ? P.heatText : P.titanium, 9, 'center');
       });
 
-      label(ctx, 'request paths · counts per state', 16, 18, C.titanium, 9);
+      label(ctx, 'request paths · counts per state', 16, 18, P.titanium, 9);
       if (hover >= 0) return `${states[hover].name} · ${counts[hover]} visits · primary ${counts[4]} · self-corrected ${counts[5]} · failover ${counts[6]} · intercepted ${counts[2]}`;
       return `in flight ${tokens.length} · primary ${counts[4]} · self-corrected ${counts[5]} · failover ${counts[6]} · intercepted ${counts[2]}`;
     },
@@ -461,15 +464,15 @@ function createMemoryScene(): PlateScene {
   for (let k = 0; k < DIM; k++) ax2[k] -= d12 * ax1[k];
   const n2 = Math.hypot(...ax2);
   for (let k = 0; k < DIM; k++) ax2[k] /= n2;
-  const P = vecs.map((v) => [v.reduce((s, x, k) => s + x * ax1[k], 0), v.reduce((s, x, k) => s + x * ax2[k], 0)]);
+  const proj = vecs.map((v) => [v.reduce((s, x, k) => s + x * ax1[k], 0), v.reduce((s, x, k) => s + x * ax2[k], 0)]);
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  for (const [x, y] of P) { minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
+  for (const [x, y] of proj) { minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
   const cos = (a: number[], b: number[]) => a.reduce((s, x, k) => s + x * b[k], 0);
   const screen = (f: StageFrame, i: number) => {
     const pad = 40;
     const w = f.width - pad * 2;
     const h = f.height - pad * 2 - 10;
-    return [pad + ((P[i][0] - minX) / (maxX - minX)) * w, pad + 10 + ((P[i][1] - minY) / (maxY - minY)) * h] as const;
+    return [pad + ((proj[i][0] - minX) / (maxX - minX)) * w, pad + 10 + ((proj[i][1] - minY) / (maxY - minY)) * h] as const;
   };
   const sims = new Float32Array(vecs.length);
   const shown = new Float32Array(vecs.length);
@@ -480,8 +483,9 @@ function createMemoryScene(): PlateScene {
       return screen(f, i) as unknown as [number, number];
     },
     draw(ctx, f) {
-      drawVignette(ctx, f.width, f.height);
-      drawGrid(ctx, f.width, f.height, 32, 0.035);
+      const P = f.palette;
+      drawVignette(ctx, P, f.width, f.height);
+      drawGrid(ctx, P, f.width, f.height, 32, 0.035);
       const intro = easeOutCubic(f.age / 0.9);
       let q = 0;
       let qd = Infinity;
@@ -502,16 +506,16 @@ function createMemoryScene(): PlateScene {
         ctx.beginPath();
         ctx.moveTo(qx, qy);
         ctx.lineTo(qx + (x - qx) * intro, qy + (y - qy) * intro);
-        phosphor(ctx, C.red, 0.6, 0.06 + (5 - rank) * 0.02);
-        label(ctx, sims[i].toFixed(3), x + 7, y - 6, C.alabaster, 9);
+        phosphor(ctx, P, P.red, 0.6, 0.06 + (5 - rank) * 0.02);
+        label(ctx, sims[i].toFixed(3), x + 7, y - 6, P.alabaster, 9);
       });
 
       ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalCompositeOperation = P.add;
       for (let i = 0; i < vecs.length; i++) {
         const [x, y] = screen(f, i);
         const s = clamp((shown[i] + 1) / 2, 0, 1);
-        const [r, g, b] = ramp([C.cobaltDeep, C.cobalt, C.silver, C.red], s ** 2);
+        const [r, g, b] = ramp([P.cobaltDeep, P.cobalt, P.silver, P.red], s ** 2);
         const rad = 1.4 + s * s * 2.2;
         ctx.fillStyle = `rgba(${r | 0},${g | 0},${b | 0},${(0.35 + s * 0.65) * intro})`;
         ctx.beginPath();
@@ -519,14 +523,14 @@ function createMemoryScene(): PlateScene {
         ctx.fill();
       }
       ctx.restore();
-      glow(ctx, qx, qy, 26, C.red, 0.7);
-      ctx.strokeStyle = C.alabaster;
+      glow(ctx, P, qx, qy, 26, P.red, 0.7);
+      ctx.strokeStyle = P.alabaster;
       ctx.lineWidth = 0.75;
       ctx.beginPath();
       ctx.arc(qx, qy, 6, 0, Math.PI * 2);
       ctx.stroke();
 
-      label(ctx, 'synthetic 8-d embeddings · 2-d projection · cosine computed in 8-d', 16, 18, C.titanium, 9);
+      label(ctx, 'synthetic 8-d embeddings · 2-d projection · cosine computed in 8-d', 16, 18, P.titanium, 9);
       return `query #${String(q).padStart(3, '0')} · top-5 cosine ${top.map((i) => sims[i].toFixed(2)).join(' / ')}`;
     },
   };
