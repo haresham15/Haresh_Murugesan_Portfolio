@@ -41,3 +41,10 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# V7 raw screenshots (contact sheets are committed)
+/.v7/baseline/*.png
+/.v7/phase1/seams/
+/.v7/phase1/*_shutter.png
+/.v7/phase1/exp_*.png
+/.v7/after/

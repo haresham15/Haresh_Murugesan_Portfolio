@@ -83,12 +83,12 @@
   - **Historical Telemetry Database:** Indexed local SQLite database executing queries across 70+ years of Formula 1 telemetry in **<12ms**.
 - **Repository:** https://github.com/haresham15/AIMotorsportsHub
 
-### 3. Tempo — Air-Gapped Cognitive Buffer & Task Regulation Suite
+### 3. Tempo — RSD Communication Buffer & Regulation Suite
 - **Problem Solved:** Communication impulsivity and executive dysfunction in high-stimulation professional settings.
 - **Technical Architecture:**
   - **Deterministic Gate:** 0.2ms pre-flight regex interception circuit evaluating emotional volatility before network dispatch.
-  - **Vector Memory:** PostgreSQL pgvector IVFFlat Cosine similarity indexing retrieving emotional grounding strategies with **100% crisis recall**.
-  - **Air-Gapped Buffer:** Dual LLM active-passive failover with strict Zod schema validation ensuring zero un-routed external packet leakage.
+  - **Vector Memory:** PostgreSQL pgvector IVFFlat Cosine similarity indexing retrieving emotional grounding strategies with **100% (5/5) crisis recall**.
+  - **Failover Buffer:** Dual LLM active-passive failover with strict Zod schema validation ensuring zero un-routed external packet leakage.
 - **Repository:** https://github.com/haresham15/TempoADHDAssist
 
 ### 4. Careline / RouteRx — Multi-Modal Healthcare Transit Hub (1st Place ASA DataFest)

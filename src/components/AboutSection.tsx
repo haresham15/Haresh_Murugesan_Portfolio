@@ -70,7 +70,7 @@ const buildTile = (): Nucleus[] => {
 };
 
 const PathologyFigure: React.FC = () => {
-  const nuclei = useMemo(buildTile, []);
+  const nuclei = useMemo(() => buildTile(), []);
   return (
     <svg viewBox="0 0 360 320" className="w-full h-auto block" role="img" aria-label="Illustrative schematic of segmented cell nuclei under a saliency overlay">
       <defs>

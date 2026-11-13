@@ -106,6 +106,8 @@ interface Spring { x: number; v: number }
 
 interface HeroState {
   w: number; h: number; dpr: number; version: number;
+  /** Embedded: the bulb alone, centred, transparent (Syntinuum). */
+  embedded: boolean;
   cx: number; cy: number; R: number; ox: number; oy: number;
   cellW: number; cellH: number; mobile: boolean;
   rects: Rect[]; pad: number;
@@ -117,7 +119,7 @@ interface HeroState {
 }
 
 const createState = (): HeroState => ({
-  w: 0, h: 0, dpr: 0, version: -1,
+  w: 0, h: 0, dpr: 0, version: -1, embedded: false,
   cx: 0, cy: 0, R: 1, ox: 0, oy: 0, cellW: 8, cellH: 10, mobile: false,
   rects: [], pad: 24, layer: null, lines: [],
   mouse: { x: 0, y: 0, active: false },
@@ -153,7 +155,12 @@ function layout(s: HeroState, canvas: HTMLCanvasElement, w: number, h: number) {
   const tablet = !mobile && w < 1024;
   const m = Math.min(w, h);
   s.mobile = mobile;
-  if (mobile) {
+  if (s.embedded) {
+    // Figure spans about 3R on each axis once the plume is dropped.
+    s.R = m / 3.1;
+    s.cx = w / 2;
+    s.cy = h / 2;
+  } else if (mobile) {
     s.R = m * 0.17;
     s.cx = w * 0.7;
     s.cy = Math.max(h * 0.16, s.R * 1.9);
@@ -174,7 +181,7 @@ function layout(s: HeroState, canvas: HTMLCanvasElement, w: number, h: number) {
   s.pad = Math.max(20, s.cellH * 2.5);
 
   const box = canvas.getBoundingClientRect();
-  const root = canvas.closest('section');
+  const root = s.embedded ? null : canvas.closest('section');
   s.rects = [];
   root?.querySelectorAll('[data-hero-protect]').forEach((el) => {
     for (const r of Array.from(el.getClientRects())) {
@@ -491,7 +498,7 @@ function renderFrame(
   const { width: w, height: h, dpr } = stage;
   if (w !== s.w || h !== s.h || dpr !== s.dpr || version !== s.version) {
     layout(s, ctx.canvas, w, h);
-    buildLayer(s, w, h, dpr);
+    if (s.embedded) { s.layer = null; s.lines = []; } else buildLayer(s, w, h, dpr);
     s.w = w; s.h = h; s.dpr = dpr; s.version = version;
     s.marker.x = s.cy;
   }
@@ -521,7 +528,7 @@ function renderFrame(
   const ribbonAng = Math.atan2(Lpv, -Lpu);
 
   // --- Streamline particles (comets), timed by the local flow speed.
-  if (!reduced) {
+  if (!reduced && !s.embedded) {
     ctx.lineCap = 'round';
     for (const pass of [0, 1]) {
       ctx.beginPath();
@@ -544,7 +551,7 @@ function renderFrame(
   }
 
   // --- Cursor-tracking diamond on the elevation ruler.
-  if (!s.mobile) {
+  if (!s.mobile && !s.embedded) {
     const target = s.mouse.active ? clamp(s.mouse.y, 50, h - 50) : cy;
     if (reduced) s.marker.x = target; else springTo(s.marker, target, 9, dt);
     const my = clamp(s.marker.x, 50, h - 50);
@@ -604,6 +611,7 @@ function renderFrame(
 
       // ---- Exhaust plume with 4 standing Mach diamonds.
       if (v < NOZZLE_V) {
+        if (s.embedded) continue;
         const pv = NOZZLE_V - v;
         const barrel = 0.15 + 0.035 * Math.abs(Math.sin((Math.PI * pv) / 0.3)) + Math.max(0, pv - 1.2) * 0.6;
         if (au > barrel + 0.07) continue;
@@ -772,7 +780,15 @@ function renderFrame(
   }
 }
 
-export const AsciiDnaLightbulbCanvas: React.FC = () => {
+export interface AsciiDnaLightbulbCanvasProps {
+  /**
+   * 'hero' (default): full hero scene. 'embedded': the bulb and helix filament only,
+   * centred in a transparent container; size it with the parent (about 96px in Syntinuum).
+   */
+  variant?: 'hero' | 'embedded';
+}
+
+export const AsciiDnaLightbulbCanvas: React.FC<AsciiDnaLightbulbCanvasProps> = ({ variant = 'hero' }) => {
   const { isReduced } = useMotionPreference();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -809,9 +825,13 @@ export const AsciiDnaLightbulbCanvas: React.FC = () => {
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, stage: CanvasStage) => {
       if (!stateRef.current) stateRef.current = createState();
+      if (stateRef.current.embedded !== (variant === 'embedded')) {
+        stateRef.current.embedded = variant === 'embedded';
+        stateRef.current.version = -1;
+      }
       renderFrame(ctx, stage, stateRef.current, isReduced, layoutVersion);
     },
-    [isReduced, layoutVersion],
+    [isReduced, layoutVersion, variant],
   );
 
   useCanvasStage(containerRef, canvasRef, draw, { animate: !isReduced });

@@ -1,0 +1,254 @@
+/* ==========================================================================
+   V7 materials. Two surfaces: dark forged carbon and white-silver weave.
+   Section roots carry data-material="dark|light"; text colours scope to them.
+   Rules: .claude/skills/v7-materials/SKILL.md
+   ========================================================================== */
+
+:root {
+  /* Light weave primitives */
+  --weave-base: #F4F6F9;
+  --weave-gap: #EAEFF5;
+  --weave-highlight: #FFFFFF;
+  --weave-shadow: #CBD5E1;
+  --weave-glint: #BFD4FF;
+  --ink: #050811;
+  --titanium-ink: #475569;
+
+  /* Material-scoped semantic tokens; dark is the default */
+  --mat-bg: var(--bg-midnight);
+  --mat-ink: var(--text-alabaster);
+  --mat-body: var(--metal-silver);
+  --mat-muted: var(--metal-titanium);
+  --mat-rule: rgba(200, 210, 224, 0.10);
+  --mat-rule-strong: rgba(200, 210, 224, 0.22);
+  /* Small accent text (< 24px) */
+  --mat-accent-text: var(--accent-red-orange);
+  /* Rules, marks and type >= 24px */
+  --mat-accent-mark: var(--accent-red-orange);
+  --mat-cobalt: var(--cobalt-bright);
+  --mat-body-weight: 400;
+  --mat-tracking: 0.01em;
+
+  /* One mono label size */
+  --label-size: 12px;
+  /* Display type */
+  --display-size: clamp(3rem, 7vw, 7.5rem);
+  /* Seams */
+  --seam-height: 70vh;
+  /* Fixed UI material crossfade */
+  --material-fade: 180ms;
+}
+
+[data-material="dark"] {
+  --mat-bg: var(--bg-midnight);
+  --mat-ink: var(--text-alabaster);
+  --mat-body: var(--metal-silver);
+  --mat-muted: var(--metal-titanium);
+  --mat-rule: rgba(200, 210, 224, 0.10);
+  --mat-rule-strong: rgba(200, 210, 224, 0.22);
+  --mat-accent-text: var(--accent-red-orange);
+  --mat-accent-mark: var(--accent-red-orange);
+  --mat-cobalt: var(--cobalt-bright);
+  --mat-body-weight: 400;
+  --mat-tracking: 0.01em;
+  color: var(--mat-ink);
+  color-scheme: dark;
+}
+
+[data-material="light"] {
+  --mat-bg: var(--weave-base);
+  --mat-ink: var(--ink);
+  --mat-body: rgba(5, 8, 17, 0.84);
+  --mat-muted: var(--titanium-ink);
+  --mat-rule: rgba(5, 8, 17, 0.14);
+  --mat-rule-strong: rgba(5, 8, 17, 0.28);
+  /* #FF2800 on the weave is ~3.5:1: small accent text uses cobalt */
+  --mat-accent-text: var(--cobalt-mid);
+  --mat-accent-mark: var(--accent-red-orange);
+  --mat-cobalt: var(--cobalt-mid);
+  --mat-body-weight: 500;
+  --mat-tracking: -0.005em;
+  color: var(--mat-ink);
+  color-scheme: light;
+}
+
+/* Section roots stack their fallback texture behind their own content */
+[data-material-region] {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Seams: 70vh, no text */
+[data-seam] {
+  height: var(--seam-height);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Static fallback (static tier, no WebGL2, reduced motion, or before the
+   shader's first frame). Painted on ::before so section roots never compute
+   an opaque background of their own.
+   -------------------------------------------------------------------------- */
+html:not(.carbon-live) [data-material-region]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+html:not(.carbon-live) [data-material-region][data-material="dark"]::before {
+  background-color: var(--bg-midnight);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 50% 30%, rgba(11, 30, 64, 0.30), transparent 70%),
+    repeating-linear-gradient(28deg, rgba(200, 210, 224, 0.018) 0 1px, transparent 1px 2.25px),
+    radial-gradient(ellipse at 20% 30%, rgba(21, 56, 117, 0.10) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 70%, rgba(21, 56, 117, 0.08) 0%, transparent 45%);
+  background-size: 100% 100vh, 46px 46px, 120px 120px, 160px 160px;
+}
+
+html:not(.carbon-live) [data-material-region][data-material="light"]::before {
+  background-color: var(--weave-base);
+  background-image:
+    repeating-linear-gradient(45deg, rgba(203, 213, 225, 0.30) 0 1px, transparent 1px 8.485px),
+    linear-gradient(90deg, var(--weave-gap) 0.75px, transparent 0.75px),
+    linear-gradient(var(--weave-gap) 0.75px, transparent 0.75px);
+  background-size: auto, 6px 6px, 6px 6px;
+}
+
+html:not(.carbon-live) [data-seam]::before {
+  background: linear-gradient(to bottom, var(--seam-from), var(--seam-to));
+}
+
+[data-seam][data-from="dark"] { --seam-from: var(--bg-midnight); }
+[data-seam][data-from="light"] { --seam-from: var(--weave-base); }
+[data-seam][data-to="dark"] { --seam-to: var(--bg-midnight); }
+[data-seam][data-to="light"] { --seam-to: var(--weave-base); }
+
+/* --------------------------------------------------------------------------
+   Fixed UI that reads the material under it (header mark, nav rim, cursor).
+   The element carries data-on="dark|light".
+   -------------------------------------------------------------------------- */
+[data-on] {
+  --on-ink: var(--text-alabaster);
+  --on-ink-soft: rgba(244, 246, 249, 0.30);
+  --on-surface: #060A12;
+  --on-shadow: rgba(3, 5, 10, 0.85);
+}
+[data-on="light"] {
+  --on-ink: var(--ink);
+  --on-ink-soft: rgba(5, 8, 17, 0.30);
+  --on-surface: var(--weave-base);
+  --on-shadow: rgba(203, 213, 225, 0.0);
+}
+[data-on] .on-material {
+  transition:
+    color var(--material-fade) ease,
+    background-color var(--material-fade) ease,
+    border-color var(--material-fade) ease,
+    filter var(--material-fade) ease;
+}
+
+/* Reduced motion keeps crossfades: opt in with .rm-crossfade */
+.reduced-motion .rm-crossfade,
+.reduced-motion [data-on] .on-material {
+  transition-duration: 200ms !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rm-crossfade,
+  [data-on] .on-material {
+    transition-duration: 200ms !important;
+  }
+}
+
+/* Visually hidden, still announced */
+.sr-only-v7 {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Legacy bridge. Sections written for dark carbon hard-code hex classes.
+   Inside a light region these remap to light tokens. New V7 code must use
+   the --mat-* tokens instead and never rely on this block.
+   -------------------------------------------------------------------------- */
+[data-material="light"] :is(
+  [class~="text-[#F4F6F9]"], [class~="text-[#E6ECF5]"], [class~="text-[#C8D2E0]"]
+) { color: var(--mat-ink); }
+[data-material="light"] :is(
+  [class~="text-[#C8D2E0]/90"], [class~="text-[#C8D2E0]/85"], [class~="text-[#C8D2E0]/80"], [class~="text-[#C8D2E0]/70"]
+) { color: var(--mat-body); }
+[data-material="light"] :is(
+  [class~="text-[#7E8B9B]"], [class~="text-[#7E8B9B]/80"], [class~="text-[#7E8B9B]/60"]
+) { color: var(--mat-muted); }
+[data-material="light"] :is([class~="text-[#FF2800]"], [class~="text-[#FF4419]"], [class~="text-[#2563EB]"]) {
+  color: var(--mat-accent-text);
+}
+/* Display type keeps the red-orange */
+[data-material="light"] :is(h1, h2) :is([class~="text-[#FF2800]"], [class~="text-[#FF4419]"]),
+[data-material="light"] :is(h1, h2):is([class~="text-[#FF2800]"], [class~="text-[#FF4419]"]) {
+  color: var(--mat-accent-mark);
+}
+[data-material="light"] :is(
+  [class~="hover:text-[#F4F6F9]"], [class~="hover:text-[#E6ECF5]"], [class~="hover:text-[#C8D2E0]"], [class~="focus-visible:text-[#F4F6F9]"]
+):is(:hover, :focus-visible) { color: var(--mat-ink); }
+[data-material="light"] :is([class~="hover:text-[#FF2800]"], [class~="hover:text-[#FF4419]"], [class~="group-hover:text-[#FF2800]"]):hover,
+[data-material="light"] .group:hover [class~="group-hover:text-[#FF2800]"] {
+  color: var(--mat-accent-text);
+}
+[data-material="light"] :is(
+  [class~="border-[#C8D2E0]/10"], [class~="border-[#C8D2E0]/12"], [class~="border-[#C8D2E0]/20"]
+) { border-color: var(--mat-rule); }
+[data-material="light"] :is([class~="divide-[#C8D2E0]/10"]) > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--mat-rule);
+}
+[data-material="light"] [class~="hover:border-[#C8D2E0]/50"]:hover { border-color: var(--mat-rule-strong); }
+[data-material="light"] [class~="bg-[#C8D2E0]/10"] { background-color: rgba(5, 8, 17, 0.06); }
+
+/* --------------------------------------------------------------------------
+   Cursor: one 10px dot, inverted by the material under it.
+   -------------------------------------------------------------------------- */
+html.v7-cursor,
+html.v7-cursor *:not(input):not(textarea):not(select):not([contenteditable="true"]) {
+  cursor: none;
+}
+.v7-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity var(--material-fade) ease;
+}
+.v7-cursor-dot[data-visible="false"] { opacity: 0; }
+.v7-cursor-dot > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background-color: var(--on-ink);
+}
+
+/* CarbonField sits at z -10; isolating its parent keeps it above that parent's background */
+:has(> [data-carbon-field]) {
+  isolation: isolate;
+}
+
+/* Nav rim: a machined part; on the weave it gains a contact shadow instead of changing colour */
+[data-rim] > * {
+  transition: filter var(--material-fade) ease;
+}
+[data-rim][data-on="light"] > * {
+  filter: drop-shadow(0 1px 1px rgba(5, 8, 17, 0.22)) drop-shadow(0 2px 4px rgba(5, 8, 17, 0.12));
+}

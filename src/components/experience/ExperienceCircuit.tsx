@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 import Link from 'next/link';
 import { useMotionPreference } from '../MotionPreference';
 import { experiences } from '../../content/experience';
+import { register } from '@/v7/runtime/scheduler';
 
 const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
@@ -563,11 +564,7 @@ const CircuitStage: React.FC = () => {
 
   /* ---- frame loop (paused offscreen) ---- */
   useEffect(() => {
-    let raf = 0;
-    let running = false;
-
     const tick = (now: number) => {
-      raf = requestAnimationFrame(tick);
       const k = kin.current;
       const geo = geoRef.current;
       const section = sectionRef.current;
@@ -583,6 +580,16 @@ const CircuitStage: React.FC = () => {
       const rect = section.getBoundingClientRect();
       const runway = Math.max(1, rect.height - lay.H);
       const raw = clamp(-rect.top / runway, 0, 1);
+
+      // The sector bar belongs to the pinned stage: fade it out as the pin releases,
+      // so it never rides up over the next section.
+      const footerEl = footerRef.current;
+      if (footerEl) {
+        const vh = window.innerHeight;
+        const hudOpacity = clamp((rect.bottom - vh) / (0.12 * vh), 0, 1) * clamp((vh - rect.top) / (0.12 * vh), 0, 1);
+        footerEl.style.opacity = hudOpacity.toFixed(3);
+        footerEl.style.visibility = hudOpacity < 0.01 ? 'hidden' : 'visible';
+      }
 
       if (!k.init) {
         k.init = true;
@@ -726,26 +733,15 @@ const CircuitStage: React.FC = () => {
       if (progressRef.current) progressRef.current.style.transform = `scaleX(${(wrapping ? s / L : k.p).toFixed(4)})`;
     };
 
-    const start = () => {
-      if (running) return;
-      running = true;
-      kin.current.lastT = 0;
-      raf = requestAnimationFrame(tick);
-    };
-    const stop = () => {
-      running = false;
-      cancelAnimationFrame(raf);
-    };
-
-    const io = new IntersectionObserver(
-      ([entry]) => (entry.isIntersecting ? start() : stop()),
-      { rootMargin: '200px 0px' }
-    );
-    if (sectionRef.current) io.observe(sectionRef.current);
-    return () => {
-      io.disconnect();
-      stop();
-    };
+    // Site-wide scheduler; paused while the section is off screen.
+    const section = sectionRef.current;
+    if (!section) return;
+    const task = register(({ now, dt }) => {
+      if (dt === 0) kin.current.lastT = 0;
+      tick(now);
+      return true;
+    }, { element: section, budgeted: false });
+    return () => task.dispose();
   }, []);
 
   /* ---- sector navigation (forward-only) ---- */

@@ -1,0 +1,1396 @@
+{
+  "1440x900": {
+    "pageHeight": 17320,
+    "totalCanvases": 7,
+    "totalSvgs": 8,
+    "sections": [
+      {
+        "id": "hero",
+        "top": 0,
+        "height": 900,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "about",
+        "top": 900,
+        "height": 1746,
+        "canvases": 0,
+        "svgs": 1
+      },
+      {
+        "id": "experience",
+        "top": 2646,
+        "height": 4140,
+        "canvases": 0,
+        "svgs": 2
+      },
+      {
+        "id": "projects",
+        "top": 6786,
+        "height": 1124,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "archive",
+        "top": 7910,
+        "height": 1207,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "podcast",
+        "top": 9117,
+        "height": 1345,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "skills",
+        "top": 10462,
+        "height": 1824,
+        "canvases": 0,
+        "svgs": 0
+      },
+      {
+        "id": "achievements",
+        "top": 12286,
+        "height": 1306,
+        "canvases": 0,
+        "svgs": 5
+      },
+      {
+        "id": "history",
+        "top": 13592,
+        "height": 1732,
+        "canvases": 0,
+        "svgs": 0
+      },
+      {
+        "id": "now",
+        "top": 15324,
+        "height": 1033,
+        "canvases": 0,
+        "svgs": 0
+      },
+      {
+        "id": "contact-section",
+        "top": 16357,
+        "height": 963,
+        "canvases": 0,
+        "svgs": 0
+      }
+    ],
+    "boxed": [
+      {
+        "tag": "section",
+        "id": "hero",
+        "cls": "relative w-full h-dvh min-h-[700px] overflow-hidden flex items-end md:items-center px-6 md",
+        "w": 1440,
+        "h": 900,
+        "border": false,
+        "shadow": false,
+        "opaqueBg": true
+      },
+      {
+        "tag": "section",
+        "id": "about",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1440,
+        "h": 1746,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "absolute inset-0 translate-x-2 translate-y-2 border border-[#FF2800]/40 pointer-events-non",
+        "w": 460,
+        "h": 575,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "relative w-full h-full bg-[#060A12] overflow-hidden shadow-[0_24px_60px_rgba(3,5,10,0.85)]",
+        "w": 460,
+        "h": 575,
+        "border": false,
+        "shadow": true,
+        "opaqueBg": true
+      },
+      {
+        "tag": "ul",
+        "id": "",
+        "cls": "mt-10 border-t border-[#C8D2E0]/10",
+        "w": 640,
+        "h": 208,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "mt-28 pt-12 border-t border-[#C8D2E0]/10",
+        "w": 1376,
+        "h": 585,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "mt-8 border-t border-[#C8D2E0]/10",
+        "w": 776,
+        "h": 268,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "grid grid-cols-[2rem_1fr] gap-3 py-4 border-b border-[#C8D2E0]/10",
+        "w": 776,
+        "h": 105,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "flex flex-col justify-between gap-6 border-b border-[#C8D2E0]/12 pb-8 sm:flex-row sm:items",
+        "w": 1304,
+        "h": 189,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/12 first:border-t",
+        "w": 515,
+        "h": 461,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-10 pb-6 border-b borde",
+        "w": 1336,
+        "h": 206,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "podcast",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1440,
+        "h": 1345,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "dl",
+        "id": "",
+        "cls": "lg:col-span-5 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-[#C8D2E0]/10 pt-6 font-mono",
+        "w": 536,
+        "h": 129,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "relative left-1/2 w-screen -translate-x-1/2 h-[200px] sm:h-[260px] lg:h-[300px] border-y b",
+        "w": 1440,
+        "h": 300,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "relative flex lg:grid lg:grid-cols-5 overflow-x-auto snap-x snap-mandatory scrollbar-none ",
+        "w": 1376,
+        "h": 128,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 536,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 536,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 536,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 536,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 536,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "skills",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1440,
+        "h": 1824,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "pb-12 sm:pb-16 border-b border-[#C8D2E0]/10",
+        "w": 1376,
+        "h": 241,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 896,
+        "h": 276,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 896,
+        "h": 224,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 896,
+        "h": 279,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 896,
+        "h": 252,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 896,
+        "h": 248,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ul",
+        "id": "",
+        "cls": "mt-6 border-t border-[#C8D2E0]/10",
+        "w": 416,
+        "h": 496,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "achievements",
+        "cls": "relative w-full max-w-none overflow-x-clip py-24 lg:py-36 border-b border-[#18458B]/20",
+        "w": 1440,
+        "h": 1306,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-8 items-en",
+        "w": 1440,
+        "h": 261,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "history",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1440,
+        "h": 1732,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "pb-12 sm:pb-16 border-b border-[#C8D2E0]/10",
+        "w": 1376,
+        "h": 241,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "now",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1440,
+        "h": 1033,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "pb-12 sm:pb-16 border-b border-[#C8D2E0]/10",
+        "w": 1376,
+        "h": 241,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "lg:col-span-7 lg:pr-16 lg:border-r border-[#C8D2E0]/10",
+        "w": 803,
+        "h": 439,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "mt-10 pt-10 border-t border-[#C8D2E0]/10",
+        "w": 509,
+        "h": 206,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      }
+    ],
+    "shots": 17,
+    "console": []
+  },
+  "1024x768": {
+    "pageHeight": 17384,
+    "totalCanvases": 7,
+    "totalSvgs": 8,
+    "sections": [
+      {
+        "id": "hero",
+        "top": 0,
+        "height": 768,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "about",
+        "top": 768,
+        "height": 2008,
+        "canvases": 0,
+        "svgs": 1
+      },
+      {
+        "id": "experience",
+        "top": 2776,
+        "height": 3533,
+        "canvases": 0,
+        "svgs": 2
+      },
+      {
+        "id": "projects",
+        "top": 6308,
+        "height": 1124,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "archive",
+        "top": 7432,
+        "height": 1174,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "podcast",
+        "top": 8606,
+        "height": 1389,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "skills",
+        "top": 9996,
+        "height": 2034,
+        "canvases": 0,
+        "svgs": 0
+      },
+      {
+        "id": "achievements",
+        "top": 12029,
+        "height": 1346,
+        "canvases": 0,
+        "svgs": 5
+      },
+      {
+        "id": "history",
+        "top": 13375,
+        "height": 1956,
+        "canvases": 0,
+        "svgs": 0
+      },
+      {
+        "id": "now",
+        "top": 15331,
+        "height": 1182,
+        "canvases": 0,
+        "svgs": 0
+      },
+      {
+        "id": "contact-section",
+        "top": 16512,
+        "height": 871,
+        "canvases": 0,
+        "svgs": 0
+      }
+    ],
+    "boxed": [
+      {
+        "tag": "section",
+        "id": "hero",
+        "cls": "relative w-full h-dvh min-h-[700px] overflow-hidden flex items-end md:items-center px-6 md",
+        "w": 1024,
+        "h": 768,
+        "border": false,
+        "shadow": false,
+        "opaqueBg": true
+      },
+      {
+        "tag": "section",
+        "id": "about",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1024,
+        "h": 2008,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "absolute inset-0 translate-x-2 translate-y-2 border border-[#FF2800]/40 pointer-events-non",
+        "w": 352,
+        "h": 440,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "relative w-full h-full bg-[#060A12] overflow-hidden shadow-[0_24px_60px_rgba(3,5,10,0.85)]",
+        "w": 352,
+        "h": 440,
+        "border": false,
+        "shadow": true,
+        "opaqueBg": true
+      },
+      {
+        "tag": "ul",
+        "id": "",
+        "cls": "mt-10 border-t border-[#C8D2E0]/10",
+        "w": 528,
+        "h": 208,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "mt-28 pt-12 border-t border-[#C8D2E0]/10",
+        "w": 960,
+        "h": 733,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "mt-8 border-t border-[#C8D2E0]/10",
+        "w": 533,
+        "h": 316,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "grid grid-cols-[2rem_1fr] gap-3 py-4 border-b border-[#C8D2E0]/10",
+        "w": 533,
+        "h": 105,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "grid grid-cols-[2rem_1fr] gap-3 py-4 border-b border-[#C8D2E0]/10",
+        "w": 533,
+        "h": 105,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "grid grid-cols-[2rem_1fr] gap-3 py-4 border-b border-[#C8D2E0]/10",
+        "w": 533,
+        "h": 105,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "flex flex-col justify-between gap-6 border-b border-[#C8D2E0]/12 pb-8 sm:flex-row sm:items",
+        "w": 928,
+        "h": 189,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/12 first:border-t",
+        "w": 359,
+        "h": 461,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-10 pb-6 border-b borde",
+        "w": 960,
+        "h": 230,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "podcast",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1024,
+        "h": 1389,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "dl",
+        "id": "",
+        "cls": "lg:col-span-5 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-[#C8D2E0]/10 pt-6 font-mono",
+        "w": 363,
+        "h": 148,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "relative left-1/2 w-screen -translate-x-1/2 h-[200px] sm:h-[260px] lg:h-[300px] border-y b",
+        "w": 1024,
+        "h": 300,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "relative flex lg:grid lg:grid-cols-5 overflow-x-auto snap-x snap-mandatory scrollbar-none ",
+        "w": 960,
+        "h": 144,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 363,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 363,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 363,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 363,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 363,
+        "h": 160,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "skills",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1024,
+        "h": 2034,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "pb-12 sm:pb-16 border-b border-[#C8D2E0]/10",
+        "w": 960,
+        "h": 241,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 619,
+        "h": 303,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 619,
+        "h": 303,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 619,
+        "h": 331,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 619,
+        "h": 276,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 619,
+        "h": 276,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ul",
+        "id": "",
+        "cls": "mt-6 border-t border-[#C8D2E0]/10",
+        "w": 277,
+        "h": 596,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "achievements",
+        "cls": "relative w-full max-w-none overflow-x-clip py-24 lg:py-36 border-b border-[#18458B]/20",
+        "w": 1024,
+        "h": 1346,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-8 items-en",
+        "w": 1024,
+        "h": 301,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "history",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1024,
+        "h": 1956,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "pb-12 sm:pb-16 border-b border-[#C8D2E0]/10",
+        "w": 960,
+        "h": 241,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "now",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 1024,
+        "h": 1182,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "pb-12 sm:pb-16 border-b border-[#C8D2E0]/10",
+        "w": 960,
+        "h": 241,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "lg:col-span-7 lg:pr-16 lg:border-r border-[#C8D2E0]/10",
+        "w": 560,
+        "h": 588,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "mt-10 pt-10 border-t border-[#C8D2E0]/10",
+        "w": 336,
+        "h": 268,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      }
+    ],
+    "shots": 24,
+    "console": []
+  },
+  "390x844": {
+    "pageHeight": 20713,
+    "totalCanvases": 7,
+    "totalSvgs": 8,
+    "sections": [
+      {
+        "id": "hero",
+        "top": 0,
+        "height": 844,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "about",
+        "top": 844,
+        "height": 2924,
+        "canvases": 0,
+        "svgs": 1
+      },
+      {
+        "id": "experience",
+        "top": 3768,
+        "height": 3882,
+        "canvases": 0,
+        "svgs": 2
+      },
+      {
+        "id": "projects",
+        "top": 7650,
+        "height": 1930,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "archive",
+        "top": 9580,
+        "height": 1228,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "podcast",
+        "top": 10808,
+        "height": 1426,
+        "canvases": 1,
+        "svgs": 0
+      },
+      {
+        "id": "skills",
+        "top": 12234,
+        "height": 2773,
+        "canvases": 0,
+        "svgs": 0
+      },
+      {
+        "id": "achievements",
+        "top": 15007,
+        "height": 1060,
+        "canvases": 0,
+        "svgs": 5
+      },
+      {
+        "id": "history",
+        "top": 16066,
+        "height": 2230,
+        "canvases": 0,
+        "svgs": 0
+      },
+      {
+        "id": "now",
+        "top": 18296,
+        "height": 1421,
+        "canvases": 0,
+        "svgs": 0
+      },
+      {
+        "id": "contact-section",
+        "top": 19717,
+        "height": 996,
+        "canvases": 0,
+        "svgs": 0
+      }
+    ],
+    "boxed": [
+      {
+        "tag": "section",
+        "id": "hero",
+        "cls": "relative w-full h-dvh min-h-[700px] overflow-hidden flex items-end md:items-center px-6 md",
+        "w": 390,
+        "h": 844,
+        "border": false,
+        "shadow": false,
+        "opaqueBg": true
+      },
+      {
+        "tag": "section",
+        "id": "about",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 390,
+        "h": 2924,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "absolute inset-0 translate-x-2 translate-y-2 border border-[#FF2800]/40 pointer-events-non",
+        "w": 300,
+        "h": 375,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "relative w-full h-full bg-[#060A12] overflow-hidden shadow-[0_24px_60px_rgba(3,5,10,0.85)]",
+        "w": 300,
+        "h": 375,
+        "border": false,
+        "shadow": true,
+        "opaqueBg": true
+      },
+      {
+        "tag": "ul",
+        "id": "",
+        "cls": "mt-10 border-t border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 240,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "mt-28 pt-12 border-t border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 1222,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "mt-8 border-t border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 373,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "grid grid-cols-[2rem_1fr] gap-3 py-4 border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 124,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "grid grid-cols-[2rem_1fr] gap-3 py-4 border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 124,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "grid grid-cols-[2rem_1fr] gap-3 py-4 border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 124,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "flex flex-col justify-between gap-6 border-b border-[#C8D2E0]/12 pb-8 sm:flex-row sm:items",
+        "w": 342,
+        "h": 288,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/12 first:border-t",
+        "w": 342,
+        "h": 548,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "mt-14 flex flex-col justify-between gap-4 border-t border-[#C8D2E0]/12 pt-8 sm:flex-row sm",
+        "w": 342,
+        "h": 165,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-10 pb-6 border-b borde",
+        "w": 358,
+        "h": 318,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "podcast",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 390,
+        "h": 1426,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "dl",
+        "id": "",
+        "cls": "lg:col-span-5 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-[#C8D2E0]/10 pt-6 font-mono",
+        "w": 358,
+        "h": 144,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "relative left-1/2 w-screen -translate-x-1/2 h-[200px] sm:h-[260px] lg:h-[300px] border-y b",
+        "w": 390,
+        "h": 200,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "relative flex lg:grid lg:grid-cols-5 overflow-x-auto snap-x snap-mandatory scrollbar-none ",
+        "w": 390,
+        "h": 121,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 146,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 146,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 146,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 146,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ol",
+        "id": "",
+        "cls": "divide-y divide-[#C8D2E0]/10 border-y border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 146,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "skills",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 390,
+        "h": 2773,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "pb-12 sm:pb-16 border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 197,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 388,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 322,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 369,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 314,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "li",
+        "id": "",
+        "cls": "border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 294,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "ul",
+        "id": "",
+        "cls": "mt-6 border-t border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 496,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "achievements",
+        "cls": "relative w-full max-w-none overflow-x-clip py-24 lg:py-36 border-b border-[#18458B]/20",
+        "w": 390,
+        "h": 1060,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-12 gap-8 items-en",
+        "w": 390,
+        "h": 289,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "history",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 390,
+        "h": 2230,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "pb-12 sm:pb-16 border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 197,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "section",
+        "id": "now",
+        "cls": "w-full relative overflow-x-hidden   border-b border-[#18458B]/20 py-24 lg:py-36",
+        "w": 390,
+        "h": 1421,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "pb-12 sm:pb-16 border-b border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 197,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "mt-10 pt-10 border-t border-[#C8D2E0]/10",
+        "w": 358,
+        "h": 254,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "cls": "mt-20 sm:mt-28 pt-6 border-t border-[#C8D2E0]/10 flex flex-col sm:flex-row sm:items-center",
+        "w": 358,
+        "h": 137,
+        "border": true,
+        "shadow": false,
+        "opaqueBg": false
+      }
+    ],
+    "shots": 23,
+    "console": []
+  }
+}

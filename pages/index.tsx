@@ -110,9 +110,9 @@ export default function Home() {
           {
             '@type': 'ListItem',
             position: 3,
-            name: 'Tempo — Air-Gapped Cognitive Buffer & Task Regulation Suite',
+            name: 'Tempo — RSD Communication Buffer & Regulation Suite',
             url: 'https://hareshmurugesan.com/projects/tempo',
-            description: 'Air-gapped communication buffer with pgvector emotional memory, 100% crisis recall, and dual-provider active-passive failover.',
+            description: 'Communication buffer for rejection sensitivity with pgvector emotional memory on Supabase, 100% (5/5) crisis recall, and dual-provider active-passive failover.',
           },
           {
             '@type': 'ListItem',

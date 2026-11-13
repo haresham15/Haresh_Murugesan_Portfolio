@@ -8,7 +8,7 @@ const AsciiDnaLightbulbCanvas = dynamic(() => import('./AsciiDnaLightbulbCanvas'
   ssr: false,
   loading: () => (
     <div
-      className="absolute inset-0 w-full h-full bg-[#03050A] pointer-events-none"
+      className="absolute inset-0 w-full h-full pointer-events-none"
       style={{
         backgroundImage:
           'radial-gradient(ellipse at 71% 38%, rgba(37, 99, 235, 0.18) 0%, transparent 60%)',
@@ -23,7 +23,7 @@ export const BentoHero: React.FC = () => {
   return (
     <section
       id="hero"
-      className="relative w-full h-dvh min-h-[700px] overflow-hidden flex items-end md:items-center px-6 md:px-16 lg:px-24 select-none bg-[#03050A]"
+      className="relative w-full h-dvh min-h-[700px] overflow-hidden flex items-end md:items-center px-6 md:px-16 lg:px-24 select-none"
       aria-label="Introduction"
     >
       <div className="absolute inset-0 w-full h-full z-[1] pointer-events-none">

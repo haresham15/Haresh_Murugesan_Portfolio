@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, type RefObject } from 'react';
+import { register, type FrameInfo } from '@/v7/runtime/scheduler';
 
 export interface CanvasStage {
   width: number;
@@ -51,16 +52,7 @@ export function useCanvasStage(
     let width = 0;
     let height = 0;
     let dpr = 1;
-    let frame = 0;
-    let previous = 0;
     let elapsed = 0;
-    let visible = typeof IntersectionObserver === 'undefined';
-    const canDraw = () => visible && !document.hidden && width > 0 && height > 0;
-    const stop = () => {
-      cancelAnimationFrame(frame);
-      frame = 0;
-      previous = 0;
-    };
     const syncSize = () => {
       const rect = container.getBoundingClientRect();
       width = rect.width;
@@ -71,12 +63,12 @@ export function useCanvasStage(
       if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
       if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
     };
-    const tick = (now: number) => {
-      frame = 0;
-      if (!canDraw()) return;
+    // One site-wide rAF: the scheduler pauses this stage off screen and caps how many
+    // canvases animate in one frame (src/v7/runtime/scheduler.ts).
+    const tick = ({ dt }: FrameInfo): boolean => {
+      if (width <= 0 || height <= 0) return false;
       if (dpr !== Math.min(window.devicePixelRatio || 1, 2)) syncSize();
-      const deltaTime = previous ? Math.min(now - previous, 64) : 0;
-      previous = now;
+      const deltaTime = dt;
       elapsed += deltaTime;
       const stage = { width, height, dpr, time: elapsed, deltaTime };
       let keepGoing = true;
@@ -87,30 +79,19 @@ export function useCanvasStage(
         ctx.restore();
       }
       if (frameRef.current?.(stage) === false) keepGoing = false;
-      if (animate && keepGoing) frame = requestAnimationFrame(tick);
-      else previous = 0;
+      return animate && keepGoing;
     };
-    const invalidate = () => {
-      if (canDraw() && !frame) frame = requestAnimationFrame(tick);
-    };
+    const task = register(tick, { element: container, budgeted: true });
+    const invalidate = () => task.wake();
     const resize = () => { syncSize(); invalidate(); };
-    const visibility = () => { if (canDraw()) invalidate(); else stop(); };
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
-    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting && entry.intersectionRatio >= 0.02;
-      visibility();
-    }, { threshold: 0.02 });
-    observer?.observe(container);
-    document.addEventListener('visibilitychange', visibility);
     window.addEventListener('resize', resize);
     invalidateRef.current = invalidate;
     resize();
     return () => {
-      stop();
+      task.dispose();
       resizeObserver.disconnect();
-      observer?.disconnect();
-      document.removeEventListener('visibilitychange', visibility);
       window.removeEventListener('resize', resize);
       invalidateRef.current = () => {};
     };

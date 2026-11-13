@@ -19,7 +19,22 @@ export const palette = {
   metalTitanium: '#7E8B9B',
   metalGunmetal: '#475569',
   textAlabaster: '#F4F6F9',
+  // V7 light weave
+  weaveBase: '#F4F6F9',
+  weaveGap: '#EAEFF5',
+  weaveHighlight: '#FFFFFF',
+  weaveShadow: '#CBD5E1',
+  weaveGlint: '#BFD4FF',
+  ink: '#050811',
+  titaniumInk: '#475569',
 } as const;
+
+/** V7 material-scoped semantic colours. Mirrors [data-material] in src/v7/materials/materials.css. */
+export const materials = {
+  dark: { bg: '#03050A', ink: '#F4F6F9', body: '#C8D2E0', muted: '#7E8B9B', accentText: '#FF2800', accentMark: '#FF2800', cobalt: '#2563EB' },
+  light: { bg: '#F4F6F9', ink: '#050811', body: 'rgba(5, 8, 17, 0.84)', muted: '#475569', accentText: '#153875', accentMark: '#FF2800', cobalt: '#153875' },
+} as const;
+export type MaterialName = keyof typeof materials;
 
 export const tokens = {
   palette,

@@ -5,6 +5,7 @@ import { WheelNavTrigger } from './WheelNavTrigger';
 import { useLockBodyScroll } from '@/lib/useLockBodyScroll';
 import { Portal } from './ui/Portal';
 import { profile } from '@/content/profile';
+import { useMaterialAt } from '@/v7/materials/useMaterialAt';
 
 const NAV_ID = 'site-nav';
 
@@ -37,6 +38,10 @@ export default function Header() {
   const navContainerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
+  const brandRef = useRef<HTMLDivElement>(null);
+  const rimRef = useRef<HTMLDivElement>(null);
+  const brandOn = useMaterialAt(brandRef);
+  const rimOn = useMaterialAt(rimRef);
 
   const closeNav = useCallback(() => setNavOpen(false), []);
 
@@ -103,22 +108,22 @@ export default function Header() {
       {/* Lifted above the overlay while it is open, so the wheel doubles as the close control */}
       <header className={`fixed top-0 left-0 w-full pointer-events-none ${navOpen ? 'z-[110]' : 'z-50'}`}>
         {/* Monogram and wheel share a vertical centre line: 40px on phones, 48px from sm up */}
-        <div className="fixed top-6 left-4 sm:top-8 sm:left-6 md:left-12 pointer-events-auto">
+        <div ref={brandRef} data-on={navOpen ? 'dark' : brandOn} className="fixed top-6 left-4 sm:top-8 sm:left-6 md:left-12 pointer-events-auto">
           <Link
             href="/"
             aria-label={`${profile.name}, home`}
             className="flex items-center gap-2.5 sm:gap-3 group select-none transition-transform duration-150 ease-out-expo active:scale-95"
           >
-            <span className="w-8 h-8 rounded-[2px] bg-[#060A12] border border-[#C8D2E0]/30 text-[#F4F6F9] flex items-center justify-center font-mono text-xs font-semibold group-hover:border-[#FF2800] group-hover:text-[#FF2800] transition-colors duration-200 shadow-[0_2px_12px_rgba(3,5,10,0.85)]">
+            <span className="on-material w-8 h-8 rounded-[2px] bg-[var(--on-surface)] border border-[var(--on-ink-soft)] text-[var(--on-ink)] flex items-center justify-center font-mono text-xs font-semibold group-hover:border-[#FF2800] group-hover:text-[#FF2800] shadow-[0_2px_12px_var(--on-shadow)]">
               HM
             </span>
-            <span className="font-sans font-medium text-[15px] tracking-tight text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors duration-200 whitespace-nowrap drop-shadow-[0_2px_8px_rgba(3,5,10,0.9)]">
+            <span className="on-material font-sans font-medium text-[15px] tracking-tight text-[var(--on-ink)] group-hover:text-[#FF2800] whitespace-nowrap drop-shadow-[0_2px_8px_var(--on-shadow)]">
               {profile.name}
             </span>
           </Link>
         </div>
 
-        <div className="fixed top-2 right-3 sm:top-4 sm:right-6 md:right-12 pointer-events-auto">
+        <div ref={rimRef} data-rim="" data-on={navOpen ? 'dark' : rimOn} className="fixed top-2 right-3 sm:top-4 sm:right-6 md:right-12 pointer-events-auto">
           <WheelNavTrigger
             isOpen={navOpen}
             onToggle={() => setNavOpen((open) => !open)}

@@ -23,7 +23,7 @@
 ## Flagship Systems & Case Studies
 - [Healios V2](https://hareshmurugesan.com/projects/healios): Clinical post-op recovery monitoring pipeline. 8.09ms vectorized NumPy Grad-CAM XAI, 3D LiDAR wound bed elevation topography (0.1mm margin), in-browser HTML5 Canvas Laplacian blur gate (<35ms), and in-memory BM25 ERAS guideline RAG (0.14ms).
 - [Apexis](https://hareshmurugesan.com/projects/apexis): Deterministic 60fps motorsport race simulation engine offloaded to dedicated Web Workers, client-side broadcast OCR via Tesseract.js, and sub-12ms SQLite lookups across 70+ years of F1 telemetry.
-- [Tempo](https://hareshmurugesan.com/projects/tempo): Air-gapped cognitive buffer and task regulation platform with PostgreSQL pgvector IVFFlat Cosine memory, 100% crisis recall, and dual-provider active-passive failover.
+- [Tempo](https://hareshmurugesan.com/projects/tempo): RSD communication buffer and regulation suite on Supabase with PostgreSQL pgvector IVFFlat Cosine memory, 100% crisis recall, and dual-provider active-passive failover.
 - [Careline / RouteRx](https://hareshmurugesan.com/projects/routerx-careline-hub): Healthcare transit platform pairing Open Source Routing Machine (OSRM) sub-15ms isochrone queries with census demographic matrices to identify transit deserts.
 - [TamilTrove](https://hareshmurugesan.com/projects/tamiltrove): Morphological text segmentation, corpus search, and linguistic analytics for classical Tamil script.
 - [NYC OS Market Physics](https://hareshmurugesan.com/projects/nyc-housing-market-ai): Real estate transaction vector field physics engine parsing 1M+ property records with Deck.GL.

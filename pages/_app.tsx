@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import '../src/index.css';
+import '../src/v7/materials/materials.css';
 import { usePortfolioStore } from '@/store/usePortfolioStore';
 import { MotionPreferenceProvider } from '@/components/MotionPreference';
 import { CommandPalette } from '@/components/ui/CommandPalette';
