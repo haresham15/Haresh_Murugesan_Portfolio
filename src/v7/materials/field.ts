@@ -58,6 +58,8 @@ interface Region {
 let regions: Region[] = [];
 let dirtyLayout = true;
 let ro: ResizeObserver | null = null;
+const observed = new Set<Element>();
+const observedHeight = new WeakMap<Element, number>();
 const layoutListeners = new Set<() => void>();
 
 function asMaterial(v: string | undefined, fallback: Material): Material {
@@ -85,11 +87,36 @@ function measure() {
   });
   dirtyLayout = false;
   if (!ro && typeof ResizeObserver !== 'undefined') {
-    ro = new ResizeObserver(() => invalidateLayout());
+    // Only a real height change invalidates layout. Observing an element fires one
+    // callback immediately; comparing against the last seen size ignores it.
+    ro = new ResizeObserver((entries) => {
+      let changed = false;
+      for (const e of entries) {
+        const h = e.borderBoxSize?.[0]?.blockSize ?? e.contentRect.height;
+        if (observedHeight.get(e.target) !== h) {
+          if (observedHeight.has(e.target)) changed = true;
+          observedHeight.set(e.target, h);
+        }
+      }
+      if (changed) invalidateLayout();
+    });
   }
   if (ro) {
-    ro.disconnect();
-    for (const r of regions) ro.observe(r.el);
+    // Observe each region once; never disconnect and re-observe (that loops).
+    const current = new Set<Element>(regions.map((r) => r.el));
+    for (const el of observed) {
+      if (!current.has(el)) {
+        ro.unobserve(el);
+        observed.delete(el);
+        observedHeight.delete(el);
+      }
+    }
+    for (const el of current) {
+      if (!observed.has(el)) {
+        observed.add(el);
+        ro.observe(el);
+      }
+    }
   }
 }
 

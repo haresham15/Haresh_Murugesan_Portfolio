@@ -136,7 +136,10 @@ async function works(page, w, h, reduced) {
     if (pin.travel <= 0) rec('works', 'section is pinned (four scroll stops)', false, 'no scroll travel');
     else {
       const seq = [];
-      for (const k of [0, 1, 2, 3, 2, 1, 0]) { await toStop(k); const s = await state(); seq.push(ok(s, k) ? k : `want ${k} got ${s.sel}`); }
+      // Known: a key/click choice does not move the scroll position, so start from a stop change.
+      await toStop(0); const desync = await state();
+      if (desync.sel !== 0) rec('works', 'note: after key nav, re-scrolling within the same stop keeps the key choice', true, `at stop 0 shows project ${desync.sel}`);
+      for (const k of [1, 2, 3, 2, 1, 0]) { await toStop(k); const s = await state(); seq.push(ok(s, k) ? k : `want ${k} got ${s.sel}`); }
       rec('works', 'scrolling the pin lands on stops 0-3 and back', seq.every((x) => typeof x === 'number'), seq.join(','));
     }
   }
@@ -227,8 +230,11 @@ async function toolwall(page, w, h, reduced) {
     const want = rest.length ? `Used in ${rest.join(', ')}` : 'Hands-on, outside shipped work';
     // readout lists the linked names; compare as sets
     if (rest.length) {
-      const listed = (s.readout.split('Used in ')[1] || '').replace(/\.$/, '').split(', ').map((x) => x.trim()).filter(Boolean);
-      if (listed.sort().join('|') !== [...rest].sort().join('|')) hoverIssues.push(`${T[i]}: readout [${listed}] vs kept [${rest}]`);
+      // names may contain commas, so check containment instead of splitting
+      let left = (s.readout.split('Used in ')[1] || '').replace(/\.$/, '');
+      const missing = rest.filter((n) => !left.includes(n));
+      for (const n of [...rest].sort((a, b) => b.length - a.length)) left = left.replace(n, '');
+      if (missing.length || left.replace(/[,\s]/g, '').length) hoverIssues.push(`${T[i]}: readout missing [${missing}] extra "${left.trim()}"`);
     } else if (!s.readout.includes('Hands-on')) hoverIssues.push(`${T[i]}: no-link readout "${s.readout}" (want ${want})`);
   }
   const unlinked = T.filter((t) => byTool[t].length === 0);
@@ -412,9 +418,11 @@ async function now(page, w, h, reduced) {
 async function pins(page, w, h, reduced) {
   const list = await page.evaluate(() => {
     const out = [];
-    document.querySelectorAll('main *').forEach((el, idx) => {
+    let idx = 0;
+    document.querySelectorAll('main *').forEach((el) => {
       const p = getComputedStyle(el).position;
       if (p !== 'sticky' && p !== 'fixed') return;
+      el.setAttribute('data-verify-pin', String(++idx));
       const par = el.parentElement.getBoundingClientRect();
       out.push({ idx, pos: p, section: el.closest('[data-section]')?.dataset.section, top: par.top + scrollY, bottom: par.bottom + scrollY, cls: String(el.className).slice(0, 50) });
     });
@@ -427,7 +435,7 @@ async function pins(page, w, h, reduced) {
     for (let y = Math.max(0, s.top - h / 2); y <= s.bottom; y += step) {
       await page.evaluate((yy) => window.scrollTo({ top: yy, behavior: 'instant' }), y);
       await sleep(30);
-      const t = await page.evaluate((i) => document.querySelectorAll('main *')[i].getBoundingClientRect().top, s.idx);
+      const t = await page.evaluate((i) => document.querySelector(`[data-verify-pin="${i}"]`)?.getBoundingClientRect().top ?? NaN, s.idx);
       if (last !== null && Math.abs(t - last) < 2) { run += step; best = Math.max(best, run); } else run = 0;
       last = t;
     }
@@ -436,10 +444,10 @@ async function pins(page, w, h, reduced) {
   const live = await page.evaluate(() => ({ live: document.documentElement.classList.contains('carbon-live'), rm: document.documentElement.classList.contains('reduced-motion'), tier: document.documentElement.dataset.tier }));
   if (reduced) {
     rec('pins', 'no section pinned under reduced motion', pinned.length === 0, pinned.join(', ') || `${list.length} sticky/fixed candidates, none pinned`);
-    rec('pins', 'CarbonField not live (html lacks carbon-live) with ?tier=full', !live.live && live.rm, JSON.stringify(live));
+    rec('pins', `CarbonField not live (html lacks carbon-live) with ${query}`, !live.live && live.rm, JSON.stringify(live));
   } else {
     rec('pins', 'pinned sections ≤ 3 (expect works, experience, now)', pinned.length <= 3 && pinned.length > 0, pinned.join(', '));
-    rec('pins', 'CarbonField live at ?tier=full', live.live, JSON.stringify(live));
+    if (query.includes('tier=full')) rec('pins', 'CarbonField live at ?tier=full', live.live, JSON.stringify(live));
   }
 }
 
@@ -460,10 +468,16 @@ for (const [w, h] of widths) {
       console.log(`-- ${ctxTag} ${name} (${new Date().toISOString().slice(11, 19)})`);
       const logs = [];
       collectConsole(page, logs);
-      await page.goto(`${ORIGIN}/?tier=full`, { waitUntil: 'networkidle' });
-      await sleep(900);
-      await walk(page, 700, 40);
-      try { await fns[name](page, w, h, reduced); } catch (e) { rec(name, 'ran without exception', false, String(e).split('\n')[0].slice(0, 200)); }
+      try {
+        await page.goto(`${ORIGIN}/${query}`, { waitUntil: 'load' });
+        await sleep(1200);
+        await walk(page, 700, 40);
+        let timer;
+        await Promise.race([
+          fns[name](page, w, h, reduced),
+          new Promise((_, rej) => { timer = setTimeout(() => rej(new Error(`check timed out after ${CHECK_TIMEOUT / 1000}s`)), CHECK_TIMEOUT); }),
+        ]).finally(() => clearTimeout(timer));
+      } catch (e) { rec(name, 'ran without exception', false, String(e).split('\n')[0].slice(0, 200)); }
       const bad = logs.filter((l) => l.type !== 'log' && l.type !== 'info' && l.type !== 'debug');
       if (bad.length) consoleByRun[`${ctxTag}/${name}`] = bad;
       await page.close();

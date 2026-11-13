@@ -110,6 +110,8 @@ export const WorksSection: React.FC = () => {
   const lastSector = useRef(0);
   const inputKind = useRef<'touch' | 'other'>('other');
   const stopRef = useRef(0);
+  // Set by the pin effect: scroll the page to a project's stop so scroll and wheel agree.
+  const syncScrollRef = useRef<((project: number) => void) | null>(null);
   const taskRef = useRef<TaskHandle | null>(null);
   const apexRef = useRef(0);
   const reducedRef = useRef(isReduced);
@@ -154,10 +156,11 @@ export const WorksSection: React.FC = () => {
     }
   }, []);
 
-  const goTo = useCallback((next: number) => {
+  const goTo = useCallback((next: number, fromScroll = false) => {
     const from = wheel.current.theta;
     target.current = next;
     const project = projectAt(next);
+    if (!fromScroll) syncScrollRef.current?.(project);
     setSelected(project);
     setMounted((m) => (m.includes(project) ? m : [...m, project]));
     if (reducedRef.current) {
@@ -252,9 +255,21 @@ export const WorksSection: React.FC = () => {
         stopRef.current = next;
         if (!dragging.current) {
           inputKind.current = 'other';
-          goTo(angleForProject(target.current, next));
+          goTo(angleForProject(target.current, next), true);
         }
       }
+    };
+    syncScrollRef.current = (project: number) => {
+      const sec = sectionRef.current;
+      const stage = stageRef.current;
+      if (!sec || !stage) return;
+      const r = sec.getBoundingClientRect();
+      const runway = r.height - stage.offsetHeight;
+      // Only while pinned; outside the pin a choice must not move the page.
+      if (runway <= 0 || r.top > 0.5 || r.top < -runway - 0.5) return;
+      stopRef.current = project;
+      const y = window.scrollY + r.top + ((project + 0.5) / PROJECTS) * runway;
+      window.scrollTo({ top: Math.round(y), behavior: 'instant' });
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -350,7 +365,8 @@ export const WorksSection: React.FC = () => {
 
   /* ---------- keys on the tablist ---------- */
 
-  const focusTab = (project: number) => tabRefs.current[project]?.focus();
+  // preventScroll: the tabs are visually hidden; focusing must not scroll the pinned page.
+  const focusTab = (project: number) => tabRefs.current[project]?.focus({ preventScroll: true });
   const onTabKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
     let next: number | null = null;
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') next = target.current - DETENT;
@@ -373,18 +389,21 @@ export const WorksSection: React.FC = () => {
     const r = el.getBoundingClientRect();
     const pivot = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     const reduced = reducedRef.current;
-    const run = (root: HTMLElement | null, entering: boolean, dir: number) => {
-      if (!root) return [] as Animation[];
-      return Array.from(root.children).map((node, i) => {
-        const line = node as HTMLElement;
-        const box = line.getBoundingClientRect();
+    // Read every line box before writing any style, so the turn costs one layout, not one per line.
+    const measure = (root: HTMLElement | null) =>
+      root ? Array.from(root.children).map((node) => ({ line: node as HTMLElement, box: node.getBoundingClientRect() })) : [];
+    const incomingLines = measure(columnRef.current);
+    const outgoingLines = text.leaving ? measure(ghostRef.current) : [];
+    const run = (items: { line: HTMLElement; box: DOMRect }[], entering: boolean, dir: number) => {
+      return items.map(({ line, box }, i) => {
         line.style.transformOrigin = `${(pivot.x - box.left).toFixed(1)}px ${(pivot.y - box.top).toFixed(1)}px`;
         const turned = `rotate(${(entering ? -TEXT_TILT : TEXT_TILT) * dir}deg)`;
         const frames: Keyframe[] = reduced
           ? [{ opacity: entering ? 0 : 1 }, { opacity: entering ? 1 : 0 }]
           : entering
-            ? [{ transform: turned, opacity: 0 }, { transform: 'rotate(0deg)', opacity: 1 }]
-            : [{ transform: 'rotate(0deg)', opacity: 1 }, { transform: turned, opacity: 0 }];
+            ? // Incoming copy stays clear until the outgoing lines have mostly faded.
+              [{ transform: turned, opacity: 0 }, { opacity: 0, offset: 0.3 }, { transform: 'rotate(0deg)', opacity: 1 }]
+            : [{ transform: 'rotate(0deg)', opacity: 1 }, { opacity: 0, offset: 0.4 }, { transform: turned, opacity: 0 }];
         return line.animate(frames, {
           duration: reduced ? RM_FADE_MS : TEXT_MS,
           delay: reduced ? 0 : i * TEXT_STAGGER,
@@ -393,9 +412,9 @@ export const WorksSection: React.FC = () => {
         });
       });
     };
-    const incoming = run(columnRef.current, true, text.dir);
+    const incoming = run(incomingLines, true, text.dir);
     const leaving = text.leaving;
-    const outgoing = leaving ? run(ghostRef.current, false, leaving.dir) : [];
+    const outgoing = leaving ? run(outgoingLines, false, leaving.dir) : [];
     const last = outgoing[outgoing.length - 1];
     let alive = true;
     if (last && leaving) last.finished.then(() => { if (alive) dispatch({ type: 'settled', id: leaving.id }); }, () => {});

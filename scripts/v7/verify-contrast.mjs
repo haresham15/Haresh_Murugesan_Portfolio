@@ -44,16 +44,30 @@ function collect(seen) {
     const op = vis(el);
     if (op < 0.06) return;
     const cs = getComputedStyle(el);
-    if (cs.webkitTextFillColor && cs.webkitTextFillColor !== cs.color && /rgba\(0, 0, 0, 0\)/.test(cs.webkitTextFillColor)) return; // clipped gradient text
-    const m = cs.color.match(/[\d.]+/g).map(Number);
+    let m = cs.color.match(/[\d.]+/g).map(Number);
+    // Gradient text (background-clip: text, transparent fill): score each gradient stop.
+    let stops = null;
+    if ((m[3] ?? 1) === 0 && /text/.test(cs.backgroundClip || cs.webkitBackgroundClip || '')) {
+      stops = [...cs.backgroundImage.matchAll(/rgba?\(([^)]+)\)/g)].map((x) => x[1].split(',').map(Number).slice(0, 3));
+      if (!stops.length) return;
+      m = [...stops[0], 1];
+    }
     const matEl = el.closest('[data-material]');
+    // Text on its own opaque surface (a filled button) is judged against that surface,
+    // not the material behind it: the material never touches the glyphs.
+    let ownBg = null;
+    for (let n = el; n && n !== matEl; n = n.parentElement) {
+      const b = getComputedStyle(n).backgroundColor.match(/rgba?\(([^)]+)\)/);
+      const c = b ? b[1].split(',').map(Number) : [];
+      if (c.length === 3 || (c.length === 4 && c[3] >= 0.99)) { ownBg = c.slice(0, 3); break; }
+    }
     const cls = typeof el.className === 'string' ? el.className : el.getAttribute('class') || '';
     out.push({
       idx, tag: el.tagName.toLowerCase(), id: el.id, cls: cls.slice(0, 90), text: own.slice(0, 50),
       section: el.closest('[data-section]')?.dataset.section ?? '?', material: matEl?.dataset.material ?? '?',
       ariaHidden: !!el.closest('[aria-hidden="true"]'),
       rect: [r.left, r.top, r.width, r.height], color: [m[0], m[1], m[2], m[3] ?? 1], op,
-      size: parseFloat(cs.fontSize), weight: parseInt(cs.fontWeight, 10) || 400,
+      size: parseFloat(cs.fontSize), weight: parseInt(cs.fontWeight, 10) || 400, stops, ownBg,
     });
   });
   return out;
@@ -114,10 +128,10 @@ for (const [w, h] of widths) {
         const bg = bgs[k];
         if (!bg) return;
         const a = it.color[3] * it.op;
-        const fg = over(it.color.slice(0, 3), a, bg);
-        const r = ratio(fg, bg);
-        const mats = MAT[it.material] ?? [];
-        const rMat = mats.length ? Math.min(...mats.map((mb) => ratio(over(it.color.slice(0, 3), a, mb), mb))) : null;
+        const fgs = it.stops ?? [it.color.slice(0, 3)];
+        const r = Math.min(...fgs.map((c) => ratio(over(c, a, bg), bg)));
+        const mats = it.ownBg ? [it.ownBg] : MAT[it.material] ?? [];
+        const rMat = mats.length ? Math.min(...mats.flatMap((mb) => fgs.map((c) => ratio(over(c, a, mb), mb)))) : null;
         const large = it.size >= 24 || (it.size >= 18.66 && it.weight >= 700);
         const need = large ? 3 : 4.5;
         rows.push({ ...it, bg: bg.map(Math.round), ratio: +r.toFixed(2), ratioMaterial: rMat && +rMat.toFixed(2), large, need, pass: r >= need, passMaterial: rMat === null || rMat >= need });
@@ -131,6 +145,8 @@ for (const [w, h] of widths) {
   const bySection = {};
   rows.forEach((r) => { (bySection[r.section] ??= []).push(r.ratio); });
   console.log('  min ratio per section:', Object.entries(bySection).map(([k, v]) => `${k} ${Math.min(...v).toFixed(2)} (n=${v.length})`).join(' · '));
+  const near = rows.filter((r) => r.pass && r.passMaterial && r.ratio < 4.5);
+  if (near.length) console.log('  large text between 3 and 4.5:1 (passes as large):', near.map((r) => `${r.section} "${r.text.slice(0, 24)}" ${r.size}px ${r.ratio}`).join(' · '));
   for (const f of fails) {
     console.log(`  FAIL [${f.section}/${f.material}] <${f.tag}${f.id ? '#' + f.id : ''}> "${f.text}" ${f.size}px/${f.weight}${f.ariaHidden ? ' aria-hidden' : ''} rgba(${f.color.map((v) => +(+v).toFixed(2))}) op ${f.op.toFixed(2)} on rgb(${f.bg}) → ${f.ratio}:1 (material ${f.ratioMaterial}:1, need ${f.need})\n        .${f.cls}`);
   }

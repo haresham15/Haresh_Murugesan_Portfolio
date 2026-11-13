@@ -294,6 +294,9 @@ const CircuitStage: React.FC = () => {
 
   const [layout, setLayout] = useState<Layout | null>(null);
   const [fontsVersion, setFontsVersion] = useState(0);
+  // Sampling the track is expensive (getPointAtLength walks the whole path each call);
+  // build it only once the section is within 1.5 viewports, not at page load.
+  const [near, setNear] = useState(false);
   const [activeSector, setActiveSector] = useState(0);
   const geoRef = useRef<Geo | null>(null);
 
@@ -356,16 +359,24 @@ const CircuitStage: React.FC = () => {
     };
   }, [measure]);
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || near) return;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) setNear(true); }, { rootMargin: '150% 0px 150% 0px' });
+    io.observe(section);
+    return () => io.disconnect();
+  }, [near]);
+
   /* ---- sample the real path, place curbs + stations from its geometry ---- */
   useIsoLayoutEffect(() => {
     const path = pathRef.current;
-    if (!layout || !path) return;
+    if (!layout || !path || !near) return;
     const { kx, ox, ya, yb, sw, scale, docked, hudBottom, footerTop, M, r, xaPx, xbPx, vw } = layout;
     const X = (x: number) => ox + x * kx;
     const Y = (y: number) => ya + y * yb;
 
     const L = path.getTotalLength();
-    const step = 5;
+    const step = 8;
     const n = Math.ceil(L / step) + 1;
     const xs = new Float32Array(n);
     const ys = new Float32Array(n);
@@ -560,7 +571,7 @@ const CircuitStage: React.FC = () => {
 
     geoRef.current = { L, apexS, apexP, sOfP, cameraOfX, layout };
     kin.current.init = false;
-  }, [layout, fontsVersion]);
+  }, [layout, fontsVersion, near]);
 
   /* ---- frame loop (paused offscreen) ---- */
   useEffect(() => {
@@ -718,8 +729,12 @@ const CircuitStage: React.FC = () => {
         const focus = 1 - smoothstep(0.1 * lay.vw, (lay.docked ? 0.45 : 0.6) * lay.vw, d);
         const el = stationRefs.current[idx];
         if (el) {
-          const floor = lay.docked ? 0.12 : 0.3;
-          el.style.opacity = (floor + (1 - floor) * focus).toFixed(3);
+          // Readable or hidden, never parked at a dim opacity that fails 4.5:1 contrast.
+          const shown = focus > 0.45 ? '1' : '0';
+          if (el.style.opacity !== shown) {
+            el.style.transition = 'opacity 260ms ease';
+            el.style.opacity = shown;
+          }
           const dir = Number(el.dataset.dir || 1);
           el.style.transform = `translate3d(0, ${((1 - focus) * 10 * dir).toFixed(2)}px, 0)`;
         }

@@ -21,6 +21,47 @@ const SPEED = Number(arg('speed', 1500)); // px per second
 const RATE = Number(arg('rate', 4));
 const report = {};
 
+/* ---------------- 0. idle CPU profile: page at the top, no input ---------------- */
+for (const q of process.argv.includes('--skip-idle') ? [] : ['', '?tier=full']) {
+  const browser = await launch();
+  const ctx = await newContext(browser, [1440, 900]);
+  const page = await ctx.newPage();
+  await page.goto(`${ORIGIN}/${q}`, { waitUntil: 'load' });
+  await sleep(2500);
+  const cdp = await ctx.newCDPSession(page);
+  await cdp.send('Profiler.enable');
+  await cdp.send('Profiler.setSamplingInterval', { interval: 500 });
+  await cdp.send('Profiler.start');
+  const idle = await page.evaluate(async () => {
+    let frames = 0; let busy = 0; const t0 = performance.now();
+    const po = new PerformanceObserver((l) => l.getEntries().forEach((e) => { busy += e.duration; }));
+    po.observe({ type: 'longtask' });
+    await new Promise((r) => { const f = () => { frames++; if (performance.now() - t0 < 4000) requestAnimationFrame(f); else r(); }; requestAnimationFrame(f); });
+    po.disconnect();
+    return { frames, longtaskMs: Math.round(busy), tier: document.documentElement.dataset.tier, live: document.documentElement.classList.contains('carbon-live') };
+  });
+  const { profile } = await cdp.send('Profiler.stop');
+  const dt = profile.timeDeltas.reduce((a, b) => a + b, 0) / 1000 / Math.max(1, profile.samples.length); // ms per sample
+  const hits = new Map(profile.nodes.map((n) => [n.id, 0]));
+  profile.samples.forEach((id) => hits.set(id, hits.get(id) + 1));
+  const self = {};
+  let total = 0;
+  for (const n of profile.nodes) {
+    const cf = n.callFrame;
+    if (['(idle)', '(program)', '(garbage collector)', '(root)'].includes(cf.functionName) && !cf.url) continue;
+    const key = `${cf.functionName || '(anon)'} ${path.basename(cf.url || '')}:${cf.lineNumber + 1}:${cf.columnNumber + 1}`;
+    const ms = hits.get(n.id) * dt;
+    total += ms;
+    self[key] = (self[key] || 0) + ms;
+  }
+  const top = Object.entries(self).sort((a, b) => b[1] - a[1]).slice(0, 15).map(([k, v]) => `${v.toFixed(0)}ms ${k}`);
+  (report.idle ??= {})[q || 'default'] = { ...idle, jsSelfMsIn4s: Math.round(total), top };
+  console.log(`idle 4s at top (${q || 'default tier'}): ${JSON.stringify(idle)}; JS self time ${Math.round(total)} ms`);
+  top.forEach((t) => console.log(`   ${t}`));
+  await ctx.close();
+  await browser.close();
+}
+
 /* ---------------- 1. throttled scroll ---------------- */
 {
   const browser = await launch();
@@ -35,7 +76,10 @@ const report = {};
   const cdp = await ctx.newCDPSession(page);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: RATE });
   const tracePath = path.join(OUT, 'perf-trace.json');
-  await browser.startTracing(page, { path: tracePath, categories: ['devtools.timeline', 'disabled-by-default-devtools.timeline', 'toplevel', 'v8.execute', 'blink.user_timing'] });
+  await cdp.send('Profiler.enable');
+  await cdp.send('Profiler.setSamplingInterval', { interval: 1000 });
+  await cdp.send('Profiler.start');
+  await browser.startTracing(page, { path: tracePath, categories: ['devtools.timeline', 'toplevel', 'blink.user_timing'] });
   const run = await page.evaluate(async (speed) => {
     const longtasks = [];
     const po = new PerformanceObserver((list) => {
@@ -53,7 +97,7 @@ const report = {};
         if (last) frames.push({ t: now, dt: now - last, y: scrollY });
         last = now;
         const y = Math.min(max, ((now - t0) / 1000) * speed);
-        window.scrollTo(0, y);
+        window.scrollTo({ top: y, behavior: 'instant' }); // html has scroll-behavior: smooth
         if (y >= max) return resolve();
         requestAnimationFrame(tick);
       };
@@ -66,6 +110,22 @@ const report = {};
     return { frames, longtasks, max, sections, origin: performance.timeOrigin };
   }, SPEED);
   await browser.stopTracing();
+  {
+    const { profile } = await cdp.send('Profiler.stop');
+    const dt = profile.timeDeltas.reduce((a, b) => a + b, 0) / 1000 / Math.max(1, profile.samples.length);
+    const hits = new Map(profile.nodes.map((n) => [n.id, 0]));
+    profile.samples.forEach((id) => hits.set(id, hits.get(id) + 1));
+    const self = {};
+    for (const n of profile.nodes) {
+      const cf = n.callFrame;
+      if (['(idle)', '(program)', '(root)'].includes(cf.functionName) && !cf.url) continue;
+      const key = `${cf.functionName || '(anon)'} ${path.basename(cf.url || '')}:${cf.lineNumber + 1}:${cf.columnNumber + 1}`;
+      self[key] = (self[key] || 0) + hits.get(n.id) * dt;
+    }
+    report.scrollProfileTopSelf = Object.entries(self).sort((a, b) => b[1] - a[1]).slice(0, 20).map(([k, v]) => `${v.toFixed(0)}ms ${k}`);
+    console.log('scroll CPU profile, top self time (4x throttle):');
+    report.scrollProfileTopSelf.forEach((t) => console.log(`   ${t}`));
+  }
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
   await ctx.close();
   await browser.close();
@@ -186,4 +246,6 @@ if (lhBin && serveMjs) {
   }
 }
 
-fs.writeFileSync(path.join(OUT, 'perf.json'), JSON.stringify(report, null, 2));
+const prevPath = path.join(OUT, 'perf.json');
+if (!report.lighthouse && fs.existsSync(prevPath)) { try { report.lighthouse = JSON.parse(fs.readFileSync(prevPath, 'utf8')).lighthouse; } catch { /* keep going */ } }
+fs.writeFileSync(prevPath, JSON.stringify(report, null, 2));

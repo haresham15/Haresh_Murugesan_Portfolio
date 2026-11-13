@@ -61,7 +61,7 @@ export const BentoHero: React.FC = () => {
           <Link
             href="/#projects"
             data-hero-protect
-            className={`group inline-flex items-center gap-2.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#F4F6F9] px-7 py-3.5 font-mono text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] shadow-[0_0_24px_rgba(255,40,0,0.32)] transition-[background-color,transform] duration-500 ${SPRING} hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF4419]`}
+            className={`group inline-flex items-center gap-2.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] px-7 py-3.5 font-mono text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] shadow-[0_0_24px_rgba(255,40,0,0.32)] transition-[background-color,transform] duration-500 ${SPRING} hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF4419]`}
           >
             <span>Explore Work</span>
             <span aria-hidden="true" className={`transition-transform duration-500 ${SPRING} group-hover:translate-x-1`}>

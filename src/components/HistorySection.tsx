@@ -171,7 +171,7 @@ export const HistorySection: React.FC = () => {
                       <div className={`flex items-baseline gap-4 ${isLeft ? 'lg:flex-row-reverse' : ''}`}>
                         <span
                           className="font-serif text-[64px] leading-none tracking-[-0.03em] tabular-nums transition-colors duration-500"
-                          style={{ color: lit ? '#F4F6F9' : '#7E8B9B' }}
+                          style={{ color: lit ? 'var(--mat-ink)' : 'var(--mat-muted)' }}
                         >
                           {m.year}
                         </span>
