@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { allProjects } from '@/content/projects';
+import { allProjects, projectTier, type ProjectTier } from '@/content/projects';
 import { useCanvasStage, type CanvasStage } from '@/hooks/useCanvasStage';
 import { useMotionPreference } from './MotionPreference';
 
@@ -114,6 +114,7 @@ interface FilterDef {
 }
 
 const FILTERS: FilterDef[] = [
+  { id: 'featured', label: 'Featured', domains: null },
   { id: 'all', label: 'All', domains: null },
   { id: 'cv', label: 'Clinical CV & Imaging', domains: ['domain-cv-lidar'] },
   { id: 'latency', label: 'Low-Latency & Telemetry', domains: ['domain-telemetry-ui'] },
@@ -136,6 +137,7 @@ interface GraphProject {
   summary: string;
   domainId: string;
   coreId: CoreId;
+  tier: ProjectTier;
   x: number;
   y: number;
 }
@@ -158,6 +160,7 @@ const PROJECTS: GraphProject[] = PLACEMENTS.flatMap((pl) => {
       summary: content.description,
       domainId: domain.id,
       coreId: domain.coreId,
+      tier: projectTier(content),
       x: domain.x + Math.cos(rad) * pl.dist,
       y: domain.y + Math.sin(rad) * pl.dist,
     },
@@ -395,6 +398,11 @@ function mulberry32(seed: number) {
   };
 }
 
+// Flagships read largest; coursework and personal builds smallest.
+const TIER_RADIUS: Record<ProjectTier, number> = { flagship: 6, supporting: 4.5, coursework: 3.5 };
+// In the Featured view, coursework stays in the graph but recedes (below the label threshold of 0.3).
+const COURSEWORK_FEATURED_ALPHA = 0.28;
+
 function makeNode(partial: Pick<GNode, 'kind' | 'id' | 'label' | 'sub' | 'r' | 'tint' | 'ring' | 'parent' | 'domainIndex' | 'bx' | 'by'>): GNode {
   return {
     ...partial,
@@ -440,7 +448,7 @@ function createSim(): Sim {
   });
   PROJECTS.forEach((p) => {
     const di = DOMAINS.findIndex((d) => d.id === p.domainId);
-    nodes.push(makeNode({ kind: 2, id: p.slug, label: p.short, sub: '', r: 4.5, tint: DOMAINS[di].tint, ring: DOMAINS[di].ring, parent: ANCHORS.length + di, domainIndex: di, bx: p.x, by: p.y }));
+    nodes.push(makeNode({ kind: 2, id: p.slug, label: p.short, sub: '', r: TIER_RADIUS[p.tier], tint: DOMAINS[di].tint, ring: DOMAINS[di].ring, parent: ANCHORS.length + di, domainIndex: di, bx: p.x, by: p.y }));
   });
 
   const edges: GEdge[] = [];
@@ -547,6 +555,7 @@ export const HomeCodeGraph: React.FC = () => {
   const [touchSlug, setTouchSlug] = useState<string | null>(null);
   const [keyboardSlug, setKeyboardSlug] = useState<string | null>(null);
   const [warping, setWarping] = useState(false);
+  const [featured, setFeatured] = useState(true);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -560,6 +569,7 @@ export const HomeCodeGraph: React.FC = () => {
     reduced: false,
     focusIds: null as Set<string> | null,
     focusKey: 'all',
+    featured: true,
     matches: [] as QueryMatch[],
     matchKey: '',
     touchSlug: null as string | null,
@@ -574,6 +584,7 @@ export const HomeCodeGraph: React.FC = () => {
     ui.reduced = isReduced;
     ui.focusIds = focus ? new Set(focus.ids) : null;
     ui.focusKey = focus ? focus.ids.join(',') : 'all';
+    ui.featured = featured;
     ui.matches = matches;
     ui.matchKey = matches.map((m) => `${m.index}:${m.sim.toFixed(2)}`).join(',');
     ui.touchSlug = touchSlug;
@@ -590,7 +601,7 @@ export const HomeCodeGraph: React.FC = () => {
         node.simText = `${m.sim.toFixed(2)} SIM`;
       });
     }
-  }, [isReduced, focus, matches, touchSlug, keyboardSlug]);
+  }, [isReduced, focus, featured, matches, touchSlug, keyboardSlug]);
 
   useEffect(() => {
     const sim = simRef.current;
@@ -764,7 +775,7 @@ export const HomeCodeGraph: React.FC = () => {
       ctx.clearRect(0, 0, W, H);
 
       // --- 1. Targets: recomputed only when layout inputs change ---------
-      const layoutKey = `${Math.round(W)}x${Math.round(H)}|${ui.focusKey}|${ui.matchKey}|${portrait}`;
+      const layoutKey = `${Math.round(W)}x${Math.round(H)}|${ui.focusKey}|${ui.featured}|${ui.matchKey}|${portrait}`;
       if (layoutKey !== sim.layoutKey) {
         sim.layoutKey = layoutKey;
         let minX = Infinity;
@@ -803,6 +814,10 @@ export const HomeCodeGraph: React.FC = () => {
           } else {
             n.tz = inFocus ? 95 : -60;
             n.ta = inFocus ? 1 : 0.16;
+            if (ui.featured && !focusIds && PROJECTS[i - ANCHORS.length - DOMAINS.length].tier === 'coursework') {
+              n.tz = -20;
+              n.ta = COURSEWORK_FEATURED_ALPHA;
+            }
             if (queryActive) {
               if (n.matchRank >= 0) {
                 // Matches are pulled onto a focal orbit around the origin,
@@ -1540,7 +1555,11 @@ export const HomeCodeGraph: React.FC = () => {
 
   const lensProject = lensSlug ? PROJECTS.find((p) => p.slug === lensSlug) ?? null : null;
   const lensMatch = lensProject ? matches.find((m) => PROJECTS[m.index].slug === lensProject.slug) : undefined;
-  const activeFilter = FILTERS.find((f) => (f.domains ? focus?.ids.join(',') === f.domains.join(',') : !focus))?.id;
+  const activeFilter = focus
+    ? FILTERS.find((f) => f.domains && focus.ids.join(',') === f.domains.join(','))?.id
+    : featured
+      ? 'featured'
+      : 'all';
   const focusCoreDef = focus?.core ? ANCHORS.find((a) => a.id === focus.core) : null;
   const focusDomainDef = focus?.domain ? DOMAINS.find((d) => d.id === focus.domain) : null;
   const focusFilterDef = focus && !focus.domain && !focusCoreDef ? FILTERS.find((f) => f.id === activeFilter) : null;
@@ -1558,6 +1577,12 @@ export const HomeCodeGraph: React.FC = () => {
               All {PROJECTS.length} projects, placed by what they share. Search by idea, filter by domain, or hover a
               node to see its three nearest neighbors by text similarity.
             </p>
+            <Link
+              href="/projects"
+              className="inline-flex min-h-[32px] items-center gap-2 font-sans text-sm text-[#F4F6F9] underline decoration-[#FF2800]/60 underline-offset-[5px] hover:text-[#FF4419] transition-colors"
+            >
+              Browse all {PROJECTS.length} <span aria-hidden="true">→</span>
+            </Link>
           </div>
 
           <div className="flex flex-col gap-3 w-full lg:w-auto lg:min-w-[420px] lg:max-w-[520px]">
@@ -1604,6 +1629,7 @@ export const HomeCodeGraph: React.FC = () => {
                         else {
                           setFocus(null);
                           setQuery('');
+                          setFeatured(f.id === 'featured');
                         }
                       }}
                       className={`min-h-[32px] px-1 cursor-pointer transition-colors underline-offset-4 decoration-1 ${

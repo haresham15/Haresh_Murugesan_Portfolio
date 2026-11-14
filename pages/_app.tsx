@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import { Analytics } from '@vercel/analytics/next';
+import { track } from '@vercel/analytics';
 import '../src/index.css';
 import '../src/v7/materials/materials.css';
 import { usePortfolioStore } from '@/store/usePortfolioStore';
@@ -35,13 +37,26 @@ export default function App({ Component, pageProps }: AppProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [setCommandPaletteOpen]);
 
+  // Résumé, GitHub and LinkedIn links carry data-track="<event>"; one listener reports every click.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const el = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-track]');
+      const name = el?.dataset.track;
+      if (!el || !name) return;
+      const from = el.closest('[id]')?.id || 'page';
+      track(name, { from, path: window.location.pathname });
+    };
+    document.addEventListener('click', onClick, { capture: true });
+    return () => document.removeEventListener('click', onClick, { capture: true });
+  }, []);
+
   return (
     <MotionPreferenceProvider>
       <Head>
         <title>Haresh Murugesan | Software & Systems Engineer</title>
         <meta
           name="description"
-          content="Portfolio of Haresh Murugesan — B.S. Computer Science & Engineering at Ohio State. Building high-performance systems, real-time simulation engines, and clinical computer vision architectures."
+          content="Haresh Murugesan, Computer Science (AI) at Ohio State, graduating May 2028. Seeking Summer 2027 software and ML internships."
         />
         <meta
           name="keywords"
@@ -50,26 +65,14 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="author" content="Haresh Murugesan" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://hareshmurugesan.com" />
-
-        {/* Open Graph */}
-        <meta property="og:title" content="Haresh Murugesan | Software & Systems Engineer" />
-        <meta
-          property="og:description"
-          content="Explore Haresh's engineering systems, performance benchmarks, and verified technical case studies."
-        />
-        <meta property="og:image" content="https://hareshmurugesan.com/profile.jpeg" />
-        <meta property="og:url" content="https://hareshmurugesan.com" />
-        <meta property="og:type" content="website" />
-
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Haresh Murugesan | Software & Systems Engineer" />
         <meta
           name="twitter:description"
-          content="Portfolio of Haresh Murugesan — Computer Science & Engineering at Ohio State. Featured systems: Apexis, Healios V2, Tempo, Careline."
+          content="Haresh Murugesan, Computer Science (AI) at Ohio State. Seeking Summer 2027 software and ML internships."
         />
-        <meta name="twitter:image" content="https://hareshmurugesan.com/profile.jpeg" />
+        <meta name="twitter:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
       </Head>
 
       {/* Global Command & Navigation Palette */}
@@ -79,6 +82,7 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <Component {...pageProps} />
+      <Analytics />
     </MotionPreferenceProvider>
   );
 }

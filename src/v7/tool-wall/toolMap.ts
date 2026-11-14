@@ -42,7 +42,7 @@ export interface ToolSpec {
  * light up no names. If data later links one of them, the test fails so this list is
  * kept honest.
  */
-export const EXPERIENCE_ONLY_TOOLS = ['cpp', 'go', 'swift', 'matlab', 'docker', 'threejs'] as const;
+export const EXPERIENCE_ONLY_TOOLS = ['cpp', 'go', 'swift', 'matlab', 'docker', 'threejs', 'pytorch'] as const;
 export type ExperienceOnlyToolId = (typeof EXPERIENCE_ONLY_TOOLS)[number];
 
 /** Row order follows skills.ts; tool order within a row is the order below. */
@@ -153,9 +153,9 @@ export interface WallSources {
 
 /** Short display names for roles; keyed by experience id. */
 const ROLE_NAMES: Record<string, string> = {
-  'cas-2026': 'CAS, AI & Software Development',
+  'cas-2026': 'CAS, AI and Software Development Intern',
   'osu-pathology-research': 'OSU Digital Pathology Research',
-  'cis-honda-99p': 'Honda 99P Labs Accelerator',
+  'cis-honda-99p': 'Honda 99P Labs, Innovation Analyst Intern',
   'philocracy-leadership': 'Philocracy',
   'syntinuum-podcast': 'Syntinuum Podcast',
 };

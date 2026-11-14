@@ -5,34 +5,35 @@
 ## Summary
 - **Name:** Haresh Murugesan
 - **Role:** Software & Systems Engineer
-- **Education:** B.S. Computer Science & Engineering, The Ohio State University (Expected May 2028)
+- **Education:** Bachelor of Engineering in Computer Science, specializing in AI, minor in Business, The Ohio State University (May 2028)
+- **Seeking:** Summer 2027 software and ML internships
 - **Primary Disciplines:** High-Performance Client Web, Computer Vision, Distributed Systems, Real-Time Simulation, Spatial Telemetry
-- **Canonical Website:** https://hareshmurugesan.com
-- **GitHub:** https://github.com/HareshMurugesan
-- **LinkedIn:** https://linkedin.com/in/haresh-murugesan
+- **Canonical Website:** https://www.hareshmurugesan.com
+- **GitHub:** https://github.com/haresham15
+- **LinkedIn:** https://www.linkedin.com/in/haresh-murugesan-4173412a1/
 - **Spotify Podcast:** https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98
 
 ## Key Distinctions
 - **2× 1st Place Champion — American Statistical Association DataFest (2025, 2026):** Best Use of External Data for spatial healthcare routing (Careline / RouteRx) and demographic optimization.
 - **Top Data Science Award — Hack to the Future (2026):** Spatial physics & housing market valuation engine parsing 1M+ records.
-- **Technology Intern — Chemical Abstracts Service (CAS, Summer 2026):** Delivered 12 serverless microservices with C4 architectural models and sub-second scientific data indexing.
-- **Undergraduate Research Assistant — The Ohio State University (2026–Present):** Digital Pathology & Clinical Diagnostics Lab building automated histological segmentation pipelines.
-- **Innovation Analyst — Honda Research Institute / 99P Labs (2025–Present):** Evaluated 1,000+ connected-vehicle telemetry and spatial energy models.
-- **Founder & Host — Syntinuum: Endless Evolutions Podcast (2023–Present):** 10+ technical founder dialogues; 100K+ combined impressions.
+- **AI and Software Development Intern — CAS (Chemical Abstracts Service, ACS), May–Aug 2026:** Agent-based AI and ML full-stack applications on AWS S3 and DynamoDB; agentic workflows with vector databases and RAG; C2/C4 architecture designs.
+- **Undergraduate AI/ML Researcher — The Ohio State University (Jul 2026–Present):** Digital pathology with AI/ML methods under Dr. Anil Parwani.
+- **Innovation Analyst Intern — Honda Research Institute 99P Labs Onramp Program (May 2025–Present):** Market research with lean startup methods across 1,000+ data models.
+- **Founder and Interviewer — Syntinuum: Endless Evolutions Podcast (Aug 2023–Present):** 10 guests; 8K YouTube views, 50K Instagram views, 50K+ TikTok views.
 
 ## Flagship Systems & Case Studies
-- [Healios V2](https://hareshmurugesan.com/projects/healios): Clinical post-op recovery monitoring pipeline. 8.09ms vectorized NumPy Grad-CAM XAI, 3D LiDAR wound bed elevation topography (0.1mm margin), in-browser HTML5 Canvas Laplacian blur gate (<35ms), and in-memory BM25 ERAS guideline RAG (0.14ms).
-- [Apexis](https://hareshmurugesan.com/projects/apexis): Deterministic 60fps motorsport race simulation engine offloaded to dedicated Web Workers, client-side broadcast OCR via Tesseract.js, and sub-12ms SQLite lookups across 70+ years of F1 telemetry.
-- [Tempo](https://hareshmurugesan.com/projects/tempo): RSD communication buffer and regulation suite on Supabase with PostgreSQL pgvector IVFFlat Cosine memory, 100% crisis recall, and dual-provider active-passive failover.
-- [Careline / RouteRx](https://hareshmurugesan.com/projects/routerx-careline-hub): Healthcare transit platform pairing Open Source Routing Machine (OSRM) sub-15ms isochrone queries with census demographic matrices to identify transit deserts.
-- [TamilTrove](https://hareshmurugesan.com/projects/tamiltrove): Morphological text segmentation, corpus search, and linguistic analytics for classical Tamil script.
-- [NYC OS Market Physics](https://hareshmurugesan.com/projects/nyc-housing-market-ai): Real estate transaction vector field physics engine parsing 1M+ property records with Deck.GL.
+- [Healios V2](https://www.hareshmurugesan.com/projects/healios): Clinical post-op recovery monitoring pipeline. 8.09ms vectorized NumPy Grad-CAM XAI, 3D LiDAR wound bed elevation topography (0.1mm margin), in-browser HTML5 Canvas Laplacian blur gate (<35ms), and in-memory BM25 ERAS guideline RAG (0.14ms).
+- [Apexis](https://www.hareshmurugesan.com/projects/apexis): Deterministic 60fps motorsport race simulation engine offloaded to dedicated Web Workers, client-side broadcast OCR via Tesseract.js, and sub-12ms SQLite lookups across 70+ years of F1 telemetry.
+- [Tempo](https://www.hareshmurugesan.com/projects/tempo): RSD communication buffer and regulation suite on Supabase with PostgreSQL pgvector IVFFlat Cosine memory, 100% crisis recall, and dual-provider active-passive failover.
+- [Careline / RouteRx](https://www.hareshmurugesan.com/projects/routerx-careline): Healthcare transit platform pairing Open Source Routing Machine (OSRM) sub-15ms isochrone queries with census demographic matrices to identify transit deserts.
+- [TamilTrove](https://www.hareshmurugesan.com/projects/tamiltrove): Morphological text segmentation, corpus search, and linguistic analytics for classical Tamil script.
+- [NYC OS Market Physics](https://www.hareshmurugesan.com/projects/nyc-housing-market-ai): Real estate transaction vector field physics engine parsing 1M+ property records with Deck.GL.
 
 ## Core Technical Competencies
 - **Languages:** Python, TypeScript, JavaScript, C/C++, R, SQL, Bash
 - **Frontend & 3D:** React, Next.js, Three.js, React Three Fiber, WebGL, Tailwind CSS, Framer Motion, HTML5 Canvas API, Swift/ARKit
-- **Backend & Cloud:** FastAPI, Node.js, AWS (Lambda, S3, DynamoDB, CloudWatch), PostgreSQL, Supabase, pgvector, Docker, Redis
+- **Backend & Cloud:** FastAPI, Node.js, AWS (S3, DynamoDB), PostgreSQL, Supabase, pgvector, Docker, Redis
 - **Data & CV:** PyTorch, TensorFlow, OpenCV, NumPy, Pandas, OSRM, Deck.GL
 
-Full technical documentation: https://hareshmurugesan.com/llms-full.txt
+Full technical documentation: https://www.hareshmurugesan.com/llms-full.txt
 

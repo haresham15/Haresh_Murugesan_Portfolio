@@ -10,14 +10,14 @@ import { profile } from '@/content/profile';
 export default function AboutPage() {
   const milestones = [
     {
-      period: 'Summer 2026 – Present',
-      title: 'Digital Pathology AI/ML Research @ Ohio State',
-      description: 'Applying convolutional neural networks and explainable saliency techniques (Grad-CAM) to histology tissue classification and automated allergy wheal measurement.',
+      period: 'Jul 2026 – Present',
+      title: 'Undergraduate AI/ML Researcher @ The Ohio State University',
+      description: 'Working on technical tasks in digital pathology using AI/ML methods under Dr. Anil Parwani.',
     },
     {
-      period: 'Summer 2026',
-      title: 'Technology Intern (DA&I Division) @ CAS',
-      description: 'Engineered serverless AWS pipelines across 12 internal chemical research use cases with S3, DynamoDB, Lambda, and agentic LLM integrations.',
+      period: 'May 2026 – Aug 2026',
+      title: 'AI and Software Development Intern @ CAS (Chemical Abstracts Service, ACS)',
+      description: 'Built agent-based AI and ML full-stack applications on AWS S3 and DynamoDB, and deployed agentic workflows using vector databases, RAG and model training.',
     },
     {
       period: 'Spring 2026',
@@ -25,24 +25,24 @@ export default function AboutPage() {
       description: 'Built RouteRx (Careline), a bi-directional transit routing engine resolving healthcare transit deserts in Shawnee County, KS for Stormont Vail Health.',
     },
     {
-      period: 'Feb 2026 – Present',
-      title: 'Innovation Analyst @ Center for Innovation Strategies / Honda 99P Labs',
-      description: 'Synthesizing spatial telemetry and connected-vehicle trip data to evaluate urban driving efficiency and battery wear trends.',
-    },
-    {
-      period: 'Dec 2025 – Present',
-      title: 'Host & Producer (Season 3) @ Syntinuum Podcast',
-      description: 'Surpassed 100K+ impressions interviewing tech founders and engineering leaders on software architecture, hardware scaling, and technical tradeoffs.',
-    },
-    {
       period: 'Spring 2025',
       title: '1st Place for Best Use of External Data (ASA DataFest 2025)',
       description: 'Awarded first place at the American Statistical Association collegiate data hackathon at The Ohio State University.',
     },
     {
+      period: 'May 2025 – Present',
+      title: 'Innovation Analyst Intern @ Honda Research Institute 99P Labs (Onramp Program)',
+      description: 'Market research with lean startup methods across 1,000+ data models, and customer-trend forecasting through statistical analysis.',
+    },
+    {
+      period: 'Aug 2023 – Present',
+      title: 'Founder and Interviewer @ Syntinuum: Endless Evolutions Podcast',
+      description: 'A tech podcast with CEOs and tech pioneers: 8K YouTube views, 50K Instagram views and 50K+ TikTok views.',
+    },
+    {
       period: 'Aug 2023 – Present',
       title: 'Undergraduate @ The Ohio State University',
-      description: 'B.S. in Computer Science & Engineering with an Artificial Intelligence specialization. Expected graduation: May 2028.',
+      description: 'Bachelor of Engineering in Computer Science, specializing in AI, minor in Business. Graduating May 2028.',
     },
   ];
 
@@ -72,13 +72,13 @@ export default function AboutPage() {
     '@type': 'AboutPage',
     name: 'About Haresh Murugesan | Systems & AI Engineer',
     description: 'Background, engineering narrative, academic research, and collegiate leadership of Haresh Murugesan.',
-    url: 'https://hareshmurugesan.com/about',
+    url: 'https://www.hareshmurugesan.com/about',
     mainEntity: {
       '@type': 'Person',
       name: profile.name,
       legalName: profile.legalName,
-      url: 'https://hareshmurugesan.com',
-      image: 'https://hareshmurugesan.com/profile.jpeg',
+      url: 'https://www.hareshmurugesan.com',
+      image: 'https://www.hareshmurugesan.com/preview-image.jpeg',
       jobTitle: 'Software & Systems Engineer',
       alumniOf: {
         '@type': 'CollegeOrUniversity',
@@ -100,16 +100,16 @@ export default function AboutPage() {
           name="description"
           content="Background, engineering narrative, academic research, and collegiate leadership of Haresh Murugesan (CS &amp; AI at The Ohio State University)."
         />
-        <link rel="canonical" href="https://hareshmurugesan.com/about" />
+        <link rel="canonical" href="https://www.hareshmurugesan.com/about" />
         <meta property="og:title" content="About Haresh Murugesan | Systems &amp; AI Engineer" />
         <meta property="og:description" content="Read Haresh's engineering journey, academic milestones, and collegiate leadership." />
-        <meta property="og:url" content="https://hareshmurugesan.com/about" />
+        <meta property="og:url" content="https://www.hareshmurugesan.com/about" />
         <meta property="og:type" content="profile" />
-        <meta property="og:image" content="https://hareshmurugesan.com/profile.jpeg" />
+        <meta property="og:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="About Haresh Murugesan | Systems &amp; AI Engineer" />
         <meta name="twitter:description" content="Read Haresh's engineering journey, academic milestones, and collegiate leadership." />
-        <meta name="twitter:image" content="https://hareshmurugesan.com/profile.jpeg" />
+        <meta name="twitter:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
@@ -145,7 +145,8 @@ export default function AboutPage() {
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-4">
                 <a
-                  href="/Haresh_Murugesan_Resume.pdf"
+                  href={profile.contacts.resumeUrl}
+                  data-track="resume_click"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="min-h-[44px] px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono text-xs font-semibold rounded-[2px] transition-colors select-none inline-flex items-center justify-center gap-2 shadow-[0_0_16px_rgba(255,40,0,0.3)] cursor-pointer"

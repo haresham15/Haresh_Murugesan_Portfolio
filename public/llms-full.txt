@@ -4,11 +4,12 @@
 - **Name:** Haresh Murugesan
 - **Role:** Software & Systems Engineer
 - **Institution:** The Ohio State University, College of Engineering
-- **Degree:** B.S. in Computer Science & Engineering (Expected Graduation: May 2028)
+- **Degree:** Bachelor of Engineering in Computer Science, specializing in AI, minor in Business (May 2028)
+- **Seeking:** Summer 2027 software and ML internships
 - **Location:** Columbus, Ohio, United States
-- **Canonical Portfolio URL:** https://hareshmurugesan.com
-- **Verified GitHub:** https://github.com/HareshMurugesan
-- **LinkedIn:** https://linkedin.com/in/haresh-murugesan
+- **Canonical Portfolio URL:** https://www.hareshmurugesan.com
+- **Verified GitHub:** https://github.com/haresham15
+- **LinkedIn:** https://www.linkedin.com/in/haresh-murugesan-4173412a1/
 - **Podcast Series:** Syntinuum: Endless Evolutions (Spotify, Apple Podcasts, YouTube)
 
 ---
@@ -24,26 +25,22 @@
 
 ## 3. Production Work Experience & Academic Research
 
-### Chemical Abstracts Service (CAS) — Technology Intern, Systems & Software Engineering
-- **Period:** Summer 2026 (DA&I Division, ACE Team)
-- **Architecture & Deliverables:**
-  - Engineered serverless microservices and asynchronous data pipelines on AWS (Lambda, DynamoDB, S3) handling scientific research indexing across 12 distinct data use cases.
-  - Authored C4 model system architecture diagrams standardizing service boundaries.
-  - Implemented trunk-based CI/CD testing pipelines enforcing strict TypeScript schemas and IAM least-privilege security policies.
-
-### The Ohio State University — Undergraduate Research Assistant, Computer Vision & Digital Pathology
-- **Period:** June 2026 – Present (Digital Pathology & Clinical Diagnostics Lab)
-- **Focus:** Automated histological feature extraction, clinical boundary identification, and tissue morphology analysis.
+### CAS (Chemical Abstracts Service, ACS) — AI and Software Development Intern
+- **Period:** May 2026 – August 2026, Columbus, OH
 - **Deliverables:**
-  - Authored computer vision segmentation pipelines in Python, OpenCV, and PyTorch reducing false-positive boundary artifacts.
-  - Designed cross-validation evaluation harnesses computing Dice coefficient and IoU metrics against board-certified pathologist ground-truth annotations.
+  - Engineered agent-based AI and ML full-stack applications for product stakeholders on AWS S3 and DynamoDB, and deployed agentic AI workflows using vector databases, RAG and model training.
+  - Streamlined deployment pipelines with trunk-based development through GitLab.
+  - Contributed to C2/C4 architecture designs.
 
-### Honda Research Institute / 99P Labs — Innovation Analyst Intern
-- **Period:** May 2025 – Present (Connected Mobility Data Accelerator)
-- **Focus:** Fleet telematics, spatial energy consumption, and connected vehicle datasets.
+### The Ohio State University — Undergraduate AI/ML Researcher
+- **Period:** July 2026 – Present, Columbus, OH
+- **Focus:** Technical tasks in digital pathology using AI/ML methods under Dr. Anil Parwani.
+
+### Honda Research Institute 99P Labs Onramp Program — Innovation Analyst Intern
+- **Period:** May 2025 – Present, Columbus, OH
 - **Deliverables:**
-  - Evaluated 1,000+ data models and spatial heatmaps across connected-vehicle telemetry datasets in the 99P Labs developer ecosystem.
-  - Analyzed urban route congestion patterns and EV battery depletion rates across temperature variations.
+  - Led market research using lean startup methods to find unmet needs, across 1,000+ data models.
+  - Drove product ideation by forecasting customer trends through statistical analysis and data visuals.
 
 ### Philocracy — CEO & Director of Finances
 - **Period:** 2024 – 2025
@@ -51,9 +48,9 @@
   - Directed engineering for an online debate platform modeling complex philosophical arguments via recursive tree schemas in TypeScript without cycle bugs.
   - Built full-lifecycle frontend and API interfaces using Next.js and Tailwind CSS.
 
-### Syntinuum: Endless Evolutions Podcast — Founder & Host
+### Syntinuum: Endless Evolutions Podcast — Founder and Interviewer
 - **Period:** August 2023 – Present
-- **Metrics:** 10+ long-form technical founder dialogues; 100K+ combined organic impressions across Spotify, Apple Podcasts, and YouTube.
+- **Metrics:** 10 guests; 8K YouTube views and 75 watch hours, 50K Instagram views, 50K+ TikTok views.
 - **Featured Dialogues:**
   - Arjun Kaicker (Head of Analytics, Zaha Hadid Architects): Parametric Topology & Algorithmic Spatial Design.
   - Dr. Joseph Wszalek (Cognitive Neuroscientist): Neurobiology & Machine Decision Boundaries.
@@ -103,6 +100,6 @@
 ## 5. Technology Matrix
 - **Core Languages:** Python 3.11, TypeScript 5.9, JavaScript (ES2024), C/C++ (C++17), R, SQL, Bash
 - **Frontend & Web Systems:** React 18/19, Next.js 14/15/16, Three.js, React Three Fiber, WebGL shaders, Tailwind CSS, Framer Motion, HTML5 Canvas API, Swift 6 / iOS ARKit
-- **Backend & Cloud Infrastructure:** FastAPI, Node.js LTS, AWS (Lambda, S3, DynamoDB, IAM, CloudWatch), PostgreSQL 16, pgvector, Supabase, Docker, Redis
+- **Backend & Cloud Infrastructure:** FastAPI, Node.js LTS, AWS (S3, DynamoDB), PostgreSQL 16, pgvector, Supabase, Docker, Redis
 - **Data Science & Computer Vision:** PyTorch, TensorFlow/Keras, OpenCV 4.x, NumPy, Pandas, OSRM, Deck.GL, Jupyter
 

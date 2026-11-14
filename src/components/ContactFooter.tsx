@@ -4,10 +4,10 @@ import { useMotionPreference } from './MotionPreference';
 import { profile } from '@/content/profile';
 
 const SOCIAL = [
-  { label: 'GitHub', href: profile.contacts.github },
-  { label: 'LinkedIn', href: profile.contacts.linkedin },
-  { label: 'Spotify', href: 'https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98' },
-  { label: 'YouTube', href: 'https://www.youtube.com/@syntinuum' },
+  { label: 'GitHub', href: profile.contacts.github, track: 'github_click' },
+  { label: 'LinkedIn', href: profile.contacts.linkedin, track: 'linkedin_click' },
+  { label: 'Spotify', href: 'https://open.spotify.com/show/5LPGObcWQdkoERNzZsdL98', track: undefined },
+  { label: 'YouTube', href: 'https://www.youtube.com/@syntinuum', track: undefined },
 ];
 
 /** Clipboard API first; falls back to a hidden textarea + execCommand for older or insecure contexts. */
@@ -67,7 +67,7 @@ export const ContactFooter: React.FC = () => {
           <Reveal delay={0.06} className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
             <p className="lg:col-span-6 max-w-[52ch] text-base sm:text-lg font-sans text-[#C8D2E0]/85 leading-relaxed">
               Based in {profile.education.location}. {profile.availability.status} for{' '}
-              {profile.availability.targetSeason} {profile.availability.seeking.toLowerCase()}.
+              {profile.availability.targetSeason} {profile.availability.seeking}.
             </p>
 
             <div className="lg:col-span-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 font-mono text-xs">
@@ -106,6 +106,7 @@ export const ContactFooter: React.FC = () => {
               <a
                 href={profile.contacts.resumeUrl}
                 download={profile.contacts.resumeDownloadName}
+                data-track="resume_click"
                 className="min-h-[52px] px-6 rounded-[2px] border border-[#C8D2E0]/20 hover:border-[#C8D2E0]/50 text-[#F4F6F9] inline-flex items-center justify-between sm:justify-center gap-3 transition-colors"
               >
                 <span>Résumé</span>
@@ -128,6 +129,7 @@ export const ContactFooter: React.FC = () => {
                 <li key={s.label}>
                   <a
                     href={s.href}
+                    data-track={s.track}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="min-h-[44px] inline-flex items-center gap-1 hover:text-[#F4F6F9] transition-colors"

@@ -14,7 +14,7 @@ const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : use
 const SHORT_LABEL: Record<string, string> = {
   'cas-2026': 'CAS',
   'osu-pathology-research': 'OSU',
-  'cis-honda-99p': 'CIS',
+  'cis-honda-99p': 'Honda 99P',
   'philocracy-leadership': 'Philocracy',
   'syntinuum-podcast': 'Syntinuum',
 };
@@ -27,6 +27,10 @@ export interface CircuitStation {
   company: string;
   team?: string;
   role: string;
+  /** One measured outcome from the résumé, when it gives one. */
+  outcome?: string;
+  /** Leadership and media roles are labelled so the engineering roles read first. */
+  leadership: boolean;
   point: string;
   stack: string[];
   lane: 'upper' | 'lower';
@@ -40,6 +44,8 @@ export const STATIONS: CircuitStation[] = experiences.map((e, i) => ({
   company: e.company,
   team: e.teamOrDivision,
   role: e.role,
+  outcome: e.outcome,
+  leadership: e.type === 'Leadership' || e.type === 'Media',
   point: e.bullets[0] ?? '',
   stack: e.skillsDemonstrated.slice(0, 5),
   lane: i % 2 === 0 ? 'upper' : 'lower',
@@ -988,12 +994,14 @@ const CircuitStage: React.FC = () => {
                 <span className="text-4xl lg:text-5xl font-serif text-[#FF2800] leading-none">{st.numeral}</span>
                 <span className="text-[#2563EB] font-mono text-sm select-none" aria-hidden="true">·</span>
                 <span className="text-xs font-mono tracking-wide text-[#C8D2E0]">{st.period}</span>
+                {st.leadership && <span className="text-xs font-sans text-[#7E8B9B]">Leadership</span>}
               </div>
               <h3 className="text-2xl lg:text-3xl font-serif font-normal text-[#F4F6F9] mt-2 tracking-tight leading-[1.12]">
                 {st.company}
               </h3>
               <p className="text-sm font-sans font-medium text-[#FF4419] mt-1.5 leading-snug">{st.role}</p>
               {st.team && <p className="text-xs font-sans text-[#7E8B9B] mt-0.5 leading-snug">{st.team}</p>}
+              {st.outcome && <p className="text-sm font-sans font-medium text-[#F4F6F9] mt-2 leading-snug tabular-nums">{st.outcome}</p>}
               <p className="text-sm font-sans text-[#C8D2E0]/90 leading-relaxed mt-2.5 group-data-[compact=true]:line-clamp-3">
                 {st.point}
               </p>
@@ -1056,10 +1064,10 @@ const CircuitStage: React.FC = () => {
               })}
             </nav>
             <Link
-              href="#projects"
+              href="#archive"
               className="shrink-0 text-xs font-mono text-[#7E8B9B] hover:text-[#FF2800] transition-colors focus:outline-none focus-visible:underline"
             >
-              <span className="hidden sm:inline">Selected works </span>↓
+              <span className="hidden sm:inline">All projects </span>↓
             </Link>
           </div>
         </div>
@@ -1084,11 +1092,13 @@ const StaticExperience: React.FC = () => (
           <div className="flex md:flex-col items-baseline gap-3 md:gap-2">
             <span className="text-4xl font-serif text-[#FF2800] leading-none">{st.numeral}</span>
             <span className="text-xs font-mono text-[#C8D2E0]">{st.period}</span>
+            {st.leadership && <span className="text-xs text-[#7E8B9B]">Leadership</span>}
           </div>
           <div>
             <h3 className="text-2xl md:text-3xl font-serif font-normal text-[#F4F6F9] tracking-tight">{st.company}</h3>
             <p className="text-sm font-medium text-[#FF4419] mt-1.5">{st.role}</p>
             {st.team && <p className="text-xs text-[#7E8B9B] mt-0.5">{st.team}</p>}
+            {st.outcome && <p className="text-sm font-medium text-[#F4F6F9] mt-2 tabular-nums">{st.outcome}</p>}
             <p className="text-sm text-[#C8D2E0]/90 leading-relaxed mt-3 max-w-2xl">{st.point}</p>
             <p className="text-xs font-mono text-[#C8D2E0]/70 mt-3">{st.stack.join(' · ')}</p>
           </div>

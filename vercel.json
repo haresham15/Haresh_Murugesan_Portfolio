@@ -3,6 +3,9 @@
   "framework": "nextjs",
   "cleanUrls": true,
   "trailingSlash": true,
+  "redirects": [
+    { "source": "/resume.pdf", "destination": "/Haresh_Murugesan_Resume.pdf", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/(.*)",

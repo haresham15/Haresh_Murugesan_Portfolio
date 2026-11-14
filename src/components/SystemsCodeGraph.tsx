@@ -42,7 +42,7 @@ export const DOMAIN_MODULES: DomainModule[] = [
     label: 'Spatial Econometrics & ML',
     tagline: '1st Place ASA DataFest 2026 transit analysis and classical AI search',
     accentColor: '#2563EB',
-    projectSlugs: ['routerx-careline-hub', 'cs50-ai-projects'],
+    projectSlugs: ['routerx-careline', 'cs50-ai-projects'],
   },
   {
     id: 'domain-serverless-cloud',

@@ -21,7 +21,11 @@ export interface Work {
   narrative: string;
   stats: WorkStat[];
   stack: string;
+  /** Your role on the project, from projects.ts. */
+  role: string;
   github?: string;
+  /** A running deployment. Omitted when the project only has a repository. */
+  live?: string;
   plate: PlateDefinition;
   /** The one live view this project shows (the mode bar is cut). */
   mode: string;
@@ -32,7 +36,7 @@ export interface Work {
  * (previously in UnifiedProjectField). 8.09 ms and 60 fps live here; the DataFest
  * first place lives in Recognition, so RouteRx shows its other measured figures.
  */
-const BASE: Omit<Work, 'stack' | 'github'>[] = [
+const BASE: Omit<Work, 'stack' | 'role' | 'github' | 'live'>[] = [
   {
     key: 'healios',
     index: '01',
@@ -99,12 +103,15 @@ const BASE: Omit<Work, 'stack' | 'github'>[] = [
   },
 ];
 
-/** Stack and repository come straight from projects.ts, separated with middle dots. */
+/** Stack, role, repository and live link come straight from projects.ts; stack items are separated with middle dots. */
 export const WORKS: Work[] = BASE.map((w) => {
   const p = getProjectBySlug(w.slug);
+  const live = p?.demo && !/github\.com/.test(p.demo) ? p.demo : undefined;
   return {
     ...w,
     stack: (p?.stack ?? '').split(',').map((s) => s.trim()).filter(Boolean).join(' · '),
+    role: p?.role ?? '',
     github: p?.github,
+    live,
   };
 });

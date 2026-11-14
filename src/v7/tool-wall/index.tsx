@@ -258,7 +258,7 @@ export const ToolWallSection: React.FC = () => {
       className={`relative w-full ${isReduced ? styles.reduced : ''}`}
     >
       <div className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8">
-        {/* The first rule continues the Syntinuum baseline. */}
+        {/* The first rule opens the section after the horizon seam from the Constellation. */}
         <div
           ref={stageRef}
           className="relative grid grid-cols-1 gap-x-12 border-t border-[var(--mat-rule)] lg:grid-cols-[minmax(0,1fr)_17rem] lg:grid-rows-[auto_1fr] xl:grid-cols-[minmax(0,1fr)_20rem] xl:gap-x-16"
@@ -295,7 +295,7 @@ export const ToolWallSection: React.FC = () => {
                   <div
                     role="toolbar"
                     aria-labelledby={titleId}
-                    className="flex flex-1 flex-wrap content-end gap-x-10 gap-y-6 sm:gap-x-14"
+                    className="flex flex-1 flex-wrap content-end gap-x-7 gap-y-6 sm:gap-x-9"
                   >
                     {row.tools.map((tool, index) => (
                       <button
@@ -321,6 +321,9 @@ export const ToolWallSection: React.FC = () => {
                         onKeyDown={(e) => onToolKey(e, rowIndex, index)}
                       >
                         <Glyph icon={TOOL_ICONS[tool.id]} />
+                        <span className={styles.caption} aria-hidden="true">
+                          {tool.name}
+                        </span>
                         <span className={styles.tick} aria-hidden="true" />
                       </button>
                     ))}

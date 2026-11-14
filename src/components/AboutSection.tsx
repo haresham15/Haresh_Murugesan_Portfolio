@@ -5,16 +5,13 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ThemeSection, Reveal } from './ThemeSection';
 import { useMotionPreference } from './MotionPreference';
 import { profile } from '../content/profile';
-import { getEvidence } from '../content/evidence';
 
 const MotionDiv = motion.div;
 
 const CHAMFER = 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%)';
 
-const aws = getEvidence('cas-aws-scale');
-
 const ANCHORS = [
-  { value: aws?.value.replace(' Internal Use Cases', '') ?? '12', label: 'AWS use cases shipped', source: 'Chemical Abstracts Service', href: '/#experience' },
+  { value: '2×', label: 'First place, Best Use of External Data', source: 'ASA DataFest 2025 and 2026', href: '/#achievements' },
 ];
 
 /* ---------------------------------------------------------------------------
@@ -183,7 +180,7 @@ export const AboutSection: React.FC = () => {
             </p>
             <p className="mt-5 max-w-[60ch] text-base font-sans text-[var(--mat-muted)] leading-relaxed [font-weight:var(--mat-body-weight)]">
               {profile.education.degree} at {profile.education.university}, expected {profile.education.expectedGraduation}.
-              Seeking {profile.availability.targetSeason} {profile.availability.seeking.toLowerCase()}.
+              Seeking {profile.availability.targetSeason} {profile.availability.seeking}.
             </p>
 
             <ul className="mt-10 border-t border-[var(--mat-rule)]">

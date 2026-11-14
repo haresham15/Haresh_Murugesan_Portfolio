@@ -37,16 +37,16 @@ export default function DesignSystemPage() {
           name="description"
           content="Design token architecture, DTCG specifications, typography scale, and accessible component library for hareshmurugesan.com."
         />
-        <link rel="canonical" href="https://hareshmurugesan.com/system" />
+        <link rel="canonical" href="https://www.hareshmurugesan.com/system" />
         <meta property="og:title" content="Living Design System | Haresh Murugesan" />
         <meta property="og:description" content="DTCG tokens, color swatches, typography hierarchy, and evidence primitives." />
-        <meta property="og:url" content="https://hareshmurugesan.com/system" />
+        <meta property="og:url" content="https://www.hareshmurugesan.com/system" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://hareshmurugesan.com/profile.jpeg" />
+        <meta property="og:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Living Design System | Haresh Murugesan" />
         <meta name="twitter:description" content="DTCG tokens, color swatches, typography hierarchy, and evidence primitives." />
-        <meta name="twitter:image" content="https://hareshmurugesan.com/profile.jpeg" />
+        <meta name="twitter:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
       </Head>
 
       <div className="w-full min-h-screen bg-[#03050A] text-[#F4F6F9] overflow-x-hidden flex flex-col selection:bg-[#FF2800] selection:text-[#03050A] relative">

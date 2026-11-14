@@ -51,6 +51,12 @@ export interface ProjectCaseStudy {
   personalContribution: string;
   limitations: string;
   nextSteps: string;
+  /** When it was built, as the résumé states it. Hidden when unknown. */
+  dates?: string;
+  /** "Solo" or the team size. Hidden when unknown. */
+  teamSize?: string;
+  /** One thing I would change with hindsight. Hidden when unknown. */
+  whatIdChange?: string;
 }
 
 export interface Project {
@@ -94,6 +100,7 @@ export const flagshipProjects: Project[] = [
     image: '/apexis.png',
     featured: true,
     caseStudy: {
+      dates: 'April 2026',
       executiveSummary: 'Apexis unifies fragmented multi-series motorsport telemetry into a singular browser-based intelligence hub. By executing 2D physics simulations and live broadcast OCR off the main JavaScript thread via Web Workers, it delivers real-time spatial race modeling with zero cloud computing overhead.',
       problem: 'Motorsport followers are forced to jump between disjointed timing websites, static classification PDFs, and ungrounded social commentary during race weekends. There existed no centralized system combining live spatial car tracking with contextual machine learning to explain tire degradation cliffs, pit stop windows, and undercut deltas dynamically.',
       architecture: 'Architected on Next.js with React and strict TypeScript. Compute-intensive tasks are offloaded to isolated Web Workers: simulator.worker.ts executes real-time position calculations against OpenF1 track coordinate schemas, while a client-side Tesseract.js worker parses broadcast timing graphics directly in-browser. An embedded SQLite database powers sub-12ms historical lookups dating back to 1950.',
@@ -163,6 +170,7 @@ export const flagshipProjects: Project[] = [
     image: '/healios.png',
     featured: true,
     caseStudy: {
+      dates: 'February 2026',
       executiveSummary: 'Healios V2 is a full-stack post-surgical wound monitoring intelligence platform that solves the clinical trust deficit in healthcare AI. By coupling deep convolutional classifications with sub-10ms Grad-CAM saliency heatmaps, HSV tissue bed segmentation, and edge blur rejection, surgeons inspect transparent diagnostic rationale rather than black-box scores.',
       problem: 'Postoperative surgical site infections (SSIs) drive up to 20% of unplanned 30-day hospital readmissions. Remote monitoring apps fail because surgeons reject unexplained probability outputs, blurry patient phone photos waste cloud compute, and generic LLM chatbots hallucinate non-standard medical advice rather than conforming to established ERAS guidelines.',
       architecture: 'Structured as a Next.js 14 TypeScript client communicating with a high-throughput Python 3.11 FastAPI backend. Pre-flight edge inspection on the client Canvas rejects out-of-focus captures in <35ms. On the server, a custom Grad-CAM implementation generates saliency overlays via vectorized NumPy piecewise linear interpolation in 8.09ms, while an embedded hybrid BM25/TF-IDF retriever injects verified ERAS surgical protocols into the diagnostic tool loop.',
@@ -235,7 +243,6 @@ export const flagshipProjects: Project[] = [
     primaryEvidenceId: 'tempo-crisis-recall',
     icons: ['nextjs.svg', 'react.svg', 'typescript.svg', 'sql.svg', 'tailwind.svg'],
     github: 'https://github.com/haresham15/TempoADHDAssist',
-    demo: 'https://github.com/haresham15/TempoADHDAssist',
     image: '/tempo.png',
     featured: true,
     caseStudy: {
@@ -489,7 +496,7 @@ export const archiveProjects: Project[] = [
     categoryFilter: 'systems',
     statusBadge: 'Live Demo',
     role: 'Full-Stack Developer',
-    highlight: '100K+ Impressions Streaming Engine',
+    highlight: 'The podcast’s own site',
     stack: 'JavaScript, React, Tailwind CSS, Next.js',
     description: 'Global audio streaming web application for the Syntinuum podcast network, delivering persistent uninterrupted audio playback, episode catalogs, and responsive interfaces.',
     icons: ['javascript.svg', 'react.svg', 'tailwind.svg'],
@@ -497,7 +504,7 @@ export const archiveProjects: Project[] = [
     demo: 'https://www.syntinuumpodcast.com/',
     featured: false,
     caseStudy: {
-      executiveSummary: 'A fast, accessible web platform built to host, stream, and catalog podcast episodes for the Syntinuum network (100K+ combined cross-platform impressions).',
+      executiveSummary: 'A fast, accessible web platform built to host, stream, and catalog podcast episodes for the Syntinuum network (100K+ views across YouTube, Instagram and TikTok).',
       problem: 'Third-party podcast landing pages lacked custom design control, persistent playback across page navigations, and direct episode show-note indexing.',
       architecture: 'Bespoke frontend built with React and Tailwind CSS, utilizing HTML5 audio APIs and global audio state for continuous background playback during route transitions.',
       tradeoffsSummary: 'Selected static JSON schemas to maximize page load speeds and SEO indexing without database query latency.',
@@ -511,7 +518,7 @@ export const archiveProjects: Project[] = [
         },
       ],
       metrics: [
-        { label: 'Combined Reach', value: '100K+ Impr.', detail: 'Cross-platform audience engagement' },
+        { label: 'Combined Reach', value: '100K+ views', detail: 'YouTube, Instagram and TikTok combined' },
         { label: 'Playback Uptime', value: '99.9%', detail: 'Global CDN static audio distribution' },
       ],
       personalContribution: 'Designed and built the full web application, deployed to production, and configured Spotify episode integration.',
@@ -820,7 +827,7 @@ export const archiveProjects: Project[] = [
     description: 'The portfolio website and design system you are currently viewing. Features complete static HTML export, DTCG three-tier token architecture, Recruiter Mode, and qualified evidence registers.',
     icons: ['nextjs.svg', 'react.svg', 'tailwind.svg', 'typescript.svg'],
     github: 'https://github.com/haresham15/Haresh_Murugesan_Portfolio',
-    demo: 'https://hareshmurugesan.com',
+    demo: 'https://www.hareshmurugesan.com',
     featured: false,
     caseStudy: {
       executiveSummary: 'The portfolio website and living design system you are currently viewing. Engineered to deliver instant recruiter scannability, deterministic evidence attribution, and zero-compromise static export performance.',
@@ -891,6 +898,36 @@ export const archiveProjects: Project[] = [
 ];
 
 export const allProjects: Project[] = [...flagshipProjects, ...archiveProjects];
+
+/**
+ * Three tiers, so coursework and personal builds don't carry the same weight as the flagships.
+ * Flagship = the four featured projects; coursework = class sets, family sites and this portfolio.
+ */
+export type ProjectTier = 'flagship' | 'supporting' | 'coursework';
+
+export const TIER_ORDER: ProjectTier[] = ['flagship', 'supporting', 'coursework'];
+
+export const TIER_LABEL: Record<ProjectTier, string> = {
+  flagship: 'Flagship',
+  supporting: 'Supporting',
+  coursework: 'Coursework and personal',
+};
+
+const COURSEWORK_SLUGS = new Set(['software-1-projects', 'software-2-projects', 'anna-birthday', 'momwebsite', 'portfolio-website']);
+
+export function projectTier(p: Pick<Project, 'slug' | 'featured'>): ProjectTier {
+  if (p.featured) return 'flagship';
+  return COURSEWORK_SLUGS.has(p.slug) ? 'coursework' : 'supporting';
+}
+
+/** The flagships in the order the home page's Works wheel shows them. */
+export const FLAGSHIP_ORDER = ['healios', 'apexis', 'routerx-careline', 'tempo'];
+
+/** All projects, flagships first (in Works order), then supporting, then coursework. */
+export const projectsByTier: Project[] = TIER_ORDER.flatMap((tier) => {
+  const inTier = allProjects.filter((p) => projectTier(p) === tier);
+  return tier === 'flagship' ? [...inTier].sort((x, y) => FLAGSHIP_ORDER.indexOf(x.slug) - FLAGSHIP_ORDER.indexOf(y.slug)) : inTier;
+});
 
 export function getProjectBySlug(slug: string): Project | undefined {
   return allProjects.find((p) => p.slug === slug || (p.aliases && p.aliases.includes(slug)));

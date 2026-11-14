@@ -13,12 +13,12 @@ export default function ResumePage() {
     '@type': 'ProfilePage',
     name: 'Résumé | Haresh Murugesan — Software & Systems Engineer',
     description: 'Verified résumé, technical proficiencies, research experience, and awards of Haresh Murugesan.',
-    url: 'https://hareshmurugesan.com/resume',
+    url: 'https://www.hareshmurugesan.com/resume',
     mainEntity: {
       '@type': 'Person',
       name: profile.name,
       legalName: profile.legalName,
-      url: 'https://hareshmurugesan.com',
+      url: 'https://www.hareshmurugesan.com',
       jobTitle: 'Software & Systems Engineer',
       knowsAbout: [
         'Artificial Intelligence',
@@ -38,18 +38,18 @@ export default function ResumePage() {
         <title>Résumé | Haresh Murugesan — Software &amp; Systems Engineer</title>
         <meta
           name="description"
-          content="Verified résumé of Haresh Murugesan — B.S. Computer Science &amp; Engineering at The Ohio State University. Seeking Summer 2027 Software Engineering &amp; Systems Internships."
+          content="Résumé of Haresh Murugesan, Bachelor of Engineering in Computer Science (AI) at The Ohio State University, graduating May 2028. Seeking Summer 2027 software and ML internships."
         />
-        <link rel="canonical" href="https://hareshmurugesan.com/resume" />
+        <link rel="canonical" href="https://www.hareshmurugesan.com/resume" />
         <meta property="og:title" content="Résumé | Haresh Murugesan" />
         <meta property="og:description" content="Technical background, industry experience, and verified project milestones." />
-        <meta property="og:url" content="https://hareshmurugesan.com/resume" />
+        <meta property="og:url" content="https://www.hareshmurugesan.com/resume" />
         <meta property="og:type" content="profile" />
-        <meta property="og:image" content="https://hareshmurugesan.com/profile.jpeg" />
+        <meta property="og:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Résumé | Haresh Murugesan" />
         <meta name="twitter:description" content="Technical background, industry experience, and verified project milestones." />
-        <meta name="twitter:image" content="https://hareshmurugesan.com/profile.jpeg" />
+        <meta name="twitter:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
@@ -79,6 +79,7 @@ export default function ResumePage() {
             <div className="flex items-center gap-3">
               <a
                 href={profile.contacts.resumeUrl}
+                data-track="resume_click"
                 download={profile.contacts.resumeDownloadName}
                 className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono font-semibold text-xs rounded-[2px] transition-colors select-none shadow-[0_0_16px_rgba(255,40,0,0.3)]"
               >
@@ -221,7 +222,7 @@ export default function ResumePage() {
                 </div>
                 <div className="p-4 bg-[#03050A] border border-[#18458B]/20 rounded-[2px]">
                   <p className="font-mono text-[#10B981] font-bold mb-1">Cloud &amp; Infrastructure:</p>
-                  <p className="text-[#7E8B9B]">AWS (S3, DynamoDB, Lambda), PostgreSQL (pgvector), SQLite, Docker, Git, CI/CD</p>
+                  <p className="text-[#7E8B9B]">AWS (S3, DynamoDB), FastAPI, Next.js, REST APIs, Docker, SQL, Git/GitLab</p>
                 </div>
                 <div className="p-4 bg-[#03050A] border border-[#18458B]/20 rounded-[2px]">
                   <p className="font-mono text-[#FF2800] font-bold mb-1">Concepts &amp; Systems:</p>

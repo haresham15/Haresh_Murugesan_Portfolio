@@ -35,4 +35,4 @@ Allow: /
 User-agent: Cohere-ai
 Allow: /
 
-Sitemap: https://hareshmurugesan.com/sitemap.xml
+Sitemap: https://www.hareshmurugesan.com/sitemap.xml

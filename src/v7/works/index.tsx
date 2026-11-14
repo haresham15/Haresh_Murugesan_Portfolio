@@ -41,6 +41,12 @@ const Lines: React.FC<{ work: Work; ghost?: boolean }> = ({ work, ghost }) => {
       <p className={`mt-3 font-serif text-[clamp(1.05rem,1.35vw,1.3rem)] italic leading-snug text-[var(--mat-body)]`}>
         {work.thesis}
       </p>
+      {work.role && (
+        <p className="mt-2 font-sans text-[13px] leading-snug text-[var(--mat-muted)]">
+          <span className="sr-only-v7">Role: </span>
+          {work.role}
+        </p>
+      )}
       <p
         className={`${styles.wide} mt-4 font-sans text-[15px] leading-[1.65] text-[var(--mat-body)]`}
         style={{ fontWeight: 'var(--mat-body-weight)', letterSpacing: 'var(--mat-tracking)' }}
@@ -80,6 +86,17 @@ const Lines: React.FC<{ work: Work; ghost?: boolean }> = ({ work, ghost }) => {
             className={`inline-flex min-h-11 items-center gap-2 text-[var(--mat-muted)] transition-colors hover:text-[var(--mat-ink)] ${FOCUS_RING}`}
           >
             Source <span aria-hidden="true">↗</span>
+          </a>
+        )}
+        {work.live && (
+          <a
+            href={work.live}
+            target="_blank"
+            rel="noopener noreferrer"
+            tabIndex={tab}
+            className={`inline-flex min-h-11 items-center gap-2 text-[var(--mat-muted)] transition-colors hover:text-[var(--mat-ink)] ${FOCUS_RING}`}
+          >
+            Live <span aria-hidden="true">↗</span>
           </a>
         )}
       </div>

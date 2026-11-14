@@ -61,9 +61,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     {
       id: 'action-resume',
       title: 'View Résumé (PDF)',
-      subtitle: 'Opens official PDF transcript and verified academic credentials',
+      subtitle: 'One page, opens in a new tab',
       category: 'Action',
-      href: '/Haresh_Murugesan_Resume.pdf',
+      href: profile.contacts.resumeUrl,
       badge: 'PDF',
     },
     {

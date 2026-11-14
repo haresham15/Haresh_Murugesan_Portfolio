@@ -7,22 +7,24 @@ import ContactFooter from '@/components/ContactFooter';
 import ForgedCarbonCanvas from '@/components/ForgedCarbonCanvas';
 import { MotionPreferenceProvider } from '@/components/MotionPreference';
 import { GridCrosshair } from '@/components/ui/GridCrosshair';
-import { allProjects, Project } from '@/content/projects';
+import { allProjects, projectsByTier, projectTier, TIER_LABEL, Project } from '@/content/projects';
+
+const FLAGSHIP_COUNT = allProjects.filter((p) => projectTier(p) === 'flagship').length;
 import SystemsCodeGraph from '@/components/SystemsCodeGraph';
 
 export default function ProjectsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'All' | 'AI & Vision' | 'Full-Stack Systems' | 'Research & Data' | 'Systems & Core'>('All');
-  const [sortBy, setSortBy] = useState<'latest' | 'flagship' | 'title'>('latest');
-  const [viewFormat, setViewFormat] = useState<'topology' | 'table'>('topology');
+  const [sortBy, setSortBy] = useState<'tier' | 'latest' | 'title'>('tier');
+  // The ledger is the default so every title is in the exported HTML; the graph is ?view=graph.
+  const [viewFormat, setViewFormat] = useState<'topology' | 'table'>('table');
 
   // Sync category & view format with URL query params if present
   useEffect(() => {
     if (router.isReady) {
-      if (router.query.view && (router.query.view === 'topology' || router.query.view === 'table')) {
-        setViewFormat(router.query.view as any);
-      }
+      if (router.query.view === 'graph' || router.query.view === 'topology') setViewFormat('topology');
+      else if (router.query.view === 'table' || router.query.view === 'list') setViewFormat('table');
       if (router.query.category) {
         const cat = String(router.query.category);
         if (['All', 'AI & Vision', 'Full-Stack Systems', 'Research & Data', 'Systems & Core'].includes(cat)) {
@@ -65,7 +67,7 @@ export default function ProjectsPage() {
   }, []);
 
   const filteredProjects = useMemo(() => {
-    let result = allProjects.filter((project: Project) => {
+    let result = projectsByTier.filter((project: Project) => {
       const matchesCategory = selectedCategory === 'All' || project.category === selectedCategory;
       if (!matchesCategory) return false;
 
@@ -81,10 +83,9 @@ export default function ProjectsPage() {
       return titleMatch || stackMatch || descMatch || highlightMatch || roleMatch;
     });
 
+    // 'tier' keeps projectsByTier order: flagship, supporting, then coursework and personal.
     if (sortBy === 'latest') {
       result = [...result].sort((a, b) => parseInt(b.year, 10) - parseInt(a.year, 10));
-    } else if (sortBy === 'flagship') {
-      result = [...result].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
     } else if (sortBy === 'title') {
       result = [...result].sort((a, b) => a.title.localeCompare(b.title));
     }
@@ -97,11 +98,11 @@ export default function ProjectsPage() {
     '@type': 'CollectionPage',
     name: 'Engineering Systems Archive | Haresh Murugesan',
     description: 'Complete searchable telemetry sheet and repository index of 18 software systems, AI pipelines, and research prototypes by Haresh Murugesan.',
-    url: 'https://hareshmurugesan.com/projects',
+    url: 'https://www.hareshmurugesan.com/projects',
     isPartOf: {
       '@type': 'WebSite',
       name: 'Haresh Murugesan — Software & Systems Architecture',
-      url: 'https://hareshmurugesan.com',
+      url: 'https://www.hareshmurugesan.com',
     },
     mainEntity: {
       '@type': 'ItemList',
@@ -109,7 +110,7 @@ export default function ProjectsPage() {
       itemListElement: allProjects.map((proj, idx) => ({
         '@type': 'ListItem',
         position: idx + 1,
-        url: `https://hareshmurugesan.com/projects/${proj.slug}`,
+        url: `https://www.hareshmurugesan.com/projects/${proj.slug}`,
         name: proj.title,
         description: proj.description,
       })),
@@ -125,22 +126,22 @@ export default function ProjectsPage() {
           content="Complete searchable ledger and timing sheet of 18 software systems, real-time simulation engines, clinical computer vision pipelines, and spatial models by Haresh Murugesan."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="canonical" href="https://hareshmurugesan.com/projects" />
+        <link rel="canonical" href="https://www.hareshmurugesan.com/projects" />
         <meta property="og:title" content="Engineering Systems Archive | Haresh Murugesan" />
         <meta
           property="og:description"
           content="Searchable telemetry ledger indexing 18 software systems, AI pipelines, and research prototypes."
         />
-        <meta property="og:url" content="https://hareshmurugesan.com/projects" />
+        <meta property="og:url" content="https://www.hareshmurugesan.com/projects" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://hareshmurugesan.com/profile.jpeg" />
+        <meta property="og:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Engineering Systems Archive | Haresh Murugesan" />
         <meta
           name="twitter:description"
           content="Searchable telemetry ledger indexing 18 software systems, AI pipelines, and research prototypes."
         />
-        <meta name="twitter:image" content="https://hareshmurugesan.com/profile.jpeg" />
+        <meta name="twitter:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
@@ -164,7 +165,7 @@ export default function ProjectsPage() {
               <span className="text-[#FF2800] font-semibold">PROJECT ARCHIVE</span>
             </div>
             <div className="flex items-center gap-4 text-[11px]">
-              <span className="hidden sm:inline text-[#C8D2E0]">18 VERIFIED REPOSITORIES</span>
+              <span className="hidden sm:inline text-[#C8D2E0]">{allProjects.length} REPOSITORIES</span>
               <span className="text-[#10B981]">● STATIC EXPORT RUNTIME</span>
             </div>
           </div>
@@ -183,7 +184,7 @@ export default function ProjectsPage() {
                 Engineering Systems Archive
               </h1>
               <p className="text-base sm:text-lg font-sans text-[#7E8B9B] max-w-3xl leading-[1.7] font-normal">
-                Searchable telemetry ledger indexing 18 software systems, real-time simulation engines, clinical computer vision pipelines, and spatial transit models authored and maintained by Haresh Murugesan.
+                Searchable ledger of {allProjects.length} software systems, real-time simulation engines, clinical computer vision pipelines, and spatial transit models authored and maintained by Haresh Murugesan.
               </p>
             </div>
 
@@ -191,12 +192,12 @@ export default function ProjectsPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 border border-[#18458B]/20 divide-x divide-y lg:divide-y-0 divide-[#18458B]/20 mt-10 bg-[#0B1E40]/20 rounded-[2px] overflow-hidden">
               <div className="p-5 sm:p-6 space-y-1">
                 <span className="text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider block">TOTAL SYSTEMS</span>
-                <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#FF2800] tabular-nums">18</div>
+                <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#FF2800] tabular-nums">{allProjects.length}</div>
                 <span className="text-xs font-sans text-[#7E8B9B] block">Documented codebases</span>
               </div>
               <div className="p-5 sm:p-6 space-y-1">
                 <span className="text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider block">FLAGSHIP DEEP-DIVES</span>
-                <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#F4F6F9] tabular-nums">04</div>
+                <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#F4F6F9] tabular-nums">{String(FLAGSHIP_COUNT).padStart(2, '0')}</div>
                 <span className="text-xs font-sans text-[#7E8B9B] block">Interactive case studies</span>
               </div>
               <div className="p-5 sm:p-6 space-y-1">
@@ -221,26 +222,28 @@ export default function ProjectsPage() {
             <div className="flex items-center border border-[#18458B]/30 bg-[#03050A] rounded-[2px] overflow-hidden text-xs">
               <button
                 type="button"
-                onClick={() => setViewFormat('topology')}
+                aria-pressed={viewFormat === 'table'}
+                onClick={() => setViewFormat('table')}
                 className={`px-4 py-2 font-medium transition-colors cursor-pointer flex items-center gap-2 ${
-                  viewFormat === 'topology'
+                  viewFormat === 'table'
                     ? 'bg-[#FF2800] text-[#03050A] font-semibold'
                     : 'text-[#7E8B9B] hover:text-[#F4F6F9]'
                 }`}
               >
-                <span>Interactive Vector Topology</span>
-                <span className="font-mono text-[11px] opacity-80">(18)</span>
+                <span>List</span>
+                <span className="font-mono text-[11px] opacity-80">({allProjects.length})</span>
               </button>
               <button
                 type="button"
-                onClick={() => setViewFormat('table')}
+                aria-pressed={viewFormat === 'topology'}
+                onClick={() => setViewFormat('topology')}
                 className={`px-4 py-2 font-medium transition-colors cursor-pointer flex items-center gap-2 border-l border-[#18458B]/30 ${
-                  viewFormat === 'table'
+                  viewFormat === 'topology'
                     ? 'bg-[#2563EB] text-[#F4F6F9] font-semibold'
                     : 'text-[#7E8B9B] hover:text-[#F4F6F9]'
                 }`}
               >
-                <span>Timing Sheet Ledger</span>
+                <span>Graph</span>
               </button>
             </div>
           </section>
@@ -299,8 +302,8 @@ export default function ProjectsPage() {
                       className="px-3 py-3 bg-[#060A12] border border-[#18458B]/30 rounded-[2px] text-xs font-mono text-[#F4F6F9] focus:outline-none focus:border-[#FF2800] cursor-pointer"
                       aria-label="Sort projects"
                     >
-                      <option value="latest">Latest First (2026 → 2023)</option>
-                      <option value="flagship">Flagship Case Studies First</option>
+                      <option value="tier">Flagship first, by tier</option>
+                      <option value="latest">Latest first</option>
                       <option value="title">Alphabetical (A → Z)</option>
                     </select>
                   </div>
@@ -372,8 +375,13 @@ export default function ProjectsPage() {
                   {filteredProjects.length > 0 ? (
                     <div className="divide-y divide-[#18458B]/15">
                       {filteredProjects.map((proj, idx) => (
+                        <React.Fragment key={proj.slug}>
+                        {sortBy === 'tier' && (idx === 0 || projectTier(filteredProjects[idx - 1]) !== projectTier(proj)) && (
+                          <h2 className="px-6 sm:px-8 pt-8 pb-2 font-serif text-xl text-[#F4F6F9]">
+                            {TIER_LABEL[projectTier(proj)]}
+                          </h2>
+                        )}
                         <article
-                          key={proj.slug}
                           className="py-5 px-6 sm:px-8 hover:bg-[#0B1E40]/25 transition-colors group flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-4 items-start lg:items-center relative"
                         >
                           {/* Top Hairline Accent on hover */}
@@ -459,6 +467,7 @@ export default function ProjectsPage() {
                             )}
                           </div>
                         </article>
+                        </React.Fragment>
                       ))}
                     </div>
                   ) : (

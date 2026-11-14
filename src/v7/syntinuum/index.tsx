@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import AsciiDnaLightbulbCanvas from '@/components/AsciiDnaLightbulbCanvas';
 import { useMotionPreference } from '@/components/MotionPreference';
 import { useCanvasStage, type CanvasStage } from '@/hooks/useCanvasStage';
@@ -207,7 +208,7 @@ export const SyntinuumSection: React.FC = () => {
         ctx.restore();
       }
 
-      // Baseline: stays when the bars flatten, and hands off to the Index's first rule.
+      // Baseline: stays when the bars flatten, and lands on the baseline seam into About.
       if (s.baseline.w !== w || !s.baseline.fill) {
         const g = ctx.createLinearGradient(0, 0, w, 0);
         g.addColorStop(0, 'rgba(0,0,0,0)');
@@ -331,6 +332,15 @@ export const SyntinuumSection: React.FC = () => {
         </h2>
         <p className="mt-6 max-w-[58ch] text-base sm:text-lg leading-relaxed text-[var(--mat-body)]" style={BODY_STYLE}>
           {podcastSummary}
+        </p>
+        <p className="mt-3 max-w-[58ch] text-base leading-relaxed text-[var(--mat-muted)]" style={BODY_STYLE}>
+          I founded and host the show, and built its website in Next.js.{' '}
+          <Link
+            href="/projects/syntinuum-podcast-website"
+            className="inline-flex min-h-[44px] items-center gap-1.5 text-[var(--mat-accent-text)] transition-colors hover:text-[var(--mat-ink)] focus-visible:text-[var(--mat-ink)]"
+          >
+            How the site works <span aria-hidden="true">→</span>
+          </Link>
         </p>
       </div>
 

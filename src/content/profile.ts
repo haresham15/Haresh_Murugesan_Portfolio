@@ -19,6 +19,8 @@ export interface Profile {
   education: {
     university: string;
     degree: string;
+    /** Short form used in the hero fact line. */
+    shortDegree: string;
     specialization: string;
     expectedGraduation: string;
     location: string;
@@ -50,17 +52,19 @@ export const profile: Profile = {
   name: 'Haresh Murugesan',
   legalName: 'Haresh Aravind Murugesan',
   headline: 'Software engineer exploring high-performance systems, client architectures, and computational algorithms.',
-  roleLine: 'B.S. Computer Science & Engineering at The Ohio State University · Expected May 2028 · Seeking Summer 2027 Software Engineering & Systems Internships',
+  roleLine: 'Bachelor of Engineering in Computer Science (AI) at The Ohio State University · May 2028 · Seeking Summer 2027 software and ML internships',
   education: {
     university: 'The Ohio State University',
-    degree: 'B.S. Computer Science & Engineering',
-    specialization: 'Software Systems & Real-Time Computing',
+    degree: 'Bachelor of Engineering in Computer Science',
+    shortDegree: 'Computer Science (AI)',
+    specialization: 'Specializing in AI, Minor in Business',
     expectedGraduation: 'May 2028',
     location: 'Columbus, OH',
   },
   availability: {
     status: 'Actively Interviewing',
-    seeking: 'Software Engineering & Systems Internships',
+    /** Written in sentence case; rendered as-is after the season. */
+    seeking: 'software and ML internships',
     targetSeason: 'Summer 2027',
   },
   proofChips: [
@@ -73,8 +77,8 @@ export const profile: Profile = {
     },
     {
       id: 'chip-cas',
-      label: 'AWS & Serverless Pipelines @ CAS',
-      sublabel: '12 internal use cases · S3 · DynamoDB · Lambda',
+      label: 'AI and Software Development Intern @ CAS',
+      sublabel: 'Agentic AI workflows · RAG · AWS S3 · DynamoDB',
       evidenceId: 'cas-aws-scale',
       href: '/#experience',
     },
@@ -90,7 +94,7 @@ export const profile: Profile = {
     email: 'haresham2006@gmail.com',
     github: 'https://github.com/haresham15',
     linkedin: 'https://www.linkedin.com/in/haresh-murugesan-4173412a1/',
-    resumeUrl: '/resume.pdf',
+    resumeUrl: '/Haresh_Murugesan_Resume.pdf',
     resumeDownloadName: 'Haresh_Murugesan_Resume.pdf',
   },
   manifesto: {

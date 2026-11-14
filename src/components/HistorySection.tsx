@@ -23,7 +23,7 @@ const MILESTONES: Milestone[] = [
     title: 'A podcast as a way of asking better questions',
     reflection:
       'Started the show that became Syntinuum (formerly Adapt: Implementing Innovations) to ask founders, researchers and executives how ideas survive contact with production.',
-    detail: ['Long-form technical dialogues', '100K+ combined impressions'],
+    detail: ['Long-form technical dialogues', '100K+ views across platforms'],
     link: { href: '#podcast', label: 'Listen to Syntinuum' },
   },
   {

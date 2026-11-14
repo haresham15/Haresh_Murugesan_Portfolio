@@ -1,6 +1,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { profile } from '@/content/profile';
 
 // The canvas measures every [data-hero-protect] rect in this section and keeps
 // the plume, streamlines and background clear of them.
@@ -19,6 +20,11 @@ const AsciiDnaLightbulbCanvas = dynamic(() => import('./AsciiDnaLightbulbCanvas'
 
 const SPRING = 'ease-[cubic-bezier(0.34,1.56,0.64,1)]';
 
+const PROOFS = [
+  { label: 'AI and software intern, CAS', href: '#experience' },
+  { label: '2× 1st place, ASA DataFest', href: '#achievements' },
+];
+
 export const BentoHero: React.FC = () => {
   return (
     <section
@@ -31,13 +37,18 @@ export const BentoHero: React.FC = () => {
       </div>
 
       <div className="relative z-20 w-full max-w-[680px] flex flex-col pb-20 md:pb-0 pointer-events-none">
-        <p className="mb-4 sm:mb-6 text-[11px] sm:text-xs font-mono tracking-widest uppercase font-semibold flex flex-wrap items-center gap-x-2.5 gap-y-1 pointer-events-auto">
-          <span data-hero-protect className="text-[#FF2800]">The Ohio State University</span>
-          <span className="text-[#7E8B9B]" aria-hidden="true">·</span>
-          <span data-hero-protect className="text-[#C8D2E0]">B.S. CSE (AI Specialization)</span>
+        {/* The résumé facts a recruiter scans for first: degree, graduation, role and season. */}
+        <p className="mb-5 sm:mb-7 max-w-[52ch] font-sans text-[15px] sm:text-base leading-snug text-[#C8D2E0] pointer-events-auto">
+          {/* One sentence per line, so a web-font swap can't move words between lines (layout shift). */}
+          <span data-hero-protect className="block">
+            {profile.education.shortDegree} at Ohio State, graduating {profile.education.expectedGraduation}.
+          </span>{' '}
+          <span data-hero-protect className="block text-[#F4F6F9]">
+            Seeking {profile.availability.targetSeason} {profile.availability.seeking}.
+          </span>
         </p>
 
-        <h1 className="font-serif font-normal text-[clamp(3.4rem,6vw,6.5rem)] leading-[0.95] tracking-[-0.035em] pointer-events-auto">
+        <h1 className="font-serif font-normal text-[clamp(3rem,min(6vw,8.5vh),6.5rem)] leading-[0.95] tracking-[-0.035em] pointer-events-auto">
           <span className="block text-[#F4F6F9]">
             <span data-hero-protect>Curious about intelligence.</span>
           </span>
@@ -51,42 +62,59 @@ export const BentoHero: React.FC = () => {
           </span>
         </h1>
 
-        <p className="mt-6 max-w-[45ch] text-[18px] leading-relaxed text-[#C8D2E0]/85 font-sans pointer-events-auto">
+        <p className="mt-5 sm:mt-6 max-w-[45ch] text-[17px] sm:text-[18px] leading-relaxed text-[#C8D2E0]/85 font-sans pointer-events-auto">
           <span data-hero-protect>
             Building high-speed computational systems where machine intelligence meets physical reality.
           </span>
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-5 pointer-events-auto">
-          <Link
-            href="/#projects"
-            data-hero-protect
-            className={`group inline-flex items-center gap-2.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] px-7 py-3.5 font-mono text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] shadow-[0_0_24px_rgba(255,40,0,0.32)] transition-[background-color,transform] duration-500 ${SPRING} hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF4419]`}
-          >
-            <span>Explore Work</span>
-            <span aria-hidden="true" className={`transition-transform duration-500 ${SPRING} group-hover:translate-x-1`}>
-              →
-            </span>
-          </Link>
+        {/* Two proof points, each a link to its section further down. */}
+        <ul
+          aria-label="Highlights"
+          className="mt-5 flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-x-3 gap-y-2 font-sans text-[15px] text-[#F4F6F9] pointer-events-auto"
+        >
+          {PROOFS.map((proof, i) => (
+            <li key={proof.href} className="flex items-baseline gap-x-3">
+              {i > 0 && (
+                <span aria-hidden="true" className="hidden sm:inline text-[#7E8B9B]">
+                  ·
+                </span>
+              )}
+              <a
+                href={proof.href}
+                data-hero-protect
+                className="underline decoration-[#FF2800]/60 decoration-1 underline-offset-[5px] hover:text-[#FF4419] hover:decoration-[#FF4419] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF4419]"
+              >
+                {proof.label}
+              </a>
+            </li>
+          ))}
+        </ul>
 
+        <div className="mt-7 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-5 pointer-events-auto">
           <a
-            href="/Haresh_Murugesan_Resume.pdf"
+            href={profile.contacts.resumeUrl}
             target="_blank"
             rel="noopener noreferrer"
             data-hero-protect
-            className="inline-flex items-center gap-2 text-xs font-mono text-[#F4F6F9] hover:text-[#FF4419] bg-[#060A12] border border-[#153875] hover:border-[#FF2800]/60 px-5 py-3.5 rounded-[2px] transition-colors duration-300 uppercase tracking-[0.16em] font-semibold"
+            data-track="resume_click"
+            className={`group inline-flex items-center gap-2.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] px-7 py-3.5 font-mono text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] shadow-[0_0_24px_rgba(255,40,0,0.32)] transition-[background-color,transform] duration-500 ${SPRING} hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF4419]`}
           >
             <span>Résumé (PDF)</span>
-            <span aria-hidden="true" className="text-[#FF2800]">↗</span>
+            <span aria-hidden="true" className={`transition-transform duration-500 ${SPRING} group-hover:translate-x-0.5 group-hover:-translate-y-0.5`}>
+              ↗
+            </span>
           </a>
 
           <Link
-            href="/projects"
+            href="/#projects"
             data-hero-protect
-            className="hidden md:inline-flex items-center gap-2 text-xs font-mono text-[#7E8B9B] hover:text-[#F4F6F9] transition-colors duration-300 py-2 uppercase tracking-[0.16em]"
+            className="group inline-flex items-center gap-2 text-xs font-mono text-[#F4F6F9] hover:text-[#FF4419] bg-[#060A12] border border-[#153875] hover:border-[#FF2800]/60 px-5 py-3.5 rounded-[2px] transition-colors duration-300 uppercase tracking-[0.16em] font-semibold"
           >
-            <span>Browse 18 Systems</span>
-            <span aria-hidden="true" className="text-[#FF2800]">↓</span>
+            <span>Explore work</span>
+            <span aria-hidden="true" className="text-[#FF2800] transition-transform duration-300 group-hover:translate-x-1">
+              →
+            </span>
           </Link>
         </div>
       </div>

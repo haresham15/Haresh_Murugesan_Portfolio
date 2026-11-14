@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { Project, EngineeringTradeoff } from '@/content/projects';
+import { getEvidence } from '@/content/evidence';
 import Header from '@/components/Header';
 import ContactFooter from '@/components/ContactFooter';
 import ForgedCarbonCanvas from '@/components/ForgedCarbonCanvas';
@@ -15,11 +16,18 @@ const HealiosDemo = dynamic(() => import('@/setpieces/HealiosDemo').then((m) => 
 const TempoDemo = dynamic(() => import('@/setpieces/TempoDemo').then((m) => m.TempoDemo), { ssr: false });
 const RouteRxDemo = dynamic(() => import('@/setpieces/RouteRxDemo').then((m) => m.RouteRxDemo), { ssr: false });
 
-interface CaseStudyLayoutProps {
-  project: Project;
+export interface ProjectLink {
+  slug: string;
+  title: string;
 }
 
-export const CaseStudyLayout: React.FC<CaseStudyLayoutProps> = ({ project }) => {
+interface CaseStudyLayoutProps {
+  project: Project;
+  prev?: ProjectLink | null;
+  next?: ProjectLink | null;
+}
+
+export const CaseStudyLayout: React.FC<CaseStudyLayoutProps> = ({ project, prev, next }) => {
   const { caseStudy } = project;
   const [copiedSummary, setCopiedSummary] = useState(false);
 
@@ -34,7 +42,7 @@ ${project.caseStudy.executiveSummary}
 ## Key Metrics
 ${project.caseStudy.metrics.map((m) => `- **${m.label}:** ${m.value} (${m.detail})`).join('\n')}
 
-Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
+Read full case study: https://www.hareshmurugesan.com/projects/${project.slug}`;
 
     try {
       await navigator.clipboard.writeText(summaryMarkdown);
@@ -60,19 +68,19 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
     '@graph': [
       {
         '@type': 'TechArticle',
-        '@id': `https://hareshmurugesan.com/projects/${project.slug}#article`,
+        '@id': `https://www.hareshmurugesan.com/projects/${project.slug}#article`,
         headline: project.title,
         description: project.caseStudy.executiveSummary,
         author: {
           '@type': 'Person',
           name: 'Haresh Murugesan',
-          url: 'https://hareshmurugesan.com',
+          url: 'https://www.hareshmurugesan.com',
         },
         publisher: {
           '@type': 'Person',
           name: 'Haresh Murugesan',
         },
-        mainEntityOfPage: `https://hareshmurugesan.com/projects/${project.slug}`,
+        mainEntityOfPage: `https://www.hareshmurugesan.com/projects/${project.slug}`,
         datePublished: `${project.year}-01-01T00:00:00Z`,
       },
       {
@@ -94,19 +102,19 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
             '@type': 'ListItem',
             position: 1,
             name: 'Home',
-            item: 'https://hareshmurugesan.com',
+            item: 'https://www.hareshmurugesan.com',
           },
           {
             '@type': 'ListItem',
             position: 2,
             name: 'Projects',
-            item: 'https://hareshmurugesan.com/#projects',
+            item: 'https://www.hareshmurugesan.com/#projects',
           },
           {
             '@type': 'ListItem',
             position: 3,
             name: project.title,
-            item: `https://hareshmurugesan.com/projects/${project.slug}`,
+            item: `https://www.hareshmurugesan.com/projects/${project.slug}`,
           },
         ],
       },
@@ -119,20 +127,20 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
         <title>{`${project.title} | Haresh Murugesan`}</title>
         <meta name="description" content={project.caseStudy.executiveSummary} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="canonical" href={`https://hareshmurugesan.com/projects/${project.slug}`} />
+        <link rel="canonical" href={`https://www.hareshmurugesan.com/projects/${project.slug}`} />
         
         {/* Open Graph */}
         <meta property="og:title" content={`${project.title} | Haresh Murugesan`} />
         <meta property="og:description" content={project.caseStudy.executiveSummary} />
-        <meta property="og:url" content={`https://hareshmurugesan.com/projects/${project.slug}`} />
+        <meta property="og:url" content={`https://www.hareshmurugesan.com/projects/${project.slug}`} />
         <meta property="og:type" content="article" />
-        <meta property="og:image" content={`https://hareshmurugesan.com${project.image || '/profile.jpeg'}`} />
+        <meta property="og:image" content={`https://www.hareshmurugesan.com${project.image || '/preview-image.jpeg'}`} />
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${project.title} | Haresh Murugesan`} />
         <meta name="twitter:description" content={project.caseStudy.executiveSummary} />
-        <meta name="twitter:image" content={`https://hareshmurugesan.com${project.image || '/profile.jpeg'}`} />
+        <meta name="twitter:image" content={`https://www.hareshmurugesan.com${project.image || '/preview-image.jpeg'}`} />
 
         {/* JSON-LD Structured Data */}
         <script
@@ -173,14 +181,28 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
               <span className="text-xs font-mono uppercase px-2.5 py-1 rounded-[2px] bg-[#060A12] border border-[#18458B]/25 text-[#FF2800]">
                 {project.statusBadge}
               </span>
-              <span className="text-xs font-mono text-[#7E8B9B] ml-auto">
-                {project.year} • {project.role}
-              </span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-raleway font-extrabold text-[#F4F6F9] tracking-tight leading-[1.1] mb-6">
               {project.title}
             </h1>
+
+            {/* The facts a reviewer checks first. Fields without a source are left out, not guessed. */}
+            <dl className="mb-8 flex flex-wrap gap-x-8 gap-y-3 border-t border-[#C8D2E0]/10 pt-4 text-sm font-sans">
+              {[
+                { term: 'Role', value: project.role },
+                { term: 'Dates', value: caseStudy.dates ?? project.year },
+                { term: 'Team', value: caseStudy.teamSize },
+                { term: 'Stack', value: project.stack.split(/,\s*/).join(' · ') },
+              ]
+                .filter((f): f is { term: string; value: string } => Boolean(f.value))
+                .map((f) => (
+                  <div key={f.term} className="min-w-0">
+                    <dt className="text-xs text-[#7E8B9B]">{f.term}</dt>
+                    <dd className="mt-0.5 text-[#F4F6F9]">{f.value}</dd>
+                  </div>
+                ))}
+            </dl>
 
             {/* QUICK ACTIONS BAR */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-[2px] bg-[#060A12]/80 border border-[#18458B]/25 mb-8 backdrop-blur-sm">
@@ -385,6 +407,12 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                           <p className="text-xs font-mono text-[#7E8B9B] mb-1">{metric.label}</p>
                           <p className="text-2xl font-mono font-bold text-[#FF2800] mb-2">{metric.value}</p>
                           <p className="text-xs font-sans text-[#7E8B9B] leading-relaxed">{metric.detail}</p>
+                          {metric.evidenceId && getEvidence(metric.evidenceId)?.hardwareOrEnv && (
+                            <p className="mt-2 text-xs font-sans text-[#C8D2E0] leading-relaxed">
+                              <span className="text-[#7E8B9B]">Measured on: </span>
+                              {getEvidence(metric.evidenceId)?.hardwareOrEnv}
+                            </p>
+                          )}
                         </div>
                         {metric.evidenceId && (
                           <div className="mt-3 pt-3 border-t border-[#18458B]/15">
@@ -423,6 +451,13 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
                       <p className="text-xs font-mono uppercase text-[#2563EB] mb-1 font-semibold">Next Engineering Steps:</p>
                       <p className="text-[#F4F6F9] leading-relaxed">{caseStudy.nextSteps}</p>
                     </div>
+
+                    {caseStudy.whatIdChange && (
+                      <div className="p-3.5 sm:p-4 rounded-[2px] bg-[#03050A] border border-[#18458B]/20">
+                        <p className="text-xs font-mono text-[#C8D2E0] mb-1 font-semibold">What I would change</p>
+                        <p className="text-[#F4F6F9] leading-relaxed">{caseStudy.whatIdChange}</p>
+                      </div>
+                    )}
                   </div>
                 </section>
 
@@ -431,6 +466,31 @@ Read full case study: https://hareshmurugesan.com/projects/${project.slug}`;
             </div>
           </div>
 
+          {(prev || next) && (
+            <nav
+              aria-label="More case studies"
+              className="max-w-[1280px] mx-auto px-4 sm:px-6 mt-16 pt-6 border-t border-[#C8D2E0]/10 grid grid-cols-1 sm:grid-cols-2 gap-6 font-sans"
+            >
+              {prev ? (
+                <Link href={`/projects/${prev.slug}`} className="group flex flex-col gap-1 min-h-[44px]">
+                  <span className="text-xs text-[#7E8B9B]">
+                    <span aria-hidden="true">← </span>Previous
+                  </span>
+                  <span className="text-lg text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors">{prev.title}</span>
+                </Link>
+              ) : (
+                <span />
+              )}
+              {next && (
+                <Link href={`/projects/${next.slug}`} className="group flex flex-col gap-1 min-h-[44px] sm:items-end sm:text-right">
+                  <span className="text-xs text-[#7E8B9B]">
+                    Next<span aria-hidden="true"> →</span>
+                  </span>
+                  <span className="text-lg text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors">{next.title}</span>
+                </Link>
+              )}
+            </nav>
+          )}
         </main>
 
         <ContactFooter />

@@ -10,7 +10,7 @@ export const podcastSummary =
   'An engineering leadership podcast on system architecture, scaling dilemmas and technical tradeoffs, with founders, researchers and executives.';
 
 /** Kept as one line in the section. */
-export const podcastReach = '100K+ impressions, 10 guests';
+export const podcastReach = '100K+ views across YouTube, Instagram and TikTok, 10 guests';
 
 export interface PodcastPillar {
   id: 'intelligence' | 'scale' | 'accountability';

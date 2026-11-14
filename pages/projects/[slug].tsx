@@ -2,14 +2,16 @@ import React from 'react';
 import Head from 'next/head';
 import { GetStaticProps, GetStaticPaths } from 'next';
 import Link from 'next/link';
-import { allProjects, getProjectBySlug, getAllProjectSlugs, Project } from '@/content/projects';
-import { CaseStudyLayout } from '@/components/case-study/CaseStudyLayout';
+import { getProjectBySlug, getAllProjectSlugs, projectsByTier, projectTier, Project } from '@/content/projects';
+import { CaseStudyLayout, type ProjectLink } from '@/components/case-study/CaseStudyLayout';
 
 interface ProjectPageProps {
   project: Project | null;
+  prev: ProjectLink | null;
+  next: ProjectLink | null;
 }
 
-export default function ProjectPage({ project }: ProjectPageProps) {
+export default function ProjectPage({ project, prev, next }: ProjectPageProps) {
   if (!project) {
     return (
       <div className="min-h-screen bg-[#07090D] text-white flex flex-col items-center justify-center p-6 text-center">
@@ -25,7 +27,7 @@ export default function ProjectPage({ project }: ProjectPageProps) {
     );
   }
 
-  return <CaseStudyLayout project={project} />;
+  return <CaseStudyLayout project={project} prev={prev} next={next} />;
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -45,9 +47,28 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const slug = params?.slug as string;
   const project = getProjectBySlug(slug) || null;
 
+  // Flagships page through each other in Works order; everything else pages through the rest by tier.
+  let prev: ProjectLink | null = null;
+  let next: ProjectLink | null = null;
+  if (project) {
+    const isFlagship = projectTier(project) === 'flagship';
+    const ring = projectsByTier.filter((p) => (projectTier(p) === 'flagship') === isFlagship);
+    const i = ring.findIndex((p) => p.slug === project.slug);
+    const at = (k: number) => {
+      const p = ring[(k + ring.length) % ring.length];
+      return { slug: p.slug, title: p.title };
+    };
+    if (ring.length > 1) {
+      prev = at(i - 1);
+      next = at(i + 1);
+    }
+  }
+
   return {
     props: {
       project,
+      prev,
+      next,
     },
   };
 };
