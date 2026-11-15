@@ -97,7 +97,7 @@ export default function ProjectsPage() {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: 'Engineering Systems Archive | Haresh Murugesan',
-    description: 'Complete searchable telemetry sheet and repository index of 18 software systems, AI pipelines, and research prototypes by Haresh Murugesan.',
+    description: `Complete searchable telemetry sheet and repository index of ${allProjects.length} software systems, AI pipelines, and research prototypes by Haresh Murugesan.`,
     url: 'https://www.hareshmurugesan.com/projects',
     isPartOf: {
       '@type': 'WebSite',
@@ -123,14 +123,14 @@ export default function ProjectsPage() {
         <title>Engineering Systems Archive | Haresh Murugesan</title>
         <meta
           name="description"
-          content="Complete searchable ledger and timing sheet of 18 software systems, real-time simulation engines, clinical computer vision pipelines, and spatial models by Haresh Murugesan."
+          content={`Complete searchable ledger and timing sheet of ${allProjects.length} software systems, real-time simulation engines, clinical computer vision pipelines, and spatial models by Haresh Murugesan.`}
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="canonical" href="https://www.hareshmurugesan.com/projects" />
         <meta property="og:title" content="Engineering Systems Archive | Haresh Murugesan" />
         <meta
           property="og:description"
-          content="Searchable telemetry ledger indexing 18 software systems, AI pipelines, and research prototypes."
+          content={`Searchable telemetry ledger indexing ${allProjects.length} software systems, AI pipelines, and research prototypes.`}
         />
         <meta property="og:url" content="https://www.hareshmurugesan.com/projects" />
         <meta property="og:type" content="website" />
@@ -139,7 +139,7 @@ export default function ProjectsPage() {
         <meta name="twitter:title" content="Engineering Systems Archive | Haresh Murugesan" />
         <meta
           name="twitter:description"
-          content="Searchable telemetry ledger indexing 18 software systems, AI pipelines, and research prototypes."
+          content={`Searchable telemetry ledger indexing ${allProjects.length} software systems, AI pipelines, and research prototypes.`}
         />
         <meta name="twitter:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
         <script

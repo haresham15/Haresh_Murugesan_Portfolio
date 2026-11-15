@@ -214,11 +214,12 @@ export const NowSection: React.FC = () => {
   }, []);
 
   /* ---- scroll ↔ stop ---- */
-  const pinState = useCallback(() => {
+  /** `measured`: the rect read in the scheduler's measure phase; otherwise read it now. */
+  const pinState = useCallback((measured?: DOMRect | null) => {
     const section = sectionRef.current;
     const s = m.current;
     if (!section || s.reduced) return null;
-    const rect = section.getBoundingClientRect();
+    const rect = measured ?? section.getBoundingClientRect();
     const runway = rect.height - s.stageH;
     if (runway <= 1) return null;
     return { rect, runway, pinned: rect.top <= 1 && rect.bottom >= s.stageH - 1 };
@@ -245,9 +246,9 @@ export const NowSection: React.FC = () => {
     taskRef.current?.wake();
   }, [pinState]);
 
-  const readScroll = useCallback(() => {
+  const readScroll = useCallback((measured?: DOMRect | null) => {
     const s = m.current;
-    const pin = pinState();
+    const pin = pinState(measured);
     if (!pin) return;
     const p = -pin.rect.top / pin.runway;
     const prev = s.scrollStop;
@@ -269,9 +270,11 @@ export const NowSection: React.FC = () => {
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
+    let rect: DOMRect | null = null;
     const task = register(({ dt }) => {
       const s = m.current;
-      readScroll();
+      readScroll(rect);
+      rect = null;
       if (s.dragging) {
         setLock(-1);
         apply(s.x);
@@ -281,7 +284,7 @@ export const NowSection: React.FC = () => {
       apply(s.x);
       setLock(settled ? s.target : -1);
       return !settled;
-    }, { element: section, budgeted: false });
+    }, { element: section, budgeted: false, measure: () => { rect = section.getBoundingClientRect(); } });
     taskRef.current = task;
     return () => {
       task.dispose();

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useMotionPreference } from './MotionPreference';
+import { tokens } from '../tokens';
 
 export type ChromaticTheme =
   | 'obsidian'
@@ -170,9 +171,12 @@ export const ThemeSection: React.FC<ThemeSectionProps> = ({
 
 /**
  * Scroll reveal shared by the lower home sections: fires once via IntersectionObserver
- * (framer-motion whileInView) and settles on a critically damped spring.
+ * (framer-motion whileInView). One tween for every reveal: the motion token's slow
+ * ease-out-expo, which is visually done in about a third of its 0.6 s.
  */
-export const REVEAL_SPRING = { type: 'spring' as const, stiffness: 120, damping: 22, mass: 0.9 };
+export const REVEAL_TWEEN = tokens.motion.tweenSlow;
+/** Rise distance for every reveal, px. */
+export const REVEAL_Y = 16;
 
 export interface RevealProps {
   children: React.ReactNode;
@@ -182,7 +186,7 @@ export interface RevealProps {
   as?: 'div' | 'li' | 'article';
 }
 
-export const Reveal: React.FC<RevealProps> = ({ children, className, delay = 0, y = 28, as = 'div' }) => {
+export const Reveal: React.FC<RevealProps> = ({ children, className, delay = 0, y = REVEAL_Y, as = 'div' }) => {
   const { isReduced } = useMotionPreference();
   const Tag = (as === 'li' ? motion.li : as === 'article' ? motion.article : motion.div) as typeof motion.div;
   if (isReduced) {
@@ -194,7 +198,7 @@ export const Reveal: React.FC<RevealProps> = ({ children, className, delay = 0, 
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ ...REVEAL_SPRING, delay }}
+      transition={{ duration: REVEAL_TWEEN.duration, ease: [...REVEAL_TWEEN.ease], delay }}
     >
       {children}
     </Tag>

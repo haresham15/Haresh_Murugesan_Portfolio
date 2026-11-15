@@ -686,14 +686,14 @@ function createRouteScene(): PlateScene {
 
 export const routeRxPlate: PlateDefinition = {
   modes: [
-    { id: 'iso', label: 'Isochrones', description: 'Synthetic street network with 5, 15 and 30 minute travel-time isochrones around three generic clinics, plus demand vectors from transit-desert blocks.' },
     { id: 'deserts', label: 'Transit deserts', description: '141 synthetic census blocks; the 43 farthest from any bus stop fall outside an 800 metre walk and are marked as deserts.' },
+    { id: 'iso', label: 'Isochrones', description: 'Synthetic street network with 5, 15 and 30 minute travel-time isochrones around three generic clinics, plus demand vectors from transit-desert blocks.' },
     { id: 'route', label: 'Routing', description: 'Shortest-path shuttle routing from the hospital to a pickup point chosen by the cursor, with DBSCAN pickup clusters.' },
   ],
   createScene(modeId) {
-    if (modeId === 'deserts') return createDesertScene();
+    if (modeId === 'iso') return createIsoScene();
     if (modeId === 'route') return createRouteScene();
-    return createIsoScene();
+    return createDesertScene();
   },
 };
 

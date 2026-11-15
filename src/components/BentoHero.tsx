@@ -37,8 +37,20 @@ export const BentoHero: React.FC = () => {
       </div>
 
       <div className="relative z-20 w-full max-w-[680px] flex flex-col pb-20 md:pb-0 pointer-events-none">
+        <h1 className="font-serif font-normal text-[#F4F6F9] text-[clamp(3rem,min(7vw,9vh),7rem)] leading-[0.92] tracking-[-0.035em] pointer-events-auto">
+          <span data-hero-protect>{profile.name}</span>
+        </h1>
+
+        <p className="mt-4 font-serif italic text-[clamp(1.5rem,min(2.6vw,4vh),2.25rem)] leading-tight text-[#C8D2E0] pointer-events-auto">
+          <span data-hero-protect>{profile.tagline}</span>
+        </p>
+
+        <p className="mt-3 font-sans text-[15px] sm:text-[17px] leading-snug text-[#C8D2E0]/85 pointer-events-auto">
+          <span data-hero-protect>{profile.focus}</span>
+        </p>
+
         {/* The résumé facts a recruiter scans for first: degree, graduation, role and season. */}
-        <p className="mb-5 sm:mb-7 max-w-[52ch] font-sans text-[15px] sm:text-base leading-snug text-[#C8D2E0] pointer-events-auto">
+        <p className="mt-6 sm:mt-8 max-w-[52ch] font-sans text-[15px] sm:text-base leading-snug text-[#C8D2E0] pointer-events-auto">
           {/* One sentence per line, so a web-font swap can't move words between lines (layout shift). */}
           <span data-hero-protect className="block">
             {profile.education.shortDegree} at Ohio State, graduating {profile.education.expectedGraduation}.
@@ -48,25 +60,6 @@ export const BentoHero: React.FC = () => {
           </span>
         </p>
 
-        <h1 className="font-serif font-normal text-[clamp(3rem,min(6vw,8.5vh),6.5rem)] leading-[0.95] tracking-[-0.035em] pointer-events-auto">
-          <span className="block text-[#F4F6F9]">
-            <span data-hero-protect>Curious about intelligence.</span>
-          </span>
-          <span className="block italic mt-2 md:pl-6">
-            <span
-              data-hero-protect
-              className="pr-[0.08em] bg-gradient-to-r from-[#F4F6F9] via-[#C8D2E0] to-[#FF2800] bg-clip-text text-transparent"
-            >
-              Obsessed with making it work.
-            </span>
-          </span>
-        </h1>
-
-        <p className="mt-5 sm:mt-6 max-w-[45ch] text-[17px] sm:text-[18px] leading-relaxed text-[#C8D2E0]/85 font-sans pointer-events-auto">
-          <span data-hero-protect>
-            Building high-speed computational systems where machine intelligence meets physical reality.
-          </span>
-        </p>
 
         {/* Two proof points, each a link to its section further down. */}
         <ul

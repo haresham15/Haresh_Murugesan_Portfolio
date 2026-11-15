@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
 import { ThemeSection, Reveal } from './ThemeSection';
 import { useMotionPreference } from './MotionPreference';
 
@@ -68,7 +68,9 @@ export const HistorySection: React.FC = () => {
   // Progress reaches the tip of the line exactly at 60% of the viewport height.
   const { scrollYProgress } = useScroll({ target: timelineRef, offset: ['start 0.6', 'end 0.6'] });
   const drawn = useSpring(scrollYProgress, { stiffness: 110, damping: 26, mass: 0.4, restDelta: 0.0005 });
-  const beadTop = useTransform(drawn, (p) => `${Math.min(1, Math.max(0, p)) * 100}%`);
+  // The bead rides on transform (translateY in px), never `top`, so it never triggers layout.
+  const trackH = useMotionValue(0);
+  const beadY = useTransform([drawn, trackH], ([p, h]: number[]) => Math.min(1, Math.max(0, p)) * h);
 
   // Node positions are measured, never hardcoded, so they stay aligned on resize.
   useEffect(() => {
@@ -77,6 +79,7 @@ export const HistorySection: React.FC = () => {
     const measure = () => {
       const box = el.getBoundingClientRect();
       if (box.height <= 0) return;
+      trackH.set(box.height);
       nodeFractions.current = nodeRefs.current.map((n) => {
         if (!n) return 1;
         const r = n.getBoundingClientRect();
@@ -87,7 +90,7 @@ export const HistorySection: React.FC = () => {
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [trackH]);
 
   useEffect(() => {
     const update = (p: number) => {
@@ -126,10 +129,9 @@ export const HistorySection: React.FC = () => {
               style={{ scaleY: isReduced ? 1 : drawn }}
             />
             {!isReduced && (
-              <motion.span
-                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 w-[9px] h-[9px] rounded-full bg-[#F4F6F9] shadow-[0_0_0_3px_rgba(255,40,0,0.35),0_0_18px_rgba(255,40,0,0.6)]"
-                style={{ top: beadTop }}
-              />
+              <motion.span className="absolute left-1/2 top-0" style={{ y: beadY }}>
+                <span className="block -translate-x-1/2 -translate-y-1/2 w-[9px] h-[9px] rounded-full bg-[#F4F6F9] shadow-[0_0_0_3px_rgba(255,40,0,0.35),0_0_18px_rgba(255,40,0,0.6)]" />
+              </motion.span>
             )}
           </div>
 
@@ -149,12 +151,14 @@ export const HistorySection: React.FC = () => {
                       nodeRefs.current[i] = el;
                     }}
                     aria-hidden="true"
-                    className="absolute top-[30px] left-[7px] lg:left-1/2 -translate-x-1/2 -translate-y-1/2 w-[15px] h-[15px] rounded-full border bg-[#03050A] transition-[border-color,box-shadow] duration-500"
-                    style={{
-                      borderColor: lit ? '#FF2800' : 'rgba(200,210,224,0.35)',
-                      boxShadow: lit ? '0 0 0 4px rgba(255,40,0,0.12)' : 'none',
-                    }}
+                    className="absolute top-[30px] left-[7px] lg:left-1/2 -translate-x-1/2 -translate-y-1/2 w-[15px] h-[15px] rounded-full border bg-[#03050A] transition-[border-color] duration-500"
+                    style={{ borderColor: lit ? '#FF2800' : 'rgba(200,210,224,0.35)' }}
                   >
+                    {/* Halo: a fixed ring that fades in on opacity, instead of a transitioned box-shadow */}
+                    <span
+                      className="absolute -inset-[5px] rounded-full border-4 border-[rgba(255,40,0,0.12)] transition-opacity duration-500"
+                      style={{ opacity: lit ? 1 : 0 }}
+                    />
                     <motion.span
                       className="absolute inset-[4px] rounded-full bg-[#FF2800]"
                       initial={false}
@@ -164,7 +168,6 @@ export const HistorySection: React.FC = () => {
                   </span>
 
                   <Reveal
-                    y={isReduced ? 0 : 32}
                     className={`pl-10 lg:pl-0 ${isLeft ? 'lg:col-start-1 lg:text-right' : 'lg:col-start-2'}`}
                   >
                     <article className={`max-w-[34rem] ${isLeft ? 'lg:ml-auto' : ''}`}>

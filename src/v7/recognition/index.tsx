@@ -114,7 +114,7 @@ function lineStyle(phase: TextPhase, i: number, reduced: boolean): CSSProperties
   if (reduced) return {};
   if (phase === 'exit') return { transform: 'translateY(-110%)', transition: `transform 100ms cubic-bezier(0.4,0,1,1) ${i * 20}ms` };
   if (phase === 'hidden') return { transform: 'translateY(110%)', transition: 'none' };
-  return { transform: 'translateY(0)', transition: `transform 420ms cubic-bezier(0.16,1,0.3,1) ${i * 60}ms` };
+  return { transform: 'translateY(0)', transition: `transform 420ms var(--ease-out-expo) ${i * 60}ms` };
 }
 
 function Line({ phase, i, reduced, children }: { phase: TextPhase; i: number; reduced: boolean; children: React.ReactNode }) {
@@ -225,10 +225,13 @@ export default function RecognitionSection() {
     // Bitmaps for medal i are in the DOM once its layers exist.
     const layersReady = (i: number) => (dom(i)?.layers.length ?? 0) > 0;
 
+    // Read in the scheduler's measure phase, before any task writes styles this frame.
+    let measuredRect: DOMRect | null = null;
     const frame = ({ now, dt }: FrameInfo): boolean => {
       const { geom: g, tier: tr, reduced } = cfg.current;
       if (!g) return false;
-      const rect = stage.getBoundingClientRect();
+      const rect = measuredRect ?? stage.getBoundingClientRect();
+      measuredRect = null;
       const st = motion.current;
       const sp = st.spring;
 
@@ -332,7 +335,7 @@ export default function RecognitionSection() {
       return keep;
     };
 
-    const task = register(frame, { element: stage, budgeted: true });
+    const task = register(frame, { element: stage, budgeted: true, measure: () => { measuredRect = stage.getBoundingClientRect(); } });
     taskRef.current = task;
     return () => {
       task.dispose();

@@ -18,15 +18,17 @@ export const CursorDot: React.FC = () => {
     let y = -100;
     let shape = '';
     let on = '';
+    let field: ReturnType<typeof readField> | null = null;
     const task = register(() => {
       el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      const m = materialAt(x, y, readField());
+      const m = materialAt(x, y, field ?? readField());
+      field = null;
       if (m !== on) {
         on = m;
         el.dataset.on = m;
       }
       return false;
-    }, { budgeted: false, wakeOnVisible: false });
+    }, { budgeted: false, wakeOnVisible: false, measure: () => { field = readField(); } });
     const move = (e: PointerEvent) => {
       if (e.pointerType === 'touch') return;
       x = e.clientX;

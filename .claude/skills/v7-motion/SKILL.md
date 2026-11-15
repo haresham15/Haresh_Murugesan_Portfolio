@@ -24,8 +24,10 @@ task.dispose();   // in the effect cleanup
 
 - `element`: observed by one shared IntersectionObserver. Off screen, the task does not run; it wakes when it scrolls back in (`wakeOnVisible`, default true).
 - `budgeted` (default true): counts toward **MAX_ANIMATING = 2**. When more budgeted tasks are awake and visible, the two with the largest visible area run; the rest wait. Every canvas is budgeted. Pointer easing, CarbonField and scroll-driven SVG are not.
+- `measure` (option): DOM reads (`getBoundingClientRect`, `readField()`, `offsetHeight`) go here. Every running task's `measure` runs before any frame callback, so reads never interleave with another task's style writes. Never read layout inside the frame callback or a scroll handler; wake a task from the handler instead.
 - Sleep whenever you are settled. A still canvas costs nothing.
-- 2D canvases: use `useCanvasStage(containerRef, canvasRef, draw, { animate })` from `src/hooks/useCanvasStage.ts`; it already registers with the scheduler. Return `false` from `draw` to sleep; call the returned `invalidate()` to wake.
+- 2D canvases: use `useCanvasStage(containerRef, canvasRef, draw, { animate })` from `src/hooks/useCanvasStage.ts`; it already registers with the scheduler. Return `false` from `draw` to sleep; call the returned `invalidate()` to wake. `stage.rect` is the container's rect from this frame's measure phase; off-screen stages skip drawing even if the IntersectionObserver lags.
+- Glyph-heavy 2D canvases: `fillText` beats a `drawImage` glyph atlas on GPU-backed canvases (measured 8 ms vs 46 ms for 3000 glyphs); cut frame rate instead.
 
 ## One pointer — `src/v7/runtime/pointer.ts`
 

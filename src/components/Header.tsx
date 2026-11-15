@@ -21,29 +21,29 @@ interface NavDestination {
 // Each href points at a section id rendered on the home page (or a static file).
 // Listed in page order.
 const NAV_DESTINATIONS: NavDestination[] = [
-  { num: '01', label: 'Work', href: '/#projects', note: 'Selected projects and case studies' },
-  { num: '02', label: 'Recognition', href: '/#achievements', note: 'Awards' },
-  { num: '03', label: 'Experience', href: '/#experience', note: 'Roles and research' },
-  { num: '04', label: 'Archive', href: '/#archive', note: 'All projects, mapped as a graph' },
-  { num: '05', label: 'Technical Index', href: '/#skills', note: 'Languages, frameworks and tools' },
-  { num: '06', label: 'Syntinuum', href: '/#podcast', note: 'The podcast' },
-  { num: '07', label: 'About', href: '/#about', note: 'Background and approach' },
+  { num: '01', label: 'About', href: '/#about', note: 'Background and approach' },
+  { num: '02', label: 'Work', href: '/#projects', note: 'Selected projects and case studies' },
+  { num: '03', label: 'Recognition', href: '/#achievements', note: 'Awards' },
+  { num: '04', label: 'Experience', href: '/#experience', note: 'Roles and research' },
+  { num: '05', label: 'Archive', href: '/#archive', note: 'All projects, mapped as a graph' },
+  { num: '06', label: 'Technical Index', href: '/#skills', note: 'Languages, frameworks and tools' },
+  { num: '07', label: 'Syntinuum', href: '/#podcast', note: 'The podcast' },
   { num: '08', label: 'Résumé', href: profile.contacts.resumeUrl, note: 'PDF, opens in a new tab', external: true },
   { num: '09', label: 'Contact', href: '/#contact', note: 'Email and profiles' },
 ];
 
 // The inline bar shown from lg up. Each id is a home-page section.
 const BAR_LINKS = [
+  { label: 'About', id: 'about' },
   { label: 'Work', id: 'projects' },
   { label: 'Experience', id: 'experience' },
   { label: 'Recognition', id: 'achievements' },
   { label: 'Skills', id: 'skills' },
-  { label: 'About', id: 'about' },
   { label: 'Contact', id: 'contact' },
 ];
 
 // Every home section, so the highlight clears while the visitor is in one the bar doesn't name.
-const SECTION_IDS = ['hero', 'projects', 'achievements', 'experience', 'archive', 'skills', 'podcast', 'about', 'history', 'now', 'contact'];
+const SECTION_IDS = ['hero', 'about', 'projects', 'achievements', 'experience', 'archive', 'skills', 'podcast', 'history', 'now', 'contact'];
 
 const GITHUB_PATH =
   'M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12';
@@ -183,16 +183,21 @@ export default function Header() {
       <header className={`fixed top-0 left-0 w-full pointer-events-none ${navOpen ? 'z-[110]' : 'z-50'}`}>
         {/* Monogram and wheel share a vertical centre line: 40px on phones, 48px from sm up */}
         <div ref={brandRef} data-on={navOpen ? 'dark' : brandOn} className="fixed top-6 left-4 sm:top-8 sm:left-6 md:left-12 pointer-events-auto">
+          {/* Wordmark: name over role, set in type rather than a badge */}
           <Link
             href="/"
-            aria-label={`${profile.name}, home`}
-            className="flex items-center gap-2.5 sm:gap-3 group select-none transition-transform duration-150 ease-out-expo active:scale-95"
+            aria-label={`${profile.name}, ${profile.title}, home`}
+            className="group flex h-8 flex-col justify-center select-none focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-[#FF2800]"
           >
-            <span className="on-material w-8 h-8 rounded-[2px] bg-[var(--on-surface)] border border-[var(--on-ink-soft)] text-[var(--on-ink)] flex items-center justify-center font-mono text-xs font-semibold group-hover:border-[#FF2800] group-hover:text-[#FF2800] shadow-[0_2px_12px_var(--on-shadow)]">
-              HM
-            </span>
-            <span className="on-material font-sans font-medium text-[15px] tracking-tight text-[var(--on-ink)] group-hover:text-[#FF2800] whitespace-nowrap drop-shadow-[0_2px_8px_var(--on-shadow)]">
+            <span className="on-material relative font-serif text-[19px] sm:text-[21px] leading-none tracking-[-0.01em] text-[var(--on-ink)] whitespace-nowrap drop-shadow-[0_1px_6px_var(--on-shadow)]">
               {profile.name}
+              <span
+                aria-hidden="true"
+                className="absolute left-0 right-0 -bottom-1 h-px bg-[#FF2800] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out-expo"
+              />
+            </span>
+            <span className="on-material hidden sm:block mt-1.5 font-sans text-[12px] leading-none tracking-normal text-[var(--on-ink)] opacity-70 whitespace-nowrap drop-shadow-[0_1px_6px_var(--on-shadow)]">
+              {profile.title}
             </span>
           </Link>
         </div>

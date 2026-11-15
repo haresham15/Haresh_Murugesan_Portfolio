@@ -90,9 +90,11 @@ export const CarbonField: React.FC = () => {
     };
 
     let first = true;
+    let field: ReturnType<typeof readField> | null = null;
     const draw = () => {
       if (lost) return false;
-      const f = readField();
+      const f = field ?? readField();
+      field = null;
       const ptr = getPointer();
       const n = Math.min(f.bands.length, MAX_BANDS);
       bandData.fill(0);
@@ -119,7 +121,8 @@ export const CarbonField: React.FC = () => {
       return false;
     };
 
-    const task = register(draw, { budgeted: false, wakeOnVisible: false });
+    // readField() re-measures section layout when it is stale: do it in the read phase.
+    const task = register(draw, { budgeted: false, wakeOnVisible: false, measure: () => { field = readField(); } });
     const wake = () => task.wake();
     const onResize = () => {
       resize();

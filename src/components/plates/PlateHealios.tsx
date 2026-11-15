@@ -709,14 +709,14 @@ function createPipelineScene(): PlateScene {
 
 export const healiosPlate: PlateDefinition = {
   modes: [
-    { id: 'depth', label: 'Depth cloud', description: 'Rotating point cloud of a synthetic wound surface. Moving the cursor slices it and plots the depth profile.' },
     { id: 'saliency', label: 'Grad-CAM', description: 'Grad-CAM saliency heatmap with isocontours. A lens follows the cursor and reads the activation under it.' },
+    { id: 'depth', label: 'Depth cloud', description: 'Rotating point cloud of a synthetic wound surface. Moving the cursor slices it and plots the depth profile.' },
     { id: 'pipeline', label: 'Pipeline', description: 'The Healios container diagram: patient app, FastAPI gateway, Grad-CAM engine, tissue analyzer, protocol retrieval and EHR store.' },
   ],
   createScene(modeId, palette = DARK_PALETTE) {
-    if (modeId === 'saliency') return createSaliencyScene(palette);
+    if (modeId === 'depth') return createDepthScene();
     if (modeId === 'pipeline') return createPipelineScene();
-    return createDepthScene();
+    return createSaliencyScene(palette);
   },
 };
 

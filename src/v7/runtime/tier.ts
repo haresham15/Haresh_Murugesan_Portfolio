@@ -1,5 +1,7 @@
 /**
- * Quality tier, chosen once per page load by a 500 ms frame-time probe.
+ * Quality tier, chosen once per page load by a 500 ms frame-time probe. The probe waits
+ * for `load` and an idle callback, so it measures the device rather than hydration, and
+ * judges the median frame so one long hydration task cannot force the CSS fallback.
  *
  *   full    shader at DPR <= 1.5 with glints
  *   lite    shader at DPR 1, no glints
@@ -9,11 +11,12 @@
  */
 import { useEffect, useState } from 'react';
 import { useMotionPreference } from '@/components/MotionPreference';
+import { register } from './scheduler';
 
 export type QualityTier = 'full' | 'lite' | 'static';
 
 export const PROBE_MS = 500;
-/** 75th-percentile frame interval thresholds, ms. */
+/** Median frame interval thresholds, ms. */
 export const FULL_MAX_FRAME = 20;
 export const LITE_MAX_FRAME = 34;
 
@@ -40,20 +43,28 @@ export function probeTier(): Promise<QualityTier> {
     const forced = override();
     if (forced) return resolve(forced);
     if (!hasWebGL2()) return resolve('static');
-    const frames: number[] = [];
-    let last = 0;
-    let start = 0;
-    const tick = (now: number) => {
-      if (!start) start = now;
-      if (last) frames.push(now - last);
-      last = now;
-      if (now - start < PROBE_MS) return void requestAnimationFrame(tick);
-      if (frames.length < 4) return resolve('lite');
-      frames.sort((a, b) => a - b);
-      const p75 = frames[Math.floor(frames.length * 0.75)];
-      resolve(p75 <= FULL_MAX_FRAME ? 'full' : p75 <= LITE_MAX_FRAME ? 'lite' : 'static');
+    const run = () => {
+      const frames: number[] = [];
+      let last = 0;
+      let start = 0;
+      const task = register(({ now }) => {
+        if (!start) start = now;
+        if (last) frames.push(now - last);
+        last = now;
+        if (now - start < PROBE_MS) return true;
+        task.dispose();
+        if (frames.length < 4) return void resolve('lite');
+        frames.sort((a, b) => a - b);
+        const median = frames[Math.floor(frames.length / 2)];
+        resolve(median <= FULL_MAX_FRAME ? 'full' : median <= LITE_MAX_FRAME ? 'lite' : 'static');
+      }, { budgeted: false, wakeOnVisible: false });
     };
-    requestAnimationFrame(tick);
+    const idle = () => {
+      if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run, { timeout: 1000 });
+      else setTimeout(run, 0);
+    };
+    if (document.readyState === 'complete') idle();
+    else window.addEventListener('load', idle, { once: true });
   }).then((t) => {
     probed = t;
     document.documentElement.dataset.tier = t;

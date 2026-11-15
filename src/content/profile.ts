@@ -14,6 +14,12 @@ export interface ProofChip {
 export interface Profile {
   name: string;
   legalName: string;
+  /** Short role shown under the name in the header wordmark. */
+  title: string;
+  /** Hero line under the name. */
+  tagline: string;
+  /** Hero focus areas, middle-dot separated. */
+  focus: string;
   headline: string;
   roleLine: string;
   education: {
@@ -51,6 +57,9 @@ export interface Profile {
 export const profile: Profile = {
   name: 'Haresh Murugesan',
   legalName: 'Haresh Aravind Murugesan',
+  title: 'Software & Systems Engineer',
+  tagline: 'Engineer and inventor.',
+  focus: 'Computer vision · real-time systems · applied AI.',
   headline: 'Software engineer exploring high-performance systems, client architectures, and computational algorithms.',
   roleLine: 'Bachelor of Engineering in Computer Science (AI) at The Ohio State University · May 2028 · Seeking Summer 2027 software and ML internships',
   education: {

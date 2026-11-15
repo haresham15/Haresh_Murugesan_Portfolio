@@ -10,20 +10,29 @@ export function useMaterialAt(ref: RefObject<HTMLElement | null>): Material {
   const [material, setMaterial] = useState<Material>('dark');
   useEffect(() => {
     let current: Material = 'dark';
+    let measured: Material | null = null;
+    // All reads (the element rect, the field) happen in the scheduler's measure phase.
     const task = register(() => {
-      const el = ref.current;
-      if (!el) return false;
-      const r = el.getBoundingClientRect();
-      const next = materialAt(r.left + r.width / 2, r.top + r.height / 2, readField());
-      if (next !== current) {
+      const next = measured;
+      measured = null;
+      if (next !== null && next !== current) {
         current = next;
         setMaterial(next);
       }
       return false;
-    }, { budgeted: false, wakeOnVisible: false });
+    }, {
+      budgeted: false,
+      wakeOnVisible: false,
+      measure: () => {
+        const el = ref.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        measured = materialAt(r.left + r.width / 2, r.top + r.height / 2, readField());
+      },
+    });
     const wake = () => task.wake();
     window.addEventListener('scroll', wake, { passive: true });
-    window.addEventListener('resize', wake);
+    window.addEventListener('resize', wake, { passive: true });
     const off = onLayoutChange(wake);
     return () => {
       task.dispose();

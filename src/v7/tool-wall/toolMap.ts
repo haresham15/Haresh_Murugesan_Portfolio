@@ -42,7 +42,7 @@ export interface ToolSpec {
  * light up no names. If data later links one of them, the test fails so this list is
  * kept honest.
  */
-export const EXPERIENCE_ONLY_TOOLS = ['cpp', 'go', 'swift', 'matlab', 'docker', 'threejs', 'pytorch'] as const;
+export const EXPERIENCE_ONLY_TOOLS = ['swift', 'matlab', 'threejs'] as const;
 export type ExperienceOnlyToolId = (typeof EXPERIENCE_ONLY_TOOLS)[number];
 
 /** Row order follows skills.ts; tool order within a row is the order below. */
@@ -98,7 +98,7 @@ export const TOOL_SPECS: ToolSpec[] = [
   { id: 'java', name: 'Java', domain: 'core-cs', match: /\bJava\b/, iconFiles: ['java.svg'] },
   { id: 'r', name: 'R', domain: 'core-cs', match: /\bRStudio\b|^R\b/ },
   { id: 'cpp', name: 'C++', domain: 'core-cs', match: /C\+\+/ },
-  { id: 'go', name: 'Go', domain: 'core-cs', match: /\bGolang\b|^Go$/ },
+  { id: 'go', name: 'Go', domain: 'core-cs', match: /\bGolang\b|\bGo\b/ },
   { id: 'swift', name: 'Swift / ARKit', domain: 'core-cs', match: /\bSwift\b|\bARKit\b/ },
   { id: 'matlab', name: 'MATLAB', domain: 'core-cs', match: /\bMATLAB\b/ },
 ];

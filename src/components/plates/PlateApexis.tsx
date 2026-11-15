@@ -692,14 +692,14 @@ function createRingScene(): PlateScene {
 
 export const apexisPlate: PlateDefinition = {
   modes: [
-    { id: 'scope', label: 'Oscilloscope', description: 'Simulated two-car lap: speed, throttle, brake and gap traces across sectors 1 to 3. The cursor scrubs along the lap.' },
     { id: 'track', label: 'Sector map', description: 'Circuit map coloured by where car B gains or loses time, with sector deltas and both cars running in real time.' },
+    { id: 'scope', label: 'Oscilloscope', description: 'Simulated two-car lap: speed, throttle, brake and gap traces across sectors 1 to 3. The cursor scrubs along the lap.' },
     { id: 'ring', label: 'Ring buffer', description: 'A 256-slot telemetry ring buffer filled at 60 Hz, showing write and read heads. Hovering a slot reads its sample.' },
   ],
   createScene(modeId) {
-    if (modeId === 'track') return createTrackScene();
+    if (modeId === 'scope') return createScopeScene();
     if (modeId === 'ring') return createRingScene();
-    return createScopeScene();
+    return createTrackScene();
   },
 };
 

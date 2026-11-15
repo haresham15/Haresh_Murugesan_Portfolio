@@ -143,6 +143,42 @@ export const WorksSection: React.FC = () => {
   const [mounted, setMounted] = useState<number[]>([0]);
   const [focusVisible, setFocusVisible] = useState(false);
   const [text, dispatch] = useReducer(textReducer, { apexSector: 0, shown: 0, leaving: null, dir: -1, seq: 0 });
+  const [activeModes, setActiveModes] = useState<Record<string, string>>(() =>
+    Object.fromEntries(WORKS.map((w) => [w.key, w.mode])),
+  );
+  const actionRefs = useRef<Record<string, { current: ((id: string) => void) | null }>>({});
+
+  const getActionRef = useCallback((key: string) => {
+    if (!actionRefs.current[key]) {
+      actionRefs.current[key] = { current: null };
+    }
+    return actionRefs.current[key];
+  }, []);
+
+  const setModeForProject = useCallback((projectKey: string, modeId: string) => {
+    setActiveModes((prev) => (prev[projectKey] === modeId ? prev : { ...prev, [projectKey]: modeId }));
+  }, []);
+
+  const onModeTabKey = useCallback(
+    (e: React.KeyboardEvent, modes: { id: string }[], projectKey: string) => {
+      const current = activeModes[projectKey] || modes[0].id;
+      const idx = modes.findIndex((m) => m.id === current);
+      let nextIdx: number | null = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        nextIdx = (idx + 1) % modes.length;
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        nextIdx = (idx - 1 + modes.length) % modes.length;
+      }
+      if (nextIdx !== null) {
+        e.preventDefault();
+        const nextMode = modes[nextIdx].id;
+        setModeForProject(projectKey, nextMode);
+        const el = document.getElementById(`mode-tab-${projectKey}-${nextMode}`);
+        el?.focus();
+      }
+    },
+    [activeModes, setModeForProject],
+  );
 
   const apex = mobile ? -90 : 0;
   useEffect(() => {
@@ -263,9 +299,13 @@ export const WorksSection: React.FC = () => {
       setSelected(first);
       setMounted((m) => (m.includes(first) ? m : [...m, first]));
     }
-    const onScroll = () => {
-      const p = read();
-      if (p === null) return;
+    // Scroll wakes a scheduler task: the rect is read in the measure phase, styles are
+    // written in the frame, so this never forces a layout between other tasks' writes.
+    let measured: number | null = null;
+    const onFrame = () => {
+      const p = measured;
+      measured = null;
+      if (p === null) return false;
       if (progressRef.current) progressRef.current.style.transform = `scaleY(${p.toFixed(4)})`;
       const next = scrollStop(p * PROJECTS, stopRef.current);
       if (next !== stopRef.current) {
@@ -275,6 +315,7 @@ export const WorksSection: React.FC = () => {
           goTo(angleForProject(target.current, next), true);
         }
       }
+      return false;
     };
     syncScrollRef.current = (project: number) => {
       const sec = sectionRef.current;
@@ -288,10 +329,17 @@ export const WorksSection: React.FC = () => {
       const y = window.scrollY + r.top + ((project + 0.5) / PROJECTS) * runway;
       window.scrollTo({ top: Math.round(y), behavior: 'instant' });
     };
-    onScroll();
+    const scrollTask = register(onFrame, {
+      element: sectionRef.current,
+      budgeted: false,
+      wakeOnVisible: false,
+      measure: () => { measured = read(); },
+    });
+    const onScroll = () => scrollTask.wake();
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', onScroll, { passive: true });
     return () => {
+      scrollTask.dispose();
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
@@ -301,22 +349,31 @@ export const WorksSection: React.FC = () => {
 
   useEffect(() => {
     if (!showSpecular) return;
-    const update = () => {
+    const el = wheelRef.current;
+    if (!el) return;
+    // Pointer steps wake a task: the wheel rect is read in the measure phase, never
+    // between other tasks' style writes.
+    let rect: DOMRect | null = null;
+    const task = register(() => {
       const g = specRef.current;
-      const el = wheelRef.current;
-      if (!g || !el || !taskRef.current?.isVisible()) return;
+      const r = rect;
+      rect = null;
+      if (!g || !r) return false;
       const p = getPointer();
       const live = p.inside && p.kind !== 'touch';
-      const r = el.getBoundingClientRect();
       const cx = r.left + r.width / 2;
       const cy = r.top + r.height / 2;
       // Idle: the key light sits above the apex, as on the nav rim.
       const phi = live ? (Math.atan2(p.y - cy, p.x - cx) * 180) / Math.PI : apexRef.current - 40;
       g.setAttribute('transform', `rotate(${phi.toFixed(2)})`);
       g.style.opacity = live ? '1' : '0.5';
+      return false;
+    }, { element: el, budgeted: false, measure: () => { rect = el.getBoundingClientRect(); } });
+    const off = subscribePointer(() => task.wake());
+    return () => {
+      off();
+      task.dispose();
     };
-    update();
-    return subscribePointer(update);
   }, [showSpecular]);
 
   /* ---------- pointer: click a tab, or drag by angle about the centre ---------- */
@@ -521,6 +578,9 @@ export const WorksSection: React.FC = () => {
             {WORKS.map((w, i) => {
               if (!mounted.includes(i)) return null;
               const on = i === selected;
+              const currentMode = activeModes[w.key] || w.mode;
+              const currentActionRef = getActionRef(w.key);
+
               return (
                 <div
                   key={w.key}
@@ -528,15 +588,64 @@ export const WorksSection: React.FC = () => {
                   style={{ opacity: on ? 1 : 0, transitionDuration: `${fade}ms`, pointerEvents: on ? 'auto' : 'none' }}
                   aria-hidden={!on}
                 >
+                  <div className={styles.modelBar}>
+                    <div
+                      role="tablist"
+                      aria-label={`${w.title} simulation models`}
+                      className={styles.modelTabs}
+                    >
+                      {w.plate.modes.map((m) => {
+                        const isCurrent = m.id === currentMode;
+                        return (
+                          <button
+                            key={m.id}
+                            id={`mode-tab-${w.key}-${m.id}`}
+                            type="button"
+                            role="tab"
+                            aria-selected={isCurrent}
+                            aria-controls={`plate-stage-${w.key}`}
+                            tabIndex={on ? (isCurrent ? 0 : -1) : -1}
+                            onClick={() => setModeForProject(w.key, m.id)}
+                            onKeyDown={(e) => onModeTabKey(e, w.plate.modes, w.key)}
+                            className={`${styles.modelTab} ${isCurrent ? styles.modelTabActive : ''} ${FOCUS_RING}`}
+                          >
+                            <span>{m.label}</span>
+                            {isCurrent && (
+                              <span className={styles.modelTabIndicator} aria-hidden="true" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {w.plate.actions?.map((a) => {
+                      if (a.modes && !a.modes.includes(currentMode)) return null;
+                      return (
+                        <button
+                          key={a.id}
+                          type="button"
+                          tabIndex={on ? 0 : -1}
+                          onClick={() => currentActionRef.current?.(a.id)}
+                          className={`${styles.modelAction} ${FOCUS_RING}`}
+                        >
+                          {a.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   <PlateStage
                     definition={w.plate}
                     systemKey={w.key}
-                    modeId={w.mode}
+                    modeId={currentMode}
                     reduced={isReduced}
                     palette={LIGHT_PALETTE}
                     active={on}
                     introRate={1.8}
-                    role="presentation"
+                    role="tabpanel"
+                    panelId={`plate-stage-${w.key}`}
+                    labelledBy={`mode-tab-${w.key}-${currentMode}`}
+                    actionRef={currentActionRef}
                   />
                 </div>
               );

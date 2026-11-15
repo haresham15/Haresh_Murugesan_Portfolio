@@ -338,7 +338,7 @@ export const ToolWallSection: React.FC = () => {
             <p aria-live="polite" className="min-h-[3.5rem]">
               {readout}
             </p>
-            <Reveal y={12}>
+            <Reveal>
               <ul aria-label="Projects and roles" className="mt-2">
                 {toolWall.names.map((n) => (
                   <li key={n.key}>

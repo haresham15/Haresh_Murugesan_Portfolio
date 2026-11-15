@@ -2,25 +2,24 @@
  * The material field: which material sits under every viewport pixel.
  *
  * Sections declare `data-material="dark|light"`. Seams (`data-seam`) sit between them,
- * 70vh tall, and own the transition. This module turns document layout into a short
+ * 40vh tall (--seam-height), and own the transition. This module turns document layout into a short
  * list of viewport bands for the CarbonField shader, and answers `materialAt(x, y)`
  * for the header, nav rim and cursor using the same mask maths as the shader.
  */
 export type Material = 'dark' | 'light';
+/** Every kind is a hard edge: the two materials never blend into a grey band. */
 export type SeamKind =
   | 'shutter'
   | 'iris-open'
   | 'iris-close'
-  | 'horizon'
   | 'turn-in'
   | 'turn-out'
-  | 'baseline'
-  | 'exposure';
+  | 'baseline';
 
-export const SEAM_KINDS: SeamKind[] = ['shutter', 'iris-open', 'iris-close', 'horizon', 'turn-in', 'turn-out', 'baseline', 'exposure'];
-/** Shader ids. 0 is a solid band. */
+export const SEAM_KINDS: SeamKind[] = ['shutter', 'iris-open', 'iris-close', 'turn-in', 'turn-out', 'baseline'];
+/** Shader ids. 0 is a solid band. Ids 4 and 8 (the old blended seams) are retired. */
 export const KIND_ID: Record<'solid' | SeamKind, number> = {
-  solid: 0, shutter: 1, 'iris-open': 2, 'iris-close': 3, horizon: 4, 'turn-in': 5, 'turn-out': 6, baseline: 7, exposure: 8,
+  solid: 0, shutter: 1, 'iris-open': 2, 'iris-close': 3, 'turn-in': 5, 'turn-out': 6, baseline: 7,
 };
 
 export interface Band {
@@ -77,7 +76,7 @@ function measure() {
         el,
         docTop: r.top + sy,
         height: r.height,
-        kind: SEAM_KINDS.includes(seam) ? seam : 'horizon',
+        kind: SEAM_KINDS.includes(seam) ? seam : 'baseline',
         a: asMaterial(el.dataset.from, 'dark'),
         b: asMaterial(el.dataset.to, 'light'),
       };
@@ -123,6 +122,7 @@ function measure() {
 /** Mark document layout stale (resize, section height change, route change). */
 export function invalidateLayout() {
   dirtyLayout = true;
+  lastSnapshot = null;
   for (const l of layoutListeners) l();
 }
 
@@ -131,11 +131,20 @@ export function onLayoutChange(fn: () => void): () => void {
   return () => layoutListeners.delete(fn);
 }
 
+let lastSnapshot: FieldSnapshot | null = null;
+
+/**
+ * The field for the current scroll position. Several tasks read it each frame (the
+ * shader, the header, the nav rim, the cursor); the snapshot is reused until scroll,
+ * viewport or layout changes. Callers must treat it as read-only.
+ */
 export function readField(): FieldSnapshot {
   if (dirtyLayout) measure();
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const sy = window.scrollY;
+  const last = lastSnapshot;
+  if (last && last.scrollY === sy && last.vw === vw && last.vh === vh) return last;
   const bands: Band[] = [];
   let sectionProgress = 0;
   let lightProgress = 0;
@@ -157,7 +166,8 @@ export function readField(): FieldSnapshot {
     const p = r.kind === 'solid' ? 0 : clamp01((vh - top) / (vh + r.height));
     bands.push({ top, bottom, kind: r.kind, a: r.a, b: r.b, p });
   }
-  return { bands, sectionProgress, lightProgress, vw, vh, scrollY: sy };
+  lastSnapshot = { bands, sectionProgress, lightProgress, vw, vh, scrollY: sy };
+  return lastSnapshot;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -168,7 +178,6 @@ export function readField(): FieldSnapshot {
 
 export const SLAT_PX = 96;
 export const IRIS_BLADES = 7;
-export const HORIZON_VH = 0.3;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smoothstep = (e0: number, e1: number, v: number) => {
@@ -187,6 +196,11 @@ export function irisRadius(theta: number, R: number, p: number) {
   let m = (theta + 0.4 * p) % seg;
   if (m < 0) m += seg;
   return (R * Math.cos(Math.PI / IRIS_BLADES)) / Math.cos(m - Math.PI / IRIS_BLADES);
+}
+
+/** Baseline wipe: a hard edge that rises from the seam's bottom to its top as p runs 0..1. */
+export function baselineEdge(h: number, p: number) {
+  return h * (1 - p);
 }
 
 export function seamMask(band: Band, x: number, y: number, vw: number, vh: number): number {
@@ -215,10 +229,6 @@ export function seamMask(band: Band, x: number, y: number, vw: number, vh: numbe
       const inside = Math.hypot(dx, dy) < irisRadius(Math.atan2(dy, dx), R, p);
       return opening ? (inside ? 1 : 0) : inside ? 0 : 1;
     }
-    case 'horizon': {
-      const band30 = HORIZON_VH * vh;
-      return smoothstep(0, 1, (yb - (h - band30) / 2) / band30);
-    }
     case 'turn-in':
     case 'turn-out': {
       // A hand pivoting 90 degrees about a bottom corner sweeps material b in.
@@ -228,11 +238,7 @@ export function seamMask(band: Band, x: number, y: number, vw: number, vh: numbe
       return ang <= sweep ? 1 : 0;
     }
     case 'baseline':
-      return yb >= h / 2 ? 1 : 0;
-    case 'exposure': {
-      const t = yb / h;
-      return smoothstep(0.15, 0.85, t + (p - 0.5) * 0.6);
-    }
+      return yb >= baselineEdge(h, p) ? 1 : 0;
   }
 }
 

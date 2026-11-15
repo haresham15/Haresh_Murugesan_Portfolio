@@ -230,7 +230,7 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
     : {
         transform: `rotate(${totalAngle}deg)`,
         transformOrigin: '50px 50px',
-        transition: 'transform 650ms cubic-bezier(0.16, 1, 0.3, 1)',
+        transition: 'transform 650ms var(--ease-out-expo)',
         willChange: 'transform',
       };
 
@@ -394,7 +394,7 @@ export const WheelNavTrigger: React.FC<WheelNavTriggerProps> = ({ isOpen, onTogg
               height="0.9"
               rx="0.45"
               fill={isOpen ? '#FF2800' : '#C8D2E0'}
-              style={{ transition: 'fill 300ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+              style={{ transition: 'fill 300ms var(--ease-out-expo)' }}
             />
           </g>
 

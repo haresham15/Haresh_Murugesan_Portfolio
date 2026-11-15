@@ -261,6 +261,10 @@ interface Geo {
   apexP: number[];
   sOfP: (p: number) => number;
   cameraOfX: (x: number) => number;
+  /** Point on the track at arc length s, interpolated from the sampled table (no DOM call). */
+  pointAt: (s: number) => { x: number; y: number };
+  /** Heading at arc length s, degrees, interpolated between sample headings. */
+  angleAt: (s: number) => number;
   layout: Layout;
 }
 
@@ -305,6 +309,7 @@ const CircuitStage: React.FC = () => {
   const [near, setNear] = useState(false);
   const [activeSector, setActiveSector] = useState(0);
   const geoRef = useRef<Geo | null>(null);
+  const taskRef = useRef<{ wake(): void } | null>(null);
 
   const kin = useRef({
     init: false,
@@ -346,11 +351,8 @@ const CircuitStage: React.FC = () => {
   useEffect(() => {
     measure();
     const vp = viewportRef.current;
-    let raf = 0;
-    const ro = new ResizeObserver(() => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(measure);
-    });
+    // ResizeObserver already batches to once per frame, after layout: measure directly.
+    const ro = new ResizeObserver(() => measure());
     if (vp) ro.observe(vp);
     let alive = true;
     document.fonts?.ready.then(() => {
@@ -360,7 +362,6 @@ const CircuitStage: React.FC = () => {
     });
     return () => {
       alive = false;
-      cancelAnimationFrame(raf);
       ro.disconnect();
     };
   }, [measure]);
@@ -575,26 +576,52 @@ const CircuitStage: React.FC = () => {
     });
     path.setAttribute('data-half', fmt(37 * scale));
 
-    geoRef.current = { L, apexS, apexP, sOfP, cameraOfX, layout };
+    // Per-frame lookups interpolate the table instead of calling getPointAtLength,
+    // which walks the whole path on every call.
+    const hd = new Float32Array(n);
+    for (let i = 0; i < n; i++) hd[i] = heading(i);
+    const locate = (sv: number) => {
+      const i = Math.min(n - 2, Math.max(0, Math.floor(sv / step)));
+      const s0 = i * step;
+      const s1 = Math.min(L, (i + 1) * step);
+      return { i, t: clamp((sv - s0) / Math.max(1e-6, s1 - s0), 0, 1) };
+    };
+    const pointAt = (sv: number) => {
+      const { i, t } = locate(sv);
+      return { x: xs[i] + (xs[i + 1] - xs[i]) * t, y: ys[i] + (ys[i + 1] - ys[i]) * t };
+    };
+    const angleAt = (sv: number) => {
+      const { i, t } = locate(sv);
+      let d = hd[i + 1] - hd[i];
+      while (d > Math.PI) d -= 2 * Math.PI;
+      while (d < -Math.PI) d += 2 * Math.PI;
+      return ((hd[i] + d * t) * 180) / Math.PI;
+    };
+
+    geoRef.current = { L, apexS, apexP, sOfP, cameraOfX, pointAt, angleAt, layout };
     kin.current.init = false;
+    taskRef.current?.wake();
   }, [layout, fontsVersion, near]);
 
   /* ---- frame loop (paused offscreen) ---- */
   useEffect(() => {
-    const tick = (now: number) => {
+    // Read in the scheduler's measure phase, before any task writes styles this frame.
+    let measuredRect: DOMRect | null = null;
+    /** Returns true while anything is still moving; the task sleeps once it settles. */
+    const tick = (now: number): boolean => {
       const k = kin.current;
       const geo = geoRef.current;
       const section = sectionRef.current;
-      const path = pathRef.current;
       const world = worldRef.current;
       const car = carRef.current;
-      if (!geo || !section || !path || !world || !car) return;
+      if (!geo || !section || !world || !car) return false;
       const { layout: lay, L } = geo;
 
       const dt = k.lastT ? clamp((now - k.lastT) / 1000, 1 / 240, 0.1) : 1 / 60;
       k.lastT = now;
 
-      const rect = section.getBoundingClientRect();
+      const rect = measuredRect ?? section.getBoundingClientRect();
+      measuredRect = null;
       const runway = Math.max(1, rect.height - lay.H);
       const raw = clamp(-rect.top / runway, 0, 1);
 
@@ -613,7 +640,7 @@ const CircuitStage: React.FC = () => {
         k.p = raw;
         k.s = geo.sOfP(raw);
         k.sPrev = k.s;
-        k.cam = geo.cameraOfX(path.getPointAtLength(k.s).x);
+        k.cam = geo.cameraOfX(geo.pointAt(k.s).x);
         k.angle = NaN;
       }
 
@@ -652,10 +679,8 @@ const CircuitStage: React.FC = () => {
       k.sPrev = s;
       k.s = s;
 
-      const pt = path.getPointAtLength(s);
-      const pa = path.getPointAtLength(Math.max(0, s - 3));
-      const pb = path.getPointAtLength(Math.min(L, s + 3));
-      const raw0 = (Math.atan2(pb.y - pa.y, pb.x - pa.x) * 180) / Math.PI;
+      const pt = geo.pointAt(s);
+      const raw0 = geo.angleAt(s);
       if (Number.isNaN(k.angle)) k.angle = raw0;
       let dA = raw0 - k.angle;
       while (dA > 180) dA -= 360;
@@ -752,6 +777,14 @@ const CircuitStage: React.FC = () => {
         setActiveSector(active);
       }
       if (progressRef.current) progressRef.current.style.transform = `scaleX(${(wrapping ? s / L : k.p).toFixed(4)})`;
+
+      // Settled: car on its scroll target, camera spring at rest, flame, speed and brakes decayed.
+      // The idle flame flicker freezes here, which is under a pixel.
+      const settled = !wrapping && !k.spring && k.p === raw
+        && Math.abs(k.v) < 0.5
+        && Math.abs(k.flame - speedN) < 0.002
+        && Math.abs(k.brake - braking) < 0.002;
+      return !settled;
     };
 
     // Site-wide scheduler; paused while the section is off screen.
@@ -759,10 +792,19 @@ const CircuitStage: React.FC = () => {
     if (!section) return;
     const task = register(({ now, dt }) => {
       if (dt === 0) kin.current.lastT = 0;
-      tick(now);
-      return true;
-    }, { element: section, budgeted: false });
-    return () => task.dispose();
+      return tick(now);
+    }, { element: section, budgeted: false, measure: () => { measuredRect = section.getBoundingClientRect(); } });
+    taskRef.current = task;
+    // Asleep when settled: scroll and resize wake it.
+    const wake = () => task.wake();
+    window.addEventListener('scroll', wake, { passive: true });
+    window.addEventListener('resize', wake, { passive: true });
+    return () => {
+      task.dispose();
+      taskRef.current = null;
+      window.removeEventListener('scroll', wake);
+      window.removeEventListener('resize', wake);
+    };
   }, []);
 
   /* ---- sector navigation (forward-only) ---- */
@@ -781,6 +823,7 @@ const CircuitStage: React.FC = () => {
       // Never reverse: run out through turn 6, re-enter at turn 1, stop at the apex.
       const distance = geo.L - k.s + sTarget;
       k.wrap = { t0: performance.now(), dur: clamp(900 + distance * 0.09, 1100, 1900), sStart: k.s, sTarget, pTarget };
+      taskRef.current?.wake();
       scrollToY(top, true);
     } else {
       scrollToY(top, false);

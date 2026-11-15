@@ -100,7 +100,7 @@ export const SyntinuumSection: React.FC = () => {
   });
 
   const draw = useCallback(
-    (ctx: CanvasRenderingContext2D, { width: w, height: h, time, deltaTime }: CanvasStage) => {
+    (ctx: CanvasRenderingContext2D, { width: w, height: h, time, deltaTime, rect: stageRect }: CanvasStage) => {
       const s = sim.current;
       const root = rootRef.current;
       const bulb = bulbRef.current;
@@ -134,7 +134,7 @@ export const SyntinuumSection: React.FC = () => {
         }
         s.scrollY = y;
         scrolling = s.scrollV !== 0;
-        const exit = exitAmplitude(root.getBoundingClientRect().top + baseY, window.innerHeight);
+        const exit = exitAmplitude((stageRect ?? root.getBoundingClientRect()).top + baseY, window.innerHeight);
         amp = exit * (1 + scrollBoost(s.scrollV));
       }
 
@@ -416,7 +416,7 @@ export const SyntinuumSection: React.FC = () => {
                   opacity: active ? 1 : 0,
                   transform: active || isReduced ? 'none' : 'translateY(8px)',
                   visibility: active ? 'visible' : 'hidden',
-                  transition: `opacity ${isReduced ? CROSSFADE_MS : 320}ms ease, transform 420ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear ${active ? 0 : isReduced ? CROSSFADE_MS : 320}ms`,
+                  transition: `opacity ${isReduced ? CROSSFADE_MS : 320}ms ease, transform 420ms var(--ease-out-expo), visibility 0s linear ${active ? 0 : isReduced ? CROSSFADE_MS : 320}ms`,
                 }}
               >
                 <h3 className="lg:col-span-5 font-serif font-normal text-[clamp(2.25rem,4.5vw,4rem)] leading-[1] tracking-[-0.015em] text-[var(--mat-ink)]">

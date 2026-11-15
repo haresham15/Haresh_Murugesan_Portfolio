@@ -27,7 +27,7 @@ export interface Work {
   /** A running deployment. Omitted when the project only has a repository. */
   live?: string;
   plate: PlateDefinition;
-  /** The one live view this project shows (the mode bar is cut). */
+  /** Default live simulation model this project displays. */
   mode: string;
 }
 
@@ -59,12 +59,12 @@ const BASE: Omit<Work, 'stack' | 'role' | 'github' | 'live'>[] = [
     slug: 'apexis',
     title: 'Apexis',
     tab: 'Apexis',
-    thesis: 'Multi-series race telemetry in one tab, with the heavy math off the main thread.',
+    thesis: 'High-frequency telemetry broker and PyTorch lap-time transformer.',
     narrative:
-      'A dedicated simulator worker computes 2D car positions against OpenF1 track coordinates at 60 fps, and a Tesseract.js worker reads broadcast timing graphics in the browser. An embedded SQLite database answers historical queries back to 1950 in under 12 ms.',
+      'A C++20 lock-free ring buffer and Go 1.23 WebSocket gateway ingest 250k+ packets/s at sub-1.8 ms p99 latency into a Flink/Iceberg lakehouse. A PyTorch transformer predicts sector deltas with 0.430 s MAE, while a dedicated worker runs 60 fps track kinematics.',
     stats: [
-      { value: '60 fps', label: 'Worker sim · 16.7 ms frame' },
-      { value: '< 12 ms', label: 'Indexed SQLite lookup' },
+      { value: '250k/s', label: 'C++20 lock-free ingest' },
+      { value: 'sub-1.8 ms', label: 'Broker p99 latency' },
     ],
     plate: apexisPlate,
     mode: 'track',

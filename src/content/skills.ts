@@ -38,6 +38,7 @@ export const skillDomains: SkillDomain[] = [
         name: 'PyTorch & TensorFlow',
         category: 'ai-ml',
         provenBy: [
+          { title: 'Apexis (Lap-Time Transformer)', slug: 'apexis', href: '/projects/apexis', type: 'project' },
           { title: 'Healios V2', slug: 'healios', href: '/projects/healios', type: 'project' },
           { title: 'OSU Digital Pathology Research', href: '/#experience', type: 'experience' },
         ],
@@ -46,7 +47,10 @@ export const skillDomains: SkillDomain[] = [
         name: 'Vector Search & pgvector RAG',
         category: 'ai-ml',
         highlight: 'Cosine IVFFlat',
-        provenBy: [{ title: 'Tempo', slug: 'tempo', href: '/projects/tempo', type: 'project' }],
+        provenBy: [
+          { title: 'Tempo', slug: 'tempo', href: '/projects/tempo', type: 'project' },
+          { title: 'AetherGate (Redis Stack HNSW)', slug: 'aethergate', href: '/projects/aethergate', type: 'project' },
+        ],
       },
       {
         name: 'OpenCV & Computer Vision',
@@ -66,6 +70,7 @@ export const skillDomains: SkillDomain[] = [
         name: 'Multimodal Vision & LLM Orchestration',
         category: 'ai-ml',
         provenBy: [
+          { title: 'Project J.A.R.V.I.S. (Multi-Agent Engine)', slug: 'jarvis', href: '/projects/jarvis', type: 'project' },
           { title: 'Tempo (Spatial Chunker)', slug: 'tempo', href: '/projects/tempo', type: 'project' },
           { title: 'CAS Agentic Pipelines', href: '/#experience', type: 'experience' },
         ],
@@ -82,6 +87,7 @@ export const skillDomains: SkillDomain[] = [
         category: 'systems',
         highlight: 'High concurrency',
         provenBy: [
+          { title: 'Project J.A.R.V.I.S. (Daemon on Port 8420)', slug: 'jarvis', href: '/projects/jarvis', type: 'project' },
           { title: 'Healios V2 Backend', slug: 'healios', href: '/projects/healios', type: 'project' },
           { title: 'NYC OS Market Engine', slug: 'nyc-housing-market-ai', href: '/projects/nyc-housing-market-ai', type: 'project' },
         ],
@@ -112,6 +118,7 @@ export const skillDomains: SkillDomain[] = [
         name: 'RESTful API Engineering & Zod Schemas',
         category: 'systems',
         provenBy: [
+          { title: 'AetherGate (OpenAI-Compatible Proxy)', slug: 'aethergate', href: '/projects/aethergate', type: 'project' },
           { title: 'Tempo Active Failover', slug: 'tempo', href: '/projects/tempo', type: 'project' },
           { title: 'Apexis OpenF1 Telemetry Ingestion', slug: 'apexis', href: '/projects/apexis', type: 'project' },
         ],
@@ -197,8 +204,9 @@ export const skillDomains: SkillDomain[] = [
         name: 'CI/CD Pipelines & GitHub Actions',
         category: 'cloud-data',
         provenBy: [
+          { title: 'AetherGate Docker CI', slug: 'aethergate', href: '/projects/aethergate', type: 'project' },
           { title: 'CAS Trunk-based Deployment', href: '/#experience', type: 'experience' },
-          { title: 'Portfolio Static Automated Export', href: '/system', type: 'project' },
+          { title: 'Portfolio Static Automated Export', slug: 'portfolio-website', href: '/system', type: 'project' },
         ],
       },
     ],

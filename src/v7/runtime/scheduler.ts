@@ -8,6 +8,10 @@
  * Budget: at most MAX_ANIMATING budgeted tasks (canvases) run in one frame. When more
  * are awake and visible, the ones with the largest visible area win; the rest wait.
  * Unbudgeted tasks (pointer easing, the CarbonField redraw, scroll-driven SVG) always run.
+ *
+ * Phases: every running task's `measure` (DOM reads only) runs before any task's frame
+ * callback (DOM writes). One task writing a style and the next reading a rect would
+ * otherwise force a fresh layout per task, per frame.
  */
 
 export const MAX_ANIMATING = 2;
@@ -30,6 +34,8 @@ export interface TaskOptions {
   wakeOnVisible?: boolean;
   /** Ties in the budget go to the higher priority. Default 0. */
   priority?: number;
+  /** Read phase: runs before every task's frame callback in the same frame. Reads only, no writes. */
+  measure?: () => void;
 }
 
 export interface TaskHandle {
@@ -45,6 +51,7 @@ interface Task {
   budgeted: boolean;
   wakeOnVisible: boolean;
   priority: number;
+  measure: (() => void) | null;
   awake: boolean;
   visible: boolean;
   ratio: number;
@@ -110,8 +117,18 @@ function loop(now: number) {
     for (let i = MAX_ANIMATING; i < budgeted.length; i++) budgeted[i].last = 0;
     budgeted.length = MAX_ANIMATING;
   }
+  const running = [...free, ...budgeted];
+  for (const t of running) {
+    if (!t.measure) continue;
+    try {
+      t.measure();
+    } catch (err) {
+      console.error('[scheduler] measure threw', err);
+    }
+  }
   let again = false;
-  for (const t of [...free, ...budgeted]) {
+  for (const t of running) {
+    if (t.disposed) continue;
     const dt = t.last ? Math.min(now - t.last, 64) : 0;
     t.last = now;
     let keep: boolean | void = false;
@@ -139,6 +156,7 @@ export function register(fn: FrameFn, options: TaskOptions = {}): TaskHandle {
     budgeted: options.budgeted ?? true,
     wakeOnVisible: options.wakeOnVisible ?? true,
     priority: options.priority ?? 0,
+    measure: options.measure ?? null,
     awake: true,
     visible: element === null || typeof IntersectionObserver === 'undefined',
     ratio: element === null ? 1 : 0,

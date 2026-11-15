@@ -12,7 +12,7 @@ export const MaterialSection: React.FC<{
   </div>
 );
 
-/** 70vh of empty space that owns the transition between two sections. */
+/** Empty space (--seam-height, 40vh) that owns the transition between two sections. */
 export const Seam: React.FC<{ kind: SeamKind; from: Material; to: Material }> = ({ kind, from, to }) => (
   <div aria-hidden="true" data-material-region="" data-seam={kind} data-from={from} data-to={to} />
 );

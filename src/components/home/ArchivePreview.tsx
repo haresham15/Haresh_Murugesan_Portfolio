@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { archiveProjects } from '@/content/projects';
+import { allProjects, archiveProjects } from '@/content/projects';
 
 export const ArchivePreview: React.FC = () => {
   // Highlight TamilTrove, NYC OS, and other notable projects
@@ -23,7 +23,7 @@ export const ArchivePreview: React.FC = () => {
             href="/projects"
             className="text-xs sm:text-sm font-sans font-semibold text-[#7DD3FC] hover:text-[#F3EFE7] transition-colors inline-flex items-center gap-1.5"
           >
-            <span>View all 18 projects in index</span>
+            <span>View all {allProjects.length} projects in index</span>
             <span>→</span>
           </Link>
         </div>

@@ -58,7 +58,7 @@ for (const [w, h] of [[1280, 720], [390, 844]]) {
   for (const [i, id] of [[0, 'experience'], [1, 'achievements']]) {
     await page.goto(`${ORIGIN}/`, { waitUntil: 'networkidle' });
     await page.locator('ul[aria-label="Highlights"] a').nth(i).click();
-    await page.waitForTimeout(1200);
+    await page.waitForTimeout(2000); // smooth scroll past the About notebook takes ~1.5s
     const top = await page.evaluate((sid) => document.getElementById(sid).getBoundingClientRect().top, id);
     rec(`${w}x${h} proof link ${i + 1} scrolls to #${id}`, Math.abs(top - 88) < 40, `top ${Math.round(top)}`); // scroll-margin-top: 5.5rem
   }
@@ -71,7 +71,7 @@ for (const [w, h] of [[1280, 720], [390, 844]]) {
   const page = await context.newPage();
   await page.goto(`${ORIGIN}/`, { waitUntil: 'networkidle' });
   const order = await page.evaluate(() => [...document.querySelectorAll('[data-material-region]')].map((el) => el.getAttribute('data-section') ?? el.dataset.name ?? el.firstElementChild?.id));
-  const ids = await page.evaluate(() => ['hero', 'projects', 'achievements', 'experience', 'archive', 'skills', 'podcast', 'about', 'history', 'now', 'contact']
+  const ids = await page.evaluate(() => ['hero', 'about', 'projects', 'achievements', 'experience', 'archive', 'skills', 'podcast', 'history', 'now', 'contact']
     .map((id) => [id, document.getElementById(id)?.getBoundingClientRect().top + scrollY]));
   const sorted = [...ids].sort((a, b) => a[1] - b[1]).map((x) => x[0]);
   rec('R5 section order matches the PRD', sorted.join(',') === ids.map((x) => x[0]).join(','), sorted.join(' → '));

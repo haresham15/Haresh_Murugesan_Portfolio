@@ -29,28 +29,28 @@ function App() {
           <CursorDot />
           <Header />
 
-          {/* Recruiter order: Hero, Works, Recognition, Experience, Constellation, Index, Syntinuum, About, Milestones, Now, Contact.
-              Materials still alternate; each seam's kind is paired with the section it opens into. */}
+          {/* Recruiter order: Hero, About, Works, Recognition, Experience, Constellation, Index, Syntinuum, Milestones, Now, Contact.
+              Materials still alternate. Three seams are showpieces (shutter, iris open, iris close); the rest are a hard baseline wipe. */}
           <main id="main-content" className="relative z-10 w-full overflow-x-clip bg-transparent">
             <MaterialSection material="dark" name="hero"><BentoHero /></MaterialSection>
             <Seam kind="shutter" from="dark" to="light" />
+            <MaterialSection material="light" name="about"><AboutSection /></MaterialSection>
             <MaterialSection material="light" name="works"><WorksSection /></MaterialSection>
             <Seam kind="iris-open" from="light" to="dark" />
             <MaterialSection material="dark" name="recognition"><RecognitionSection /></MaterialSection>
-            <Seam kind="turn-in" from="dark" to="light" />
+            <Seam kind="baseline" from="dark" to="light" />
             <MaterialSection material="light" name="experience"><ScrollyExperience /></MaterialSection>
-            <Seam kind="turn-out" from="light" to="dark" />
+            <Seam kind="baseline" from="light" to="dark" />
             <MaterialSection material="dark" name="constellation"><HomeCodeGraph /></MaterialSection>
-            <Seam kind="horizon" from="dark" to="light" />
+            <Seam kind="baseline" from="dark" to="light" />
             <MaterialSection material="light" name="index"><ToolWallSection /></MaterialSection>
-            <Seam kind="exposure" from="light" to="dark" />
+            <Seam kind="baseline" from="light" to="dark" />
             <MaterialSection material="dark" name="syntinuum"><SyntinuumSection /></MaterialSection>
             <Seam kind="baseline" from="dark" to="light" />
-            <MaterialSection material="light" name="about"><AboutSection /></MaterialSection>
             <MaterialSection material="light" name="milestones"><HistorySection /></MaterialSection>
             <Seam kind="iris-close" from="light" to="dark" />
             <MaterialSection material="dark" name="now"><NowSection /></MaterialSection>
-            <Seam kind="exposure" from="dark" to="light" />
+            <Seam kind="baseline" from="dark" to="light" />
             <MaterialSection material="light" name="contact"><ContactFooter /></MaterialSection>
           </main>
         </div>

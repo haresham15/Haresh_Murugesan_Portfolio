@@ -5,14 +5,11 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ThemeSection, Reveal } from './ThemeSection';
 import { useMotionPreference } from './MotionPreference';
 import { profile } from '../content/profile';
+import { NOTEBOOK } from '../content/notebook';
 
 const MotionDiv = motion.div;
 
 const CHAMFER = 'polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%)';
-
-const ANCHORS = [
-  { value: '2×', label: 'First place, Best Use of External Data', source: 'ASA DataFest 2025 and 2026', href: '/#achievements' },
-];
 
 /* ---------------------------------------------------------------------------
    Plate figure: a seeded, illustrative tissue tile. Nuclei are placed by
@@ -157,7 +154,7 @@ export const AboutSection: React.FC = () => {
                     alt={`Portrait of ${profile.name}`}
                     fill
                     sizes="(max-width: 1024px) 80vw, 460px"
-                    className="object-cover object-top grayscale contrast-[1.08]"
+                    className="object-cover object-top"
                   />
                 </MotionDiv>
               </div>
@@ -170,54 +167,23 @@ export const AboutSection: React.FC = () => {
 
           <Reveal delay={0.08} className="max-w-[640px]">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-normal text-[var(--mat-ink)] leading-[1.06] tracking-[-0.02em]">
-              I build software where <span className="italic text-[var(--mat-accent-mark)]">computational speed</span> meets
-              real-world physical and human systems.
+              I like building the thing that <span className="italic text-[var(--mat-accent-mark)]">doesn’t exist yet</span>,
+              then proving it works.
             </h2>
             <p className="mt-8 max-w-[60ch] text-base sm:text-lg font-sans text-[var(--mat-body)] leading-relaxed [font-weight:var(--mat-body-weight)] [letter-spacing:var(--mat-tracking)]">
-              My work sits between deterministic data pipelines, explainable deep learning and low-latency client
-              architecture: the pieces that keep clinicians, analysts and operators in control of what the
-              software is doing.
+              I study {profile.education.shortDegree} at Ohio State. Right now I’m an innovation analyst intern at
+              Honda Research Institute’s 99P Labs and an undergraduate researcher in digital pathology. This
+              summer I built agentic AI tools as a software intern at CAS.
             </p>
             <p className="mt-5 max-w-[60ch] text-base font-sans text-[var(--mat-muted)] leading-relaxed [font-weight:var(--mat-body-weight)]">
-              {profile.education.degree} at {profile.education.university}, expected {profile.education.expectedGraduation}.
-              Seeking {profile.availability.targetSeason} {profile.availability.seeking}.
+              Most of what I make starts as a problem that won’t leave me alone. I get a first version running
+              fast, then benchmark it until I know exactly where it breaks.
             </p>
 
-            <ul className="mt-10 border-t border-[var(--mat-rule)]">
-              {ANCHORS.map((a) => (
-                <li key={a.label} className="border-b border-[var(--mat-rule)]">
-                  <a
-                    href={a.href}
-                    onClick={a.href.startsWith('/#') ? scrollToAnchor(a.href.slice(2)) : undefined}
-                    className="group grid grid-cols-[6.5rem_1fr_auto] sm:grid-cols-[8rem_1fr_auto] items-baseline gap-4 py-4 min-h-[44px]"
-                  >
-                    <span className="font-serif text-2xl sm:text-3xl text-[var(--mat-ink)] tracking-tight tabular-nums">{a.value}</span>
-                    <span className="font-sans text-sm text-[var(--mat-body)] leading-snug [font-weight:var(--mat-body-weight)]">
-                      {a.label} <span className="text-[var(--mat-muted)]">· {a.source}</span>
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="font-sans text-sm text-[var(--mat-muted)] group-hover:text-[var(--mat-accent-text)] group-hover:translate-x-1 transition-[color,transform] duration-300"
-                    >
-                      →
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 font-sans text-sm">
-              <a
-                href="#experience"
-                onClick={scrollToAnchor('experience')}
-                className="px-6 py-3.5 min-h-[44px] bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] font-semibold rounded-[2px] transition-colors inline-flex items-center justify-center gap-2"
-              >
-                <span>See the experience</span>
-                <span aria-hidden="true">↑</span>
-              </a>
+            <div className="mt-10 font-sans text-sm">
               <Link
                 href="/about"
-                className="min-h-[44px] inline-flex items-center justify-center sm:justify-start gap-2 text-[var(--mat-ink)] hover:text-[var(--mat-accent-text)] transition-colors"
+                className="min-h-[44px] inline-flex items-center gap-2 text-[var(--mat-ink)] hover:text-[var(--mat-accent-text)] transition-colors"
               >
                 <span className="border-b border-current pb-0.5">Full profile</span>
                 <span aria-hidden="true">→</span>
@@ -226,37 +192,83 @@ export const AboutSection: React.FC = () => {
           </Reveal>
         </div>
 
-        {/* Research figure. The role and its bullets live in Experience (entry 02); only the figure stays here. */}
-        <Reveal className="mt-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          <figure className="lg:col-span-5">
-            <PathologyFigure />
-            <figcaption className="mt-3 font-sans text-sm text-[var(--mat-muted)] leading-relaxed [font-weight:var(--mat-body-weight)]">
-              Illustrative schematic of nucleus segmentation under a saliency overlay. Not patient data.
-            </figcaption>
-          </figure>
-
-          <div className="lg:col-span-7">
+        {/* The notebook: builds and research Selected Works doesn't show. Works follows directly below. */}
+        <div className="mt-24 lg:mt-32">
+          <Reveal className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-3 sm:gap-8">
             <h3 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[var(--mat-ink)] leading-[1.08] tracking-[-0.01em]">
-              Digital pathology, made explainable.
+              From the notebook
             </h3>
-            <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 font-sans text-sm [font-weight:var(--mat-body-weight)]">
-              <Link
-                href="/projects/cv-allergy-wheal"
-                className="min-h-[44px] inline-flex items-center gap-2 text-[var(--mat-accent-text)] hover:text-[var(--mat-ink)] transition-colors"
+            <p className="font-sans text-sm text-[var(--mat-muted)] [font-weight:var(--mat-body-weight)]">
+              Side builds and research.{' '}
+              <a
+                href="#projects"
+                onClick={scrollToAnchor('projects')}
+                className="inline-flex min-h-[44px] items-center gap-1.5 text-[var(--mat-ink)] hover:text-[var(--mat-accent-text)] transition-colors"
               >
-                <span className="border-b border-current pb-0.5">Related: wheal quantification pipeline</span>
-                <span aria-hidden="true">→</span>
-              </Link>
-              <Link
-                href="/projects/healios"
-                className="min-h-[44px] inline-flex items-center gap-2 text-[var(--mat-body)] hover:text-[var(--mat-ink)] transition-colors"
-              >
-                <span className="border-b border-current pb-0.5">Grad-CAM saliency in Healios V2</span>
-                <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-        </Reveal>
+                <span className="border-b border-current pb-0.5">The four I’d show first are next</span>
+                <span aria-hidden="true">↓</span>
+              </a>
+            </p>
+          </Reveal>
+
+          <ol className="mt-8 border-t border-[var(--mat-rule)]">
+            {NOTEBOOK.map((entry, i) => (
+              <Reveal as="li" key={entry.slug} delay={0.04 * i} className="border-b border-[var(--mat-rule)]">
+                <Link
+                  href={`/projects/${entry.slug}`}
+                  className="group grid grid-cols-1 lg:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,1fr)_13rem_1.25rem] gap-x-8 gap-y-3 py-8 lg:py-10 items-start"
+                >
+                  <span className="font-serif italic text-lg text-[var(--mat-muted)] group-hover:text-[var(--mat-accent-text)] transition-colors tabular-nums">
+                    Fig. {entry.fig}
+                  </span>
+
+                  <span className="flex flex-col gap-2">
+                    <span className="font-serif text-2xl sm:text-3xl text-[var(--mat-ink)] leading-tight tracking-[-0.01em]">
+                      {entry.name}
+                    </span>
+                    <span className="font-serif italic text-base text-[var(--mat-muted)] leading-snug">
+                      {entry.problem}
+                    </span>
+                  </span>
+
+                  <span className="font-sans text-[15px] text-[var(--mat-body)] leading-relaxed [font-weight:var(--mat-body-weight)] [letter-spacing:var(--mat-tracking)]">
+                    {entry.idea}
+                  </span>
+
+                  {entry.metric ? (
+                    <span className="flex items-baseline gap-3 lg:flex-col lg:items-end lg:gap-1 lg:text-right">
+                      <span className="font-serif text-3xl lg:text-4xl text-[var(--mat-ink)] tracking-tight tabular-nums whitespace-nowrap">
+                        {entry.metric.value}
+                      </span>
+                      <span className="font-sans text-[13px] text-[var(--mat-muted)] [font-weight:var(--mat-body-weight)]">
+                        {entry.metric.label}
+                      </span>
+                      {/* Drawing-sheet call-out: a leader under the number */}
+                      <span
+                        aria-hidden="true"
+                        className="hidden lg:block w-full border-b border-dotted border-[var(--mat-rule-strong)] group-hover:border-[var(--mat-accent-mark)] transition-colors"
+                      />
+                    </span>
+                  ) : (
+                    <figure className="w-full max-w-[220px] lg:justify-self-end">
+                      <PathologyFigure />
+                      <figcaption className="mt-2 font-sans text-[12px] text-[var(--mat-muted)] leading-snug [font-weight:var(--mat-body-weight)]">
+                        Illustrative schematic. Not patient data.
+                      </figcaption>
+                    </figure>
+                  )}
+
+                  <span
+                    aria-hidden="true"
+                    className="hidden lg:block font-sans text-sm text-[var(--mat-muted)] group-hover:text-[var(--mat-accent-text)] group-hover:translate-x-1 transition-[color,transform] duration-300"
+                  >
+                    →
+                  </span>
+                </Link>
+              </Reveal>
+            ))}
+          </ol>
+        </div>
       </div>
     </ThemeSection>
   );

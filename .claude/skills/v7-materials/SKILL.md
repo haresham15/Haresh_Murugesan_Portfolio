@@ -76,4 +76,4 @@ It must return an empty array. A single border on one side, ≤1px, is a hairlin
 
 ## Seams
 
-Sections are separated by 70vh seams (`<Seam>` in `src/v7/seams/Region.tsx`). Seams hold no text. Do not add top or bottom padding to compensate for them; a section starts where its content starts.
+Sections are separated by 40vh seams (`--seam-height`, `<Seam>` in `src/v7/seams/Region.tsx`). Seams hold no text. Every seam is a hard edge: never blend the two materials into a gradient band, in the shader or in the CSS fallback. Showpieces are `shutter`, `iris-open` and `iris-close`; every other boundary is `baseline`. Do not add top or bottom padding to compensate for them; a section starts where its content starts.

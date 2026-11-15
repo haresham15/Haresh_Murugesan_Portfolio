@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMotionPreference } from './MotionPreference';
 import { useCanvasStage, type CanvasStage } from '../hooks/useCanvasStage';
+import { getPointer } from '@/v7/runtime/pointer';
 
 /*
  * ASCII lightbulb shader.
@@ -116,6 +117,8 @@ interface HeroState {
   mouse: { x: number; y: number; active: boolean };
   lightU: Spring; lightV: Spring; marker: Spring;
   bx: number[][]; by: number[][]; bc: string[][];
+  /** ms since the last drawn frame; the idle bulb draws at 30 fps. */
+  sinceDraw: number;
 }
 
 const createState = (): HeroState => ({
@@ -125,6 +128,7 @@ const createState = (): HeroState => ({
   mouse: { x: 0, y: 0, active: false },
   lightU: { x: -0.86, v: 0 }, lightV: { x: 0.42, v: 0 }, marker: { x: -1, v: 0 },
   bx: STYLES.map(() => []), by: STYLES.map(() => []), bc: STYLES.map(() => []),
+  sinceDraw: 0,
 });
 
 const toScreen = (s: HeroState, u: number, v: number): [number, number] => [
@@ -827,13 +831,22 @@ export const AsciiDnaLightbulbCanvas: React.FC<AsciiDnaLightbulbCanvasProps> = (
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, stage: CanvasStage) => {
       if (!stateRef.current) stateRef.current = createState();
-      if (stateRef.current.embedded !== (variant === 'embedded')) {
-        stateRef.current.embedded = variant === 'embedded';
-        stateRef.current.version = -1;
+      const s = stateRef.current;
+      if (s.embedded !== (variant === 'embedded')) {
+        s.embedded = variant === 'embedded';
+        s.version = -1;
       }
-      renderFrame(ctx, stage, stateRef.current, isReduced, layoutVersion);
+      // With no pointer movement for a second, hold each frame for 33 ms (30 fps): the
+      // cell grid already quantises the motion, and it halves the idle cost.
+      s.sinceDraw += stage.deltaTime;
+      const unchanged = s.w === stage.width && s.h === stage.height && s.dpr === stage.dpr && s.version === layoutVersion;
+      // Only while animating: a still bulb (reduced motion, paused) draws on every request.
+      const animating = !isReduced && !paused;
+      if (animating && unchanged && s.sinceDraw < 33 && performance.now() - getPointer().lastMoveAt > 1000) return;
+      s.sinceDraw = 0;
+      renderFrame(ctx, stage, s, isReduced, layoutVersion);
     },
-    [isReduced, layoutVersion, variant],
+    [isReduced, layoutVersion, variant, paused],
   );
 
   useCanvasStage(containerRef, canvasRef, draw, { animate: !isReduced && !paused });

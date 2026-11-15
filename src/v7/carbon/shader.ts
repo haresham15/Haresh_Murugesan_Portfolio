@@ -1,5 +1,5 @@
 /**
- * CarbonField fragment shader. Both materials, every seam mask, one pass.
+ * CarbonField fragment shader. Both materials, every seam mask, one pass. Masks are hard edges.
  * Mask maths mirror src/v7/materials/field.ts (seamMask); keep the two in step.
  */
 export const MAX_BANDS = 6;
@@ -165,34 +165,20 @@ void main() {
     float r = R * cos(PI / BLADES) / cos(mod(th, seg) - PI / BLADES);
     bool inside = length(d) < r;
     m = opening ? (inside ? 1.0 : 0.0) : (inside ? 0.0 : 1.0);
-  } else if (kind < 4.5) { // horizon bleed
-    float band = 0.3 * view.y;
-    m = smoothstep(0.0, 1.0, (yb - (h - band) * 0.5) / band);
-    if (abs(yb - h * 0.5) < 0.5) { edgeCol = vec3(0.784, 0.824, 0.878); edgeA = 0.55; }
   } else if (kind < 6.5) { // 90-degree turn, in (5) pivots bottom-left, out (6) bottom-right
     float px = kind < 5.5 ? sc.x : view.x - sc.x;
     float ang = atan(up, px);
     float sweep = smoothstep(0.1, 0.9, p) * (PI * 0.5) * 1.001;
     m = ang <= sweep ? 1.0 : 0.0;
     if (sweep > 0.0 && sweep < PI * 0.5 && abs(px * sin(sweep) - up * cos(sweep)) < 0.6) { edgeCol = vec3(0.784, 0.824, 0.878); edgeA = 0.5; }
-  } else if (kind < 7.5) { // baseline
-    m = yb >= h * 0.5 ? 1.0 : 0.0;
-    if (abs(yb - h * 0.5) < 0.5) { edgeCol = vec3(0.494, 0.545, 0.608); edgeA = 0.8; }
-  } else { // exposure blow-out
-    float t = yb / h;
-    m = smoothstep(0.15, 0.85, t + (p - 0.5) * 0.6);
+  } else { // baseline (7): a hard edge rising from the seam's bottom to its top; field.ts baselineEdge
+    float edge = h * (1.0 - p);
+    m = yb >= edge ? 1.0 : 0.0;
+    if (abs(yb - edge) < 0.5) { edgeCol = vec3(0.494, 0.545, 0.608); edgeA = 0.8; }
   }
 
-  vec3 col;
-  if (m <= 0.0) col = material(ma, w, sc, view, H);
-  else if (m >= 1.0) col = material(mb, w, sc, view, H);
-  else col = mix(material(ma, w, sc, view, H), material(mb, w, sc, view, H), m);
-
-  if (kind > 7.5) {
-    float t = yb / h;
-    float bloom = exp(-pow((t - 0.62) / 0.16, 2.0)) * smoothstep(0.25, 0.6, p) * (1.0 - smoothstep(0.85, 1.0, p));
-    col = mix(col, vec3(1.0), 0.9 * bloom);
-  }
+  // Every mask is binary, so each pixel shades exactly one material: no blended band.
+  vec3 col = material(m >= 0.5 ? mb : ma, w, sc, view, H);
   col = mix(col, edgeCol, edgeA);
   outColor = vec4(col, 1.0);
 }

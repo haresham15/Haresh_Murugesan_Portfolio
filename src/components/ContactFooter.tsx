@@ -76,7 +76,7 @@ export const ContactFooter: React.FC = () => {
                 className="group min-h-[52px] bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] font-semibold px-7 rounded-[2px] inline-flex items-center justify-between sm:justify-center gap-3 transition-colors"
               >
                 <span>Send Direct Email</span>
-                <span aria-hidden="true" className="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1">
+                <span aria-hidden="true" className="transition-transform duration-300 ease-[var(--ease-out-expo)] group-hover:translate-x-1">
                   →
                 </span>
               </a>
@@ -91,7 +91,7 @@ export const ContactFooter: React.FC = () => {
                       key={state}
                       aria-hidden={copyState !== state}
                       style={{ gridArea: '1 / 1' }}
-                      className={`transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                      className={`transition-[opacity,transform] duration-300 ease-[var(--ease-out-expo)] ${
                         copyState === state ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
                       } ${state === 'copied' ? 'text-[#FF2800]' : ''}`}
                     >

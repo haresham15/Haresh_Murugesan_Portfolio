@@ -39,7 +39,7 @@ export default function Home() {
         legalName: profile.legalName,
         url: 'https://www.hareshmurugesan.com',
         image: 'https://www.hareshmurugesan.com/preview-image.jpeg',
-        jobTitle: 'Software & Systems Engineer',
+        jobTitle: profile.title,
         worksFor: [
           {
             '@type': 'Organization',

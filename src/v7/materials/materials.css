@@ -34,7 +34,8 @@
   /* Display type */
   --display-size: clamp(3rem, 7vw, 7.5rem);
   /* Seams */
-  --seam-height: 70vh;
+  --seam-height: 40vh;
+  --seam-hairline: rgba(126, 139, 155, 0.8);
   /* Fixed UI material crossfade */
   --material-fade: 180ms;
 }
@@ -87,17 +88,23 @@
 /* --------------------------------------------------------------------------
    Static fallback (static tier, no WebGL2, reduced motion, or before the
    shader's first frame). Painted on ::before so section roots never compute
-   an opaque background of their own.
+   an opaque background of their own. When the shader goes live the fallback
+   fades out over it instead of snapping.
    -------------------------------------------------------------------------- */
-html:not(.carbon-live) [data-material-region]::before {
+[data-material-region]::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  transition: opacity var(--material-fade) ease-out;
 }
 
-html:not(.carbon-live) [data-material-region][data-material="dark"]::before {
+html.carbon-live [data-material-region]::before {
+  opacity: 0;
+}
+
+[data-material-region][data-material="dark"]::before {
   background-color: var(--bg-midnight);
   background-image:
     radial-gradient(ellipse 60% 40% at 50% 30%, rgba(11, 30, 64, 0.30), transparent 70%),
@@ -107,7 +114,7 @@ html:not(.carbon-live) [data-material-region][data-material="dark"]::before {
   background-size: 100% 100vh, 46px 46px, 120px 120px, 160px 160px;
 }
 
-html:not(.carbon-live) [data-material-region][data-material="light"]::before {
+[data-material-region][data-material="light"]::before {
   background-color: var(--weave-base);
   background-image:
     repeating-linear-gradient(45deg, rgba(203, 213, 225, 0.30) 0 1px, transparent 1px 8.485px),
@@ -116,14 +123,15 @@ html:not(.carbon-live) [data-material-region][data-material="light"]::before {
   background-size: auto, 6px 6px, 6px 6px;
 }
 
-html:not(.carbon-live) [data-seam]::before {
-  background: linear-gradient(to bottom, var(--seam-from), var(--seam-to));
+/* Static seams are one hard edge, never a gradient: each section's texture runs
+   on into the half of the seam beside it, and a hairline marks the cut. */
+[data-material-region]:has(+ [data-seam])::before {
+  bottom: calc(var(--seam-height) * -0.5);
 }
-
-[data-seam][data-from="dark"] { --seam-from: var(--bg-midnight); }
-[data-seam][data-from="light"] { --seam-from: var(--weave-base); }
-[data-seam][data-to="dark"] { --seam-to: var(--bg-midnight); }
-[data-seam][data-to="light"] { --seam-to: var(--weave-base); }
+[data-seam] + [data-material-region]::before {
+  top: calc(var(--seam-height) * -0.5);
+  border-top: 1px solid var(--seam-hairline);
+}
 
 /* --------------------------------------------------------------------------
    Fixed UI that reads the material under it (header mark, nav rim, cursor).
@@ -141,12 +149,12 @@ html:not(.carbon-live) [data-seam]::before {
   --on-surface: var(--weave-base);
   --on-shadow: rgba(203, 213, 225, 0.0);
 }
+/* Colours crossfade; the drop-shadow filter switches in one frame (animating filter repaints every frame) */
 [data-on] .on-material {
   transition:
     color var(--material-fade) ease,
     background-color var(--material-fade) ease,
-    border-color var(--material-fade) ease,
-    filter var(--material-fade) ease;
+    border-color var(--material-fade) ease;
 }
 
 /* Reduced motion keeps crossfades: opt in with .rm-crossfade */
@@ -239,7 +247,7 @@ html.v7-cursor *:not(input):not(textarea):not(select):not([contenteditable="true
   top: 50%;
   transform: translate(-50%, -50%) scale(0.6);
   opacity: 0;
-  transition: opacity 120ms ease, transform 160ms cubic-bezier(0.16, 1, 0.3, 1), color var(--material-fade) ease;
+  transition: opacity 120ms ease, transform 160ms var(--ease-out-expo), color var(--material-fade) ease;
 }
 .v7-cursor-default {
   width: 10px;
@@ -266,10 +274,8 @@ html.v7-cursor *:not(input):not(textarea):not(select):not([contenteditable="true
   isolation: isolate;
 }
 
-/* Nav rim: a machined part; on the weave it gains a contact shadow instead of changing colour */
-[data-rim] > * {
-  transition: filter var(--material-fade) ease;
-}
+/* Nav rim: a machined part; on the weave it gains a contact shadow instead of changing colour.
+   The shadow is not transitioned: animating filter repaints the rim every frame. */
 [data-rim][data-on="light"] > * {
   filter: drop-shadow(0 1px 1px rgba(5, 8, 17, 0.22)) drop-shadow(0 2px 4px rgba(5, 8, 17, 0.12));
 }

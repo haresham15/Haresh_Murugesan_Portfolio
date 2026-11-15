@@ -48,9 +48,9 @@ export const DOMAIN_MODULES: DomainModule[] = [
     id: 'domain-serverless-cloud',
     coreId: 'core-backend',
     label: 'Cloud & Autonomous Pipelines',
-    tagline: 'Java custom collections, tree invariants, and formal contracts',
+    tagline: 'Go 1.24 AI gateways, local Tauri/LangGraph IPC daemons, and formal Java systems',
     accentColor: '#C8D2E0',
-    projectSlugs: ['software-2-projects', 'software-1-projects'],
+    projectSlugs: ['aethergate', 'jarvis', 'software-2-projects', 'software-1-projects'],
   },
 
   // Frontend Core Domains
@@ -66,7 +66,7 @@ export const DOMAIN_MODULES: DomainModule[] = [
     id: 'domain-telemetry-ui',
     coreId: 'core-frontend',
     label: 'Real-Time Telemetry & Simulators',
-    tagline: '60 FPS dedicated Web Workers and off-main-thread physics',
+    tagline: '250k+ msg/s C++20/Go telemetry broker, 60 FPS Web Workers, and zero-destination buffer',
     accentColor: '#FF2800',
     projectSlugs: ['apexis', 'tempo'],
   },

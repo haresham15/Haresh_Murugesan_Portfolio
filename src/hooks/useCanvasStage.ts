@@ -7,6 +7,8 @@ export interface CanvasStage {
   dpr: number;
   time: number;
   deltaTime: number;
+  /** Container's viewport rect, read in the scheduler's measure phase this frame. */
+  rect: DOMRectReadOnly | null;
 }
 
 /**
@@ -53,6 +55,7 @@ export function useCanvasStage(
     let height = 0;
     let dpr = 1;
     let elapsed = 0;
+    let rect: DOMRectReadOnly | null = null;
     const syncSize = () => {
       const rect = container.getBoundingClientRect();
       width = rect.width;
@@ -67,10 +70,14 @@ export function useCanvasStage(
     // canvases animate in one frame (src/v7/runtime/scheduler.ts).
     const tick = ({ dt }: FrameInfo): boolean => {
       if (width <= 0 || height <= 0) return false;
+      // IntersectionObserver callbacks can lag behind fast scrolling; never draw a stage
+      // that this frame's rect says is off screen. Stay awake (even a still stage, so a
+      // pending redraw is not lost); once the observer catches up the task stops running.
+      if (rect && (rect.bottom <= 0 || rect.top >= window.innerHeight)) return true;
       if (dpr !== Math.min(window.devicePixelRatio || 1, 1.5)) syncSize();
       const deltaTime = dt;
       elapsed += deltaTime;
-      const stage = { width, height, dpr, time: elapsed, deltaTime };
+      const stage = { width, height, dpr, time: elapsed, deltaTime, rect };
       let keepGoing = true;
       if (ctx) {
         ctx.save();
@@ -81,7 +88,11 @@ export function useCanvasStage(
       if (frameRef.current?.(stage) === false) keepGoing = false;
       return animate && keepGoing;
     };
-    const task = register(tick, { element: container, budgeted: true });
+    const task = register(tick, {
+      element: container,
+      budgeted: true,
+      measure: () => { rect = container.getBoundingClientRect(); },
+    });
     const invalidate = () => task.wake();
     const resize = () => { syncSize(); invalidate(); };
     const resizeObserver = new ResizeObserver(resize);

@@ -169,7 +169,7 @@ export default function AboutPage() {
                   src="/profile.jpeg"
                   alt="Haresh Murugesan"
                   fill
-                  className="object-cover object-top filter contrast-[1.03]"
+                  className="object-cover object-top"
                   priority
                 />
               </div>
