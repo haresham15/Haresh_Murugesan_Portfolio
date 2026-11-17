@@ -238,15 +238,15 @@ export const SkillGraphDemo: React.FC = () => {
             </div>
 
             <div className="space-y-2 pt-3 border-t border-[#F4F6F9]/[0.08]">
-              <p className="text-[11px] font-mono text-[#7E8B9B] uppercase">
-                Demonstrated In {activeNode.projects.length} System{activeNode.projects.length > 1 ? 's' : ''}:
+              <p className="text-[11px] font-mono text-[#7E8B9B]">
+                Demonstrated in {activeNode.projects.length} system{activeNode.projects.length > 1 ? 's' : ''}:
               </p>
               <div className="space-y-2">
                 {activeNode.projects.map((proj, idx) => (
                   <Link
                     key={idx}
                     href={proj.href}
-                    className="p-2.5 rounded-[2px] bg-white/[0.03] hover:bg-white/[0.08] border border-[#F4F6F9]/[0.08] hover:border-[#FF2800]/40 transition-all flex items-center justify-between group block"
+                    className="p-2.5 rounded-[2px] bg-white/[0.03] hover:bg-white/[0.08] border border-[#F4F6F9]/[0.08] hover:border-[#FF2800]/40 transition-[background-color,border-color] duration-150 flex items-center justify-between group block"
                   >
                     <span className="text-xs font-sans font-medium text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors truncate">
                       {proj.title}

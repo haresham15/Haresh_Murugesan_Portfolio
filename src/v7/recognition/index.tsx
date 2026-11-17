@@ -43,6 +43,8 @@ import { LEVEL_PAD, bakeAll, enamelOf, revoke, type MedalBitmaps } from './bake'
 import { MedalLight } from './live';
 import { makeLight } from './shade';
 import type { HeightMap } from './heightmap';
+import { soundEngine } from '@/lib/soundEngine';
+import { TelemetryMetric } from '@/components/ui/TelemetryMetric';
 
 const N = awards.length;
 const DPR_CAP = 1.5;
@@ -468,6 +470,10 @@ export default function RecognitionSection() {
     else void router.push(href);
   };
 
+  useEffect(() => {
+    soundEngine.playMechanicalTick();
+  }, [active]);
+
   const onMedalClick = (i: number, e: React.MouseEvent) => {
     if (i !== active) goTo(i);
     else if (e.detail > 0) open(awards[i].href);
@@ -573,6 +579,33 @@ export default function RecognitionSection() {
         >
           {h2x} <span className="italic text-[var(--mat-accent-mark)]">{h1st}</span>
         </p>
+
+        {/* Tactile Keycap Affordances & Award Index */}
+        <div aria-hidden="true" className="flex items-center gap-3 mt-4 text-[11px] font-mono select-none">
+          <span className="text-[var(--mat-muted)] tracking-wider tabular-nums">
+            {String(active + 1).padStart(2, '0')} / {String(N).padStart(2, '0')}
+          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => go(-1)}
+              aria-label="Previous award"
+              tabIndex={-1}
+              className="px-2 py-0.5 text-[11px] font-mono border border-[var(--mat-rule-strong,rgba(200,210,224,0.20))] text-[var(--mat-ink)] rounded-[2px] bg-[var(--mat-surface,#060A12)]/60 hover:border-[#FF2800] active:scale-95 active:bg-white/10 transition-[border-color,background-color,transform] duration-150 cursor-pointer"
+            >
+              [←]
+            </button>
+            <button
+              type="button"
+              onClick={() => go(1)}
+              aria-label="Next award"
+              tabIndex={-1}
+              className="px-2 py-0.5 text-[11px] font-mono border border-[var(--mat-rule-strong,rgba(200,210,224,0.20))] text-[var(--mat-ink)] rounded-[2px] bg-[var(--mat-surface,#060A12)]/60 hover:border-[#FF2800] active:scale-95 active:bg-white/10 transition-[border-color,background-color,transform] duration-150 cursor-pointer"
+            >
+              [→]
+            </button>
+          </div>
+        </div>
       </header>
 
       <span id="recognition-hint" className="sr-only-v7">
@@ -696,9 +729,9 @@ export default function RecognitionSection() {
                   {a.context}
                 </Line>
               </p>
-              <p className="mt-2 text-sm tabular-nums text-[var(--mat-muted)]" style={bodyType}>
+              <p className="mt-2 text-sm tabular-nums font-mono text-[var(--mat-muted)]" style={bodyType}>
                 <Line phase={ph} i={2} reduced={isReduced}>
-                  {a.year}
+                  <TelemetryMetric value={a.year} />
                 </Line>
               </p>
             </div>

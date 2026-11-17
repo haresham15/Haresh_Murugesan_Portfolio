@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { allProjects, projectTier, type ProjectTier } from '@/content/projects';
 import { useCanvasStage, type CanvasStage } from '@/hooks/useCanvasStage';
 import { useMotionPreference } from './MotionPreference';
+import { soundEngine } from '@/lib/soundEngine';
 
 // ---------------------------------------------------------------------------
 // Palette, type and projection constants
@@ -965,7 +966,10 @@ export const HomeCodeGraph: React.FC = () => {
       if (!sim.warp && pointer.inside && !pointer.touch) hover = hitTest(pointer.x, pointer.y, false);
       if (hover !== sim.hoverIndex) {
         sim.hoverIndex = hover;
-        if (hover >= 0 && nodes[hover].kind === 2) prefetch(nodes[hover].id);
+        if (hover >= 0) {
+          soundEngine.playMechanicalTick();
+          if (nodes[hover].kind === 2) prefetch(nodes[hover].id);
+        }
       }
       const canvas = canvasRef.current;
       if (canvas) {
@@ -986,6 +990,35 @@ export const HomeCodeGraph: React.FC = () => {
         setLensSlug(lensSlugNow);
       }
       const activeProject = lensIndex;
+
+      // Depth-of-Field (DoF) Focus: active node and 3 nearest neighbors stay 1.0, non-connected smoothly lerp down to 0.15
+      const focalNode = hover >= 0 ? hover : activeProject >= 0 ? activeProject : -1;
+      const dofActive = focalNode >= 0 && !sim.warp;
+      let dofFocusSet: Set<number> | null = null;
+      if (dofActive) {
+        dofFocusSet = new Set<number>([focalNode]);
+        if (nodes[focalNode].kind === 2) {
+          const projIdx = focalNode - nFixed;
+          const nbrs = VECTOR_INDEX.neighbors[projIdx];
+          if (nbrs) {
+            for (let k = 0; k < Math.min(3, nbrs.length); k++) {
+              dofFocusSet.add(nFixed + nbrs[k].index);
+            }
+          }
+          if (nodes[focalNode].parent >= 0) dofFocusSet.add(nodes[focalNode].parent);
+        } else if (nodes[focalNode].kind === 1) {
+          for (let k = 0; k < nodes.length; k++) {
+            if (nodes[k].parent === focalNode) dofFocusSet.add(k);
+          }
+          if (nodes[focalNode].parent >= 0) dofFocusSet.add(nodes[focalNode].parent);
+        }
+
+        // Apply smooth ~180ms DoF interpolation
+        for (let i = 0; i < nodes.length; i++) {
+          const targetA = dofFocusSet.has(i) ? 1.0 : 0.15;
+          nodes[i].a += (targetA - nodes[i].a) * alphaBlend;
+        }
+      }
 
       // --- 4. Warp camera ---------------------------------------------------
       let warpT = 0;
@@ -1169,19 +1202,20 @@ export const HomeCodeGraph: React.FC = () => {
 
         const energy = Math.min(1, disp / 14);
         const isLineage = activeProject >= 0 && ((edge.b === activeProject && edge.a === lineage1) || (edge.b === lineage1 && edge.a === lineage0));
+        const isDofEdge = dofActive && dofFocusSet && dofFocusSet.has(edge.a) && dofFocusSet.has(edge.b);
         const baseAlpha = Math.min(A.a, B.a) * 0.34;
         ctx.beginPath();
         ctx.moveTo(A.sx, A.sy);
         // Control offset is twice the midpoint displacement so the curve's
         // midpoint lands exactly on the simulated string point.
         ctx.quadraticCurveTo(restCx + edge.dx * 2, restCy + edge.dy * 2, B.sx, B.sy);
-        if (isLineage) {
-          ctx.strokeStyle = RED;
+        if (isLineage || isDofEdge) {
+          ctx.strokeStyle = isLineage ? RED : BLUE;
           ctx.globalAlpha = 0.9;
           ctx.lineWidth = 1.4;
         } else {
           ctx.strokeStyle = energy > 0.12 ? CHROME : edge.a === 0 && edge.b === 1 ? SILVER : B.ring;
-          ctx.globalAlpha = Math.min(1, baseAlpha + energy * 0.55);
+          ctx.globalAlpha = dofActive ? 0.15 * Math.min(A.a, B.a) : Math.min(1, baseAlpha + energy * 0.55);
           ctx.lineWidth = 1 + energy * 0.4;
         }
         ctx.stroke();
@@ -1362,9 +1396,14 @@ export const HomeCodeGraph: React.FC = () => {
       const labelOrder = sim.labelOrder;
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
-        n.wantLabel = !sim.warp && n.ta >= 0.3 && !(queryActive && n.kind === 1);
-        n.priority =
-          i === activeProject ? 0 : n.matchRank >= 0 ? 1 + n.matchRank * 0.01 : n.kind === 0 ? 2 : n.kind === 2 ? 3 : 4;
+        if (dofActive && dofFocusSet) {
+          n.wantLabel = dofFocusSet.has(i);
+          n.priority = i === focalNode ? 0 : dofFocusSet.has(i) ? 1 : 10;
+        } else {
+          n.wantLabel = !sim.warp && n.ta >= 0.3 && !(queryActive && n.kind === 1);
+          n.priority =
+            i === activeProject ? 0 : n.matchRank >= 0 ? 1 + n.matchRank * 0.01 : n.kind === 0 ? 2 : n.kind === 2 ? 3 : 4;
+        }
       }
       for (let i = 1; i < labelOrder.length; i++) {
         const v = labelOrder[i];

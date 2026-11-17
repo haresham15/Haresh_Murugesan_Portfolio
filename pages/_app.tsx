@@ -8,6 +8,7 @@ import '../src/v7/materials/materials.css';
 import { usePortfolioStore } from '@/store/usePortfolioStore';
 import { MotionPreferenceProvider } from '@/components/MotionPreference';
 import { CommandPalette } from '@/components/ui/CommandPalette';
+import { FilmGrain } from '@/components/ui/FilmGrain';
 
 export default function App({ Component, pageProps }: AppProps) {
   const { commandPaletteOpen, setCommandPaletteOpen } = usePortfolioStore();
@@ -65,9 +66,22 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="author" content="Haresh Murugesan" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="robots" content="index, follow" />
+        {/* Open Graph */}
+        <meta property="og:site_name" content="Haresh Murugesan — Software &amp; Systems Architecture" />
+        <meta property="og:title" content="Haresh Murugesan | Software &amp; Systems Engineer" />
+        <meta
+          property="og:description"
+          content="Haresh Murugesan, Computer Science (AI) at Ohio State, graduating May 2028. Seeking Summer 2027 software and ML internships."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.hareshmurugesan.com" />
+        <meta property="og:image" content="https://www.hareshmurugesan.com/preview-image.jpeg" />
+        <meta property="og:image:width" content="1400" />
+        <meta property="og:image:height" content="1000" />
+        <meta property="og:locale" content="en_US" />
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Haresh Murugesan | Software & Systems Engineer" />
+        <meta name="twitter:title" content="Haresh Murugesan | Software &amp; Systems Engineer" />
         <meta
           name="twitter:description"
           content="Haresh Murugesan, Computer Science (AI) at Ohio State. Seeking Summer 2027 software and ML internships."
@@ -80,6 +94,9 @@ export default function App({ Component, pageProps }: AppProps) {
         isOpen={commandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
       />
+
+      {/* Procedural 35mm Film Grain Overlay */}
+      <FilmGrain />
 
       <Component {...pageProps} />
       <Analytics />

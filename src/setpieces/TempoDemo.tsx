@@ -54,9 +54,9 @@ export const TempoDemo: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#F4F6F9]/10 gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#4CC38A]" />
-            <span className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold">
-              pgvector RAG & Crisis Circuit Breaker
+            <span className="w-1.5 h-1.5 rounded-full bg-[#4CC38A]" />
+            <span className="text-xs font-sans text-[#FF2800] font-medium">
+              pgvector RAG &amp; crisis circuit breaker
             </span>
           </div>
           <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F4F6F9] tracking-tight">
@@ -136,7 +136,7 @@ export const TempoDemo: React.FC = () => {
                   onClick={() => handleSelectPreset(node.id)}
                 >
                   {isSelected && (
-                    <circle r="12" stroke={fillColor} strokeWidth="1.5" opacity="0.8" className="animate-ping" />
+                    <circle r="10" stroke={fillColor} strokeWidth="1.5" opacity="0.6" strokeDasharray="3 2" />
                   )}
                   <circle
                     r={isSelected ? 6 : 4}
@@ -187,14 +187,14 @@ export const TempoDemo: React.FC = () => {
           
           {/* Preset Buttons */}
           <div className="space-y-2">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#7E8B9B]">
-              Select Benchmark Scenario
+            <p className="text-xs font-sans text-[#7E8B9B] font-medium">
+              Select benchmark scenario
             </p>
             <div className="grid grid-cols-1 gap-2">
               <button
                 type="button"
                 onClick={() => handleSelectPreset('b1')}
-                className={`p-3 rounded-[2px] text-left border transition-all ${
+                className={`p-3 rounded-[2px] text-left border transition-colors ${
                   activeNode.id === 'b1'
                     ? 'bg-[#0B1E40] border-[#FF2800]'
                     : 'bg-white/[0.02] border-white/5 hover:border-white/15'
@@ -207,7 +207,7 @@ export const TempoDemo: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleSelectPreset('b4')}
-                className={`p-3 rounded-[2px] text-left border transition-all ${
+                className={`p-3 rounded-[2px] text-left border transition-colors ${
                   activeNode.id === 'b4'
                     ? 'bg-[#0B1E40] border-[#FF2800]'
                     : 'bg-white/[0.02] border-white/5 hover:border-white/15'
@@ -220,7 +220,7 @@ export const TempoDemo: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleSelectPreset('c1')}
-                className={`p-3 rounded-[2px] text-left border transition-all ${
+                className={`p-3 rounded-[2px] text-left border transition-colors ${
                   activeNode.id === 'c1'
                     ? 'bg-[#F87171]/10 border-[#F87171]'
                     : 'bg-white/[0.02] border-white/5 hover:border-white/15'
@@ -245,7 +245,7 @@ export const TempoDemo: React.FC = () => {
             </div>
 
             <div className="pt-2 border-t border-white/5">
-              <span className="text-[#A6ADB8] block text-[10px] mb-1">ARCHITECTURAL ROUTING:</span>
+              <span className="text-[#A6ADB8] block text-[10px] mb-1">Architectural routing:</span>
               <span className={`font-sans text-xs font-semibold ${
                 activeNode.category === 'crisis' ? 'text-[#F87171]' : 'text-[#34D399]'
               }`}>

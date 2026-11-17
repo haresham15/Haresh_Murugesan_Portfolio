@@ -18,8 +18,6 @@ const AsciiDnaLightbulbCanvas = dynamic(() => import('./AsciiDnaLightbulbCanvas'
   ),
 });
 
-const SPRING = 'ease-[cubic-bezier(0.34,1.56,0.64,1)]';
-
 const PROOFS = [
   { label: 'AI and software intern, CAS', href: '#experience' },
   { label: '2× 1st place, ASA DataFest', href: '#achievements' },
@@ -91,10 +89,11 @@ export const BentoHero: React.FC = () => {
             rel="noopener noreferrer"
             data-hero-protect
             data-track="resume_click"
-            className={`group inline-flex items-center gap-2.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] px-7 py-3.5 font-mono text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] shadow-[0_0_24px_rgba(255,40,0,0.32)] transition-[background-color,transform] duration-500 ${SPRING} hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF4419]`}
+            data-cursor="magnetic"
+            className="group inline-flex items-center gap-2.5 bg-[#FF2800] hover:bg-[#FF4419] text-[#03050A] px-7 py-3.5 font-sans text-sm font-medium tracking-normal rounded-[2px] transition-[background-color,transform] duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF4419]"
           >
             <span>Résumé (PDF)</span>
-            <span aria-hidden="true" className={`transition-transform duration-500 ${SPRING} group-hover:translate-x-0.5 group-hover:-translate-y-0.5`}>
+            <span aria-hidden="true" className="transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
               ↗
             </span>
           </a>
@@ -102,10 +101,11 @@ export const BentoHero: React.FC = () => {
           <Link
             href="/#projects"
             data-hero-protect
-            className="group inline-flex items-center gap-2 text-xs font-mono text-[#F4F6F9] hover:text-[#FF4419] bg-[#060A12] border border-[#153875] hover:border-[#FF2800]/60 px-5 py-3.5 rounded-[2px] transition-colors duration-300 uppercase tracking-[0.16em] font-semibold"
+            data-cursor="magnetic"
+            className="group inline-flex items-center gap-2 text-sm font-sans font-medium text-[#F4F6F9] hover:text-[#FF4419] bg-[#060A12] border border-[#153875] hover:border-[#FF2800]/60 px-5 py-3.5 rounded-[2px] transition-colors duration-200"
           >
             <span>Explore work</span>
-            <span aria-hidden="true" className="text-[#FF2800] transition-transform duration-300 group-hover:translate-x-1">
+            <span aria-hidden="true" className="text-[#FF2800] transition-transform duration-200 ease-out group-hover:translate-x-1">
               →
             </span>
           </Link>

@@ -25,8 +25,8 @@ export default function Custom404() {
             <GridCrosshair className="absolute bottom-2 left-2 z-20 opacity-40 text-[#2563EB]" />
             <GridCrosshair className="absolute bottom-2 right-2 z-20 opacity-40 text-[#2563EB]" />
 
-            <span className="text-xs font-mono text-[#FF2800] uppercase tracking-widest px-3 py-1 rounded-[2px] bg-[#FF2800]/10 border border-[#FF2800]/25 inline-block mb-4">
-              404 — Unresolved Route
+            <span className="text-xs font-sans text-[#FF2800] font-medium px-2.5 py-1 rounded-[2px] bg-[#FF2800]/10 border border-[#FF2800]/25 inline-block mb-4">
+              404 — Unresolved route
             </span>
 
             <h1 className="text-3xl sm:text-4xl font-serif text-[#F4F6F9] tracking-tight mb-3">
@@ -40,13 +40,13 @@ export default function Custom404() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/"
-                className="w-full sm:w-auto px-5 py-2.5 rounded-[2px] bg-[#FF2800] text-[#03050A] font-mono font-semibold text-xs transition-colors hover:bg-[#C8D2E0] shadow-[0_0_12px_rgba(255,40,0,0.3)]"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-[2px] bg-[#FF2800] text-[#03050A] font-sans font-medium text-xs sm:text-sm transition-colors hover:bg-[#C8D2E0]"
               >
                 ← Return to Home
               </Link>
               <Link
                 href="/projects"
-                className="w-full sm:w-auto px-5 py-2.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/30 text-[#F4F6F9] font-mono text-xs hover:bg-[#0B1E40]/40 transition-colors"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-[2px] bg-[#060A12] border border-[#18458B]/30 text-[#F4F6F9] font-sans font-medium text-xs sm:text-sm hover:bg-[#0B1E40]/40 transition-colors"
               >
                 Browse All Projects
               </Link>

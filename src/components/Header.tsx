@@ -5,8 +5,10 @@ import { WheelNavTrigger } from './WheelNavTrigger';
 import { useLockBodyScroll } from '@/lib/useLockBodyScroll';
 import { Portal } from './ui/Portal';
 import { profile } from '@/content/profile';
+import { experiences } from '@/content/experience';
 import { useMaterialAt } from '@/v7/materials/useMaterialAt';
 import { track } from '@vercel/analytics';
+import { soundEngine } from '@/lib/soundEngine';
 
 const NAV_ID = 'site-nav';
 
@@ -103,6 +105,44 @@ export default function Header() {
   const currentSection = useCurrentSection(router.pathname === '/');
   // The bar is anchored right, so a font swap would slide its left edge. It appears once fonts are in.
   const [fontsReady, setFontsReady] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
+  useEffect(() => {
+    setSoundOn(soundEngine.isEnabled());
+    return soundEngine.subscribe((val) => setSoundOn(val));
+  }, []);
+  const [barExpOpen, setBarExpOpen] = useState(false);
+  const [menuExpOpen, setMenuExpOpen] = useState(true);
+  const barExpContainerRef = useRef<HTMLLIElement>(null);
+  const barExpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleBarExpEnter = () => {
+    if (barExpTimerRef.current) clearTimeout(barExpTimerRef.current);
+    setBarExpOpen(true);
+  };
+
+  const handleBarExpLeave = () => {
+    barExpTimerRef.current = setTimeout(() => {
+      setBarExpOpen(false);
+    }, 240);
+  };
+
+  useEffect(() => {
+    if (!barExpOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (barExpContainerRef.current && !barExpContainerRef.current.contains(e.target as Node)) {
+        setBarExpOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setBarExpOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [barExpOpen]);
   useEffect(() => {
     let live = true;
     const fonts = typeof document !== 'undefined' ? document.fonts : undefined;
@@ -213,7 +253,140 @@ export default function Header() {
         >
           <ul className="flex items-center gap-x-4 xl:gap-x-5">
             {BAR_LINKS.map((link) => {
-              const active = currentSection === link.id;
+              const isExp = link.id === 'experience';
+              const isExpRoute = router.pathname.startsWith('/experience');
+              const active = currentSection === link.id || (isExp && isExpRoute);
+
+              if (isExp) {
+                return (
+                  <li
+                    key={link.id}
+                    ref={barExpContainerRef}
+                    className="relative"
+                    onMouseEnter={handleBarExpEnter}
+                    onMouseLeave={handleBarExpLeave}
+                  >
+                    <div className="flex items-center">
+                      <Link
+                        href={`/#${link.id}`}
+                        scroll={router.pathname !== '/'}
+                        onClick={() => {
+                          setBarExpOpen(false);
+                          handleLinkClick(`/#${link.id}`);
+                        }}
+                        aria-current={active ? 'true' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={barExpOpen}
+                        className={`group on-material relative inline-flex min-h-8 items-center gap-1 font-sans text-[13px] tracking-tight text-[var(--on-ink)] drop-shadow-[0_2px_8px_var(--on-shadow)] transition-opacity hover:opacity-100 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-[#FF2800] ${
+                          active ? 'opacity-100' : 'opacity-75'
+                        }`}
+                      >
+                        <span>{link.label}</span>
+                        <span
+                          aria-hidden="true"
+                          className={`absolute left-0 right-0 bottom-0.5 h-px bg-[#FF2800] origin-left transition-transform duration-300 ease-out-expo ${
+                            active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                          }`}
+                        />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setBarExpOpen((prev) => !prev);
+                        }}
+                        aria-label="Toggle specific experiences dropdown"
+                        aria-expanded={barExpOpen}
+                        className="on-material inline-flex h-8 w-4 items-center justify-center text-[var(--on-ink)] opacity-60 hover:opacity-100 transition-opacity focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#FF2800]"
+                      >
+                        <svg
+                          viewBox="0 0 10 6"
+                          className={`w-2 h-2 transition-transform duration-200 ${barExpOpen ? 'rotate-180 text-[#FF2800]' : 'text-current'}`}
+                          aria-hidden="true"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                        >
+                          <path d="M1 1L5 5L9 1" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Floating Dropdown for Specific Experiences */}
+                    {barExpOpen && (
+                      <div
+                        role="menu"
+                        aria-label="Specific experiences"
+                        className="absolute top-full right-0 mt-2 w-80 bg-[#03050A]/95 backdrop-blur-2xl border border-[#18458B]/30 shadow-[0_16px_40px_rgba(3,5,10,0.9)] p-0 z-50 text-left select-none animate-in fade-in duration-150"
+                      >
+                        {/* Dropdown Header */}
+                        <div className="flex items-center justify-between px-3.5 py-2 border-b border-[#18458B]/20 bg-[#060A12]/80">
+                          <span className="font-mono text-[10px] tracking-widest text-[#7E8B9B] uppercase">
+                            CAREER & RESEARCH SECTORS
+                          </span>
+                          <Link
+                            href="/#experience"
+                            onClick={() => {
+                              setBarExpOpen(false);
+                              handleLinkClick('/#experience');
+                            }}
+                            className="font-mono text-[10px] text-[#FF2800] hover:underline"
+                          >
+                            CIRCUIT ↗
+                          </Link>
+                        </div>
+
+                        {/* List of 5 Experiences */}
+                        <ul className="divide-y divide-[#18458B]/15">
+                          {experiences.map((exp, idx) => (
+                            <li key={exp.id}>
+                              <Link
+                                href={`/experience/${exp.id}`}
+                                onClick={() => setBarExpOpen(false)}
+                                className="group/item flex items-start gap-3 px-3.5 py-2.5 transition-colors hover:bg-[#153875]/20 focus-visible:bg-[#153875]/30 focus-visible:outline-none"
+                              >
+                                <span className="font-mono text-[11px] text-[#FF2800] pt-0.5 tabular-nums">
+                                  {String(idx + 1).padStart(2, '0')}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <span className="font-sans text-[13px] font-medium text-[#F4F6F9] group-hover/item:text-[#FF2800] transition-colors truncate">
+                                      {exp.shortCompany || exp.company}
+                                    </span>
+                                    <span className="text-[11px] text-[#7E8B9B] opacity-0 group-hover/item:opacity-100 group-hover/item:translate-x-0.5 transition-[opacity,transform] duration-150">
+                                      →
+                                    </span>
+                                  </div>
+                                  <div className="font-sans text-[11px] text-[#7E8B9B] truncate">
+                                    {exp.role}
+                                  </div>
+                                  <div className="font-mono text-[10px] text-[#7E8B9B]/80 mt-0.5">
+                                    {exp.period}
+                                  </div>
+                                </div>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+
+                        {/* Dropdown Footer */}
+                        <div className="border-t border-[#18458B]/20 bg-[#060A12]/90 px-3.5 py-2 flex items-center justify-between">
+                          <Link
+                            href="/experience"
+                            onClick={() => setBarExpOpen(false)}
+                            className="font-mono text-[11px] text-[#C8D2E0] hover:text-[#FF2800] transition-colors flex items-center gap-1.5"
+                          >
+                            <span>View all 5 dossiers</span>
+                            <span aria-hidden="true">→</span>
+                          </Link>
+                          <span className="font-mono text-[10px] text-[#7E8B9B]">5 sectors</span>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                );
+              }
+
               return (
                 <li key={link.id}>
                   <Link
@@ -237,11 +410,35 @@ export default function Header() {
               );
             })}
           </ul>
+          {/* Procedural Web Audio Mechanical Ticks Toggle */}
+          <button
+            type="button"
+            onClick={() => setSoundOn(soundEngine.toggle())}
+            aria-label={soundOn ? 'Mute mechanical sound effects' : 'Enable mechanical sound effects'}
+            className="on-material inline-flex h-8 items-center gap-1.5 px-2 rounded-[2px] border border-[#18458B]/30 hover:border-[#FF2800] font-mono text-[11px] text-[var(--on-ink)] transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#FF2800] cursor-pointer"
+          >
+            {soundOn ? (
+              <>
+                <span className="flex items-end gap-0.5 h-2.5 w-2.5" aria-hidden="true">
+                  <span className="w-0.5 bg-[#FF2800] h-full" />
+                  <span className="w-0.5 bg-[#FF2800] h-2/3" />
+                  <span className="w-0.5 bg-[#FF2800] h-4/5" />
+                </span>
+                <span className="text-[#FF2800] tracking-wider">[SOUND: ON]</span>
+              </>
+            ) : (
+              <>
+                <span className="opacity-50 text-[10px]" aria-hidden="true">✕</span>
+                <span className="opacity-70 tracking-wider">[SOUND: OFF]</span>
+              </>
+            )}
+          </button>
           <a
             href={profile.contacts.resumeUrl}
             target="_blank"
             rel="noopener noreferrer"
             data-track="resume_click"
+            data-cursor="magnetic"
             className="on-material inline-flex h-8 items-center gap-1.5 rounded-[2px] border border-[#FF2800] px-3 font-sans text-[13px] font-medium text-[var(--on-ink)] hover:bg-[#FF2800] hover:text-[#03050A] transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-[#FF2800]"
           >
             Résumé <span aria-hidden="true">↗</span>
@@ -328,6 +525,112 @@ export default function Header() {
                 }`;
                 const linkClass =
                   'group flex flex-col py-3 sm:py-5 px-1 sm:px-2 border-b border-[#C8D2E0]/10 hover:border-[#FF2800] focus-visible:border-[#FF2800] transition-colors duration-200 select-none';
+
+                if (dest.label === 'Experience') {
+                  return (
+                    <li key={dest.label} className={itemClass} style={motion}>
+                      <div className="flex flex-col py-3 sm:py-5 px-1 sm:px-2 border-b border-[#C8D2E0]/10 select-none">
+                        <div className="flex items-center justify-between font-mono text-xs mb-1 sm:mb-2">
+                          <span className="text-[#FF2800] tabular-nums">{dest.num}</span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMenuExpOpen((prev) => !prev);
+                              }}
+                              className="font-mono text-[11px] text-[#C8D2E0] hover:text-[#FF2800] border border-[#18458B]/40 hover:border-[#FF2800] px-2 py-0.5 rounded-[2px] transition-colors flex items-center gap-1.5 cursor-pointer"
+                              aria-expanded={menuExpOpen}
+                              aria-label="Toggle specific experiences dropdown"
+                            >
+                              <span>5 Sectors</span>
+                              <svg
+                                viewBox="0 0 10 6"
+                                className={`w-2 h-2 transition-transform duration-200 ${menuExpOpen ? 'rotate-180 text-[#FF2800]' : 'text-current'}`}
+                                aria-hidden="true"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                              >
+                                <path d="M1 1L5 5L9 1" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </button>
+                            <Link
+                              href="/#experience"
+                              scroll={router.pathname !== '/'}
+                              onClick={() => handleLinkClick('/#experience')}
+                              aria-label="Jump to experience circuit timeline"
+                              className="text-[#7E8B9B] hover:text-[#FF2800] transition-colors"
+                            >
+                              →
+                            </Link>
+                          </div>
+                        </div>
+
+                        <Link
+                          data-nav-link
+                          href="/#experience"
+                          scroll={router.pathname !== '/'}
+                          onClick={() => handleLinkClick('/#experience')}
+                          className="group flex flex-col focus-visible:outline-none"
+                        >
+                          <span className="font-serif text-2xl lg:text-3xl text-[#F4F6F9] group-hover:text-[#FF2800] transition-colors leading-tight">
+                            {dest.label}
+                          </span>
+                          <span className="font-sans text-[13px] text-[#7E8B9B] mt-1 group-hover:text-[#C8D2E0] transition-colors">
+                            {dest.note}
+                          </span>
+                        </Link>
+
+                        {menuExpOpen && (
+                          <div className="mt-3.5 pt-3 border-t border-[#18458B]/25">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-mono text-[10px] text-[#7E8B9B]">
+                                Specific sectors
+                              </span>
+                              <Link
+                                href="/experience"
+                                onClick={closeNav}
+                                className="font-mono text-[10px] text-[#FF2800] hover:underline"
+                              >
+                                All dossiers →
+                              </Link>
+                            </div>
+                            <ul className="space-y-1.5 pl-1 border-l border-[#FF2800]/40">
+                              {experiences.map((exp, expIdx) => (
+                                <li key={exp.id}>
+                                  <Link
+                                    href={`/experience/${exp.id}`}
+                                    onClick={closeNav}
+                                    className="group/sub flex items-center justify-between py-1 px-2 text-left hover:bg-[#153875]/20 rounded-[2px] transition-colors"
+                                  >
+                                    <div className="min-w-0 pr-2">
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-mono text-[10px] text-[#FF2800] tabular-nums">
+                                          {String(expIdx + 1).padStart(2, '0')}
+                                        </span>
+                                        <span className="font-sans text-[12px] font-medium text-[#F4F6F9] group-hover/sub:text-[#FF2800] transition-colors truncate">
+                                          {exp.shortCompany || exp.company}
+                                        </span>
+                                      </div>
+                                      <div className="font-sans text-[11px] text-[#7E8B9B] truncate pl-5">
+                                        {exp.role}
+                                      </div>
+                                    </div>
+                                    <span className="font-mono text-[11px] text-[#7E8B9B] group-hover/sub:text-[#FF2800] group-hover/sub:translate-x-0.5 transition-[color,transform] duration-150 shrink-0">
+                                      →
+                                    </span>
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  );
+                }
+
                 const body = (
                   <>
                     <span className="flex items-center justify-between font-mono text-xs mb-1 sm:mb-2">

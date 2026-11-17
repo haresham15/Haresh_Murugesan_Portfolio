@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useMotionPreference } from '../MotionPreference';
 import { experiences } from '../../content/experience';
 import { register } from '@/v7/runtime/scheduler';
+import { SpecularBorder } from '../ui/SpecularBorder';
+import { soundEngine } from '@/lib/soundEngine';
 
 const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
@@ -1030,32 +1032,58 @@ const CircuitStage: React.FC = () => {
               ref={(el) => {
                 stationRefs.current[idx] = el as HTMLDivElement | null;
               }}
+              onMouseEnter={() => soundEngine.playMechanicalTick()}
               className="group absolute pointer-events-auto will-change-transform"
               style={{ left: 0, top: 0, width: 320, opacity: 0 }}
             >
-              <div className="flex items-baseline gap-2.5">
-                <span className="text-4xl lg:text-5xl font-serif text-[#FF2800] leading-none">{st.numeral}</span>
-                <span className="text-[#2563EB] font-mono text-sm select-none" aria-hidden="true">·</span>
-                <span className="text-xs font-mono tracking-wide text-[#C8D2E0]">{st.period}</span>
-                {st.leadership && <span className="text-xs font-sans text-[#7E8B9B]">Leadership</span>}
-              </div>
-              <h3 className="text-2xl lg:text-3xl font-serif font-normal text-[#F4F6F9] mt-2 tracking-tight leading-[1.12]">
-                {st.company}
-              </h3>
-              <p className="text-sm font-sans font-medium text-[#FF4419] mt-1.5 leading-snug">{st.role}</p>
-              {st.team && <p className="text-xs font-sans text-[#7E8B9B] mt-0.5 leading-snug">{st.team}</p>}
-              {st.outcome && <p className="text-sm font-sans font-medium text-[#F4F6F9] mt-2 leading-snug tabular-nums">{st.outcome}</p>}
-              <p className="text-sm font-sans text-[#C8D2E0]/90 leading-relaxed mt-2.5 group-data-[compact=true]:line-clamp-3">
-                {st.point}
-              </p>
-              <p className="text-xs font-mono text-[#C8D2E0]/70 mt-3 leading-relaxed group-data-[compact=true]:hidden">
-                {st.stack.map((s, i) => (
-                  <React.Fragment key={s}>
-                    {i > 0 && <span className="text-[#2563EB] px-1.5" aria-hidden="true">·</span>}
-                    {s}
-                  </React.Fragment>
-                ))}
-              </p>
+              <SpecularBorder theme="dark" className="p-3.5 -m-3.5 rounded-[2px] bg-[#03050A]/85 backdrop-blur-sm">
+                <div className="flex items-baseline gap-2.5">
+                  <Link
+                    href={`/experience/${st.id}`}
+                    className="text-4xl lg:text-5xl font-serif text-[#FF2800] leading-none hover:text-[#FF4419] transition-colors"
+                    title={`View ${st.company} dossier`}
+                  >
+                    {st.numeral}
+                  </Link>
+                  <span className="text-[#2563EB] font-mono text-sm select-none" aria-hidden="true">·</span>
+                  <span className="text-xs font-mono tracking-wide text-[#C8D2E0]">{st.period}</span>
+                  {st.leadership && <span className="text-xs font-sans text-[#7E8B9B]">Leadership</span>}
+                </div>
+                <h3 className="text-2xl lg:text-3xl font-serif font-normal text-[#F4F6F9] mt-2 tracking-tight leading-[1.12]">
+                  <Link
+                    href={`/experience/${st.id}`}
+                    className="hover:text-[#FF2800] transition-colors inline-flex items-center gap-1.5 group/link"
+                  >
+                    <span>{st.company}</span>
+                    <span aria-hidden="true" className="text-sm font-mono opacity-0 group-hover/link:opacity-100 group-hover/link:translate-x-1 transition-[opacity,transform] duration-200 text-[#FF2800]">
+                      →
+                    </span>
+                  </Link>
+                </h3>
+                <p className="text-sm font-sans font-medium text-[#FF4419] mt-1.5 leading-snug">{st.role}</p>
+                {st.team && <p className="text-xs font-sans text-[#7E8B9B] mt-0.5 leading-snug">{st.team}</p>}
+                {st.outcome && <p className="text-sm font-sans font-medium text-[#F4F6F9] mt-2 leading-snug tabular-nums">{st.outcome}</p>}
+                <p className="text-sm font-sans text-[#C8D2E0]/90 leading-relaxed mt-2.5 group-data-[compact=true]:line-clamp-3">
+                  {st.point}
+                </p>
+                <div className="mt-3.5 pt-2.5 border-t border-[#153875]/30 flex items-center justify-between gap-2">
+                  <p className="text-xs font-mono text-[#C8D2E0]/70 leading-relaxed group-data-[compact=true]:hidden truncate max-w-[200px]">
+                    {st.stack.map((s, i) => (
+                      <React.Fragment key={s}>
+                        {i > 0 && <span className="text-[#2563EB] px-1" aria-hidden="true">·</span>}
+                        {s}
+                      </React.Fragment>
+                    ))}
+                  </p>
+                  <Link
+                    href={`/experience/${st.id}`}
+                    className="shrink-0 text-xs font-mono text-[#FF2800] hover:text-[#FF4419] inline-flex items-center gap-1 font-medium"
+                  >
+                    <span>Run-down</span>
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              </SpecularBorder>
             </article>
           ))}
         </div>
@@ -1131,20 +1159,52 @@ const StaticExperience: React.FC = () => (
     </p>
     <ol className="mt-12 max-w-5xl">
       {STATIONS.map((st) => (
-        <li key={st.id} data-experience-station={st.numeral} className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-x-10 gap-y-2 py-8 border-t border-[#153875]/50">
-          <div className="flex md:flex-col items-baseline gap-3 md:gap-2">
-            <span className="text-4xl font-serif text-[#FF2800] leading-none">{st.numeral}</span>
-            <span className="text-xs font-mono text-[#C8D2E0]">{st.period}</span>
-            {st.leadership && <span className="text-xs text-[#7E8B9B]">Leadership</span>}
-          </div>
-          <div>
-            <h3 className="text-2xl md:text-3xl font-serif font-normal text-[#F4F6F9] tracking-tight">{st.company}</h3>
-            <p className="text-sm font-medium text-[#FF4419] mt-1.5">{st.role}</p>
-            {st.team && <p className="text-xs text-[#7E8B9B] mt-0.5">{st.team}</p>}
-            {st.outcome && <p className="text-sm font-medium text-[#F4F6F9] mt-2 tabular-nums">{st.outcome}</p>}
-            <p className="text-sm text-[#C8D2E0]/90 leading-relaxed mt-3 max-w-2xl">{st.point}</p>
-            <p className="text-xs font-mono text-[#C8D2E0]/70 mt-3">{st.stack.join(' · ')}</p>
-          </div>
+        <li
+          key={st.id}
+          data-experience-station={st.numeral}
+          onMouseEnter={() => soundEngine.playMechanicalTick()}
+          className="border-t border-[#153875]/50"
+        >
+          <SpecularBorder theme="dark" className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-x-10 gap-y-2 py-8 px-3 rounded-[2px]">
+            <div className="flex md:flex-col items-baseline gap-3 md:gap-2">
+              <Link
+                href={`/experience/${st.id}`}
+                className="text-4xl font-serif text-[#FF2800] leading-none hover:text-[#FF4419] transition-colors"
+                title={`View ${st.company} dossier`}
+              >
+                {st.numeral}
+              </Link>
+              <span className="text-xs font-mono text-[#C8D2E0]">{st.period}</span>
+              {st.leadership && <span className="text-xs text-[#7E8B9B]">Leadership</span>}
+            </div>
+            <div>
+              <h3 className="text-2xl md:text-3xl font-serif font-normal text-[#F4F6F9] tracking-tight">
+                <Link
+                  href={`/experience/${st.id}`}
+                  className="hover:text-[#FF2800] transition-colors inline-flex items-center gap-2 group"
+                >
+                  <span>{st.company}</span>
+                  <span aria-hidden="true" className="text-base text-[#FF2800] group-hover:translate-x-1 transition-transform">
+                    →
+                  </span>
+                </Link>
+              </h3>
+              <p className="text-sm font-medium text-[#FF4419] mt-1.5">{st.role}</p>
+              {st.team && <p className="text-xs text-[#7E8B9B] mt-0.5">{st.team}</p>}
+              {st.outcome && <p className="text-sm font-medium text-[#F4F6F9] mt-2 tabular-nums">{st.outcome}</p>}
+              <p className="text-sm text-[#C8D2E0]/90 leading-relaxed mt-3 max-w-2xl">{st.point}</p>
+              <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs font-mono text-[#C8D2E0]/70">{st.stack.join(' · ')}</p>
+                <Link
+                  href={`/experience/${st.id}`}
+                  className="text-xs font-mono text-[#FF2800] hover:underline inline-flex items-center gap-1 font-medium"
+                >
+                  <span>Full run-down</span>
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+            </div>
+          </SpecularBorder>
         </li>
       ))}
     </ol>

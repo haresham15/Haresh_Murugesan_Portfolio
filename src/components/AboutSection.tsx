@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -6,6 +6,10 @@ import { ThemeSection, Reveal } from './ThemeSection';
 import { useMotionPreference } from './MotionPreference';
 import { profile } from '../content/profile';
 import { NOTEBOOK } from '../content/notebook';
+import { SpecularBorder } from './ui/SpecularBorder';
+import { TelemetryMetric } from './ui/TelemetryMetric';
+import { soundEngine } from '@/lib/soundEngine';
+import { viewTransitionStyle } from '@/lib/viewTransitions';
 
 const MotionDiv = motion.div;
 
@@ -123,6 +127,19 @@ const PathologyFigure: React.FC = () => {
 export const AboutSection: React.FC = () => {
   const portraitRef = useRef<HTMLDivElement>(null);
   const { isReduced } = useMotionPreference();
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const onPortraitMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isReduced) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: -py * 5, y: px * 5 }); // max 2.5–3deg each way
+  };
+
+  const onPortraitMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+  };
 
   // Portrait parallax: 6% of its height across the time it is on screen.
   const { scrollYProgress } = useScroll({ target: portraitRef, offset: ['start end', 'end start'] });
@@ -146,8 +163,20 @@ export const AboutSection: React.FC = () => {
         {/* 40 / 60 spread */}
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-12 lg:gap-20 items-center">
           <Reveal className="relative">
-            <div ref={portraitRef} className="relative w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[460px] mx-auto lg:mx-0 select-none">
-              <div className="relative aspect-[4/5] overflow-hidden" style={{ clipPath: CHAMFER }}>
+            <div
+              ref={portraitRef}
+              onMouseMove={onPortraitMouseMove}
+              onMouseLeave={onPortraitMouseLeave}
+              className="relative w-full max-w-[300px] sm:max-w-[380px] lg:max-w-[460px] mx-auto lg:mx-0 select-none transition-transform duration-300 ease-out"
+              style={{
+                perspective: 1000,
+                transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+              }}
+            >
+              <div
+                className="relative aspect-[4/5] overflow-hidden transition-transform duration-300 ease-out"
+                style={{ clipPath: CHAMFER }}
+              >
                 <MotionDiv className="absolute -inset-y-[4%] inset-x-0" style={{ y: parallaxY }}>
                   <Image
                     src="/profile.jpeg"
@@ -183,6 +212,7 @@ export const AboutSection: React.FC = () => {
             <div className="mt-10 font-sans text-sm">
               <Link
                 href="/about"
+                data-cursor="magnetic"
                 className="min-h-[44px] inline-flex items-center gap-2 text-[var(--mat-ink)] hover:text-[var(--mat-accent-text)] transition-colors"
               >
                 <span className="border-b border-current pb-0.5">Full profile</span>
@@ -214,57 +244,67 @@ export const AboutSection: React.FC = () => {
           <ol className="mt-8 border-t border-[var(--mat-rule)]">
             {NOTEBOOK.map((entry, i) => (
               <Reveal as="li" key={entry.slug} delay={0.04 * i} className="border-b border-[var(--mat-rule)]">
-                <Link
-                  href={`/projects/${entry.slug}`}
-                  className="group grid grid-cols-1 lg:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,1fr)_13rem_1.25rem] gap-x-8 gap-y-3 py-8 lg:py-10 items-start"
-                >
-                  <span className="font-serif italic text-lg text-[var(--mat-muted)] group-hover:text-[var(--mat-accent-text)] transition-colors tabular-nums">
-                    Fig. {entry.fig}
-                  </span>
-
-                  <span className="flex flex-col gap-2">
-                    <span className="font-serif text-2xl sm:text-3xl text-[var(--mat-ink)] leading-tight tracking-[-0.01em]">
-                      {entry.name}
-                    </span>
-                    <span className="font-serif italic text-base text-[var(--mat-muted)] leading-snug">
-                      {entry.problem}
-                    </span>
-                  </span>
-
-                  <span className="font-sans text-[15px] text-[var(--mat-body)] leading-relaxed [font-weight:var(--mat-body-weight)] [letter-spacing:var(--mat-tracking)]">
-                    {entry.idea}
-                  </span>
-
-                  {entry.metric ? (
-                    <span className="flex items-baseline gap-3 lg:flex-col lg:items-end lg:gap-1 lg:text-right">
-                      <span className="font-serif text-3xl lg:text-4xl text-[var(--mat-ink)] tracking-tight tabular-nums whitespace-nowrap">
-                        {entry.metric.value}
-                      </span>
-                      <span className="font-sans text-[13px] text-[var(--mat-muted)] [font-weight:var(--mat-body-weight)]">
-                        {entry.metric.label}
-                      </span>
-                      {/* Drawing-sheet call-out: a leader under the number */}
-                      <span
-                        aria-hidden="true"
-                        className="hidden lg:block w-full border-b border-dotted border-[var(--mat-rule-strong)] group-hover:border-[var(--mat-accent-mark)] transition-colors"
-                      />
-                    </span>
-                  ) : (
-                    <figure className="w-full max-w-[220px] lg:justify-self-end">
-                      <PathologyFigure />
-                      <figcaption className="mt-2 font-sans text-[12px] text-[var(--mat-muted)] leading-snug [font-weight:var(--mat-body-weight)]">
-                        Illustrative schematic. Not patient data.
-                      </figcaption>
-                    </figure>
-                  )}
-
-                  <span
-                    aria-hidden="true"
-                    className="hidden lg:block font-sans text-sm text-[var(--mat-muted)] group-hover:text-[var(--mat-accent-text)] group-hover:translate-x-1 transition-[color,transform] duration-300"
+                <SpecularBorder theme="light">
+                  <Link
+                    href={`/projects/${entry.slug}`}
+                    onMouseEnter={() => soundEngine.playMechanicalTick()}
+                    className="group grid grid-cols-1 lg:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,1fr)_13rem_1.25rem] gap-x-8 gap-y-3 py-8 lg:py-10 px-2 lg:px-4 items-start"
                   >
-                    →
-                  </span>
-                </Link>
+                    {/* Outdented Hanging Gutter Index */}
+                    <span className="w-16 shrink-0 font-mono text-xs tracking-widest text-[var(--mat-muted)] group-hover:text-[var(--mat-accent-text)] transition-colors tabular-nums">
+                      Fig. {entry.fig}
+                    </span>
+
+                    <span className="flex flex-col gap-2">
+                      <span
+                        className="font-serif text-2xl sm:text-3xl text-[var(--mat-ink)] leading-tight tracking-[-0.01em]"
+                        style={viewTransitionStyle(`project-title-${entry.slug}`)}
+                      >
+                        {entry.name}
+                      </span>
+                      <span className="font-serif italic text-base text-[var(--mat-muted)] leading-snug">
+                        {entry.problem}
+                      </span>
+                    </span>
+
+                    <span className="font-sans text-[15px] text-[var(--mat-body)] leading-relaxed [font-weight:var(--mat-body-weight)] [letter-spacing:var(--mat-tracking)]">
+                      {entry.idea}
+                    </span>
+
+                    {entry.metric ? (
+                      <span className="flex items-baseline gap-3 lg:flex-col lg:items-end lg:gap-1 lg:text-right">
+                        <span
+                          className="font-serif text-3xl lg:text-4xl text-[var(--mat-ink)] tracking-tight tabular-nums whitespace-nowrap"
+                          style={viewTransitionStyle(`project-metric-${entry.slug}`)}
+                        >
+                          <TelemetryMetric value={entry.metric.value} />
+                        </span>
+                        <span className="font-sans text-[13px] text-[var(--mat-muted)] [font-weight:var(--mat-body-weight)]">
+                          {entry.metric.label}
+                        </span>
+                        {/* Drawing-sheet call-out: a leader under the number */}
+                        <span
+                          aria-hidden="true"
+                          className="hidden lg:block w-full border-b border-dotted border-[var(--mat-rule-strong)] group-hover:border-[var(--mat-accent-mark)] transition-colors"
+                        />
+                      </span>
+                    ) : (
+                      <figure className="w-full max-w-[220px] lg:justify-self-end">
+                        <PathologyFigure />
+                        <figcaption className="mt-2 font-sans text-[12px] text-[var(--mat-muted)] leading-snug [font-weight:var(--mat-body-weight)]">
+                          Illustrative schematic. Not patient data.
+                        </figcaption>
+                      </figure>
+                    )}
+
+                    <span
+                      aria-hidden="true"
+                      className="hidden lg:block font-sans text-sm text-[var(--mat-muted)] group-hover:text-[var(--mat-accent-text)] group-hover:translate-x-1 transition-[color,transform] duration-300"
+                    >
+                      →
+                    </span>
+                  </Link>
+                </SpecularBorder>
               </Reveal>
             ))}
           </ol>

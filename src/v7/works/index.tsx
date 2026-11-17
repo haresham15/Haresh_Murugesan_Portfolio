@@ -7,6 +7,9 @@ import { register, type TaskHandle } from '@/v7/runtime/scheduler';
 import { getPointer, subscribePointer } from '@/v7/runtime/pointer';
 import { useQualityTier } from '@/v7/runtime/tier';
 import { WORKS, type Work } from './content';
+import { soundEngine } from '@/lib/soundEngine';
+import { TelemetryMetric } from '@/components/ui/TelemetryMetric';
+import { viewTransitionStyle } from '@/lib/viewTransitions';
 import { Wheel } from './Wheel';
 import {
   DETENT, PROJECTS, angleDelta, angleForProject, detentIndex, pinProgress, projectAt, releaseTarget, scrollStop,
@@ -35,7 +38,10 @@ const Lines: React.FC<{ work: Work; ghost?: boolean }> = ({ work, ghost }) => {
   const tab = ghost ? -1 : undefined;
   return (
     <>
-      <h3 className={`m-0 font-serif text-[clamp(2rem,3.4vw,3.5rem)] font-normal leading-[1.02] tracking-tight text-[var(--mat-ink)]`}>
+      <h3
+        className={`m-0 font-serif text-[clamp(2rem,3.4vw,3.5rem)] font-normal leading-[1.02] tracking-tight text-[var(--mat-ink)]`}
+        style={viewTransitionStyle(`project-title-${work.slug}`)}
+      >
         {work.title}
       </h3>
       <p className={`mt-3 font-serif text-[clamp(1.05rem,1.35vw,1.3rem)] italic leading-snug text-[var(--mat-body)]`}>
@@ -57,8 +63,11 @@ const Lines: React.FC<{ work: Work; ghost?: boolean }> = ({ work, ghost }) => {
         {work.stats.map((s, i) => (
           <div key={s.label} className="min-w-0">
             <dt className="sr-only-v7">{s.label}</dt>
-            <dd className={`m-0 font-serif text-[28px] leading-none tabular-nums ${i === 0 ? 'text-[var(--mat-accent-mark)]' : 'text-[var(--mat-ink)]'}`}>
-              {s.value}
+            <dd
+              className={`m-0 font-serif text-[28px] leading-none tabular-nums ${i === 0 ? 'text-[var(--mat-accent-mark)]' : 'text-[var(--mat-ink)]'}`}
+              style={i === 0 ? viewTransitionStyle(`project-metric-${work.slug}`) : undefined}
+            >
+              <TelemetryMetric value={s.value} />
             </dd>
             <dd aria-hidden="true" className="m-0 mt-2 font-sans text-[13px] leading-snug text-[var(--mat-muted)]">
               {s.label}
@@ -505,6 +514,10 @@ export const WorksSection: React.FC = () => {
   const leavingWork = text.leaving ? WORKS[text.leaving.project] : null;
   const fade = isReduced ? RM_FADE_MS : PLATE_FADE_MS;
 
+  useEffect(() => {
+    soundEngine.playMechanicalTick();
+  }, [text.shown]);
+
   return (
     <section
       ref={sectionRef}
@@ -518,11 +531,27 @@ export const WorksSection: React.FC = () => {
           Four flagship projects on a wheel. Choose a project tab and use the arrow keys, Home and End, or drag the wheel or scroll to turn it.
         </p>
 
+        {/* Tactile Keycap HUD Bar */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none select-none flex items-center gap-2 mb-3 text-[11px] font-mono text-[var(--mat-muted)]"
+        >
+          <span className="px-1.5 py-0.5 text-[10px] font-mono border border-[var(--mat-rule-strong,rgba(200,210,224,0.20))] text-[var(--mat-ink)] rounded-[2px] bg-[var(--mat-surface,#060A12)]/50">
+            [←]
+          </span>
+          <span className="px-1.5 py-0.5 text-[10px] font-mono border border-[var(--mat-rule-strong,rgba(200,210,224,0.20))] text-[var(--mat-ink)] rounded-[2px] bg-[var(--mat-surface,#060A12)]/50">
+            [→]
+          </span>
+          <span className="px-2 py-0.5 text-[10px] font-mono border border-[var(--mat-rule-strong,rgba(200,210,224,0.18))] text-[var(--mat-muted)] rounded-[2px] bg-[var(--mat-surface,#060A12)]/50">
+            [DRAG · TURN]
+          </span>
+        </div>
+
         <div
           ref={wheelRef}
           className={styles.wheel}
           data-material="dark"
-          data-cursor="rotate"
+          data-cursor="wheel"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={(e) => release(e, false)}

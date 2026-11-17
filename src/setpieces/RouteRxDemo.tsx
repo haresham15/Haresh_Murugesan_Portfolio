@@ -27,9 +27,9 @@ export const RouteRxDemo: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#F4F6F9]/10 gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#82B7FF]" />
-            <span className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold">
-              ASA DataFest 2026 1st Place Platform
+            <span className="w-1.5 h-1.5 rounded-full bg-[#82B7FF]" />
+            <span className="text-xs font-sans text-[#FF2800] font-medium">
+              ASA DataFest 2026 first place platform
             </span>
           </div>
           <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F4F6F9] tracking-tight">
@@ -42,7 +42,7 @@ export const RouteRxDemo: React.FC = () => {
           <button
             type="button"
             onClick={() => handleModeToggle('baseline')}
-            className={`px-3 py-1.5 rounded-[2px] transition-all ${
+            className={`px-3 py-1.5 rounded-[2px] transition-colors ${
               transitMode === 'baseline'
                 ? 'bg-[#F87171]/20 text-[#F87171] border border-[#F87171]/40 font-semibold'
                 : 'text-[#7E8B9B] hover:text-[#F4F6F9]'
@@ -53,7 +53,7 @@ export const RouteRxDemo: React.FC = () => {
           <button
             type="button"
             onClick={() => handleModeToggle('routerx')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
+            className={`px-3 py-1.5 rounded-[2px] transition-colors ${
               transitMode === 'routerx'
                 ? 'bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/40 font-semibold'
                 : 'text-[#A6ADB8] hover:text-white'
@@ -126,7 +126,7 @@ export const RouteRxDemo: React.FC = () => {
 
             {/* Dynamic Shuttle Light Trails (Visible in RouteRx mode) */}
             {transitMode === 'routerx' ? (
-              <g stroke="#34D399" strokeWidth="2" strokeDasharray="4 3" className="animate-pulse">
+              <g stroke="#34D399" strokeWidth="2" strokeDasharray="4 3" opacity="0.85">
                 {/* Route North */}
                 <path d="M 180 140 L 100 70" />
                 {/* Route Central */}
@@ -163,8 +163,8 @@ export const RouteRxDemo: React.FC = () => {
           
           {/* Zone Selector */}
           <div className="space-y-2">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#A6ADB8]">
-              Inspect Vulnerability Zone
+            <p className="text-xs font-sans text-[#7E8B9B] font-medium">
+              Inspect vulnerability zone
             </p>
             <div className="grid grid-cols-1 gap-2">
               {zoneData.map((zone) => (
@@ -172,7 +172,7 @@ export const RouteRxDemo: React.FC = () => {
                   key={zone.id}
                   type="button"
                   onClick={() => setSelectedZone(zone.id)}
-                  className={`p-3 rounded-[2px] text-left border transition-all ${
+                  className={`p-3 rounded-[2px] text-left border transition-colors ${
                     zone.id === selectedZone
                       ? 'bg-white/10 border-[#F4F6F9] text-[#F4F6F9]'
                       : 'bg-white/[0.02] border-white/5 text-[#7E8B9B] hover:border-white/15 hover:text-[#F4F6F9]'
@@ -216,8 +216,8 @@ export const RouteRxDemo: React.FC = () => {
 
       {/* Accessible Zone Facts HTML Table */}
       <div className="pt-4 border-t border-white/5">
-        <p className="text-[11px] font-mono uppercase tracking-widest text-[#A6ADB8]/70 mb-3">
-          Census Tract Accessibility Ledger (ASA DataFest 2026 Evaluation)
+        <p className="text-[11px] font-sans text-[#7E8B9B] mb-3">
+          Census tract accessibility ledger (ASA DataFest 2026 evaluation)
         </p>
         <div className="overflow-x-auto no-scrollbar">
           <table className="w-full text-left text-xs font-mono">

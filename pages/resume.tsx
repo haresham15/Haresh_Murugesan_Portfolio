@@ -65,8 +65,8 @@ export default function ResumePage() {
           {/* Header Action Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-8 mb-10 border-b border-[#18458B]/20 gap-6">
             <div className="space-y-2">
-              <p className="text-xs font-mono uppercase tracking-widest text-[#FF2800]">
-                VERIFIED CURRICULUM VITAE
+              <p className="text-xs font-sans text-[#FF2800] font-medium">
+                Verified curriculum vitae
               </p>
               <h1 className="text-3xl sm:text-5xl font-raleway font-bold text-[#F4F6F9] tracking-tight">
                 Haresh Murugesan
@@ -81,7 +81,7 @@ export default function ResumePage() {
                 href={profile.contacts.resumeUrl}
                 data-track="resume_click"
                 download={profile.contacts.resumeDownloadName}
-                className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono font-semibold text-xs rounded-[2px] transition-colors select-none shadow-[0_0_16px_rgba(255,40,0,0.3)]"
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-sans font-medium text-xs sm:text-sm rounded-[2px] transition-colors select-none"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -94,7 +94,7 @@ export default function ResumePage() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="hidden sm:inline-flex items-center gap-2 px-5 py-3.5 bg-[#060A12] hover:bg-[#0B1E40]/40 border border-[#18458B]/30 text-[#F4F6F9] font-mono text-xs rounded-[2px] transition-colors cursor-pointer select-none"
+                className="hidden sm:inline-flex items-center gap-2 px-5 py-3.5 bg-[#060A12] hover:bg-[#0B1E40]/40 border border-[#18458B]/30 text-[#F4F6F9] font-sans font-medium text-xs sm:text-sm rounded-[2px] transition-colors cursor-pointer select-none"
               >
                 Print / Save
               </button>
@@ -125,7 +125,7 @@ export default function ResumePage() {
 
             {/* EDUCATION */}
             <div>
-              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold pb-3 mb-6 border-b border-[#18458B]/20">
+              <h3 className="text-xs font-sans text-[#FF2800] font-medium pb-3 mb-6 border-b border-[#18458B]/20">
                 Education
               </h3>
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
@@ -146,7 +146,7 @@ export default function ResumePage() {
 
             {/* EXPERIENCE */}
             <div>
-              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold pb-3 mb-6 border-b border-[#18458B]/20">
+              <h3 className="text-xs font-sans text-[#FF2800] font-medium pb-3 mb-6 border-b border-[#18458B]/20">
                 Work &amp; Research Experience
               </h3>
               <div className="space-y-8">
@@ -181,7 +181,7 @@ export default function ResumePage() {
 
             {/* SELECTED FLAGSHIP PROJECTS */}
             <div>
-              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold pb-3 mb-6 border-b border-[#18458B]/20">
+              <h3 className="text-xs font-sans text-[#FF2800] font-medium pb-3 mb-6 border-b border-[#18458B]/20">
                 Selected Engineering Projects
               </h3>
               <div className="space-y-6">
@@ -208,7 +208,7 @@ export default function ResumePage() {
 
             {/* TECHNICAL SKILLS */}
             <div>
-              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold pb-3 mb-6 border-b border-[#18458B]/20">
+              <h3 className="text-xs font-sans text-[#FF2800] font-medium pb-3 mb-6 border-b border-[#18458B]/20">
                 Technical Skills
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
@@ -233,7 +233,7 @@ export default function ResumePage() {
 
             {/* HONORS & AWARDS */}
             <div>
-              <h3 className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold pb-3 mb-6 border-b border-[#18458B]/20">
+              <h3 className="text-xs font-sans text-[#FF2800] font-medium pb-3 mb-6 border-b border-[#18458B]/20">
                 Honors &amp; Achievements
               </h3>
               <div className="space-y-4 text-xs sm:text-sm font-sans">

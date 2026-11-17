@@ -125,9 +125,9 @@ export default function AboutPage() {
           {/* Header Profile Section (40% Portrait / 60% Narrative) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start mb-16 sm:mb-28 pb-12 sm:pb-20 border-b border-[#18458B]/20">
             <div className="lg:col-span-8 space-y-6">
-              <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800]">
+              <div className="flex items-center gap-3 text-xs font-sans text-[#FF2800] font-medium">
                 <span className="w-6 h-px bg-[#FF2800]" />
-                <span>ENGINEERING NARRATIVE</span>
+                <span>Engineering narrative</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-raleway font-bold text-[#F4F6F9] tracking-tight leading-tight">
@@ -149,14 +149,14 @@ export default function AboutPage() {
                   data-track="resume_click"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="min-h-[44px] px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-mono text-xs font-semibold rounded-[2px] transition-colors select-none inline-flex items-center justify-center gap-2 shadow-[0_0_16px_rgba(255,40,0,0.3)] cursor-pointer"
+                  className="min-h-[44px] px-6 py-3.5 bg-[#FF2800] hover:bg-[#C8D2E0] text-[#03050A] font-sans text-xs sm:text-sm font-medium rounded-[2px] transition-colors select-none inline-flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>View Verified Résumé</span>
                   <span>↗</span>
                 </a>
                 <Link
                   href="/projects"
-                  className="min-h-[44px] px-6 py-3.5 bg-[#060A12] hover:bg-[#0B1E40]/40 border border-[#18458B]/25 text-[#F4F6F9] font-mono text-xs font-medium rounded-[2px] transition-colors select-none inline-flex items-center justify-center cursor-pointer"
+                  className="min-h-[44px] px-6 py-3.5 bg-[#060A12] hover:bg-[#0B1E40]/40 border border-[#18458B]/25 text-[#F4F6F9] font-sans text-xs sm:text-sm font-medium rounded-[2px] transition-colors select-none inline-flex items-center justify-center cursor-pointer"
                 >
                   Explore Systems Index
                 </Link>
@@ -179,8 +179,8 @@ export default function AboutPage() {
           {/* Current Focus (Now Section) */}
           <section className="mb-16 sm:mb-28 p-5 sm:p-8 md:p-10 bg-[#060A12]/85 border border-[#18458B]/25 rounded-[2px] backdrop-blur-sm shadow-xl">
             <div className="flex items-center gap-2.5 mb-6 text-xs font-mono text-[#7E8B9B]">
-              <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
-              <span className="uppercase tracking-widest text-[#FF2800] font-semibold">CURRENT FOCUS &amp; AVAILABILITY (NOW)</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FF2800]" />
+              <span className="text-xs font-sans text-[#FF2800] font-medium">Current focus &amp; availability</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm font-sans">
               <div className="space-y-2">

@@ -9,6 +9,8 @@ import Header from '@/components/Header';
 import ContactFooter from '@/components/ContactFooter';
 import ForgedCarbonCanvas from '@/components/ForgedCarbonCanvas';
 import { EvidenceBadge } from '@/components/ui/EvidenceBadge';
+import { TelemetryMetric } from '@/components/ui/TelemetryMetric';
+import { viewTransitionStyle } from '@/lib/viewTransitions';
 import { C4DiagramViewer } from './C4DiagramViewer';
 
 const ApexisDemo = dynamic(() => import('@/setpieces/ApexisDemo').then((m) => m.ApexisDemo), { ssr: false });
@@ -175,15 +177,18 @@ Read full case study: https://www.hareshmurugesan.com/projects/${project.slug}`;
             </div>
 
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="text-xs font-mono uppercase px-2.5 py-1 rounded-[2px] bg-[#0B1E40]/50 text-[#2563EB] border border-[#18458B]/30">
+              <span className="text-xs font-mono px-2.5 py-1 rounded-[2px] bg-[#0B1E40]/50 text-[#2563EB] border border-[#18458B]/30">
                 {project.category}
               </span>
-              <span className="text-xs font-mono uppercase px-2.5 py-1 rounded-[2px] bg-[#060A12] border border-[#18458B]/25 text-[#FF2800]">
+              <span className="text-xs font-mono px-2.5 py-1 rounded-[2px] bg-[#060A12] border border-[#18458B]/25 text-[#FF2800]">
                 {project.statusBadge}
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-raleway font-extrabold text-[#F4F6F9] tracking-tight leading-[1.1] mb-6">
+            <h1
+              className="text-3xl sm:text-5xl md:text-6xl font-raleway font-extrabold text-[#F4F6F9] tracking-tight leading-[1.1] mb-6"
+              style={viewTransitionStyle(`project-title-${project.slug}`)}
+            >
               {project.title}
             </h1>
 
@@ -212,7 +217,7 @@ Read full case study: https://www.hareshmurugesan.com/projects/${project.slug}`;
                     href={project.demo}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="min-h-[44px] px-4 py-2 rounded-[2px] bg-[#FF2800] text-[#03050A] font-sans font-semibold text-xs hover:bg-[#C8D2E0] transition-colors flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(255,40,0,0.3)] cursor-pointer"
+                    className="min-h-[44px] px-4 py-2 rounded-[2px] bg-[#FF2800] text-[#03050A] font-sans font-semibold text-xs hover:bg-[#C8D2E0] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <span>Open Live System</span>
                     <span>↗</span>
@@ -260,7 +265,7 @@ Read full case study: https://www.hareshmurugesan.com/projects/${project.slug}`;
               
               {/* STICKY DESKTOP SECTION NAV (3 cols) */}
               <aside className="hidden lg:block lg:col-span-3 sticky top-24 space-y-2 p-4 rounded-[2px] bg-[#060A12]/85 border border-[#18458B]/25 backdrop-blur-sm">
-                <p className="text-xs font-mono uppercase tracking-wider text-[#7E8B9B] mb-3 px-2">
+                <p className="text-xs font-sans text-[#7E8B9B] mb-3 px-2 font-medium">
                   Sections
                 </p>
                 <nav className="flex flex-col space-y-1">
@@ -268,7 +273,7 @@ Read full case study: https://www.hareshmurugesan.com/projects/${project.slug}`;
                     <a
                       key={sec.id}
                       href={`#${sec.id}`}
-                      className="px-3 py-2 rounded-[2px] text-xs font-mono text-[#7E8B9B] hover:text-[#FF2800] hover:bg-[#0B1E40]/30 transition-all text-left"
+                      className="px-3 py-2 rounded-[2px] text-xs font-mono text-[#7E8B9B] hover:text-[#FF2800] hover:bg-[#0B1E40]/30 transition-colors text-left"
                     >
                       {sec.label}
                     </a>
@@ -315,8 +320,8 @@ Read full case study: https://www.hareshmurugesan.com/projects/${project.slug}`;
                   {['apexis', 'healios', 'tempo', 'routerx-careline', 'careline'].includes(project.slug) && (
                     <div className="mt-8 mb-8">
                       <div className="flex items-center gap-2 mb-3 text-xs font-mono text-[#2563EB]">
-                        <span className="w-2 h-2 rounded-full bg-[#FF2800] animate-pulse" />
-                        <span className="uppercase tracking-wider font-semibold">Interactive Architecture Laboratory</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF2800]" />
+                        <span className="font-sans text-xs font-medium text-[#2563EB]">Interactive architecture laboratory</span>
                       </div>
                       {project.slug === 'apexis' && <ApexisDemo />}
                       {project.slug === 'healios' && <HealiosDemo />}
@@ -405,7 +410,9 @@ Read full case study: https://www.hareshmurugesan.com/projects/${project.slug}`;
                       >
                         <div>
                           <p className="text-xs font-mono text-[#7E8B9B] mb-1">{metric.label}</p>
-                          <p className="text-2xl font-mono font-bold text-[#FF2800] mb-2">{metric.value}</p>
+                          <div className="mb-2" style={mIdx === 0 ? viewTransitionStyle(`project-metric-${project.slug}`) : undefined}>
+                            <TelemetryMetric value={metric.value} className="text-2xl font-mono font-bold text-[#FF2800]" />
+                          </div>
                           <p className="text-xs font-sans text-[#7E8B9B] leading-relaxed">{metric.detail}</p>
                           {metric.evidenceId && getEvidence(metric.evidenceId)?.hardwareOrEnv && (
                             <p className="mt-2 text-xs font-sans text-[#C8D2E0] leading-relaxed">
@@ -443,12 +450,12 @@ Read full case study: https://www.hareshmurugesan.com/projects/${project.slug}`;
                   </h2>
                   <div className="space-y-4 text-sm sm:text-base font-sans">
                     <div className="p-3.5 sm:p-4 rounded-[2px] bg-[#03050A] border border-[#18458B]/20">
-                      <p className="text-xs font-mono uppercase text-[#FF2800] mb-1 font-semibold">Known Limitations:</p>
+                      <p className="text-xs font-mono text-[#FF2800] mb-1 font-semibold">Known limitations:</p>
                       <p className="text-[#7E8B9B] leading-relaxed">{caseStudy.limitations}</p>
                     </div>
 
                     <div className="p-3.5 sm:p-4 rounded-[2px] bg-[#03050A] border border-[#18458B]/20">
-                      <p className="text-xs font-mono uppercase text-[#2563EB] mb-1 font-semibold">Next Engineering Steps:</p>
+                      <p className="text-xs font-mono text-[#2563EB] mb-1 font-semibold">Next engineering steps:</p>
                       <p className="text-[#F4F6F9] leading-relaxed">{caseStudy.nextSteps}</p>
                     </div>
 

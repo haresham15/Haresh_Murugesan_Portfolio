@@ -52,7 +52,8 @@ for (const [w, h] of widths) {
   const context = await browser.newContext({ viewport: { width: w, height: h } });
   await serveOut(context);
   const page = await context.newPage();
-  await page.goto(`${ORIGIN}/${query}`, { waitUntil: 'networkidle' });
+  await page.goto(`${ORIGIN}/${query}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.waitForTimeout(500);
   // Walk the page so lazy sections mount, then audit at several scroll positions
   // (sticky stages only lay out fully while pinned).
   const height = await page.evaluate(() => document.documentElement.scrollHeight);
@@ -66,6 +67,7 @@ for (const [w, h] of widths) {
   total += list.length;
   console.log(`\n${w}x${h}: ${list.length} violation(s)`);
   for (const v of list) console.log(`  [${v.section}] <${v.tag}${v.id ? `#${v.id}` : ''}> ${v.size} — ${v.reasons}\n      ${v.cls}`);
+  await page.close();
   await context.close();
 }
 await browser.close();

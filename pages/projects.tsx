@@ -160,13 +160,13 @@ export default function ProjectsPage() {
           {/* 1. TOP ARCHITECTURAL DATUM STRIP */}
           <div className="w-full border-b border-[#18458B]/20 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#7E8B9B] bg-[#060A12]/95">
             <div className="flex items-center gap-3">
-              <Link href="/" className="hover:text-[#FF2800] transition-colors">HOME</Link>
+              <Link href="/" className="hover:text-[#FF2800] transition-colors">Home</Link>
               <span className="text-[#C8D2E0]/25">/</span>
-              <span className="text-[#FF2800] font-semibold">PROJECT ARCHIVE</span>
+              <span className="text-[#FF2800] font-semibold">Project archive</span>
             </div>
             <div className="flex items-center gap-4 text-[11px]">
-              <span className="hidden sm:inline text-[#C8D2E0]">{allProjects.length} REPOSITORIES</span>
-              <span className="text-[#10B981]">● STATIC EXPORT RUNTIME</span>
+              <span className="hidden sm:inline text-[#C8D2E0]">{allProjects.length} repositories</span>
+              <span className="text-[#10B981]">Static export runtime</span>
             </div>
           </div>
 
@@ -176,9 +176,9 @@ export default function ProjectsPage() {
             <GridCrosshair className="absolute -top-[4.5px] -right-[4.5px]" />
 
             <div className="max-w-4xl space-y-5">
-              <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.25em] text-[#FF2800]">
+              <div className="flex items-center gap-3 text-xs font-sans text-[#FF2800] font-medium">
                 <span className="w-6 h-px bg-[#FF2800]" />
-                <span>ARCHITECTURAL REPOSITORY &amp; TELEMETRY</span>
+                <span>Architectural repository &amp; telemetry</span>
               </div>
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-raleway font-bold text-[#F4F6F9] tracking-tight leading-[1.05]">
                 Engineering Systems Archive
@@ -191,22 +191,22 @@ export default function ProjectsPage() {
             {/* Architectural Telemetry Metric Gutter (Shared Hairlines) */}
             <div className="grid grid-cols-2 lg:grid-cols-4 border border-[#18458B]/20 divide-x divide-y lg:divide-y-0 divide-[#18458B]/20 mt-10 bg-[#0B1E40]/20 rounded-[2px] overflow-hidden">
               <div className="p-5 sm:p-6 space-y-1">
-                <span className="text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider block">TOTAL SYSTEMS</span>
+                <span className="text-[11px] font-sans text-[#7E8B9B] block">Total systems</span>
                 <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#FF2800] tabular-nums">{allProjects.length}</div>
                 <span className="text-xs font-sans text-[#7E8B9B] block">Documented codebases</span>
               </div>
               <div className="p-5 sm:p-6 space-y-1">
-                <span className="text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider block">FLAGSHIP DEEP-DIVES</span>
+                <span className="text-[11px] font-sans text-[#7E8B9B] block">Flagship deep-dives</span>
                 <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#F4F6F9] tabular-nums">{String(FLAGSHIP_COUNT).padStart(2, '0')}</div>
                 <span className="text-xs font-sans text-[#7E8B9B] block">Interactive case studies</span>
               </div>
               <div className="p-5 sm:p-6 space-y-1">
-                <span className="text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider block">EDGE DISTRIBUTION</span>
+                <span className="text-[11px] font-sans text-[#7E8B9B] block">Edge distribution</span>
                 <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#10B981] tabular-nums">100%</div>
                 <span className="text-xs font-sans text-[#7E8B9B] block">Pre-rendered SSG export</span>
               </div>
               <div className="p-5 sm:p-6 space-y-1">
-                <span className="text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider block">ACADEMIC RECOGNITION</span>
+                <span className="text-[11px] font-sans text-[#7E8B9B] block">Academic recognition</span>
                 <div className="text-3xl sm:text-4xl font-raleway font-bold text-[#C8D2E0] tabular-nums">2×</div>
                 <span className="text-xs font-sans text-[#7E8B9B] block">ASA DataFest 1st Place</span>
               </div>
@@ -217,7 +217,7 @@ export default function ProjectsPage() {
           <section className="px-6 sm:px-8 lg:px-10 py-4 bg-[#060A12]/80 border-b border-[#18458B]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-              <span className="font-mono text-[#7E8B9B] uppercase tracking-wider text-[11px]">Exploration Mode:</span>
+              <span className="font-sans text-[#7E8B9B] text-[11px]">Exploration mode:</span>
             </div>
             <div className="flex items-center border border-[#18458B]/30 bg-[#03050A] rounded-[2px] overflow-hidden text-xs">
               <button
@@ -295,7 +295,7 @@ export default function ProjectsPage() {
 
                   {/* Sort Dropdown */}
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-[#7E8B9B] uppercase tracking-wider hidden sm:inline">Sort:</span>
+                    <span className="text-xs font-sans text-[#7E8B9B] hidden sm:inline">Sort:</span>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
@@ -363,12 +363,12 @@ export default function ProjectsPage() {
                 <div className="border-b border-[#18458B]/20">
                   
                   {/* Desktop Table Headers */}
-                  <div className="hidden lg:grid grid-cols-12 gap-4 py-3.5 px-6 sm:px-8 text-[11px] font-mono text-[#7E8B9B] uppercase tracking-wider bg-[#060A12]/90 border-b border-[#18458B]/20">
-                    <div className="col-span-1">INDEX</div>
-                    <div className="col-span-4">SYSTEM / REPOSITORY</div>
-                    <div className="col-span-4">DOMAIN &amp; TECHNICAL STACK</div>
-                    <div className="col-span-1">VERIFIED BENCHMARK</div>
-                    <div className="col-span-2 text-right">ACTION</div>
+                  <div className="hidden lg:grid grid-cols-12 gap-4 py-3.5 px-6 sm:px-8 text-[11px] font-mono text-[#7E8B9B] bg-[#060A12]/90 border-b border-[#18458B]/20">
+                    <div className="col-span-1">Index</div>
+                    <div className="col-span-4">System / repository</div>
+                    <div className="col-span-4">Domain &amp; stack</div>
+                    <div className="col-span-1">Benchmark</div>
+                    <div className="col-span-2 text-right">Action</div>
                   </div>
 
                   {/* Rows */}
@@ -403,7 +403,7 @@ export default function ProjectsPage() {
                                 {proj.title}
                               </Link>
                               {proj.featured && (
-                                <span className="px-1.5 py-0.5 bg-[#FF2800]/20 border border-[#FF2800]/40 text-[#FF2800] text-[10px] font-mono uppercase tracking-wider rounded-[2px]">
+                                <span className="px-1.5 py-0.5 bg-[#FF2800]/20 border border-[#FF2800]/40 text-[#FF2800] text-[10px] font-mono rounded-[2px]">
                                   Flagship
                                 </span>
                               )}
@@ -422,13 +422,13 @@ export default function ProjectsPage() {
                               {proj.stack}
                             </div>
                             <div className="text-[11px] font-mono text-[#7E8B9B]">
-                              <span className="text-[#C8D2E0]/40 uppercase text-[10px]">Category:</span> {proj.category}
+                              <span className="text-[#C8D2E0]/40 text-[10px]">Category:</span> {proj.category}
                             </div>
                           </div>
 
                           {/* Col 4: Verified Benchmark / Status */}
                           <div className="lg:col-span-1 text-xs font-mono text-[#C8D2E0] tabular-nums font-medium">
-                            <span className="lg:hidden text-[#7E8B9B] text-[10px] uppercase block">Benchmark:</span>
+                            <span className="lg:hidden text-[#7E8B9B] text-[10px] block">Benchmark:</span>
                             {proj.highlight || proj.statusBadge}
                           </div>
 

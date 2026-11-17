@@ -264,9 +264,16 @@ html.v7-cursor *:not(input):not(textarea):not(select):not([contenteditable="true
 .v7-cursor-dot[data-shape="rotate"] .v7-cursor-rotate,
 .v7-cursor-dot[data-shape="hairline"] .v7-cursor-hairline,
 .v7-cursor-dot[data-shape="grab"] .v7-cursor-grab,
-.v7-cursor-dot[data-shape="focus"] .v7-cursor-focus {
+.v7-cursor-dot[data-shape="focus"] .v7-cursor-focus,
+.v7-cursor-dot[data-shape="wheel"] .v7-cursor-wheel,
+.v7-cursor-dot[data-shape="lens"] .v7-cursor-lens,
+.v7-cursor-dot[data-shape="magnetic"] .v7-cursor-default {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+.v7-cursor-dot[data-shape="magnetic"] .v7-cursor-default {
+  transform: translate(-50%, -50%) scale(1.5);
+  box-shadow: 0 0 0 2px var(--on-ink-soft);
 }
 
 /* CarbonField sits at z -10; isolating its parent keeps it above that parent's background */

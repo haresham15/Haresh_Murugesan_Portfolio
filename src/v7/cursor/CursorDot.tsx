@@ -9,6 +9,7 @@ import { register } from '../runtime/scheduler';
  */
 export const CursorDot: React.FC = () => {
   const ref = useRef<HTMLDivElement | null>(null);
+  const lensCoordRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     const el = ref.current;
@@ -31,11 +32,33 @@ export const CursorDot: React.FC = () => {
     }, { budgeted: false, wakeOnVisible: false, measure: () => { field = readField(); } });
     const move = (e: PointerEvent) => {
       if (e.pointerType === 'touch') return;
-      x = e.clientX;
-      y = e.clientY;
-      el.dataset.visible = 'true';
       const target = (e.target as Element | null)?.closest?.('[data-cursor]') as HTMLElement | null;
       const next = target?.dataset.cursor ?? '';
+
+      if (next === 'magnetic' && target) {
+        // Subtle magnetic pull (±4px) towards element center
+        const rect = target.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = cx - e.clientX;
+        const dy = cy - e.clientY;
+        const pull = 0.16;
+        x = e.clientX + Math.max(-4, Math.min(4, dx * pull));
+        y = e.clientY + Math.max(-4, Math.min(4, dy * pull));
+      } else {
+        x = e.clientX;
+        y = e.clientY;
+      }
+
+      // Update live lens coordinate readout if over a lens
+      if (next === 'lens' && target && lensCoordRef.current) {
+        const rect = target.getBoundingClientRect();
+        const nx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)).toFixed(2);
+        const ny = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height)).toFixed(2);
+        lensCoordRef.current.textContent = `[${nx}, ${ny}]`;
+      }
+
+      el.dataset.visible = 'true';
       if (next !== shape) {
         shape = next;
         el.dataset.shape = next;
@@ -64,6 +87,17 @@ export const CursorDot: React.FC = () => {
         <path d="M 5 14 A 9 9 0 1 1 14 23" fill="none" stroke="currentColor" strokeWidth="1.5" />
         <path d="M 2 11 L 5 15 L 8 11" fill="none" stroke="currentColor" strokeWidth="1.5" />
       </svg>
+      {/* [DRAG · TURN] pill for wheel mode */}
+      <span className="v7-cursor-mark v7-cursor-wheel font-mono text-[9px] tracking-wider px-1.5 py-0.5 border border-current rounded-[2px] whitespace-nowrap bg-[#03050A]/90 text-[var(--on-ink)]">
+        DRAG · TURN
+      </span>
+      {/* Live [X, Y] normalized coordinate readout for lens mode */}
+      <span
+        ref={lensCoordRef}
+        className="v7-cursor-mark v7-cursor-lens font-mono text-[9px] tracking-wider px-1.5 py-0.5 border border-[#FF2800] rounded-[2px] whitespace-nowrap bg-[#03050A]/95 text-[#FF2800]"
+      >
+        [0.00, 0.00]
+      </span>
       {/* Vertical hairline over the waveform */}
       <span className="v7-cursor-mark v7-cursor-hairline" />
       {/* Grab hand over the orbit */}

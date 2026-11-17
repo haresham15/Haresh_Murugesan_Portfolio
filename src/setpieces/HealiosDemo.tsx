@@ -51,9 +51,9 @@ export const HealiosDemo: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#F4F6F9]/10 gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-[#C8D2E0]" />
-            <span className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold">
-              Explainable AI (XAI) Architecture
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C8D2E0]" />
+            <span className="text-xs font-sans text-[#FF2800] font-medium">
+              Explainable AI architecture
             </span>
           </div>
           <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F4F6F9] tracking-tight">
@@ -108,7 +108,7 @@ export const HealiosDemo: React.FC = () => {
 
           {/* Saliency Heatmap Layer (Clipped by Lens Slider) */}
           <div
-            className="absolute inset-0 w-full h-full pointer-events-none transition-all duration-75"
+            className="absolute inset-0 w-full h-full pointer-events-none transition-[clip-path] duration-75 ease-out"
             style={{
               clipPath: `polygon(0 0, ${lensPosition}% 0, ${lensPosition}% 100%, 0 100%)`,
             }}
@@ -176,8 +176,8 @@ export const HealiosDemo: React.FC = () => {
         <div className="xl:col-span-5 flex flex-col justify-between space-y-4">
           
           <div className="space-y-2.5">
-            <p className="text-xs font-mono uppercase tracking-widest text-[#7E8B9B]">
-              Vectorized Pipeline Inspection
+            <p className="text-xs font-sans text-[#7E8B9B] font-medium">
+              Vectorized pipeline inspection
             </p>
 
             {stages.map((stage) => {
@@ -187,7 +187,7 @@ export const HealiosDemo: React.FC = () => {
                   key={stage.id}
                   type="button"
                   onClick={() => handleStageSelect(stage.id)}
-                  className={`w-full text-left p-3 rounded-[2px] border transition-all ${
+                  className={`w-full text-left p-3 rounded-[2px] border transition-colors ${
                     isSelected
                       ? 'bg-[#0B1E40] border-[#FF2800] shadow-sm'
                       : 'bg-white/[0.02] border-white/5 hover:border-white/15'

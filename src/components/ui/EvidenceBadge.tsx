@@ -26,7 +26,7 @@ export const EvidenceBadge: React.FC<EvidenceBadgeProps> = ({
         onMouseLeave={() => setShowTooltip(false)}
         onFocus={() => setShowTooltip(true)}
         onBlur={() => setShowTooltip(false)}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#7DD3FC]/10 border border-[#7DD3FC]/30 text-xs font-mono text-[#7DD3FC] hover:bg-[#7DD3FC]/20 hover:border-[#7DD3FC]/50 transition-all text-left"
+        className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-[2px] bg-[#7DD3FC]/10 border border-[#7DD3FC]/30 text-xs font-mono text-[#7DD3FC] hover:bg-[#7DD3FC]/20 hover:border-[#7DD3FC]/50 transition-colors text-left"
         aria-label={`Evidence metric: ${displayLabel} ${displayValue}`}
       >
         <span className="w-1.5 h-1.5 rounded-full bg-[#7DD3FC]" />

@@ -5,11 +5,13 @@ import Link from 'next/link';
 export interface GridCrosshairProps {
   className?: string;
   size?: number;
+  active?: boolean;
 }
 
 export const GridCrosshair: React.FC<GridCrosshairProps> = ({
   className = '',
   size = 9,
+  active = false,
 }) => {
   return (
     <svg
@@ -18,7 +20,7 @@ export const GridCrosshair: React.FC<GridCrosshairProps> = ({
       viewBox="0 0 9 9"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`text-[#F3EFE7]/30 select-none pointer-events-none ${className}`}
+      className={`${active ? 'text-[#FF2800]' : 'text-[#F3EFE7]/30'} select-none pointer-events-none ${className}`}
       aria-hidden="true"
     >
       <line x1="4.5" y1="0" x2="4.5" y2="9" stroke="currentColor" strokeWidth="1" />

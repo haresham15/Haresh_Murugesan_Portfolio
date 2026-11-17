@@ -195,6 +195,7 @@ export const PlateStage: React.FC<PlateStageProps> = ({
       id={panelId}
       role={role}
       aria-labelledby={labelledBy}
+      data-cursor={systemKey === 'healios' ? 'lens' : undefined}
       className={`relative flex-1 min-h-0 w-full overflow-hidden cursor-crosshair ${className}`}
       style={{
         touchAction: 'pan-y',

@@ -145,8 +145,8 @@ export const ApexisDemo: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="w-2 h-2 rounded-full bg-[#4CC38A]" />
-            <span className="text-xs font-mono uppercase tracking-widest text-[#FF2800] font-semibold">
-              Live Architecture Inspection
+            <span className="text-xs font-sans text-[#FF2800] font-medium">
+              Live architecture inspection
             </span>
           </div>
           <h3 className="text-xl sm:text-2xl font-raleway font-bold text-[#F4F6F9] tracking-tight">
@@ -185,7 +185,7 @@ export const ApexisDemo: React.FC = () => {
                 key={mult}
                 type="button"
                 onClick={() => handleSpeedChange(mult)}
-                className={`px-2 py-1 rounded-[2px] transition-all ${
+                className={`px-2 py-1 rounded-[2px] transition-colors ${
                   speedMultiplier === mult
                     ? 'bg-[#FF2800] text-[#060A12] font-semibold'
                     : 'text-[#7E8B9B] hover:text-[#F4F6F9]'
@@ -247,9 +247,9 @@ export const ApexisDemo: React.FC = () => {
                   className="cursor-pointer transition-transform"
                   onClick={() => setSelectedCarId(car.id)}
                 >
-                  {/* Selected Ping Ring */}
+                  {/* Selected Focus Ring */}
                   {isSelected && (
-                    <circle r="12" stroke={car.color} strokeWidth="1.5" opacity="0.6" className="animate-ping" />
+                    <circle r="11" stroke={car.color} strokeWidth="1.5" opacity="0.6" strokeDasharray="3 2" />
                   )}
                   {/* Car Node */}
                   <circle
@@ -347,13 +347,13 @@ export const ApexisDemo: React.FC = () => {
             {/* Gauges: Speed & Gear */}
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
               <div className="p-2.5 rounded-[2px] bg-[#060A12] border border-[#F4F6F9]/10">
-                <span className="text-[#7E8B9B] block text-[10px]">CURRENT SPEED</span>
+                <span className="text-[#7E8B9B] block text-[10px]">Current speed</span>
                 <span className="text-2xl font-bold text-[#F4F6F9]">{selectedCar.speed}</span>
                 <span className="text-[#7E8B9B] ml-1">km/h</span>
               </div>
 
               <div className="p-2.5 rounded-[2px] bg-[#060A12] border border-[#F4F6F9]/10">
-                <span className="text-[#7E8B9B] block text-[10px]">GEARBOX</span>
+                <span className="text-[#7E8B9B] block text-[10px]">Gearbox</span>
                 <span className="text-2xl font-bold text-[#FF2800]">G{selectedCar.gear}</span>
                 <span className="text-[#7E8B9B] ml-1">Tire: {selectedCar.tireWear}%</span>
               </div>
@@ -362,20 +362,20 @@ export const ApexisDemo: React.FC = () => {
             {/* Pedals: Throttle & Brake Progress */}
             <div className="space-y-1.5 text-[10px] font-mono">
               <div className="flex items-center justify-between">
-                <span className="text-[#34D399]">THROTTLE ({(selectedCar.throttle * 100).toFixed(0)}%)</span>
+                <span className="text-[#34D399]">Throttle ({(selectedCar.throttle * 100).toFixed(0)}%)</span>
                 <div className="w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
                   <div
-                    className="h-full bg-[#34D399] transition-all duration-75"
+                    className="h-full bg-[#34D399] transition-[width] duration-75"
                     style={{ width: `${selectedCar.throttle * 100}%` }}
                   />
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-[#F87171]">BRAKE ({(selectedCar.brake * 100).toFixed(0)}%)</span>
+                <span className="text-[#F87171]">Brake ({(selectedCar.brake * 100).toFixed(0)}%)</span>
                 <div className="w-32 h-1.5 rounded-full bg-white/10 overflow-hidden">
                   <div
-                    className="h-full bg-[#F87171] transition-all duration-75"
+                    className="h-full bg-[#F87171] transition-[width] duration-75"
                     style={{ width: `${selectedCar.brake * 100}%` }}
                   />
                 </div>
@@ -390,7 +390,7 @@ export const ApexisDemo: React.FC = () => {
                 key={car.id}
                 type="button"
                 onClick={() => setSelectedCarId(car.id)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-mono border transition-all ${
+                className={`px-2.5 py-1 rounded-[2px] text-xs font-mono border transition-colors ${
                   car.id === selectedCarId
                     ? 'bg-white/20 text-white border-white'
                     : 'bg-white/5 text-[#A6ADB8] border-white/5 hover:text-white'

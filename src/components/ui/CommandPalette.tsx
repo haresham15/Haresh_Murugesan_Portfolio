@@ -107,7 +107,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       title: `${exp.role} @ ${exp.company}`,
       subtitle: `${exp.period} • ${exp.skillsDemonstrated.slice(0, 3).join(', ')}`,
       category: 'Experience' as const,
-      href: '/#experience',
+      href: `/experience/${exp.id}`,
       badge: exp.type,
     })),
 
